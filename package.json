@@ -1,0 +1,30 @@
+{
+  "name": "web-rsc-dev-league",
+  "version": "1.0.0",
+  "description": "The RSC \"Dev League\" is an additional league run concurrently with the regular RSC season. This league gives Free Agents the opportunity to play and earn stats throughout the regular season while they await an opportunity to play on a roster.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RSC-NA/web-rsc-dev-league.git"
+  },
+  "author": "Eric Ryan Harrison",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RSC-NA/web-rsc-dev-league/issues"
+  },
+  "homepage": "https://github.com/RSC-NA/web-rsc-dev-league#readme",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
