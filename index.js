@@ -74,7 +74,7 @@ app.get('/oauth2', (req, res) => {
 		res.send(error);
 	});
 });
-grant_type=authorization_code&client_id=1006600605265055876&client_secret=ZS_VzAka7l8JreNB8K-1JL7gdbA6yka3&code=KAPTOFh5g1G5fv9RRM0hF7x6qIiQ8t
+//grant_type=authorization_code&client_id=1006600605265055876&client_secret=ZS_VzAka7l8JreNB8K-1JL7gdbA6yka3&code=KAPTOFh5g1G5fv9RRM0hF7x6qIiQ8t
 app.get('/callback', (req, res) => {
 	res.json(req.body);
 });
