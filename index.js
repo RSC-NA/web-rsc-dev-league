@@ -41,7 +41,20 @@ app.get('/oauth2', (req, res) => {
 	const requestToken = req.query.code;
 	const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
 
-	res.send(requestToken);
+	axios.post(tokenUrl, {
+		grant_type: 'authorization_code',
+		client_id: process.env.DISCORD_CLIENT_ID,
+		client_secret: process.env.DISCORD_CLIENT_SECRET,
+		code: requestToken,
+		scope: 'identify',
+	}).then((response) => {
+		res.send(response);
+	}).catch((error) => {
+		res.send(error);
+	});
+
+
+	//res.send(requestToken);
 	// axios.post(tokenUrl, {
 	// 	"grant_type": "authorization_code", 
 	// 	"client_id": process.env.DISCORD_CLIENT_ID,
