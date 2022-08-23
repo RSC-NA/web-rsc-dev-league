@@ -55,10 +55,10 @@ app.get('/oauth2', (req, res) => {
 		headers: {
 			accept: "application/json",
 		}
-	}).then((res) => {
+	}).then((response) => {
 
-		oauth.getUser(res.data.access_token).then((response) => {
-			res.json(res.data);
+		oauth.getUser(response.data.access_token).then((discord_response) => {
+			res.json(discord_response.data);
 		});
 
 		// axios({
