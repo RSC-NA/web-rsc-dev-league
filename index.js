@@ -7,6 +7,8 @@ const mysql = require('mysql2');
 const DiscordOauth2 = require('discord-oauth2');
 const oauth = new DiscordOauth2();
 
+const axios = require('axios');
+
 require('dotenv').config();
 
 app.use( express.urlencoded({ extended: true }) );
@@ -32,13 +34,16 @@ app.get('/', (req, res) => {
 });
 
 app.get('/oauth2', (req, res) => {
-	oauth.tokenRequest({
-		clientId: process.env.DISCORD_CLIENT_ID,
-		clientSecret: process.env.DISCORD_CLIENT_SECRET,
-		code: req.query.code,
-		scope: "identify",
-		grantType: "authorization_code",
-		redirectUrl: "https://rsc-devleague.herokuapp.com/callback",
+	const requestToken = req.query.code;
+
+	axios({
+		method: 'post',
+		url: `https://discord.com/api/v10/oauth2/token?client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}`,
+		headers: {
+			accept: "application/json",
+		}
+	}).then((res) => {
+		res.json(res.data);
 	});
 });
 
