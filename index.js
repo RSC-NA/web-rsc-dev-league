@@ -43,7 +43,7 @@ app.get('/oauth2', (req, res) => {
 	axios({
 		method: 'post',
 		url: tokenUrl,
-		data: `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/oauth2&scope=identify`,
+		data: `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/callback&scope=identify`,
 		// data: {
 		// 	"grant_type": "authorization_code", 
 		// 	"client_id": process.env.DISCORD_CLIENT_ID,
