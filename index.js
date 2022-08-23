@@ -53,7 +53,7 @@ app.get('/oauth2', (req, res) => {
 		scope: 'identify',
 		grantType: 'authorization_code',
 		redirectUri: 'https://rsc-devleague.herokuapp.com/oauth2',
-	}).then(res.json);
+	}).then(res.json).catch(res.send);
 
 
 
