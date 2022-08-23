@@ -63,6 +63,9 @@ app.get('/oauth2', async (req, res) => {
 	const response = await fetch(tokenUrl, {
 		method: 'POST',
 		body: params,
+		headers: {
+			Authorization: `Basic ${creds}`,
+		}
 	});
 	const data = await response.json();
 	res.json(data);
