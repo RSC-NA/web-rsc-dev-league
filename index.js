@@ -4,6 +4,9 @@ const session = require('express-session');
 
 const mysql = require('mysql2');
 
+const DiscordOauth2 = require('discord-oauth2');
+const oauth = new DiscordOauth2();
+
 require('dotenv').config();
 
 app.use( express.urlencoded({ extended: true }) );
@@ -29,6 +32,17 @@ app.get('/', (req, res) => {
 });
 
 app.get('/oauth2', (req, res) => {
+	oauth.tokenRequest({
+		clientId: process.env.DISCORD_CLIENT_ID,
+		clientSecret: process.env.DISCORD_CLIENT_SECRET,
+		code: req.query.code,
+		scope: "identify",
+		grantType: "authorization_code",
+		redirectUrl: "https://rsc-devleague.herokuapp.com/callback",
+	}).then(console.log);
+});
+
+app.get('/callback', (req, res) => {
 	res.json(req.body);
 });
 
