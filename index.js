@@ -46,13 +46,24 @@ app.get('/oauth2', (req, res) => {
 		'Content-type': 'application/x-www-form-urlencoded',
 	};
 
-	axios.post(tokenUrl, data, {
-		headers: headers
-	}).then((response) => {
-		res.send(response);
-	}).catch(error => {
-		res.send(error);
-	});
+	oauth.tokenRequest({
+		clientId: process.env.DISCORD_CLIENT_ID,
+		clientSecret: process.env.DISCORD_CLIENT_SECRET,
+		code: requestToken,
+		scope: 'identify',
+		grantType: 'authorization_code',
+		redirectUri: 'https://rsc-devleague.herokuapp.com/oauth2',
+	}).then(res.json);
+
+
+
+	// axios.post(tokenUrl, data, {
+	// 	headers: headers
+	// }).then((response) => {
+	// 	res.send(response);
+	// }).catch(error => {
+	// 	res.send(error);
+	// });
 
 
 	//res.send(requestToken);
