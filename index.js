@@ -39,7 +39,7 @@ app.get('/oauth2', (req, res) => {
 		scope: "identify",
 		grantType: "authorization_code",
 		redirectUrl: "https://rsc-devleague.herokuapp.com/callback",
-	}).then(console.log);
+	});
 });
 
 app.get('/callback', (req, res) => {
