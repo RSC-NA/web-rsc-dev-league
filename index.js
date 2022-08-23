@@ -40,50 +40,52 @@ app.get('/', (req, res) => {
 app.get('/oauth2', (req, res) => {
 	const requestToken = req.query.code;
 	const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
-	axios.post(tokenUrl, {
-		"grant_type": "authorization_code", 
-		"client_id": process.env.DISCORD_CLIENT_ID,
-		"client_secret": process.env.DISCORD_CLIENT_SECRET,
-		"code": requestToken,
-		"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
-		"scope": "identify",
-	}).then((data) => {
-		res.send(data);
-	})
-	// 	{
-	// 	method: 'post',
-	// 	url: tokenUrl,
-	// 	data: `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/callback&scope=identify`,
-	// 	data: {
-	// 		"grant_type": "authorization_code", 
-	// 		"client_id": process.env.DISCORD_CLIENT_ID,
-	// 		"client_secret": process.env.DISCORD_CLIENT_SECRET,
-	// 		"code": requestToken,
-	// 		"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
-	// 		"scope": "identify",
-	// 	},
-	// 	headers: {
-	// 		accept: "application/json",
-	// 	}
-	// }).then((response) => {
 
-	// 	oauth.getUser(response.data.access_token).then((discord_response) => {
-	// 		res.json(discord_response.data);
-	// 	});
+	res.send(requestToken);
+	// axios.post(tokenUrl, {
+	// 	"grant_type": "authorization_code", 
+	// 	"client_id": process.env.DISCORD_CLIENT_ID,
+	// 	"client_secret": process.env.DISCORD_CLIENT_SECRET,
+	// 	"code": requestToken,
+	// 	"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
+	// 	"scope": "identify",
+	// }).then((data) => {
+	// 	res.send(data);
+	// })
+	// // 	{
+	// // 	method: 'post',
+	// // 	url: tokenUrl,
+	// // 	data: `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/callback&scope=identify`,
+	// // 	data: {
+	// // 		"grant_type": "authorization_code", 
+	// // 		"client_id": process.env.DISCORD_CLIENT_ID,
+	// // 		"client_secret": process.env.DISCORD_CLIENT_SECRET,
+	// // 		"code": requestToken,
+	// // 		"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
+	// // 		"scope": "identify",
+	// // 	},
+	// // 	headers: {
+	// // 		accept: "application/json",
+	// // 	}
+	// // }).then((response) => {
 
-	// 	// axios({
-	// 	// 	method: 'get',
-	// 	// 	url: 'https://discord.com/api/v10/users/@me',
-	// 	// 	data: {
+	// // 	oauth.getUser(response.data.access_token).then((discord_response) => {
+	// // 		res.json(discord_response.data);
+	// // 	});
+
+	// // 	// axios({
+	// // 	// 	method: 'get',
+	// // 	// 	url: 'https://discord.com/api/v10/users/@me',
+	// // 	// 	data: {
 				
-	// 	// 	}
-	// 	// });
+	// // 	// 	}
+	// // 	// });
 
-		//res.json(res.data);
-	.catch((error) => {
-		console.log(error);
-		res.send(error);
-	});
+	// 	//res.json(res.data);
+	// .catch((error) => {
+	// 	console.log(error);
+	// 	res.send(error);
+	// });
 });
 //grant_type=authorization_code&client_id=1006600605265055876&client_secret=ZS_VzAka7l8JreNB8K-1JL7gdbA6yka3&code=KAPTOFh5g1G5fv9RRM0hF7x6qIiQ8t
 app.get('/callback', (req, res) => {
