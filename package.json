@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/RSC-NA/web-rsc-dev-league#readme",
   "dependencies": {
+    "atob": "^2.1.2",
     "axios": "^0.27.2",
     "btoa": "^1.2.1",
     "discord-oauth2": "^2.10.0",
