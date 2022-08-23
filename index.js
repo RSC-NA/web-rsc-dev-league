@@ -13,10 +13,8 @@ const oauth = new DiscordOauth2({
 
 const axios = require('axios');
 
-//const fetch = require('node-fetch');
-//const btoa = require('btoa');
-//const { catchAsync } = require('../utils');
-
+const btoa = require('btoa');
+const atob = require('atob');
 
 require('dotenv').config();
 
@@ -30,7 +28,9 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-	res.locals.discordIdent = req.session.discordIdent;
+	res.locals.nickname = req.session.nickname;
+	res.locals.discord_id = req.session.discord_id;
+
 	next();
 });
 
@@ -39,98 +39,33 @@ app.use( express.static('static') );
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
+	// TODO(load template)
 	res.send('Hello RSC! <a href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify">Login With Discord</a>');
 });
 
-app.get('/league', (req, res) => {
-	res.render('league');
+app.get('/process_login', (req, res) => {
+	if ( ! req.query.rsc ) {
+		res.redirect('/');
+	}
+
+	let token = atob(req.query.rsc).split(':');
+
+	// 1. check DB for existing user, if it exists, create session and redirect
+	let nickname = token[0] + ':' + token[1];
+	let discord_id = token[2];
+
+	res.send(nickname + ' - ' + discord_id);
+	// 2. If it doesn't exist, create account, session, redirect
+});
+
+app.get('/login', (req, res) => {
+	res.render('login');
 });
 
 app.get('/oauth2', async (req, res) => {
-	res.render('league');
-	//res.redirect('league?token=' + requestToken)
-	// const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
-	// let url = encodeURIComponent('https://rsc-devleague.herokuapp.com/callback');
-	// //let data = `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=${url}&scope=identify`;
-	// let params = {
-	// 	grant_type: 'authorization_code',
-	// 	client_id: process.env.DISCORD_CLIENT_ID,
-	// 	client_secret: process.env.DISCORD_CLIENT_SECRET,
-	// 	code: requestToken,
-	// 	redirectUri: url,
-	// 	scope: 'identify',
-	// };
-	// let headers = {
-	// 	'Content-type': 'application/x-www-form-urlencoded',
-	// };
-
-	// const creds = btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`);
-	// const response = await fetch(tokenUrl, {
-	// 	method: 'POST',
-	// 	body: params,
-	// 	headers: {
-	// 		Authorization: `Basic ${creds}`,
-	// 	}
-	// });
-	// const data = await response.json();
-	// res.json(data);
-
-	// axios.post(tokenUrl, data, {
-	// 	headers: headers
-	// }).then((response) => {
-	// 	res.send(response);
-	// }).catch(error => {
-	// 	res.send(error);
-	// });
-
-
-	//res.send(requestToken);
-	// axios.post(tokenUrl, {
-	// 	"grant_type": "authorization_code", 
-	// 	"client_id": process.env.DISCORD_CLIENT_ID,
-	// 	"client_secret": process.env.DISCORD_CLIENT_SECRET,
-	// 	"code": requestToken,
-	// 	"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
-	// 	"scope": "identify",
-	// }).then((data) => {
-	// 	res.send(data);
-	// })
-	// // 	{
-	// // 	method: 'post',
-	// // 	url: tokenUrl,
-	// // 	data: `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/callback&scope=identify`,
-	// // 	data: {
-	// // 		"grant_type": "authorization_code", 
-	// // 		"client_id": process.env.DISCORD_CLIENT_ID,
-	// // 		"client_secret": process.env.DISCORD_CLIENT_SECRET,
-	// // 		"code": requestToken,
-	// // 		"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
-	// // 		"scope": "identify",
-	// // 	},
-	// // 	headers: {
-	// // 		accept: "application/json",
-	// // 	}
-	// // }).then((response) => {
-
-	// // 	oauth.getUser(response.data.access_token).then((discord_response) => {
-	// // 		res.json(discord_response.data);
-	// // 	});
-
-	// // 	// axios({
-	// // 	// 	method: 'get',
-	// // 	// 	url: 'https://discord.com/api/v10/users/@me',
-	// // 	// 	data: {
-				
-	// // 	// 	}
-	// // 	// });
-
-	// 	//res.json(res.data);
-	// .catch((error) => {
-	// 	console.log(error);
-	// 	res.send(error);
-	// });
+	res.render('login');
 });
-//grant_type=authorization_code&client_id=1006600605265055876&client_secret=ZS_VzAka7l8JreNB8K-1JL7gdbA6yka3&code=KAPTOFh5g1G5fv9RRM0hF7x6qIiQ8t
+
 app.get('/callback', (req, res) => {
 	res.json(req.body);
 });
