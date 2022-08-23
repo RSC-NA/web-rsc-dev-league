@@ -41,15 +41,16 @@ app.get('/oauth2', (req, res) => {
 	const requestToken = req.query.code;
 	const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
 
-	axios.post(tokenUrl, {
-		grant_type: 'authorization_code',
-		client_id: process.env.DISCORD_CLIENT_ID,
-		client_secret: process.env.DISCORD_CLIENT_SECRET,
-		code: requestToken,
-		scope: 'identify',
+	let data = `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/callback&scope=identify`;
+	let headers = {
+		'Content-type': 'application/x-www-form-urlencoded',
+	};
+
+	axios.post(tokenUrl, data, {
+		headers: headers
 	}).then((response) => {
 		res.send(response);
-	}).catch((error) => {
+	}).catch(error => {
 		res.send(error);
 	});
 
