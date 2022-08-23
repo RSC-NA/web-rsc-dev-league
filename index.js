@@ -5,7 +5,11 @@ const session = require('express-session');
 const mysql = require('mysql2');
 
 const DiscordOauth2 = require('discord-oauth2');
-const oauth = new DiscordOauth2();
+const oauth = new DiscordOauth2({
+	clientId: process.env.DISCORD_CLIENT_ID,
+	clientSecret: process.env.DISCORD_CLIENT_SECRET,
+	redirectUri: 'https://rsc-devleague.herokuapp.com/oauth2'
+});
 
 const axios = require('axios');
 
@@ -35,21 +39,42 @@ app.get('/', (req, res) => {
 
 app.get('/oauth2', (req, res) => {
 	const requestToken = req.query.code;
-
+	const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
 	axios({
 		method: 'post',
-		url: `https://discord.com/api/v10/oauth2/token?client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}`,
+		url: tokenUrl,
+		data: {
+			"grant_type": "authorization_code"
+			"client_id": process.env.DISCORD_CLIENT_ID,
+			"client_secret": process.env.DISCORD_CLIENT_SECRET,
+			"code": requestToken,
+			"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
+			"scope": "identify",
+		}
 		headers: {
 			accept: "application/json",
 		}
 	}).then((res) => {
-		res.json(res.data);
+
+		oauth.getUser(res.data.access_token).then((response) => {
+			res.json(res.data);
+		});
+
+		// axios({
+		// 	method: 'get',
+		// 	url: 'https://discord.com/api/v10/users/@me',
+		// 	data: {
+				
+		// 	}
+		// });
+
+		//res.json(res.data);
 	}).catch((error) => {
 		console.log(error);
 		res.send(error);
 	});
 });
-
+grant_type=authorization_code&client_id=1006600605265055876&client_secret=ZS_VzAka7l8JreNB8K-1JL7gdbA6yka3&code=KAPTOFh5g1G5fv9RRM0hF7x6qIiQ8t
 app.get('/callback', (req, res) => {
 	res.json(req.body);
 });
