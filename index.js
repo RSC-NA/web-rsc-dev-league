@@ -51,7 +51,7 @@ app.get('/process_login', (req, res) => {
 	let token = atob(req.query.rsc).split(':');
 
 	// 1. check DB for existing user, if it exists, create session and redirect
-	let nickname = token[0] + ':' + token[1];
+	let nickname = token[0] + '#' + token[1];
 	let discord_id = token[2];
 
 	res.send(nickname + ' - ' + discord_id);
