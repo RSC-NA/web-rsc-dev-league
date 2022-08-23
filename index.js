@@ -40,30 +40,19 @@ app.get('/', (req, res) => {
 app.get('/oauth2', (req, res) => {
 	const requestToken = req.query.code;
 	const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
-
-	let data = `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=https://rsc-devleague.herokuapp.com/callback&scope=identify`;
+	let url = encodeURIComponent('https://rsc-devleague.herokuapp.com/callback');
+	let data = `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=${url}&scope=identify`;
 	let headers = {
 		'Content-type': 'application/x-www-form-urlencoded',
 	};
 
-	oauth.tokenRequest({
-		clientId: process.env.DISCORD_CLIENT_ID,
-		clientSecret: process.env.DISCORD_CLIENT_SECRET,
-		code: requestToken,
-		scope: 'identify',
-		grantType: 'authorization_code',
-		redirectUri: 'https://rsc-devleague.herokuapp.com/oauth2',
-	}).then(res.json).catch(res.send);
-
-
-
-	// axios.post(tokenUrl, data, {
-	// 	headers: headers
-	// }).then((response) => {
-	// 	res.send(response);
-	// }).catch(error => {
-	// 	res.send(error);
-	// });
+	axios.post(tokenUrl, data, {
+		headers: headers
+	}).then((response) => {
+		res.send(response);
+	}).catch(error => {
+		res.send(error);
+	});
 
 
 	//res.send(requestToken);
