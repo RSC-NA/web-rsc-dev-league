@@ -39,36 +39,42 @@ app.use( express.static('static') );
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-	res.send('Hello RSC! <a href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=code&scope=identify">Login With Discord</a>');
+	res.render('Hello RSC! <a href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify">Login With Discord</a>');
+});
+
+app.get('/league', (req, res) => {
+	res.render('league');
 });
 
 app.get('/oauth2', async (req, res) => {
 	const requestToken = req.query.code;
-	const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
-	let url = encodeURIComponent('https://rsc-devleague.herokuapp.com/callback');
-	//let data = `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=${url}&scope=identify`;
-	let params = {
-		grant_type: 'authorization_code',
-		client_id: process.env.DISCORD_CLIENT_ID,
-		client_secret: process.env.DISCORD_CLIENT_SECRET,
-		code: requestToken,
-		redirectUri: url,
-		scope: 'identify',
-	};
-	let headers = {
-		'Content-type': 'application/x-www-form-urlencoded',
-	};
+	res.send(requestToken);
+	//res.redirect('league?token=' + requestToken)
+	// const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
+	// let url = encodeURIComponent('https://rsc-devleague.herokuapp.com/callback');
+	// //let data = `grant_type=authorization_code&client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&code=${requestToken}&redirect_uri=${url}&scope=identify`;
+	// let params = {
+	// 	grant_type: 'authorization_code',
+	// 	client_id: process.env.DISCORD_CLIENT_ID,
+	// 	client_secret: process.env.DISCORD_CLIENT_SECRET,
+	// 	code: requestToken,
+	// 	redirectUri: url,
+	// 	scope: 'identify',
+	// };
+	// let headers = {
+	// 	'Content-type': 'application/x-www-form-urlencoded',
+	// };
 
-	const creds = btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`);
-	const response = await fetch(tokenUrl, {
-		method: 'POST',
-		body: params,
-		headers: {
-			Authorization: `Basic ${creds}`,
-		}
-	});
-	const data = await response.json();
-	res.json(data);
+	// const creds = btoa(`${process.env.DISCORD_CLIENT_ID}:${process.env.DISCORD_CLIENT_SECRET}`);
+	// const response = await fetch(tokenUrl, {
+	// 	method: 'POST',
+	// 	body: params,
+	// 	headers: {
+	// 		Authorization: `Basic ${creds}`,
+	// 	}
+	// });
+	// const data = await response.json();
+	// res.json(data);
 
 	// axios.post(tokenUrl, data, {
 	// 	headers: headers
