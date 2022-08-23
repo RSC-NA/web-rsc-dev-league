@@ -44,7 +44,7 @@ app.get('/oauth2', (req, res) => {
 		method: 'post',
 		url: tokenUrl,
 		data: {
-			"grant_type": "authorization_code"
+			"grant_type": "authorization_code", 
 			"client_id": process.env.DISCORD_CLIENT_ID,
 			"client_secret": process.env.DISCORD_CLIENT_SECRET,
 			"code": requestToken,
