@@ -4,15 +4,6 @@ const session = require('express-session');
 
 const mysql = require('mysql2');
 
-const DiscordOauth2 = require('discord-oauth2');
-const oauth = new DiscordOauth2({
-	clientId: process.env.DISCORD_CLIENT_ID,
-	clientSecret: process.env.DISCORD_CLIENT_SECRET,
-	redirectUri: 'https://rsc-devleague.herokuapp.com/oauth2'
-});
-
-const axios = require('axios');
-
 const btoa = require('btoa');
 const atob = require('atob');
 
