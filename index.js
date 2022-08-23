@@ -47,8 +47,7 @@ app.get('/league', (req, res) => {
 });
 
 app.get('/oauth2', async (req, res) => {
-	const requestToken = req.query.code;
-	res.send(requestToken);
+	res.render('league');
 	//res.redirect('league?token=' + requestToken)
 	// const tokenUrl = 'https://discord.com/api/v10/oauth2/token';
 	// let url = encodeURIComponent('https://rsc-devleague.herokuapp.com/callback');
