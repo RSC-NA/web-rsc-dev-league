@@ -50,7 +50,7 @@ app.get('/oauth2', (req, res) => {
 			"code": requestToken,
 			"redirect_uri": "https://rsc-devleague.herokuapp.com/oauth2",
 			"scope": "identify",
-		}
+		},
 		headers: {
 			accept: "application/json",
 		}
