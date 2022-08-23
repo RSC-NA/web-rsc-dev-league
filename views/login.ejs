@@ -21,7 +21,7 @@
 				if ( username && discriminator && id ) {
 					// redirect to login page
 					let userString = btoa(`${username}:${discriminator}:${id}`);
-					window.location.redirect('/process_login?rsc=' + userString);
+					window.location.href = '/process_login?rsc=' + userString;
 				}
 			})
 			.catch(console.error);
