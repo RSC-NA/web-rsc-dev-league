@@ -73,8 +73,6 @@ app.get('/process_login', (req, res) => {
 			}
 		}
 	);
-
-	res.send(nickname + ' - ' + discord_id);
 });
 
 app.get('/login', (req, res) => {
