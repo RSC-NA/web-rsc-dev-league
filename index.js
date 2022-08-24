@@ -45,8 +45,36 @@ app.get('/process_login', (req, res) => {
 	let nickname = token[0] + '#' + token[1];
 	let discord_id = token[2];
 
+	connection.query(
+		'SELECT id FROM players WHERE discord_id = ?',
+		[ discord_id ],
+		function(err, results) {
+			if ( err ) {
+				console.error(err);
+				throw err;
+			}
+
+			let exists = false;
+			if ( results.length ) {
+				exists = true;
+				res.redirect('/player/' + discord_id);
+			}
+
+			// user doesn't exist, create the account.
+			if ( ! exists ) {
+				connection.query(
+					'INSERT INTO players (nickname,discord_id) VALUES (?, ?)',
+					[ nickname, discord_id ],
+					function (err, results) {
+						if (err) throw err;
+						res.redirect('/player/' + discord_id);
+					}
+				);
+			}
+		}
+	);
+
 	res.send(nickname + ' - ' + discord_id);
-	// 2. If it doesn't exist, create account, session, redirect
 });
 
 app.get('/login', (req, res) => {
@@ -59,6 +87,17 @@ app.get('/oauth2', async (req, res) => {
 
 app.get('/callback', (req, res) => {
 	res.json(req.body);
+});
+
+const connection = mysql.createPool({
+	host: process.env.DB_HOST,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASS,
+	port: process.env.DB_PORT,
+	database: process.env.DB_SCHEMA,
+	waitForConnections: true,
+	connectionLimit: 10,
+	queueLimit: 0
 });
 
 app.listen( process.env.PORT || 3000 );
