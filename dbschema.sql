@@ -37,7 +37,7 @@ CREATE TABLE team_players (
 CREATE TABLE league_settings (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`season` INT UNSIGNED NOT NULL,
-	`contract_url` VARCHAR(255) NOT NULL 
+	`contract_url` VARCHAR(255) NOT NULL, 
 	`amateur` TINYINT NOT NULL DEFAULT 0,
 	`contender` TINYINT NOT NULL DEFAULT 0,
 	`prospect` TINYINT NOT NULL DEFAULT 0,
