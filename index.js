@@ -126,6 +126,27 @@ app.get('/check_in', (req, res) => {
 	}
 });
 
+app.get('/check_out', (req, res) => {
+	if ( req.session.discord_id && ! req.session.checked_in ) {
+		// TODO(get season and match day from somewhere)
+		let season = 15;
+		let match_day = 1;
+		connection.query(
+			'UPDATE signups SET active = 0 WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
+			[ req.session.user_id ],
+			function(err, results) {
+				if ( err ) throw err;
+
+				req.session.checked_in = false;
+
+				res.redirect('/');
+			}
+		);
+	} else {
+		res.redirect('/');
+	}
+});
+
 app.get('/process_gameday', (req, res) => {
 	res.render('template');
 });
