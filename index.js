@@ -57,6 +57,8 @@ app.get('/process_login', (req, res) => {
 			let exists = false;
 			if ( results.length ) {
 				exists = true;
+				req.session.nickname = nickname;
+				req.session.discord_id = discord_id;
 				res.redirect('/player/' + discord_id);
 			}
 
@@ -67,6 +69,8 @@ app.get('/process_login', (req, res) => {
 					[ nickname, discord_id ],
 					function (err, results) {
 						if (err) throw err;
+						req.session.nickname = nickname;
+						req.session.discord_id = discord_id;
 						res.redirect('/player/' + discord_id);
 					}
 				);
