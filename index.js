@@ -32,7 +32,7 @@ app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
 	// TODO(load template)
-	res.render('template');
+	res.render('dashboard');
 });
 
 app.get('/process_login', (req, res) => {
@@ -80,6 +80,14 @@ app.get('/process_login', (req, res) => {
 			}
 		}
 	);
+});
+
+app.get('/process_gameday', (req, res) => {
+	res.render('template');
+});
+
+app.get('/manage_league', (req, res) => {
+	res.render('template');
 });
 
 app.get('/login', (req, res) => {
