@@ -21,6 +21,7 @@ app.use(session({
 app.use((req, res, next) => {
 	res.locals.nickname = req.session.nickname;
 	res.locals.discord_id = req.session.discord_id;
+	res.locals.is_admin = req.session.is_admin;
 
 	next();
 });
@@ -46,7 +47,7 @@ app.get('/process_login', (req, res) => {
 	let discord_id = token[2];
 
 	connection.query(
-		'SELECT id FROM players WHERE discord_id = ?',
+		'SELECT id,admin FROM players WHERE discord_id = ?',
 		[ discord_id ],
 		function(err, results) {
 			if ( err ) {
@@ -59,6 +60,7 @@ app.get('/process_login', (req, res) => {
 				exists = true;
 				req.session.nickname = nickname;
 				req.session.discord_id = discord_id;
+				req.session.is_admin = results[0].admin ? true : false;
 				res.redirect('/player/' + discord_id);
 			}
 
@@ -71,6 +73,7 @@ app.get('/process_login', (req, res) => {
 						if (err) throw err;
 						req.session.nickname = nickname;
 						req.session.discord_id = discord_id;
+						req.session.is_admin = false;
 						res.redirect('/player/' + discord_id);
 					}
 				);
