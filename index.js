@@ -86,6 +86,20 @@ app.get('/login', (req, res) => {
 	res.render('login');
 });
 
+app.get('/logout', (req, res) => {
+	if ( req.session ) {
+		req.session.destroy(err => {
+			if ( err ) {
+				res.status(400).send('Unable to log out');
+			} else {
+				res.redirect('/');
+			}
+		});
+	} else {
+		res.redirect('/');
+	}
+});
+
 app.get('/oauth2', async (req, res) => {
 	res.render('login');
 });
