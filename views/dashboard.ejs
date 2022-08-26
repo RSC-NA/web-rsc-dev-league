@@ -1,13 +1,6 @@
 
 <%- include('partials/header.ejs'); %>
 
-	<main>
-		<p>Welcome to RSC!</p>
-		<% if ( nickname ) { %>
-			<%= nickname %>
-		<% } %>
-	</main>
-
 	<main class="container">
 		<div class="bg-light p-5 rounded">
 			<% if ( nickname ) { %>
@@ -23,9 +16,13 @@
 		<p>
 			Games run every Monday night on active game days at 8:30PM ET and are usually finished by 9:00PM
 			so that you can sub for active franchises if needed. If you wish to play tonight, please check in by clicking
-			the button below.
+			the button below (must be signed in with your Discord account).
 		</p>
+		<% if ( nickname ) { %>
 		<a class="btn btn-lg btn-primary" href="/check_in" role="button">Check In!</a>
+		<% } else { %>
+		<a class="btn btn-lg btn-primary" href="/https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify" role="button">Log In with Discord</a>
+		<% } %>
 		</div>
 	</main>
 

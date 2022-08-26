@@ -61,7 +61,8 @@ app.get('/process_login', (req, res) => {
 				req.session.nickname = nickname;
 				req.session.discord_id = discord_id;
 				req.session.is_admin = results[0].admin ? true : false;
-				res.redirect('/player/' + discord_id);
+				res.redirect('/');
+				//res.redirect('/player/' + discord_id);
 			}
 
 			// user doesn't exist, create the account.
@@ -74,7 +75,8 @@ app.get('/process_login', (req, res) => {
 						req.session.nickname = nickname;
 						req.session.discord_id = discord_id;
 						req.session.is_admin = false;
-						res.redirect('/player/' + discord_id);
+						res.redirect('/');
+						//res.redirect('/player/' + discord_id);
 					}
 				);
 			}
