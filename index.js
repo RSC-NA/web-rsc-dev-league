@@ -18,7 +18,7 @@ app.use(session({
 	saveUninitialized: true
 }));
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
 
 	res.locals.user_id = req.session.user_id;
 	res.locals.nickname = req.session.nickname;
@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 	res.locals.is_admin = req.session.is_admin;
 	res.locals.checked_in = false;
 	if ( req.session.user_id ) {
-		connection.query(
+		await connection.query(
 			'SELECT id,active FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
 			[ req.session.user_id ],
 			(err, results) => {
