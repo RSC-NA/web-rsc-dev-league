@@ -132,7 +132,7 @@ app.get('/check_out', (req, res) => {
 		let season = 15;
 		let match_day = 1;
 		connection.query(
-			'UPDATE signups SET active = 0 WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
+			'DELETE FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
 			[ req.session.user_id ],
 			function(err, results) {
 				if ( err ) throw err;
