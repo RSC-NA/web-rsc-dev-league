@@ -6,6 +6,7 @@ const mysql = require('mysql2');
 
 const btoa = require('btoa');
 const atob = require('atob');
+const e = require('express');
 
 require('dotenv').config();
 
@@ -18,7 +19,7 @@ app.use(session({
 	saveUninitialized: true
 }));
 
-app.use(async (req, res, next) => {
+app.use((req, res, next) => {
 
 	res.locals.user_id = req.session.user_id;
 	res.locals.nickname = req.session.nickname;
@@ -26,7 +27,7 @@ app.use(async (req, res, next) => {
 	res.locals.is_admin = req.session.is_admin;
 	res.locals.checked_in = false;
 	if ( req.session.user_id ) {
-		await connection.query(
+		connection.query(
 			'SELECT id,active FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
 			[ req.session.user_id ],
 			(err, results) => {
@@ -34,12 +35,14 @@ app.use(async (req, res, next) => {
 					req.session.checked_in = results[0].active;
 					res.locals.checked_in = req.session.checked_in;
 					next();
+				} else {
+					next();
 				}
 			}
 		);
+	} else {
+		next();
 	}
-
-	next();
 });
 
 // express setup
