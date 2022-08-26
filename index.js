@@ -19,9 +19,25 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
+
+	res.locals.user_id = req.session.user_id;
 	res.locals.nickname = req.session.nickname;
 	res.locals.discord_id = req.session.discord_id;
 	res.locals.is_admin = req.session.is_admin;
+	res.locals.checked_in = false;
+	if ( req.session.user_id ) {
+		connection.query(
+			'SELECT id,active FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
+			[ req.session.user_id ],
+			(err, results) => {
+				if ( results.length > 0 ) {
+					req.session.checked_in = results[0].active;
+					res.locals.checked_in = req.session.checked_in;
+					next();
+				}
+			}
+		);
+	}
 
 	next();
 });
@@ -60,6 +76,7 @@ app.get('/process_login', (req, res) => {
 				exists = true;
 				req.session.nickname = nickname;
 				req.session.discord_id = discord_id;
+				req.session.user_id = results[0].id;
 				req.session.is_admin = results[0].admin ? true : false;
 				res.redirect('/');
 				//res.redirect('/player/' + discord_id);
@@ -72,6 +89,7 @@ app.get('/process_login', (req, res) => {
 					[ nickname, discord_id ],
 					function (err, results) {
 						if (err) throw err;
+						req.session.user_id = results.insertId;
 						req.session.nickname = nickname;
 						req.session.discord_id = discord_id;
 						req.session.is_admin = false;
@@ -82,6 +100,27 @@ app.get('/process_login', (req, res) => {
 			}
 		}
 	);
+});
+
+app.get('/check_in', (req, res) => {
+	if ( req.session.discord_id && ! req.session.checked_in ) {
+		// TODO(get season and match day from somewhere)
+		let season = 15;
+		let match_day = 1;
+		connection.query(
+			'INSERT INTO signups (player_id, season, match_day) VALUES (?, ?, ?)',
+			[ req.session.user_id, season, match_day],
+			function(err, results) {
+				if ( err ) throw err;
+
+				req.session.checked_in = true;
+
+				res.redirect('/');
+			}
+		);
+	} else {
+		res.redirect('/');
+	}
 });
 
 app.get('/process_gameday', (req, res) => {
