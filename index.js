@@ -149,11 +149,25 @@ app.get('/check_out', (req, res) => {
 	}
 });
 
+app.get('/make_active/:signup_id', (req, res) => {
+	let query = 'UPDATE signups SET active = 1 WHERE id = ?';
+	connection.query(query, [ req.params.signup_id ], (err, results) => {
+		res.redirect('/process_gameday');
+	});
+});
+
+app.get('/make_inactive/:signup_id', (req, res) => {
+	let query = 'UPDATE signups SET active = 0 WHERE id = ?';
+	connection.query(query, [ req.params.signup_id ], (err, results) => {
+		res.redirect('/process_gameday');
+	});
+});
+
 app.get('/process_gameday', (req, res) => {
 
 	let signups_query = `
 	SELECT 
-		s.player_id,s.active,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
+		s.id,s.player_id,s.active,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
 	FROM 
 		signups AS s
 	LEFT JOIN players AS p 
