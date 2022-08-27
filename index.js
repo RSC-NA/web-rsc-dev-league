@@ -152,7 +152,7 @@ app.get('/process_gameday', (req, res) => {
 });
 
 app.get('/manage_league', (req, res) => {
-	res.render('template');
+	res.render('manage');
 });
 
 app.get('/login', (req, res) => {
