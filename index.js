@@ -27,6 +27,8 @@ app.use((req, res, next) => {
 	res.locals.nickname = req.session.nickname;
 	res.locals.discord_id = req.session.discord_id;
 	res.locals.is_admin = req.session.is_admin;
+	res.locals.user = req.session.user;
+
 	res.locals.checked_in = false;
 	if ( req.session.user_id ) {
 		connection.query(
@@ -68,7 +70,7 @@ app.get('/process_login', (req, res) => {
 	let discord_id = token[2];
 
 	connection.query(
-		'SELECT id,admin FROM players WHERE discord_id = ?',
+		'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
 		[ discord_id ],
 		function(err, results) {
 			if ( err ) {
@@ -82,6 +84,21 @@ app.get('/process_login', (req, res) => {
 				req.session.nickname = nickname;
 				req.session.discord_id = discord_id;
 				req.session.user_id = results[0].id;
+
+				let user = {
+					user_id: results[0].id,
+					nickname: nickname,
+					name: results[0].name,
+					mmr: results[0].mmr,
+					tier: results[0].tier,
+					status: results[0].status,
+					rsc_id: results[0].rsc_id,
+					discord_id: discord_id,
+					is_admin: results[0].admin ? true: false,
+				};
+
+				req.session.user = user;
+
 				req.session.is_admin = results[0].admin ? true : false;
 				res.redirect('/');
 				//res.redirect('/player/' + discord_id);
@@ -94,12 +111,26 @@ app.get('/process_login', (req, res) => {
 					[ nickname, discord_id ],
 					function (err, results) {
 						if (err) throw err;
-						req.session.user_id = results.insertId;
-						req.session.nickname = nickname;
-						req.session.discord_id = discord_id;
-						req.session.is_admin = false;
-						res.redirect('/');
-						//res.redirect('/player/' + discord_id);
+
+						connection.query(
+							'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
+							[ discord_id ],
+							(err, results) => {
+								let user = {
+									user_id: results[0].id,
+									nickname: nickname,
+									name: results[0].name,
+									mmr: results[0].mmr,
+									tier: results[0].tier,
+									status: results[0].status,
+									rsc_id: results[0].rsc_id,
+									discord_id: discord_id,
+									is_admin: results[0].admin ? true: false,
+								};
+				
+								req.session.user = user;
+								res.redirect('/');
+						});
 					}
 				);
 			}

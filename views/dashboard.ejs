@@ -25,7 +25,10 @@
 			</p>
 		</div>
 
-		<div class="bg-light p-5 ronded">
+		<div class="bg-light p-5 rounded">
+		<% 
+			if ( "rsc_id" in user ) {
+		%>
 		<% if ( nickname && ! checked_in ) { %>
 			<a class="btn btn-lg btn-primary" href="/check_in" role="button">Check In!</a>
 		<% } else if ( nickname && checked_in ) { %>
@@ -37,6 +40,13 @@
 			<a class="btn btn-lg btn-danger" href="/check_out" role="button">Check Out</a>
 		<% } else { %>
 			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify" role="button">Log In with Discord</a>
+		<% } %>
+		<% } else {// end of real player check %>
+			<h2>You are not an active player</h2>
+			<p>
+				This league is only available to valid members of RSC with an active contract. Please sign up for the league
+				at <a href="https://discord.gg/rsc" rel="nofollow">https://discord.gg/rsc</a>
+			</p>
 		<% } %>
 		</div>
 	</main>
