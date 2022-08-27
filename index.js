@@ -155,7 +155,21 @@ app.get('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
 	} 
-	res.render('manage');
+
+	let settings_query = `
+	SELECT 
+		id,season,contract_url,
+		amateur,contender,prospect,challenger,rival,
+		veteran,elite,master,premier
+	FROM 
+		league_settings 
+	ORDER by id DESC 
+	LIMIT 1
+	`;
+	connection.query(settings_query, (err, results) => { 
+		if (err) { throw err; }
+		res.render('manage', { settings: results[0] });
+	});
 	
 });
 

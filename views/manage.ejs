@@ -23,6 +23,13 @@
 				<span class="text-muted">Active Leagues</span>
 				<span class="badge badge-secondary badge-pill">3</span>
 			</h4>
+
+			<form class="card p-2" action="/import_contracts">
+				<div class="input-group">
+					<button type="submit" class="btn btn-primary">Import Contracts</button>
+				</div>
+			</form>
+
 			<ul class="list-group mb-3">
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
 					<div>
@@ -113,22 +120,18 @@
 				
 			</ul>
 
-			<form class="card p-2">
-				<div class="input-group">
-					<button type="submit" class="btn btn-primary">Import Contracts</button>
-				</div>
-			</form>
+			
 		</div>
 
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">League Settings</h4>
 			
-			<form class="needs-validation" novalidate>
+			<form class="needs-validation" novalidate action="/manage_league" method="post">
 
 			<div class="mb-3">
 				<label for="username">Season</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="season" placeholder="season" required>
+					<input type="text" class="form-control" name="season" id="season" placeholder="season" value="<%= settings.season %>" required>
 					<div class="invalid-feedback" style="width: 100%;">
 						Season is required
 					</div>
@@ -138,7 +141,7 @@
 			<div class="mb-3">
 				<label for="username">Contract Sheet</label>
 				<div class="input-group">
-					<input type="text" class="form-control" id="contract_url" placeholder="contract_url" required>
+					<input type="text" class="form-control" name="contract_url" id="contract_url" placeholder="contract_url" value="<%= settings.contract_url %>" required>
 					<div class="invalid-feedback" style="width: 100%;">
 						Contract sheet URL is required.
 					</div>
@@ -148,39 +151,39 @@
 			<hr class="mb-4">
 			
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="premier">
+				<input type="checkbox" class="custom-control-input" name="premier" id="premier">
 				<label class="custom-control-label" for="master">Premier</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="master">
+				<input type="checkbox" class="custom-control-input" name="master" id="master">
 				<label class="custom-control-label" for="master">Master</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="elite">
+				<input type="checkbox" class="custom-control-input" name="elite" id="elite">
 				<label class="custom-control-label" for="elite">Elite</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="veteran">
+				<input type="checkbox" class="custom-control-input" name="veteran" id="veteran">
 				<label class="custom-control-label" for="veteran">Veteran</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="rival">
+				<input type="checkbox" class="custom-control-input" name="rival" id="rival">
 				<label class="custom-control-label" for="rival">Rival</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="challenger">
+				<input type="checkbox" class="custom-control-input" name="challenger" id="challenger">
 				<label class="custom-control-label" for="challenger">Challenger</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="prospect">
+				<input type="checkbox" class="custom-control-input" name="prospect" id="prospect">
 				<label class="custom-control-label" for="prospect">Prospect</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="contender">
+				<input type="checkbox" class="custom-control-input" name="contender" id="contender">
 				<label class="custom-control-label" for="contender">Contender</label>
 			</div>
 			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" id="amateur">
+				<input type="checkbox" class="custom-control-input" name="amateur" id="amateur">
 				<label class="custom-control-label" for="amateur">Amateur</label>
 			</div>
 		
