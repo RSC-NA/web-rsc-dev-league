@@ -227,22 +227,41 @@ app.get('/manage_league', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	let settings_query = `
-	SELECT 
-		id,season,contract_url,
-		amateur,contender,prospect,challenger,rival,
-		veteran,elite,master,premier
-	FROM 
-		league_settings 
-	ORDER by id DESC 
-	LIMIT 1
-	`;
-	connection.query(settings_query, (err, results) => { 
-		if (err) { throw err; }
-		let contract_sheet_id = results[0].contract_url.split('/')[5];
-		res.render('manage', { settings: results[0], contract_sheet_id: contract_sheet_id });
+	let counts_query = 'select count(*) AS count,tier,status from contracts group by tier,status order by tier,status';
+	connection.query(counts_query, (err, results) => {
+		if ( err ) { throw err; }
+
+		let tiers = {};
+		for ( let i = 0; i < results.length; i++ ) {
+			if ( ! (results[i]['tier'] in tiers) ) {
+				tiers[ results[i]['tier'] ] = { total: 0, fa: 0 };
+			}
+
+			tiers[ results[i]['tier'] ]['total'] += results[i]['count'];
+
+			if ( results[i]['status'] == 'Free Agent' ) {
+				tiers[ results[i]['tier'] ]['fa'] += results[i]['count'];
+			}
+		}
+
+		let settings_query = `
+		SELECT 
+			id,season,contract_url,
+			amateur,contender,prospect,challenger,rival,
+			veteran,elite,master,premier
+		FROM 
+			league_settings 
+		ORDER by id DESC 
+		LIMIT 1
+		`;
+		connection.query(settings_query, (err, results) => { 
+			if (err) { throw err; }
+			let contract_sheet_id = results[0].contract_url.split('/')[5];
+			res.render('manage', { tiers: tiers, settings: results[0], contract_sheet_id: contract_sheet_id });
+		});
+
 	});
-	
+
 });
 
 app.post('/manage_league', (req, res) => {
