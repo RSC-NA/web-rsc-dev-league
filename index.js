@@ -175,7 +175,7 @@ app.get('/process_gameday', (req, res) => {
 					'sub': [],
 				};
 			}
-			if ( results[i]['status'] == 'Free Agent' ) {
+			if ( results[i]['status'] == 'Free Agent' || results[i]['active'] == 1 ) {
 				signups[ results[i]['tier'] ]['fa'].push(results[i]);
 			} else {
 				signups[ results[i]['tier'] ]['sub'].push(results[i]);
