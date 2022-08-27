@@ -154,6 +154,9 @@ app.get('/process_gameday', (req, res) => {
 });
 
 app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
 
 	// 1. create google sheets object
 	const doc = new GoogleSpreadsheet(req.params.contract_sheet_id);
@@ -216,20 +219,12 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 				res.redirect('/manage_league');
 		});
 	});
-	
-
-	//res.json(players);
-	//res.json(rows);
-
-	//res.send(doc.title);
-
-	// 4. store in database
 
 });
 
 app.get('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
-		//return res.redirect('/');
+		return res.redirect('/');
 	} 
 
 	let settings_query = `
@@ -252,7 +247,7 @@ app.get('/manage_league', (req, res) => {
 
 app.post('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
-		//return res.redirect('/');
+		return res.redirect('/');
 	} 
 
 	let amateur    = "amateur"    in req.body ? 1 : 0;
