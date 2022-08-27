@@ -153,7 +153,7 @@ app.get('/process_gameday', (req, res) => {
 
 app.get('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
-		res.redirect('/');
+		return res.redirect('/');
 	} 
 	res.render('manage');
 	
