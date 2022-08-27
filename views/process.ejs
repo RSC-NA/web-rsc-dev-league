@@ -77,13 +77,29 @@
 			<div class="mb-3">
 				<h5><%= tier %></h5>
 
-				<% if ( signups[tier]['sub'].length ) { %>
+				<% 
 
+				if ( signups[tier]['fa'].length ) { 
+					if ( signups[tier]['fa'].length + signups[tier]['sub'].length > 6 ) {
+						// has enough players for team generation
+				%>
 				<form class="card p-2" action="#">
 					<div class="input-group">
-						<button type="submit" class="btn btn-primary">Generate Premier Teams</button>
+						<button type="submit" class="btn btn-primary">Generate <%= tier %> Teams</button>
 					</div>
 				</form>
+				<%
+					} else {
+						// does not have enough players for team generation
+				%>
+				<form class="card p-2" action="#">
+					<div class="input-group">
+						At least 6 players are required to generate Dev League teams.
+					</div>
+				</form>
+				<%		
+					}
+				%>
 				<ul class="list-group mb-3">
 
 					<% 
