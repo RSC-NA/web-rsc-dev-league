@@ -129,7 +129,7 @@ app.get('/check_in', (req, res) => {
 });
 
 app.get('/check_out', (req, res) => {
-	if ( req.session.discord_id && ! req.session.checked_in ) {
+	if ( req.session.discord_id && req.session.checked_in ) {
 		// TODO(get season and match day from somewhere)
 		let season = 15;
 		let match_day = 1;
