@@ -153,13 +153,15 @@ app.get('/process_gameday', (req, res) => {
 
 	let signups_query = `
 	SELECT 
-		s.player_id,s.active,p.discord_id,c.rsc_id,c.mmr,c.tier,c.status
+		s.player_id,s.active,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
 	FROM 
 		signups AS s
 	LEFT JOIN players AS p 
 		ON s.player_id = p.id
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
+	WHERE s.active = 1
+	ORDER BY c.mmr DESC
 	`; // WHERE DATE(s.signup_dtg) = CURDATE()
 
 	connection.query(signups_query, (err, results) => {

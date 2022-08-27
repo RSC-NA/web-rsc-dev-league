@@ -28,115 +28,87 @@
 			</form> -->
 
 			<ul class="list-group mb-3">
-				<li class="list-group-item  justify-content-between lh-condensed">
+
+				<% 
+					for ( let tier in signups ) { 
+				%>
+
+				<li class="list-group-item justify-content-between lh-condensed">
 					<div>
-						<h6 class="my-0">Premier</h6>
+						<h6 class="my-0"><%= tier %></h6>
 						
-						<ul class=" mb-3">
+					<% if ( signups[tier]['sub'].length ) { %>
+
+						<ul class="mb-3">
+
+						<% 
+							for ( let i = 0; i < signups[tier]['sub'].length; i++ ) {
+								let player = signups[tier]['sub'][i]; 
+						%>
+						
 							<li class="list-group-item d-flex justify-content-between lh-condensed">
 								<div>
-									<h6 class="my-0">tehblister</h6>
-									<small class="text-muted">Free Agent</small>
+									<h6 class="my-0"><%= player['name'] %></h6>
+									<small class="text-muted"><% player['status'] %></small>
 								</div>
-								<span class="text-muted">1560 MMR</span>
+								<span class="text-muted"><%= player['mmr'] %> MMR</span>
 							</li>
-							<li class="list-group-item d-flex justify-content-between lh-condensed">
-								<div>
-									<h6 class="my-0">tehblister</h6>
-									<small class="text-muted">Free Agent</small>
-								</div>
-								<span class="text-muted">1560 MMR</span>
-							</li>
+						<% } %>
+
 						</ul>
-						<!-- <small class="text-muted">Brief description</small> -->
+
+					<% } else { // end of sub check %>
+						<em>No Free Agents for this Tier</em>
+					<% } %>
 					</div>
-					<!-- <span class="text-muted">10 Signed / 10 FA</span> -->
 				</li>
 
-				<li class="list-group-item  justify-content-between lh-condensed">
-					<div>
-						<h6 class="my-0">Master</h6>
-						
-						<ul class=" mb-3">
-							<li class="list-group-item d-flex justify-content-between lh-condensed">
-								<div>
-									<h6 class="my-0">tehblister</h6>
-									<small class="text-muted">Free Agent</small>
-								</div>
-								<span class="text-muted">1560 MMR</span>
-							</li>
-							<li class="list-group-item d-flex justify-content-between lh-condensed">
-								<div>
-									<h6 class="my-0">tehblister</h6>
-									<small class="text-muted">Free Agent</small>
-								</div>
-								<span class="text-muted">1560 MMR</span>
-							</li>
-						</ul>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<!-- <span class="text-muted">10 Signed / 10 FA</span> -->
-				</li>
+				<% } %>
 
 			</ul>
-
-			
 		</div>
 
+		<!-- primary FA signup / team generation -->
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">Signups By Tier</h4>
 			
+			<% for ( let tier in signups ) { %>
+
 			<div class="mb-3">
-				<h5>Premier</h5>
+				<h5><%= tier %></h5>
+
+				<% if ( signups[tier]['sub'].length ) { %>
+
 				<form class="card p-2" action="#">
 					<div class="input-group">
 						<button type="submit" class="btn btn-primary">Generate Premier Teams</button>
 					</div>
 				</form>
 				<ul class="list-group mb-3">
+
+					<% 
+						for ( let i = 0; i < signups[tier]['fa'].length; i++ ) {
+							let player = signups[tier]['fa'][i]; 
+					%>
+
 					<li class="list-group-item d-flex justify-content-between lh-condensed">
 						<div>
-							<h6 class="my-0">tehblister</h6>
-							<small class="text-muted">Free Agent</small>
+							<h6 class="my-0"><%= player['name'] %></h6>
+							<small class="text-muted"><%= player['status'] %></small>
 						</div>
-						<span class="text-muted">1560 MMR</span>
+						<span class="text-muted"><%= player['mmr'] %> MMR</span>
 					</li>
-					<li class="list-group-item d-flex justify-content-between lh-condensed">
-						<div>
-							<h6 class="my-0">tehblister</h6>
-							<small class="text-muted">Free Agent</small>
-						</div>
-						<span class="text-muted">1560 MMR</span>
-					</li>
+
+					<% } // end of player for loop %>
+
 				</ul>
+
+				<% } // end of signups check %>
+
 			</div>
 
-			<div class="mb-3">
-				<h5>Master</h5>
-				<form class="card p-2" action="#">
-					<div class="input-group">
-						<button type="submit" class="btn btn-primary">Generate Master Teams</button>
-					</div>
-				</form>
-				<ul class="list-group mb-3">
-					<li class="list-group-item d-flex justify-content-between lh-condensed">
-						<div>
-							<h6 class="my-0">tehblister</h6>
-							<small class="text-muted">Free Agent</small>
-						</div>
-						<span class="text-muted">1560 MMR</span>
-					</li>
-					<li class="list-group-item d-flex justify-content-between lh-condensed">
-						<div>
-							<h6 class="my-0">tehblister</h6>
-							<small class="text-muted">Free Agent</small>
-						</div>
-						<span class="text-muted">1560 MMR</span>
-					</li>
-				</ul>
-			</div>
+			<% } // end of tier loop %>
 
-			
 		</div>
 
 	</div>
