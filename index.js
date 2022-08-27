@@ -231,16 +231,20 @@ app.get('/manage_league', (req, res) => {
 	connection.query(counts_query, (err, results) => {
 		if ( err ) { throw err; }
 
-		let tiers = {};
+		let tiers = {
+			'all': { 'total': 0, 'fa': 0 },
+		};
 		for ( let i = 0; i < results.length; i++ ) {
 			if ( ! (results[i]['tier'] in tiers) ) {
 				tiers[ results[i]['tier'] ] = { total: 0, fa: 0 };
 			}
 
 			tiers[ results[i]['tier'] ]['total'] += results[i]['count'];
+			tiers['all']['total'] += results[i]['count'];
 
 			if ( results[i]['status'] == 'Free Agent' ) {
 				tiers[ results[i]['tier'] ]['fa'] += results[i]['count'];
+				tiers['all']['fa'] += results[i]['count'];
 			}
 		}
 
