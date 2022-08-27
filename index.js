@@ -173,6 +173,42 @@ app.get('/manage_league', (req, res) => {
 	
 });
 
+app.post('/manage_league', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
+	let amateur    = "amateur"    in req.body ? 1 : 0;
+	let contender  = "contender"  in req.body ? 1 : 0;
+	let prospect   = "prospect"   in req.body ? 1 : 0;
+	let challenger = "challenger" in req.body ? 1 : 0;
+	let rival      = "rival"      in req.body ? 1 : 0;
+	let veteran    = "veteran"    in req.body ? 1 : 0;
+	let elite      = "elite"      in req.body ? 1 : 0;
+	let master     = "master"     in req.body ? 1 : 0;
+	let premier    = "premier"    in req.body ? 1 : 0;
+
+	let settings_query = `
+	INSERT INTO league_settings
+		(
+			season,contract_url,amateur,contender,prospect,challenger,
+			rival,veteran,elite,master,premier
+		)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`;
+	connection.query(
+		settings_query,
+		[
+			req.body.season, req.body.contract_url, amateur, contender, prospect,
+			challenger, rival, veteran, elite, master, premier
+		],
+		(err, results) => {
+			if ( err ) { throw err; }
+			res.redirect('/manage_league');
+		}
+	);
+});
+
 app.get('/login', (req, res) => {
 	res.render('login');
 });
