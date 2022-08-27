@@ -121,7 +121,7 @@ app.get('/check_in', (req, res) => {
 				res.redirect('/');
 			}
 		);
-	} else {
+	} else {	
 		res.redirect('/');
 	}
 });
@@ -152,7 +152,11 @@ app.get('/process_gameday', (req, res) => {
 });
 
 app.get('/manage_league', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		res.redirect('/');
+	} 
 	res.render('manage');
+	
 });
 
 app.get('/login', (req, res) => {
