@@ -32,7 +32,7 @@
 
 			<ul class="list-group mb-3">
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div>
+					<div <%- settings.premier ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Premier</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -40,7 +40,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div>
+					<div <%- settings.master ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Master</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -48,7 +48,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div>
+					<div <%- settings.elite ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Elite</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -56,7 +56,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div class="text-success">
+					<div <%- settings.veteran ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Veteran</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -64,7 +64,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div class="text-success">
+					<div <%- settings.rival ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Rival</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -72,7 +72,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div class="text-success">
+					<div <%- settings.challenger ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Challenger</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -80,7 +80,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div>
+					<div <%- settings.prospect ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Prospect</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -88,7 +88,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div>
+					<div <%- settings.contender ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Contender</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -96,7 +96,7 @@
 				</li>
 
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div>
+					<div <%- settings.amateur ? 'class="text-success"' : '' %>>
 						<h6 class="my-0">Amateur</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
@@ -105,7 +105,7 @@
 				
 				<li class="list-group-item d-flex justify-content-between">
 					<span>FA</span>
-					<strong><%= tiers['all']['fa'] %>></strong>
+					<strong><%= tiers['all']['fa'] %></strong>
 				</li>
 
 				<!-- <li class="list-group-item d-flex justify-content-between">
@@ -115,7 +115,7 @@
 
 				<li class="list-group-item d-flex justify-content-between">
 					<span>Total Players</span>
-					<strong><%= tiers['all']['total'] %>></strong>
+					<strong><%= tiers['all']['total'] %></strong>
 				</li>
 				
 			</ul>
