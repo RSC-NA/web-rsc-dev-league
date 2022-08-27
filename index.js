@@ -150,7 +150,39 @@ app.get('/check_out', (req, res) => {
 });
 
 app.get('/process_gameday', (req, res) => {
-	res.render('template');
+
+	let signups_query = `
+	SELECT 
+		s.player_id,s.active,p.discord_id,c.rsc_id,c.mmr,c.tier,c.status
+	FROM 
+		signups AS s
+	LEFT JOIN players AS p 
+		ON s.player_id = p.id
+	LEFT JOIN contracts AS c
+		ON p.discord_id = c.discord_id
+	`; // WHERE DATE(s.signup_dtg) = CURDATE()
+
+	connection.query(signups_query, (err, results) => {
+		if ( err ) { throw err; }
+
+		let signups = {};
+		for ( let i = 0; i < results.length; i++ ) {
+			if ( ! ( results[i]['tier'] in signups ) ) {
+				signups[ results[i]['tier'] ] = {
+					'fa': [],
+					'sub': [],
+				};
+			}
+			if ( results[i]['status'] == 'Free Agent' ) {
+				signups[ results[i]['tier'] ]['fa'].push(results[i]);
+			} else {
+				signups[ results[i]['tier'] ]['sub'].push(results[i]);
+			}	
+		}
+		console.log(signups);
+		res.render('process', { signups: signups });
+	});
+
 });
 
 app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
@@ -207,11 +239,11 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		for ( let rsc_id in players ) {
 			let player = players[rsc_id];
 			// discord_id, rsc_id, mmr, tier, status
-			playersArray.push([ player['discord_id'], player['rsc_id'], player['mmr'], player['tier'], player['status'] ]);
+			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'] ]);
 		}
 
 		connection.query(
-			'INSERT INTO contracts (discord_id, rsc_id, mmr, tier, status) VALUES ?',
+			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status) VALUES ?',
 			[ playersArray ],
 			(err, results) => {
 				if (err) { throw err; }

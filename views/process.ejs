@@ -10,111 +10,74 @@
 		</p>
 		<p class="lead">
 			Each tier will need multiples of 6 players to have valid games for each night. Free Agents are prioritized
-			in building teams, but rostered players that sign up as a sub can be added to teams after team generation.
+			in building teams, but contract players that sign up as a sub can be added to teams after team generation.
 		</p>
 	</div>
 
 	<div class="row">
 		<div class="col-md-4 order-md-2 mb-4">
 			<h4 class="d-flex justify-content-between align-items-center mb-3">
-				<span class="text-muted">Active Leagues</span>
+				<span class="text-muted">Available Subs</span>
 				<span class="badge badge-secondary badge-pill">3</span>
 			</h4>
 
-			<form class="card p-2" action="/import_contracts/<%= contract_sheet_id %>">
+			<!-- <form class="card p-2" action="#">
 				<div class="input-group">
 					<button type="submit" class="btn btn-primary">Import Contracts</button>
 				</div>
-			</form>
+			</form> -->
 
 			<ul class="list-group mb-3">
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.premier ? 'class="text-success"' : '' %>>
+				<li class="list-group-item  justify-content-between lh-condensed">
+					<div>
 						<h6 class="my-0">Premier</h6>
+						
+						<ul class=" mb-3">
+							<li class="list-group-item d-flex justify-content-between lh-condensed">
+								<div>
+									<h6 class="my-0">tehblister</h6>
+									<small class="text-muted">Free Agent</small>
+								</div>
+								<span class="text-muted">1560 MMR</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between lh-condensed">
+								<div>
+									<h6 class="my-0">tehblister</h6>
+									<small class="text-muted">Free Agent</small>
+								</div>
+								<span class="text-muted">1560 MMR</span>
+							</li>
+						</ul>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
-					<span class="text-muted"><%= tiers['Premier']['total'] - tiers['Premier']['fa'] %> Signed / <%= tiers['Premier']['fa'] %> FA</span>
+					<!-- <span class="text-muted">10 Signed / 10 FA</span> -->
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.master ? 'class="text-success"' : '' %>>
+				<li class="list-group-item  justify-content-between lh-condensed">
+					<div>
 						<h6 class="my-0">Master</h6>
+						
+						<ul class=" mb-3">
+							<li class="list-group-item d-flex justify-content-between lh-condensed">
+								<div>
+									<h6 class="my-0">tehblister</h6>
+									<small class="text-muted">Free Agent</small>
+								</div>
+								<span class="text-muted">1560 MMR</span>
+							</li>
+							<li class="list-group-item d-flex justify-content-between lh-condensed">
+								<div>
+									<h6 class="my-0">tehblister</h6>
+									<small class="text-muted">Free Agent</small>
+								</div>
+								<span class="text-muted">1560 MMR</span>
+							</li>
+						</ul>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
-					<span class="text-muted"><%= tiers['Master']['total'] - tiers['Master']['fa'] %> Signed / <%= tiers['Master']['fa'] %> FA</span>
+					<!-- <span class="text-muted">10 Signed / 10 FA</span> -->
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.elite ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Elite</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Elite']['total'] - tiers['Elite']['fa'] %> Signed / <%= tiers['Elite']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.veteran ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Veteran</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Veteran']['total'] - tiers['Veteran']['fa'] %> Signed / <%= tiers['Veteran']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.rival ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Rival</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Rival']['total'] - tiers['Rival']['fa'] %> Signed / <%= tiers['Rival']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.challenger ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Challenger</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Challenger']['total'] - tiers['Challenger']['fa'] %> Signed / <%= tiers['Challenger']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.prospect ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Prospect</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Prospect']['total'] - tiers['Prospect']['fa'] %> Signed / <%= tiers['Prospect']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.contender ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Contender</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Contender']['total'] - tiers['Contender']['fa'] %> Signed / <%= tiers['Contender']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.amateur ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Amateur</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Amateur']['total'] - tiers['Amateur']['fa'] %> Signed / <%= tiers['Amateur']['fa'] %> FA</span>
-				</li>
-				
-				<li class="list-group-item d-flex justify-content-between">
-					<span>FA</span>
-					<strong><%= tiers['all']['fa'] %></strong>
-				</li>
-
-				<!-- <li class="list-group-item d-flex justify-content-between">
-					<span>PermFA</span>
-					<strong>86</strong>
-				</li> -->
-
-				<li class="list-group-item d-flex justify-content-between">
-					<span>Total Players</span>
-					<strong><%= tiers['all']['total'] %></strong>
-				</li>
-				
 			</ul>
 
 			
@@ -123,72 +86,57 @@
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">Signups By Tier</h4>
 			
-			<form class="needs-validation" novalidate action="/manage_league" method="post">
+			<div class="mb-3">
+				<h5>Premier</h5>
+				<form class="card p-2" action="#">
+					<div class="input-group">
+						<button type="submit" class="btn btn-primary">Generate Premier Teams</button>
+					</div>
+				</form>
+				<ul class="list-group mb-3">
+					<li class="list-group-item d-flex justify-content-between lh-condensed">
+						<div>
+							<h6 class="my-0">tehblister</h6>
+							<small class="text-muted">Free Agent</small>
+						</div>
+						<span class="text-muted">1560 MMR</span>
+					</li>
+					<li class="list-group-item d-flex justify-content-between lh-condensed">
+						<div>
+							<h6 class="my-0">tehblister</h6>
+							<small class="text-muted">Free Agent</small>
+						</div>
+						<span class="text-muted">1560 MMR</span>
+					</li>
+				</ul>
+			</div>
 
 			<div class="mb-3">
-				<label for="username">Season</label>
-				<div class="input-group">
-					<input type="text" class="form-control" name="season" id="season" placeholder="season" value="<%= settings.season %>" required>
-					<div class="invalid-feedback" style="width: 100%;">
-						Season is required
+				<h5>Master</h5>
+				<form class="card p-2" action="#">
+					<div class="input-group">
+						<button type="submit" class="btn btn-primary">Generate Master Teams</button>
 					</div>
-				</div>
+				</form>
+				<ul class="list-group mb-3">
+					<li class="list-group-item d-flex justify-content-between lh-condensed">
+						<div>
+							<h6 class="my-0">tehblister</h6>
+							<small class="text-muted">Free Agent</small>
+						</div>
+						<span class="text-muted">1560 MMR</span>
+					</li>
+					<li class="list-group-item d-flex justify-content-between lh-condensed">
+						<div>
+							<h6 class="my-0">tehblister</h6>
+							<small class="text-muted">Free Agent</small>
+						</div>
+						<span class="text-muted">1560 MMR</span>
+					</li>
+				</ul>
 			</div>
 
-			<div class="mb-3">
-				<label for="username">Contract Sheet</label>
-				<div class="input-group">
-					<input type="text" class="form-control" name="contract_url" id="contract_url" placeholder="contract_url" value="<%= settings.contract_url %>" required>
-					<div class="invalid-feedback" style="width: 100%;">
-						Contract sheet URL is required.
-					</div>
-				</div>
-			</div>
-
-			<hr class="mb-4">
 			
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="premier" id="premier" <%- settings.premier ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="master">Premier</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="master" id="master" <%- settings.master ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="master">Master</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="elite" id="elite" <%- settings.elite ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="elite">Elite</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="veteran" id="veteran" <%- settings.veteran ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="veteran">Veteran</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="rival" id="rival" <%- settings.rival ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="rival">Rival</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="challenger" id="challenger" <%- settings.challenger ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="challenger">Challenger</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="prospect" id="prospect" <%- settings.prospect ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="prospect">Prospect</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="contender" id="contender" <%- settings.contender ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="contender">Contender</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="amateur" id="amateur" <%- settings.amateur ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="amateur">Amateur</label>
-			</div>
-		
-			<hr class="mb-4">
-			
-			<button class="btn btn-primary btn-lg btn-block" type="submit">Update League Settings</button>
-			
-			</form>
 		</div>
 
 	</div>
