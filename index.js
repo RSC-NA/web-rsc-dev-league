@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 	res.locals.nickname = req.session.nickname;
 	res.locals.discord_id = req.session.discord_id;
 	res.locals.is_admin = req.session.is_admin;
-	res.locals.user = req.session.user;
+	res.locals.user = req.session.user || {};
 
 	res.locals.checked_in = false;
 	if ( req.session.user_id ) {
