@@ -259,7 +259,7 @@ app.get('/manage_league', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	let counts_query = 'select count(*) AS count,tier,status from contracts group by tier,status order by tier,status';
+	let counts_query = 'select count(*) AS count,tier,status from contracts where tier != "" group by tier,status order by tier,status';
 	connection.query(counts_query, (err, results) => {
 		if ( err ) { throw err; }
 
