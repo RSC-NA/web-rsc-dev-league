@@ -265,12 +265,17 @@ app.get('/manage_league', (req, res) => {
 
 		let tiers = {
 			'all': { 'total': 0, 'fa': 0 },
+			'Premier': { 'total': 0, 'fa': 0 },
+			'Master': { 'total': 0, 'fa': 0 },
+			'Elite': { 'total': 0, 'fa': 0 },
+			'Veteran': { 'total': 0, 'fa': 0 },
+			'Rival': { 'total': 0, 'fa': 0 },
+			'Challenger': { 'total': 0, 'fa': 0 },
+			'Prospect': { 'total': 0, 'fa': 0 },
+			'Contender': { 'total': 0, 'fa': 0 },
+			'Amateur': { 'total': 0, 'fa': 0 },
 		};
 		for ( let i = 0; i < results.length; i++ ) {
-			if ( ! (results[i]['tier'] in tiers) ) {
-				tiers[ results[i]['tier'] ] = { total: 0, fa: 0 };
-			}
-
 			tiers[ results[i]['tier'] ]['total'] += results[i]['count'];
 			tiers['all']['total'] += results[i]['count'];
 
