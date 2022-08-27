@@ -8,6 +8,8 @@ const btoa = require('btoa');
 const atob = require('atob');
 const e = require('express');
 
+const { GoogleSpreadsheet } = require('google-spreadsheet');
+
 require('dotenv').config();
 
 app.use( express.urlencoded({ extended: true }) );
@@ -151,9 +153,83 @@ app.get('/process_gameday', (req, res) => {
 	res.render('template');
 });
 
+app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
+
+	// 1. create google sheets object
+	const doc = new GoogleSpreadsheet(req.params.contract_sheet_id);
+	// 2. authenticate
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+
+	// 3. pull all relevant fields
+	await doc.loadInfo();
+
+	const sheet = doc.sheetsByTitle["Players"];
+	const rows = await sheet.getRows();
+
+	let players = {};
+
+	for ( let i = 0; i < rows.length; i++ ) {
+		if ( rows[i]['3v3 Active/ Returning'] == "TRUE" ) { 
+			players[ rows[i]['RSC Unique ID'] ] = {
+				'rsc_id': rows[i]['RSC Unique ID'],
+				'name': rows[i]['Player Name'],
+				'discord_id': rows[i]['Discord ID'],
+			};
+		}
+	}
+
+	const mmrSheet = doc.sheetsByTitle["Count/Keeper"];
+	const mmrRows = await mmrSheet.getRows();
+
+	for ( let i = 0; i < mmrRows.length; i++ ) {
+		if ( mmrRows[i]['RSC ID'] in players ) {
+			players[ mmrRows[i]['RSC ID'] ]['mmr'] = mmrRows[i]['Effective MMR'];
+			players[ mmrRows[i]['RSC ID'] ]['tier'] = mmrRows[i]['Tier'];
+		}
+	}
+
+	const contractSheet = doc.sheetsByTitle['Master Contracts'];
+	const contractRows = await contractSheet.getRows();
+
+	for ( let i = 0; i < contractRows.length; i++ ) {
+		if ( contractRows[i]['RSC Unique ID'] in players ) {
+			players[ contractRows[i]['RSC Unique ID'] ]['status'] = contractRows[i]['Contract Status'];
+		}
+	}
+
+	connection.query('TRUNCATE TABLE contracts', (err,results) => {
+		if ( err ) {  throw err; }
+		
+		let playersArray = [];
+		for ( let rsc_id in players ) {
+			let player = players[rsc_id];
+			// discord_id, rsc_id, mmr, tier, status
+			playersArray.push([ player['discord_id'], player['rsc_id'], player['mmr'], player['tier'], player['status'] ]);
+		}
+
+		connection.query(
+			'INSERT INTO contracts (discord_id, rsc_id, mmr, tier, status) VALUES ?',
+			[ playersArray ],
+			(err, results) => {
+				if (err) { throw err; }
+
+				res.redirect('/manage_league');
+		});
+	});
+	
+
+	//res.json(players);
+	//res.json(rows);
+
+	//res.send(doc.title);
+
+	// 4. store in database
+
+});
+
 app.get('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
+		//return res.redirect('/');
 	} 
 
 	let settings_query = `
@@ -168,14 +244,15 @@ app.get('/manage_league', (req, res) => {
 	`;
 	connection.query(settings_query, (err, results) => { 
 		if (err) { throw err; }
-		res.render('manage', { settings: results[0] });
+		let contract_sheet_id = results[0].contract_url.split('/')[5];
+		res.render('manage', { settings: results[0], contract_sheet_id: contract_sheet_id });
 	});
 	
 });
 
 app.post('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
+		//return res.redirect('/');
 	} 
 
 	let amateur    = "amateur"    in req.body ? 1 : 0;

@@ -2,9 +2,6 @@ CREATE TABLE players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`nickname` VARCHAR(255) NOT NULL,
 	`discord_id` VARCHAR(20) NOT NULL,
-	`rsc_id` VARCHAR(10) NOT NULL,
-	`mmr` INT UNSIGNED NOT NULL DEFAULT 0,
-	`tier` VARCHAR(10) NOT NULL DEFAULT '',
 	`admin` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`),
 	INDEX `discord_id_idx` (`discord_id`)
@@ -48,4 +45,15 @@ CREATE TABLE league_settings (
 	`master` TINYINT NOT NULL DEFAULT 0,
 	`premier` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE contracts (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`discord_id` VARCHAR(20) NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`tier` VARCHAR(10) NOT NULL DEFAULT '',
+	`status` VARCHAR(20) NOT NULL DEFAULT '',
+	PRIMARY KEY(`id`),
+	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
