@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 			[ req.session.user_id ],
 			(err, results) => {
 				if ( results.length > 0 ) {
-					req.session.checked_in = results[0].active;
+					req.session.checked_in = true;
 					res.locals.checked_in = req.session.checked_in;
 					next();
 				} else {
@@ -160,7 +160,6 @@ app.get('/process_gameday', (req, res) => {
 		ON s.player_id = p.id
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
-	WHERE s.active = 1
 	ORDER BY c.mmr DESC
 	`; // WHERE DATE(s.signup_dtg) = CURDATE()
 
