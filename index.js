@@ -98,6 +98,7 @@ app.get('/process_login', (req, res) => {
 				};
 
 				req.session.user = user;
+				console.log(user);
 
 				req.session.is_admin = results[0].admin ? true : false;
 				res.redirect('/');
