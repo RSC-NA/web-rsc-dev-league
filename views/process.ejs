@@ -86,7 +86,7 @@
 
 
 				%>
-				<form class="card p-2" action="/generate_team/<%= tier %>">
+				<form class="card p-2" method="post" action="/generate_team/<%= tier %>">
 					<input type="hidden" name="player_count" id="<%= tier %>_player_count" value="<%= signups[tier]['fa'].length %>">
 					<% 
 						for ( let i = 0; i < signups[tier]['fa'].length; i++ ) {
