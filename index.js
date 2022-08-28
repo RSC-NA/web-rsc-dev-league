@@ -290,7 +290,7 @@ app.post('/generate_team/:tier', (req, res) => {
 				}
 				
 				for ( let i = 0; i < teams[team].players.length; i++ ) {
-					playerParams.push([insertId, teams[team].player[i].id ]);
+					playerParams.push([insertId, teams[team].players[i].id ]);
 				}
 
 				// move to next team
