@@ -182,11 +182,27 @@ app.get('/check_out', (req, res) => {
 	}
 });
 
+app.post('/generate_team/:tier', (req, res) => {
+	// TODO (err trapping with invalid values)
+	let numPlayers = req.body.player_count;
+	let numTeams = numPlayers / 3;
+	let tier = req.params.tier;
+
+	let players = [];
+	let teams = {};
+
+	for ( let i = 0; i < numPlayers; i++ ) {
+		players.push(req.body['player_' + i]);
+	}
+
+	res.json(players);
+});
+
 app.get('/make_active/:signup_id', (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
 	} 
-	
+
 	let query = 'UPDATE signups SET active = 1 WHERE id = ?';
 	connection.query(query, [ req.params.signup_id ], (err, results) => {
 		res.redirect('/process_gameday');
