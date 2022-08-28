@@ -192,10 +192,78 @@ app.post('/generate_team/:tier', (req, res) => {
 	let teams = {};
 
 	for ( let i = 0; i < numPlayers; i++ ) {
-		players.push(req.body['player_id_' + i]);
+		players.push(parseInt(req.body['player_id_' + i]));
 	}
 
-	res.json(req.body);
+	for ( let i = 1; i <= numTeams; i++ ) {
+		teams[tier + '_' + i] = {
+			players: [],
+			mmr: 0,
+		};
+	}
+
+	let playersQuery = 'select p.id,c.name,c.mmr,c.tier from players as p left join contracts as c on p.discord_id = c.discord_id where p.id in ? ORDER BY c.mmr DESC';
+	connection.query(playersQuery, [ players ], (err, results) => {
+		if ( err ) { throw err; }
+
+		let playerList = [];
+		for ( let i = 0; i < results.length; i++ ) {
+			playerList.push(results[i]);
+		}
+
+		let curTeam = 1;
+		let direction = 'up';
+		while ( playerList.length ) {
+			let player = playerList.pop();
+			let mmr = player['mmr'];
+
+			teams[tier + '_' + curTeam]['players'].push(player);
+			teams[tier + '_' + curTeam]['mmr']+= mmr;
+
+			if ( direction == 'up' ) {
+				curTeam += 1;
+				if ( curTeam == numTeams ) {
+					direction = 'down';
+
+					if ( playerList.length ) {
+						let playerTwo = playerList.pop();
+						let playerTwoMmr = playerTwo['mmr'];
+
+						teams[tier + '_' + curTeam]['players'].push(player);
+						teams[tier + '_' + curTeam]['mmr']+= mmr;
+					}
+				}
+			} else {
+				curTeam -= 1;
+
+				if ( curTeam == 1 ) {
+					direction = 'up';
+
+					if ( playerList.length ) {
+						let playerTwo = playerList.pop();
+						let playerTwoMmr = playerTwo['mmr'];
+
+						teams[tier + '_' + curTeam]['players'].push(player);
+						teams[tier + '_' + curTeam]['mmr']+= mmr;
+					}
+				}
+			}
+		}
+
+		res.json(teams);
+
+		// 1 -> 1,4,5
+		// 2 -> 2,3,6
+
+		// 1 -> 1, 8, 9
+		// 2 -> 2, 7, 10
+		// 3 -> 3, 6, 11
+		// 4 -> 4, 5, 12
+	
+
+		// create teams
+		// insert players into teams
+	});
 });
 
 app.get('/make_active/:signup_id', (req, res) => {
