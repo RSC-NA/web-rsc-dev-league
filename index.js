@@ -195,7 +195,7 @@ app.post('/generate_team/:tier', (req, res) => {
 		players.push(req.body['player_' + i]);
 	}
 
-	res.json(players);
+	res.json(req.body);
 });
 
 app.get('/make_active/:signup_id', (req, res) => {
