@@ -1,0 +1,51 @@
+
+<%- include('partials/header.ejs'); %>
+
+<main class="container">
+	<div class="bg-light p-5 rounded">
+		
+		<h1>Development League Match Info</h1>
+		<p class="lead">
+			Please find the lobby information provided below. If you have any questions or problems, please ask for help
+			in <a href="https://discord.com/channels/395806681994493964/1013519443684511834">#dev-league</a>.
+		</p>
+		<p>
+			Games must start promptly at 8:30. The home team is responsible for creating the lobby. The Away Team is responsible 
+			for <a href="https://www.rocketsoccarconfederation.com/replay-and-screenshot-uploads/">uploading replays and screenshots</a> to the RSC Website.
+		</p>
+	</div>
+
+	<div class="bg-light p-5 rounded">
+		<h2>Lobby Info</h2>
+		<p class="lead">This is a 4-game series.</p>
+
+		<ul>
+			<li>Lobby Username: <strong><%= lobby_user %></strong></li>
+			<li>Lobby Password: <strong><%= lobby_pass %></strong></li>
+			<li>Home Team: <strong><%= lobby_user.substring(3) %></strong></li>
+			<li>Away Team: <strong><%= lobby_pass.substring(3) %></strong></li>
+		</ul>
+
+		<div class="row">
+			<div class="col-md-4">
+				<h3>Home Team - <%= lobby_user.substring(3) %></h3>
+				<ul>
+					<li><strong><%= players[0].name %></strong> [Makes lobby]</li>
+					<li><%= players[1].name %></li>
+					<li><%= players[2].name %></li>
+				</ul>
+			</div>
+			<div class="col-md-4">
+				<h3>Away Team - <%= lobby_pass.substring(3) %></h3>
+				<ul>
+					<li><strong><%= players[3].name %></strong> [Uploads screenshots]</li>
+					<li><%= players[4].name %></li>
+					<li><%= players[5].name %></li>
+				</ul>
+			</div>
+		</div>
+	
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>

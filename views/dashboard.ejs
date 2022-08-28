@@ -1,10 +1,10 @@
 
-<%- include('partials/header.ejs', { rostered: rostered }); %>
+<%- include('partials/header.ejs'); %>
 
 	<main class="container">
 		<div class="bg-light p-5 rounded">
-			<% if ( nickname ) { %>
-				<h1>Welcome to RSC Development League, <%= nickname %></h1>
+			<% if ( user.nickname ) { %>
+				<h1>Welcome to RSC Development League, <%= user.nickname %></h1>
 			<% } else { %>
 				<h1>Welcome to RSC Development League</h1>
 			<% } %>
