@@ -78,10 +78,10 @@
 				<h5><%= tier %></h5>
 
 				<% 
-
+				let teamsBuilt = signups[tier]['fa'].length ? signups[tier]['fa'].filter(p => p.rostered ).length / 3 : null;
 				if ( signups[tier]['fa'].length ) { 
-					let player_count = (signups[tier]['fa'].length + signups[tier]['sub'].length);
-					if ( player_count >= 6 ) {
+					let player_count = (signups[tier]['fa'].length + signups[tier]['sub'].length) - (teamsBuild * 3);
+					if ( player_count >= 6 && ! teamsBuilt ) {
 						// has enough players for team generation
 
 
@@ -124,6 +124,9 @@
 
 					<% 
 						for ( let i = 0; i < signups[tier]['fa'].length; i++ ) {
+							if ( signups[tier]['fa'].rostered ) {
+								continue; // skip players on an FA league team already
+							}
 							let player = signups[tier]['fa'][i]; 
 					%>
 
