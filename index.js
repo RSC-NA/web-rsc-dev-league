@@ -144,9 +144,10 @@ app.get('/check_in', (req, res) => {
 		// TODO(get season and match day from somewhere)
 		let season = 15;
 		let match_day = 1;
+		let active = req.session.user['status'] == 'Free Agent' ? 1 : 0;
 		connection.query(
-			'INSERT INTO signups (player_id, season, match_day) VALUES (?, ?, ?)',
-			[ req.session.user_id, season, match_day],
+			'INSERT INTO signups (player_id, season, match_day, active) VALUES (?, ?, ?, ?)',
+			[ req.session.user_id, season, match_day, active],
 			function(err, results) {
 				if ( err ) throw err;
 
@@ -220,7 +221,7 @@ app.get('/process_gameday', (req, res) => {
 					'sub': [],
 				};
 			}
-			if ( results[i]['status'] == 'Free Agent' || results[i]['active'] == 1 ) {
+			if ( results[i]['active'] == 1 ) {
 				signups[ results[i]['tier'] ]['fa'].push(results[i]);
 			} else {
 				signups[ results[i]['tier'] ]['sub'].push(results[i]);
