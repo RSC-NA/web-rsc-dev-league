@@ -234,8 +234,8 @@ app.post('/generate_team/:tier', (req, res) => {
 						let playerTwo = playerList.pop();
 						let playerTwoMmr = playerTwo['mmr'];
 
-						teams[tier + '_' + curTeam]['players'].push(player);
-						teams[tier + '_' + curTeam]['mmr']+= mmr;
+						teams[tier + '_' + curTeam]['players'].push(playerTwo);
+						teams[tier + '_' + curTeam]['mmr']+= playerTwoMmr;
 					}
 				}
 			} else {
