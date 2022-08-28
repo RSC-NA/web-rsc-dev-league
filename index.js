@@ -183,6 +183,10 @@ app.get('/check_out', (req, res) => {
 });
 
 app.get('/make_active/:signup_id', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+	
 	let query = 'UPDATE signups SET active = 1 WHERE id = ?';
 	connection.query(query, [ req.params.signup_id ], (err, results) => {
 		res.redirect('/process_gameday');
@@ -190,6 +194,10 @@ app.get('/make_active/:signup_id', (req, res) => {
 });
 
 app.get('/make_inactive/:signup_id', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
 	let query = 'UPDATE signups SET active = 0 WHERE id = ?';
 	connection.query(query, [ req.params.signup_id ], (err, results) => {
 		res.redirect('/process_gameday');
@@ -197,6 +205,9 @@ app.get('/make_inactive/:signup_id', (req, res) => {
 });
 
 app.get('/process_gameday', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
 
 	let signups_query = `
 	SELECT 
