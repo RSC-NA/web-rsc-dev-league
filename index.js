@@ -259,7 +259,7 @@ app.post('/generate_team/:tier', (req, res) => {
 		// id, team_number, tier
 		// ['Elite_1', 'Elite_2' ] => [ [1, 'Elite' ], [2, 'Elite'] ]
 		let teamParams = Object.keys(teams).map(tierString => [ tierString.split('_')[1], tierString.split('_')[0] ] );
-		let teamsQuery = 'INSERT INTO teams (team_number, tier) VALUES (?)';
+		let teamsQuery = 'INSERT INTO teams (team_number, tier) VALUES ?';
 		connection.query(teamsQuery, [ teamParams ], (err, results) => {
 			if ( err ) { throw err; }
 			console.log(results);
