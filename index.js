@@ -32,12 +32,14 @@ app.use((req, res, next) => {
 	res.locals.checked_in = false;
 	if ( req.session.user_id ) {
 		connection.query(
-			'SELECT id,active FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
+			'SELECT id,active,rostered FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
 			[ req.session.user_id ],
 			(err, results) => {
 				if ( results.length > 0 ) {
 					req.session.checked_in = true;
+					req.session.rostered = true;
 					res.locals.checked_in = req.session.checked_in;
+					res.locals.rostered = req.session.rostered;
 					next();
 				} else {
 					next();
