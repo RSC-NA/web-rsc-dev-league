@@ -213,6 +213,7 @@ app.post('/generate_team/:tier', (req, res) => {
 
 		let curTeam = 1;
 		let direction = 'up';
+		console.log(players);
 		console.log(playersQuery);
 		console.log(playerList);
 		console.log(playerList.length);
