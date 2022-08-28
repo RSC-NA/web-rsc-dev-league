@@ -202,7 +202,7 @@ app.post('/generate_team/:tier', (req, res) => {
 		};
 	}
 
-	let playersQuery = 'select p.id,c.name,c.mmr,c.tier from players as p left join contracts as c on p.discord_id = c.discord_id where p.id in ? ORDER BY c.mmr DESC';
+	let playersQuery = 'select p.id,c.name,c.mmr,c.tier from players as p left join contracts as c on p.discord_id = c.discord_id where p.id in (?) ORDER BY c.mmr DESC';
 	connection.query(playersQuery, [ players ], (err, results) => {
 		if ( err ) { throw err; }
 
