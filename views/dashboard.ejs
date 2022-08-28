@@ -36,7 +36,7 @@
 				If you are unable to play, you may check out using the check out button below. 
 			</p>
 			<a class="btn btn-lg btn-danger" href="/check_out" role="button">Check Out</a>
-		<% } else if ( nickname && ! user['rsc_id'] ) { %>
+		<% } else if ( nickname && user['rsc_id'] == null ) { %>
 			<h2>You are not an active player</h2>
 			<p>
 				This league is only available to valid members of RSC with an active contract. Please sign up for the league
