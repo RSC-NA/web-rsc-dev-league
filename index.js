@@ -263,6 +263,11 @@ app.post('/generate_team/:tier', (req, res) => {
 		connection.query(teamsQuery, [ teamParams ], (err, results) => {
 			if ( err ) { throw err; }
 			console.log(results);
+			let insertId = results.insertId;
+			for ( let team in teams ) {
+				teams[ team ]['team_id'] = insertId;
+				insertId++;
+			}
 			res.json(teams);
 		});
 		
