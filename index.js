@@ -192,7 +192,7 @@ app.post('/generate_team/:tier', (req, res) => {
 	let teams = {};
 
 	for ( let i = 0; i < numPlayers; i++ ) {
-		players.push(req.body['player_' + i]);
+		players.push(req.body['player_id_' + i]);
 	}
 
 	res.json(req.body);
