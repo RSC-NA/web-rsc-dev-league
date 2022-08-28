@@ -80,7 +80,7 @@
 				<% 
 				let teamsBuilt = signups[tier]['fa'].length ? signups[tier]['fa'].filter(p => p.rostered ).length / 3 : null;
 				if ( signups[tier]['fa'].length ) { 
-					let player_count = (signups[tier]['fa'].length + signups[tier]['sub'].length) - (teamsBuild * 3);
+					let player_count = (signups[tier]['fa'].length + signups[tier]['sub'].length) - (teamsBuilt * 3);
 					if ( player_count >= 6 && ! teamsBuilt ) {
 						// has enough players for team generation
 
