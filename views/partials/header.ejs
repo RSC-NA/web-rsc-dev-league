@@ -48,6 +48,13 @@
 								Dashboard
 							</a>
 
+							<% if ( rostered ) { %>
+								<a class="nav-link" href="/match">
+									<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+									Match Info
+								</a>
+							<% } %>
+
 							<% if ( is_admin ) {  /* admin-only functionality */ %>
 							<div class="sb-sidenav-menu-heading">Admin</div>
 							<a class="nav-link" href="/process_gameday">
