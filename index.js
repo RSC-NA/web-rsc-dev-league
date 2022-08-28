@@ -215,6 +215,7 @@ app.post('/generate_team/:tier', (req, res) => {
 		let direction = 'up';
 		while ( playerList.length ) {
 			let player = playerList.pop();
+			console.log(player);
 			let mmr = player['mmr'];
 
 			teams[tier + '_' + curTeam]['players'].push(player);
