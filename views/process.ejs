@@ -93,7 +93,7 @@
 					
 					<% 
 						for ( let i = 0; i < signups[tier]['fa'].length; i++ ) {
-							if ( signups[tier]['fa'].rostered ) {
+							if ( signups[tier]['fa'][i].rostered ) {
 								continue; // skip players on an FA league team already
 							}
 							let player = signups[tier]['fa'][i]; 
@@ -115,7 +115,7 @@
 					<div class="input-group">
 						<button type="submit" class="btn btn-secondary" disabled>Generate <%= tier %> Teams [<%= player_count %>/6]</button>
 						<% if ( teamsBuilt ) { %>
-						<span class="text-muted"><%= teamsBuilt %> Teams Generated</span>
+						<span class="text-muted ml-2"><%= teamsBuilt %> Teams Generated</span>
 						<% } %>
 					</div>
 				</form>
@@ -126,7 +126,7 @@
 
 					<% 
 						for ( let i = 0; i < signups[tier]['fa'].length; i++ ) {
-							if ( signups[tier]['fa'].rostered ) {
+							if ( signups[tier]['fa'][i].rostered ) {
 								continue; // skip players on an FA league team already
 							}
 							let player = signups[tier]['fa'][i]; 
