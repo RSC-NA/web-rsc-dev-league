@@ -197,8 +197,8 @@ app.post('/generate_team/:tier', (req, res) => {
 
 	for ( let i = 1; i <= numTeams; i++ ) {
 		teams[tier + '_' + i] = {
-			home: i % 2 ? false : true,
-			away: i % 2 ? true : false,
+			home: i % 2 ? true : false,
+			away: i % 2 ? false : true,
 			match_day: req.body.match_day,
 			season: req.body.season,
 			team_number: i,
@@ -236,7 +236,7 @@ app.post('/generate_team/:tier', (req, res) => {
 						let playerTwoMmr = playerTwo['mmr'];
 
 						teams[tier + '_' + curTeam]['players'].push(playerTwo);
-						teams[tier + '_' + curTeam]['mmr']+= playerTwoMmr;
+						teams[tier + '_' + curTeam]['mmr'] += playerTwoMmr;
 					}
 				}
 			} else {
@@ -250,7 +250,7 @@ app.post('/generate_team/:tier', (req, res) => {
 						let playerTwoMmr = playerTwo['mmr'];
 
 						teams[tier + '_' + curTeam]['players'].push(playerTwo);
-						teams[tier + '_' + curTeam]['mmr']+= playerTwoMmr;
+						teams[tier + '_' + curTeam]['mmr'] += playerTwoMmr;
 					}
 				}
 			}
@@ -264,29 +264,59 @@ app.post('/generate_team/:tier', (req, res) => {
 			if ( err ) { throw err; }
 			console.log(results);
 			let insertId = results.insertId;
+
+			let playerParams = [];
+
+			let matchParams = [];
+			let matchInfo = [];
+
 			for ( let team in teams ) {
 				teams[ team ]['team_id'] = insertId;
+
+				// set up match params for home team, finish it for away
+				if ( teams[ team ].home ) {
+					matchInfo = [
+						teams[ team ].season,
+						teams[ team ].match_day,
+						insertId,
+						null,
+						'fa_' + team,
+						null
+					];
+				} else if ( teams[ team ].away ) {
+					matchInfo[3] = insertId;
+					matchInfo[5] = 'fa_' + team;
+					matchParams.push(matchInfo);
+				}
+				
+				for ( let i = 0; i < teams[team].players.length; i++ ) {
+					playerParams.push([insertId, teams[team].player[i].id ]);
+				}
+
+				// move to next team
 				insertId++;
 			}
-			res.json(teams);
-		});
-		
-		// id, team_id, player_id 
 
-		//res.json(teams);
+			let playersQuery = 'INSERT INTO team_players (team_id, player_id) VALUES ?';
+			connection.query(playersQuery, [ playerParams ], (err, results) => {
+				if ( err ) { throw err; }
 
-		// 1 -> 1,4,5
-		// 2 -> 2,3,6
+				// season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass
+				let matchQuery = 'INSERT INTO matches (season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass) VALUES ?';
+				connection.query(matchQuery, [ matchParams ], (err, results) => {
+					if ( err ) { throw err; }
 
-		// 1 -> 1, 8, 9
-		// 2 -> 2, 7, 10
-		// 3 -> 3, 6, 11
-		// 4 -> 4, 5, 12
-	
+					// finally, mark all selected players as "rostered"
+					connection.query('UPDATE signups SET rostered = 1 WHERE player_id IN (?)', [players], (err, results) => {
+						if ( err ) { throw err; }
 
-		// create teams
-		// insert players into teams
-	});
+						res.redirect('/process_gameday');
+					}); // final query, update players as rostered
+				}); // end query to create match details
+			}); // end query to insert players onto team roster
+			//res.json(teams);
+		}); // end query to generate team	
+	}); // end query to select players from provided list.
 });
 
 app.get('/make_active/:signup_id', (req, res) => {
@@ -318,7 +348,7 @@ app.get('/process_gameday', (req, res) => {
 
 	let signups_query = `
 	SELECT 
-		s.id,s.player_id,s.active,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
+		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
 	FROM 
 		signups AS s
 	LEFT JOIN players AS p 
@@ -335,6 +365,8 @@ app.get('/process_gameday', (req, res) => {
 		for ( let i = 0; i < results.length; i++ ) {
 			if ( ! ( results[i]['tier'] in signups ) ) {
 				signups[ results[i]['tier'] ] = {
+					'season': results[i]['season'],
+					'match_day': results[i]['match_day'],
 					'fa': [],
 					'sub': [],
 				};

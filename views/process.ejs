@@ -88,6 +88,9 @@
 				%>
 				<form class="card p-2" method="post" action="/generate_team/<%= tier %>">
 					<input type="hidden" name="player_count" id="<%= tier %>_player_count" value="<%= signups[tier]['fa'].length %>">
+					<input type="hidden" name="season" id="<%= tier %>_season" value="<%= signups[tier]['season'] %>">
+					<input type="hidden" name="match_day" id="<%= tier %>_match_day" value="<%= signups[tier]['match_day'] %>">
+					
 					<% 
 						for ( let i = 0; i < signups[tier]['fa'].length; i++ ) {
 							let player = signups[tier]['fa'][i]; 
