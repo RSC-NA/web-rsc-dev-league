@@ -29,14 +29,14 @@
 		
 		<% if ( nickname && ! checked_in && "rsc_id" in user ) { %>
 			<a class="btn btn-lg btn-primary" href="/check_in" role="button">Check In!</a>
-		<% } else if ( nickname && checked_in && "rsc_id" in user ) { %>
+		<% } else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] ) { %>
 			<h2>You are checked in!</h2>
 			<p class="lead">
 				Rosters are generated around 8:00PM. Keep an eye on the channel #dev-league channel for updates.
 				If you are unable to play, you may check out using the check out button below. 
 			</p>
 			<a class="btn btn-lg btn-danger" href="/check_out" role="button">Check Out</a>
-		<% } else if ( nickname && ! ( "rsc_id" in user ) ) { %>
+		<% } else if ( nickname && ! user['rsc_id'] ) { %>
 			<h2>You are not an active player</h2>
 			<p>
 				This league is only available to valid members of RSC with an active contract. Please sign up for the league
