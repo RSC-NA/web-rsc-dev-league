@@ -262,7 +262,9 @@ app.post('/generate_team/:tier', (req, res) => {
 		let teamsQuery = 'INSERT INTO teams (team_number, tier) VALUES ?';
 		connection.query(teamsQuery, [ teamParams ], (err, results) => {
 			if ( err ) { throw err; }
-			console.log(results);
+			for ( let i = 0; i < results.length; i++ ) {
+				console.log(results[i]);
+			}
 			res.json(teams);
 		});
 		
