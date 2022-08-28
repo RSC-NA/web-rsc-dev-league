@@ -197,6 +197,7 @@ app.post('/generate_team/:tier', (req, res) => {
 
 	for ( let i = 1; i <= numTeams; i++ ) {
 		teams[tier + '_' + i] = {
+			team_number: i,
 			players: [],
 			mmr: 0,
 		};
@@ -213,13 +214,9 @@ app.post('/generate_team/:tier', (req, res) => {
 
 		let curTeam = 1;
 		let direction = 'up';
-		console.log(players);
-		console.log(playersQuery);
-		console.log(playerList);
-		console.log(playerList.length);
+
 		while ( playerList.length ) {
 			let player = playerList.pop();
-			console.log(player);
 			let mmr = player['mmr'];
 
 			teams[tier + '_' + curTeam]['players'].push(player);
@@ -255,7 +252,12 @@ app.post('/generate_team/:tier', (req, res) => {
 			}
 		}
 
-		res.json(teams);
+		// id, team_number, tier
+		// ['Elite_1', 'Elite_2' ] => [ [1, 'Elite' ], [2, 'Elite'] ]
+		let teamParams = Object.keys(teams).map(tierString => [ tierString.split('_')[1], tierString.split('_')[0] ] );
+		// id, team_id, player_id 
+
+		//res.json(teams);
 
 		// 1 -> 1,4,5
 		// 2 -> 2,3,6
