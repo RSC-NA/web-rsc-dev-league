@@ -19,6 +19,8 @@
 			<li>Follow all normal RSC <a href="https://tinyurl.com/MatchDayRules">Match Day Rules</a>. (Team names are provided below)</li>
 		</ul>
 	</div>
+	
+	<hr class="mb-4">
 
 	<div class="bg-light p-2 rounded">
 		<h2>Lobby Info</h2>
@@ -33,7 +35,7 @@
 
 		<div class="row">
 			<div class="col-md-4">
-				<h3 class="bg-primary text-white">Home Team - <%= lobby_user.substring(3) %></h3>
+				<h3 class="bg-primary text-white rounded p-2">Home Team - <%= lobby_user.substring(3) %></h3>
 				<ul>
 					<li><strong><%= players[0].name %></strong> [Makes lobby]</li>
 					<li><%= players[1].name %></li>
@@ -41,7 +43,7 @@
 				</ul>
 			</div>
 			<div class="col-md-4">
-				<h3 class="bg-warning">Away Team - <%= lobby_pass.substring(3) %></h3>
+				<h3 class="bg-warning rounded p-2">Away Team - <%= lobby_pass.substring(3) %></h3>
 				<ul>
 					<li><strong><%= players[3].name %></strong> [Uploads screenshots]</li>
 					<li><%= players[4].name %></li>
