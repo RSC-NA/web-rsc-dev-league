@@ -38,7 +38,7 @@ app.use((req, res, next) => {
 			(err, results) => {
 				if ( results.length > 0 ) {
 					req.session.checked_in = true;
-					req.session.rostered = true;
+					req.session.rostered = results[0].rostered;
 					res.locals.checked_in = req.session.checked_in;
 					res.locals.rostered = req.session.rostered;
 					next();
