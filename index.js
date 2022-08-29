@@ -224,6 +224,43 @@ app.get('/match', (req, res) => {
 			players: results 
 		});
 	});
+});
+
+app.get('/match/:match_id', (req, res) => {
+	let player_id = req.session.user_id;
+
+	let matchQuery = `
+		SELECT 
+			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
+			tp.team_id, tp.player_id, c.name, c.mmr
+		FROM
+			matches AS m
+		LEFT JOIN
+			team_players AS tp
+			ON ( m.home_team_id = tp.team_id OR m.away_team_id = tp.team_id )
+		LEFT JOIN
+			players AS p 
+			ON tp.player_id = p.id
+		LEFT JOIN 
+			contracts AS c
+			ON p.discord_id = c.discord_id
+		WHERE 
+			DATE(m.match_dtg) = CURDATE() AND
+			m.id = ?
+		ORDER BY tp.team_id ASC, c.mmr DESC
+	`;
+
+	connection.query(matchQuery, [ req.params.match_id ], (err, results) => {
+		if ( err ) { throw err; }
+
+		res.render('match', { 
+			season: results[0].season, 
+			match_day: results[0].match_day, 
+			lobby_user: results[0].lobby_user, 
+			lobby_pass: results[0].lobby_pass, 
+			players: results 
+		});
+	});
 
 });
 
@@ -400,8 +437,9 @@ app.get('/process_gameday', (req, res) => {
 		ON s.player_id = p.id
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
+	WHERE DATE(s.signup_dtg) = CURDATE()
 	ORDER BY c.mmr DESC
-	`; // WHERE DATE(s.signup_dtg) = CURDATE()
+	`; 
 
 	connection.query(signups_query, (err, results) => {
 		if ( err ) { throw err; }
