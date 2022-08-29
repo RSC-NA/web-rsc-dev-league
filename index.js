@@ -245,7 +245,6 @@ app.get('/match/:match_id', (req, res) => {
 			contracts AS c
 			ON p.discord_id = c.discord_id
 		WHERE 
-			DATE(m.match_dtg) = CURDATE() AND
 			m.id = ?
 		ORDER BY tp.team_id ASC, c.mmr DESC
 	`;
