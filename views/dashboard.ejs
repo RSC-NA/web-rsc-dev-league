@@ -27,7 +27,7 @@
 
 		<div class="bg-light p-5 rounded">
 		
-		<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null ) { %>
+		<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] != 0 ) { %>
 			<a class="btn btn-lg btn-primary" href="/check_in" role="button">Check In!</a>
 		<% } else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) { %>
 			<h2>You are checked in!</h2>
@@ -41,6 +41,12 @@
 			<p>
 				This league is only available to valid members of RSC with an active contract. Please sign up for the league
 				at <a href="https://discord.gg/rsc" rel="nofollow">https://discord.gg/rsc</a>
+			</p>
+		<% } else if ( nickname &&  "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] == 0) { %>
+			<h2>Your tier is not available in the RSC Development League</h2>
+			<p>
+				Your tier, <%= user.tier %>, is not currently enabled for the RSC Development League. Check back next season or ask about it in 
+				Discord.
 			</p>
 		<% } else { %>
 			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify" role="button">Log In with Discord</a>

@@ -31,25 +31,64 @@ app.use((req, res, next) => {
 	res.locals.rostered = req.session.rostered;
 
 	res.locals.checked_in = false;
-	if ( req.session.user_id ) {
-		connection.query(
-			'SELECT id,active,rostered FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
-			[ req.session.user_id ],
-			(err, results) => {
-				if ( results.length > 0 ) {
-					req.session.checked_in = true;
-					req.session.rostered = results[0].rostered;
-					res.locals.checked_in = req.session.checked_in;
-					res.locals.rostered = req.session.rostered;
-					next();
-				} else {
-					next();
+
+	let settings = {
+		season: 15,
+		amateur: false, 
+		contender: false,
+		prospect: false,
+		challenger: false,
+		rival: false,
+		veteran: false,
+		elite: false,
+		master: false,
+		premier: false
+	};
+
+	res.locals.settings = settings;
+
+	let tiersQuery = 'SELECT season,amateur,contender,prospect,challenger,rival,veteran,elite,master,premier FROM league_settings';
+	connection.query(tiersQuery, (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			res.locals.settings = {
+				season: results[0].season,
+				amateur: results[0].amateur, 
+				contender: results[0].contender,
+				prospect: results[0].prospect,
+				challenger: results[0].challenger,
+				rival: results[0].rival,
+				veteran: results[0].veteran,
+				elite: results[0].elite,
+				master: results[0].master,
+				premier: results[0].premier,
+			};
+		}
+
+		if ( req.session.user_id ) {
+			connection.query(
+				'SELECT id,active,rostered FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
+				[ req.session.user_id ],
+				(err, results) => {
+					if ( results.length > 0 ) {
+						req.session.checked_in = true;
+						req.session.rostered = results[0].rostered;
+						res.locals.checked_in = req.session.checked_in;
+						res.locals.rostered = req.session.rostered;
+						next();
+					} else {
+						next();
+					}
 				}
-			}
-		);
-	} else {
-		next();
-	}
+			);
+		} else {
+			next();
+		}
+
+	});
+
+	
 });
 
 // express setup
