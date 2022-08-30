@@ -12,6 +12,16 @@
 		<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 		<script type="text/javascript" src="https://cdn.rawgit.com/jmhobbs/Konami-Unicorn-Blitz/master/konami-unicorn-blitz.min.js"></script>
 		<link href="/css/devleague.css" rel="stylesheet" />
+
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="RSC Development League" />
+		<meta property="og:description" content="Welcome to the RSC Development League! Matches are open to all active players in RSC and run at 8:30 on match nights." />
+		<meta property="og:url" content="https:/rsc-devleague.herokuapp.com/" />
+		<meta property="og:site_name" content="RSC Development League" />
+		<link rel="icon" href="/images/cropped-rsc-logo-1000-192x192.png" sizes="192x192" />
+		<link rel="apple-touch-icon" href="/images/cropped-rsc-logo-1000-180x180.png" />
+		<meta name="msapplication-TileImage" content="/images/cropped-rsc-logo-1000-270x270.png" />
 	</head>
 	<body class="sb-nav-fixed">
 		<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -26,7 +36,7 @@
 					<% if ( discord_id) { %>
 					<a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span><%= nickname %></span></a>
 					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-							<li><a class="dropdown-item" href="/player/<%= discord_id %>">View Profile</a></li>
+							<!-- <li><a class="dropdown-item" href="/player/<%= discord_id %>">View Profile</a></li> -->
 							<li><a class="dropdown-item" href="/logout">Log Out</a></li>
 						<% } else { %>
 					<a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span>Login</span></a>
