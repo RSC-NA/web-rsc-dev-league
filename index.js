@@ -14,6 +14,27 @@ require('dotenv').config();
 
 app.use( express.urlencoded({ extended: true }) );
 
+const matchDays = {
+	'2022-08-30': 69, // nice
+	'2022-09-12': 1,
+	'2022-09-14': 2,
+	'2022-09-19': 3,
+	'2022-09-21': 4,
+	'2022-09-26': 5,
+	'2022-09-28': 6,
+	'2022-10-03': 7,
+	'2022-10-05': 8,
+	/* 2022-10-10 - holiday */
+	'2022-10-12': 9,
+	'2022-10-17': 10,
+	'2022-10-19': 11,
+	'2022-10-24': 12,
+	'2022-10-26': 13,
+	'2022-10-31': 14,
+	'2022-11-02': 15,
+	'2022-11-07': 16,
+};
+
 // set up session
 app.use(session({
 	secret: 'rsc-dev-league',
@@ -97,7 +118,13 @@ app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
 	// TODO(load template)
-	res.render('dashboard');
+	let date = new Date().toISOString().split('T')[0];
+	let match_day = false;
+	if ( date in matchDays ) {
+		match_day = matchDays[date];
+	}
+
+	res.render('dashboard', { match_day: match_day });
 });
 
 app.get('/process_login', (req, res) => {
@@ -181,11 +208,11 @@ app.get('/process_login', (req, res) => {
 	);
 });
 
-app.get('/check_in', (req, res) => {
+app.get('/check_in/:match_day', (req, res) => {
 	if ( req.session.discord_id && ! req.session.checked_in ) {
 		// TODO(get season and match day from somewhere)
-		let season = 15;
-		let match_day = 1;
+		let season = res.locals.settings.season;
+		let match_day = req.params.match_day;
 		let active = req.session.user['status'] == 'Free Agent' ? 1 : 0;
 		connection.query(
 			'INSERT INTO signups (player_id, season, match_day, active) VALUES (?, ?, ?, ?)',
@@ -203,14 +230,14 @@ app.get('/check_in', (req, res) => {
 	}
 });
 
-app.get('/check_out', (req, res) => {
+app.get('/check_out/:match_day', (req, res) => {
 	if ( req.session.discord_id && req.session.checked_in ) {
 		// TODO(get season and match day from somewhere)
-		let season = 15;
-		let match_day = 1;
+		let season = res.locals.settings.season;
+		let match_day = req.params.match_day;
 		connection.query(
-			'DELETE FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
-			[ req.session.user_id ],
+			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND DATE(signup_dtg) = CURDATE()',
+			[ req.session.user_id, match_day ],
 			function(err, results) {
 				if ( err ) throw err;
 
