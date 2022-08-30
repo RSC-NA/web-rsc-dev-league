@@ -15,7 +15,7 @@ require('dotenv').config();
 app.use( express.urlencoded({ extended: true }) );
 
 const matchDays = {
-	'2022-08-30': 69, // nice
+	'2022-08-30': 69, // nice, really nice
 	'2022-09-12': 1,
 	'2022-09-14': 2,
 	'2022-09-19': 3,
