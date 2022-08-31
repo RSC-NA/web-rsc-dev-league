@@ -31,21 +31,26 @@
 			<li>Lobby Password: <strong><%= lobby_pass %></strong></li>
 		</ul>
 
+		<% 
+			let teamOneMmr = players[0].mmr + players[1].mmr + players[2].mmr;
+			let teamTwoMmr = players[3].mmr + players[4].mmr + players[5].mmr;
+		%> 
+
 		<div class="row">
 			<div class="col-md-4">
-				<h3 class="bg-primary text-white rounded p-2">Home Team - <%= lobby_user.substring(3) %></h3>
+				<h3 class="bg-primary text-white rounded p-2"><%= is_admin ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user.substring(3) %></h3>
 				<ul>
-					<li><strong><%= players[0].name %></strong> [Makes lobby]</li>
-					<li><%= players[1].name %></li>
-					<li><%= players[2].name %></li>
+					<li><%= is_admin ? '[' + players[0].mmr + '] ' : '' %><strong><%= players[0].name %></strong> [Makes lobby]</li>
+					<li><%= is_admin ? '[' + players[1].mmr + '] ' : '' %><%= players[1].name %></li>
+					<li><%= is_admin ? '[' + players[2].mmr + '] ' : '' %><%= players[2].name %></li>
 				</ul>
 			</div>
 			<div class="col-md-4">
-				<h3 class="bg-warning rounded p-2">Away Team - <%= lobby_pass.substring(3) %></h3>
+				<h3 class="bg-warning rounded p-2"><%= is_admin ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass.substring(3) %></h3>
 				<ul>
-					<li><strong><%= players[3].name %></strong> [Uploads screenshots]</li>
-					<li><%= players[4].name %></li>
-					<li><%= players[5].name %></li>
+					<li><%= is_admin ? '[' + players[3].mmr + '] ' : '' %><strong><%= players[3].name %></strong> [Uploads screenshots]</li>
+					<li><%= is_admin ? '[' + players[4].mmr + '] ' : '' %><%= players[4].name %></li>
+					<li><%= is_admin ? '[' + players[5].mmr + '] ' : '' %><%= players[5].name %></li>
 				</ul>
 			</div>
 		</div>
