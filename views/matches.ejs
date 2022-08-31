@@ -39,7 +39,10 @@
 						let awayTeam = matches[i].lobby_pass.substring(3);
 			%>
 				<li class="list-group-item d-flex justify-content-between 1h-condensed">
-					<h6 class="my-0"><a href="/match/<%= matches[i].id %>"><%= awayTeam %> @ <%= homeTeam %></a></h6>
+					<div>
+					<h6 class="my-0"><%= awayTeam %> @ <%= homeTeam %></h6>
+					</div>
+					<a href="/match/<%= matches[i].id %>">view teams</a>
 				</li>
 			<%
 						if ( i == matches.length - 1 || matches[i+1].match_day != matchDay ) {
