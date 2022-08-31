@@ -42,7 +42,7 @@
 					<h6 class="my-0"><a href="/match/<%= matches[i].id %>"><%= awayTeam %> @ <%= homeTeam %></a></h6>
 				</li>
 			<%
-						if ( i == matches.length || matches[i+1].match_day != matchDay ) {
+						if ( i == matches.length - 1 || matches[i+1].match_day != matchDay ) {
 							// close out the list if we're done, or if the next result is a different MD.
 			%>
 			</ul>
