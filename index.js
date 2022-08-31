@@ -116,6 +116,9 @@ app.use((req, res, next) => {
 app.use( express.static('static') ); 
 app.set('view engine', 'ejs');
 
+/*******************************************************
+ ******************** Player Views *********************
+ ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
 	let date = new Date().toISOString().split('T')[0];
@@ -125,6 +128,32 @@ app.get('/', (req, res) => {
 	}
 
 	res.render('dashboard', { match_day: match_day });
+});
+
+app.get('/login', (req, res) => {
+	res.render('login');
+});
+
+app.get('/logout', (req, res) => {
+	if ( req.session ) {
+		req.session.destroy(err => {
+			if ( err ) {
+				res.status(400).send('Unable to log out');
+			} else {
+				res.redirect('/');
+			}
+		});
+	} else {
+		res.redirect('/');
+	}
+});
+
+app.get('/oauth2', async (req, res) => {
+	res.render('login');
+});
+
+app.get('/callback', (req, res) => {
+	res.json(req.body);
 });
 
 app.get('/process_login', (req, res) => {
@@ -342,7 +371,16 @@ app.get('/matches', (req, res) => {
 	});
 });
 
+
+/*******************************************************
+ ******************** Admin Views *********************
+ ******************************************************/
+
 app.post('/generate_team/:tier', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
 	// TODO (err trapping with invalid values)
 	let numPlayers = req.body.player_count;
 	let numTeams = numPlayers / 3;
@@ -699,32 +737,6 @@ app.post('/manage_league', (req, res) => {
 			res.redirect('/manage_league');
 		}
 	);
-});
-
-app.get('/login', (req, res) => {
-	res.render('login');
-});
-
-app.get('/logout', (req, res) => {
-	if ( req.session ) {
-		req.session.destroy(err => {
-			if ( err ) {
-				res.status(400).send('Unable to log out');
-			} else {
-				res.redirect('/');
-			}
-		});
-	} else {
-		res.redirect('/');
-	}
-});
-
-app.get('/oauth2', async (req, res) => {
-	res.render('login');
-});
-
-app.get('/callback', (req, res) => {
-	res.json(req.body);
 });
 
 const connection = mysql.createPool({
