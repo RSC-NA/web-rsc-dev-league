@@ -288,11 +288,11 @@ app.get('/match', (req, res) => {
 	let player_id = req.session.user_id;
 
 	if ( ! player_id  ) {
-		res.redirect('/');
+		return res.redirect('/');
 	}
 
 	if ( ! res.locals.rostered ) {
-		res.redirect('/');
+		return res.redirect('/');
 	}
 
 	res.locals.title = 'Your Match Info - ' + res.locals.title;
