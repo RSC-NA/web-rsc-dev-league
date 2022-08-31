@@ -502,6 +502,7 @@ app.get('/process_gameday', (req, res) => {
 		return res.redirect('/');
 	} 
 
+	// TODO(erh): think about resorting this by signup date, or perhaps just in the front-end?
 	let signups_query = `
 	SELECT 
 		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
