@@ -254,6 +254,10 @@ app.get('/check_out/:match_day', (req, res) => {
 app.get('/match', (req, res) => {
 	let player_id = req.session.user_id;
 
+	if ( ! player_id ) {
+		res.redirect('/');
+	}
+
 	let matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
