@@ -287,7 +287,7 @@ app.get('/check_out/:match_day', (req, res) => {
 app.get('/match', (req, res) => {
 	let player_id = req.session.user_id;
 
-	if ( ! player_id ) {
+	if ( ! player_id  || ! res.locals.rostered ) {
 		res.redirect('/');
 	}
 
