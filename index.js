@@ -329,6 +329,15 @@ app.get('/match/:match_id', (req, res) => {
 
 });
 
+app.get('/matches', (req, res) => {
+	let matchesQuery = 'SELECT id,match_day,lobby_user,lobby_pass FROM matches WHERE season = ? ORDER BY match_day DESC';
+	connection.query(matchesQuery, [ res.locals.settings.season ], (err, results) => {
+		if ( err ) { throw err; }
+
+		res.render('matches', { matches: results });
+	});
+});
+
 app.post('/generate_team/:tier', (req, res) => {
 	// TODO (err trapping with invalid values)
 	let numPlayers = req.body.player_count;
