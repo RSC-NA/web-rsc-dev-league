@@ -273,8 +273,8 @@ app.get('/match', (req, res) => {
 			DATE(m.match_dtg) = CURDATE() AND
 			m.id = (
 				SELECT id FROM matches 
-				where home_team_id = (SELECT team_id FROM team_players WHERE player_id = ?) OR 
-				away_team_id = (SELECT team_id FROM team_players WHERE player_id = ?)
+				where home_team_id = (SELECT team_id FROM team_players WHERE player_id = ? ORDER BY id DESC LIMIT 1) OR 
+				away_team_id = (SELECT team_id FROM team_players WHERE player_id = ? ORDER BY id DESC LIMIT 1)
 			)
 		ORDER BY tp.team_id ASC, c.mmr DESC
 	`;
