@@ -330,7 +330,7 @@ app.get('/match/:match_id', (req, res) => {
 });
 
 app.get('/matches', (req, res) => {
-	let matchesQuery = 'SELECT id,match_day,lobby_user,lobby_pass FROM matches WHERE season = ? ORDER BY match_day DESC';
+	let matchesQuery = 'SELECT m.id,m.match_day,m.lobby_user,m.lobby_pass,t.tier FROM matches AS m LEFT JOIN teams AS t ON m.home_team_id = t.id WHERE m.season = ? ORDER BY m.match_day DESC';
 	connection.query(matchesQuery, [ res.locals.settings.season ], (err, results) => {
 		if ( err ) { throw err; }
 
