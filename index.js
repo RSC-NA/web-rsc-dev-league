@@ -14,8 +14,10 @@ require('dotenv').config();
 
 app.use( express.urlencoded({ extended: true }) );
 
+let title = 'RSC Development League';
+
 const matchDays = {
-	'2022-08-31': 69, // nicely
+	//'2022-08-31': 69, // nicely
 	'2022-09-12': 1,
 	'2022-09-14': 2,
 	'2022-09-19': 3,
@@ -50,6 +52,8 @@ app.use((req, res, next) => {
 	res.locals.is_admin = req.session.is_admin;
 	res.locals.user = req.session.user || {};
 	res.locals.rostered = req.session.rostered;
+
+	res.locals.title = title;
 
 	res.locals.checked_in = false;
 
@@ -287,6 +291,8 @@ app.get('/match', (req, res) => {
 		res.redirect('/');
 	}
 
+	res.locals.title = 'Your Match Info - ' + res.locals.title;
+
 	let matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
@@ -326,7 +332,8 @@ app.get('/match', (req, res) => {
 });
 
 app.get('/match/:match_id', (req, res) => {
-	let player_id = req.session.user_id;
+
+	res.locals.title = `Season ${res.settings.season} Matches - ${res.locals.title}`;
 
 	let matchQuery = `
 		SELECT 
@@ -544,6 +551,8 @@ app.get('/process_gameday', (req, res) => {
 		return res.redirect('/');
 	} 
 
+	res.locals.title = `Process Gameday - ${res.locals.title}`;
+
 	// TODO(erh): think about resorting this by signup date, or perhaps just in the front-end?
 	let signups_query = `
 	SELECT 
@@ -656,6 +665,8 @@ app.get('/manage_league', (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
 	} 
+
+	res.locals.title = `Manage League - ${res.locals.title}`;
 
 	let counts_query = 'select count(*) AS count,tier,status from contracts where tier != "" group by tier,status order by tier,status';
 	connection.query(counts_query, (err, results) => {
