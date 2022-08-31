@@ -674,6 +674,7 @@ app.get('/manage_league', (req, res) => {
 	connection.query(counts_query, (err, results) => {
 		if ( err ) { throw err; }
 
+		// hardcoded tier names so we can get correct sort order.
 		let tiers = {
 			'all': { 'total': 0, 'fa': 0 },
 			'Premier': { 'total': 0, 'fa': 0 },
