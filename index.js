@@ -570,7 +570,7 @@ app.get('/process_gameday', (req, res) => {
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
 	WHERE DATE(s.signup_dtg) = CURDATE()
-	ORDER BY c.mmr DESC
+	ORDER BY s.id ASC
 	`; 
 
 	connection.query(signups_query, (err, results) => {
