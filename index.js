@@ -72,7 +72,7 @@ app.use((req, res, next) => {
 
 	res.locals.settings = settings;
 
-	let tiersQuery = 'SELECT season,amateur,contender,prospect,challenger,rival,veteran,elite,master,premier FROM league_settings';
+	let tiersQuery = 'SELECT season,amateur,contender,prospect,challenger,rival,veteran,elite,master,premier FROM league_settings ORDER BY id DESC LIMIT 1';
 	connection.query(tiersQuery, (err, results) => {
 		if ( err ) { throw err; }
 
