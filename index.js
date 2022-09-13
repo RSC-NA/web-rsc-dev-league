@@ -93,7 +93,7 @@ app.use((req, res, next) => {
 
 		if ( req.session.user_id ) {
 			connection.query(
-				'SELECT id,active,rostered FROM signups WHERE player_id = ? AND DATE(signup_dtg) = CURDATE()',
+				'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
 				[ req.session.user_id ],
 				(err, results) => {
 					if ( results.length > 0 ) {
