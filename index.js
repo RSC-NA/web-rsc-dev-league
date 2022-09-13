@@ -91,7 +91,7 @@ app.use((req, res, next) => {
 			};
 		}
 
-		
+
 		if ( req.session.user_id ) {
 			connection.query(
 				'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
@@ -314,7 +314,11 @@ app.get('/match', (req, res) => {
 			contracts AS c
 			ON p.discord_id = c.discord_id
 		WHERE 
-			DATE(m.match_dtg) = CURDATE() AND
+			(
+				DATE(m.match_dtg) = CURDATE() OR
+				DATE_ADD(DATE(m.match_dtg), INTERVAL 1 DAY) = CURDATE()
+			)
+			AND
 			m.id = (
 				SELECT id FROM matches 
 				where home_team_id = (SELECT team_id FROM team_players WHERE player_id = ? ORDER BY id DESC LIMIT 1) OR 
