@@ -762,6 +762,16 @@ app.post('/manage_league', (req, res) => {
 	);
 });
 
+app.get('/test', (req, res) => {
+	connection.query(
+		'INSERT INTO test (server_date) VALUES (?)',
+		[ new Date() ],
+		(err, results) => {
+			res.send('record inserted on ' + new Date().toISOString());
+		}
+	)
+});
+
 const connection = mysql.createPool({
 	host: process.env.DB_HOST,
 	user: process.env.DB_USER,
