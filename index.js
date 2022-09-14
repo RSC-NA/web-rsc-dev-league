@@ -249,8 +249,8 @@ app.get('/check_in/:match_day', (req, res) => {
 		let match_day = req.params.match_day;
 		let active = req.session.user['status'] == 'Free Agent' ? 1 : 0;
 		connection.query(
-			'INSERT INTO signups (player_id, season, match_day, active) VALUES (?, ?, ?, ?)',
-			[ req.session.user_id, season, match_day, active],
+			'INSERT INTO signups (player_id, signup_dtg, season, match_day, active) VALUES (?, ?, ?, ?, ?)',
+			[ req.session.user_id, new Date(), season, match_day, active],
 			function(err, results) {
 				if ( err ) throw err;
 
@@ -270,7 +270,7 @@ app.get('/check_out/:match_day', (req, res) => {
 		let season = res.locals.settings.season;
 		let match_day = req.params.match_day;
 		connection.query(
-			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND DATE(signup_dtg) = CURDATE()',
+			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
 			[ req.session.user_id, match_day ],
 			function(err, results) {
 				if ( err ) throw err;
@@ -490,8 +490,10 @@ app.post('/generate_team/:tier', (req, res) => {
 				teams[ team ]['team_id'] = insertId;
 
 				// set up match params for home team, finish it for away
+				let matchDate = new Date();
 				if ( teams[ team ].home ) {
 					matchInfo = [
+						matchDate,
 						teams[ team ].season,
 						teams[ team ].match_day,
 						insertId,
@@ -518,12 +520,12 @@ app.post('/generate_team/:tier', (req, res) => {
 				if ( err ) { throw err; }
 
 				// season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass
-				let matchQuery = 'INSERT INTO matches (season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass) VALUES ?';
+				let matchQuery = 'INSERT INTO matches (match_dtg, season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass) VALUES ?';
 				connection.query(matchQuery, [ matchParams ], (err, results) => {
 					if ( err ) { throw err; }
 
 					// finally, mark all selected players as "rostered"
-					connection.query('UPDATE signups SET rostered = 1 WHERE player_id IN (?)', [players], (err, results) => {
+					connection.query('UPDATE signups SET rostered = 1 WHERE ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() ) AND player_id IN (?)', [players], (err, results) => {
 						if ( err ) { throw err; }
 
 						res.redirect('/process_gameday');
@@ -574,7 +576,7 @@ app.get('/process_gameday', (req, res) => {
 		ON s.player_id = p.id
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
-	WHERE DATE(s.signup_dtg) = CURDATE()
+	WHERE ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )
 	ORDER BY s.id ASC
 	`; 
 
