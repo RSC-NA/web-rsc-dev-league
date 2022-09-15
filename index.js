@@ -502,8 +502,8 @@ app.post('/generate_team/:tier', (req, res) => {
 						null
 					];
 				} else if ( teams[ team ].away ) {
-					matchInfo[3] = insertId;
-					matchInfo[5] = 'fa_' + team;
+					matchInfo[4] = insertId;
+					matchInfo[6] = 'fa_' + team;
 					matchParams.push(matchInfo);
 				}
 				
