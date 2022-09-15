@@ -263,7 +263,7 @@ app.get('/check_in/:match_day', (req, res) => {
 		res.redirect('/');
 	}
 });
-
+ 
 app.get('/check_out/:match_day', (req, res) => {
 	if ( req.session.discord_id && req.session.checked_in ) {
 		// TODO(get season and match day from somewhere)
