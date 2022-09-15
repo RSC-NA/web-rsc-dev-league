@@ -126,7 +126,7 @@ app.set('view engine', 'ejs');
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
-	let date = new Date().toISOString().split('T')[0];
+	let date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
 	let match_day = false;
 	if ( date in matchDays ) {
 		match_day = matchDays[date];
@@ -769,7 +769,7 @@ app.get('/test', (req, res) => {
 		'INSERT INTO test (server_date) VALUES (?)',
 		[ new Date() ],
 		(err, results) => {
-			res.send('record inserted on ' + new Date().toISOString());
+			res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
 		}
 	)
 });
