@@ -17,7 +17,7 @@ app.use( express.urlencoded({ extended: true }) );
 let title = 'RSC Development League';
 
 const matchDays = {
-	//'2022-08-31': 69, // nicely
+	//'2022-08-31': 69, // nice
 	'2022-09-12': 1,
 	'2022-09-14': 2,
 	'2022-09-19': 3,
