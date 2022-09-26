@@ -37,6 +37,53 @@ const matchDays = {
 	'2022-11-07': 16,
 };
 
+const mmrRange = {
+	'Premier': { 
+		'max': 2010,
+		'min': 1755,
+	},
+	'Master': { 
+		'max': 1750,
+		'min': 1655,
+	},
+	'Elite': { 
+		'max': 1650,
+		'min': 1520,
+	},
+	'Veteran': { 
+		'max': 1515,
+		'min': 1405,
+	},
+	'Rival': { 
+		'max': 1400,
+		'min': 1270,
+	},
+	'Challenger': { 
+		'max': 1265,
+		'min': 1135,
+	},
+	'Prospect': { 
+		'max': 1130,
+		'min': 1030,
+	},
+	'Contender': { 
+		'max': 1025,
+		'min': 925,
+	},
+	'Amateur': { 
+		'max': 920,
+		'min': 700,
+	},
+};
+
+function getTierFromMMR(mmr) {
+	for ( let tier in mmrRange ) {
+		if ( mmr > mmrRange[tier]['min'] && mmr < mmrRange[tier]['max'] ) {
+			return tier;
+		}
+	}
+}
+
 // set up session
 app.use(session({
 	secret: 'rsc-dev-league',
@@ -648,7 +695,17 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	for ( let i = 0; i < contractRows.length; i++ ) {
 		if ( contractRows[i]['RSC Unique ID'] in players ) {
+
+			// perm FAs don't show up in Count/Keeper sheet. We need to 
+			// calc their tier from MMR.
+			if ( ! ('tier' in players[ contractRows[i]['RSC Unique ID'] ]) ) {
+				players[contractRows[i]['RSC Unique ID']]['mmr'] = contractRows[i]['Current MMR'];
+				players[contractRows[i]['RSC Unique ID']]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']));
+			}
+
 			players[ contractRows[i]['RSC Unique ID'] ]['status'] = contractRows[i]['Contract Status'];
+
+
 		}
 	}
 
