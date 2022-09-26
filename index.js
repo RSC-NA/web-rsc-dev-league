@@ -78,7 +78,7 @@ const mmrRange = {
 
 function getTierFromMMR(mmr) {
 	for ( let tier in mmrRange ) {
-		if ( mmr > mmrRange[tier]['min'] && mmr < mmrRange[tier]['max'] ) {
+		if ( mmr >= mmrRange[tier]['min'] && mmr <= mmrRange[tier]['max'] ) {
 			return tier;
 		}
 	}
