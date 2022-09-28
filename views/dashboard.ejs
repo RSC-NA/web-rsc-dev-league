@@ -2,7 +2,7 @@
 <%- include('partials/header.ejs'); %>
 
 	<main class="container">
-		<div class="bg-light p-5 rounded">
+		<div class="bg-light p-3 rounded">
 			<% if ( user.name ) { %>
 				<h1>Welcome to the RSC Development League, <%= user.name %></h1>
 			<% } else { %>
@@ -32,7 +32,7 @@
 			</p>
 		</div>
 
-		<div class="bg-light p-5 rounded">
+		<div class="bg-light p-3 rounded">
 		<% if ( match_day ) { %>
 
 			<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] != 0 ) { %>
