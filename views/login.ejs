@@ -17,10 +17,11 @@
 			.then(result => result.json())
 			.then(response => {
 				const { username, discriminator, id } = response;
-				document.getElementById('info').innerText += ` ${username}#${discriminator} - ${id}`;
+				let userString = btoa(`${username}:${discriminator}:${id}`);
+				document.getElementById('info').innerText += ` ${username}#${discriminator} - ${id} - If you're not redirected automatically please click <a href="/process_login?rsc=${userString}">here to finish logging in.</a>`;
 				if ( username && discriminator && id ) {
 					// redirect to login page
-					let userString = btoa(`${username}:${discriminator}:${id}`);
+					
 					window.location.href = '/process_login?rsc=' + userString;
 				}
 			})
