@@ -1,6 +1,47 @@
 
 <%- include('partials/header.ejs'); %>
 
+<% 
+
+	function ucfirst(str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+	let tiers = {};
+	let advertiseText = '';
+
+	for ( let tierName in settings ) {
+		if ( tierName == 'season' ) {
+			continue;
+		}
+
+		if ( settings[tierName] === true ) {
+			tiers[ tierName ] = 6;
+		}
+
+		if ( tierName in signups && signups[tierName]['fa'].length ) { 
+			let player_count = (signups[tierName]['fa'].length);
+
+			// 6, 12, 18, 24, 30, 36
+			if ( player_count < 6 ) {
+				tiers[ tierName ] = 6 - player_count;
+			} else if ( player_count < 12 ) {
+				tiers[ tierName ] = 12 - player_count;
+			} else if ( player_count < 18 ) {
+				tiers[ tierName ] = 18 - player_count;
+			} else if ( player_count < 24 ) {
+				tiers[ tierName ] = 24 - player_count;
+			} else if ( player_count < 30 ) {
+				tiers[ tierName ] = 30 - player_count;
+			}
+		}
+	}
+
+	for ( let tierName in tiers ) {
+		advertiseText += `**${ucfirst(tierName)}**: Needs ${tiers[tierName]} more.\n`;
+	}
+%> 
+
 <main class="container">
 	<div class="py-5">
 		<h2>Dev League Match Day Setup</h2>
@@ -21,11 +62,12 @@
 				<span class="badge badge-secondary badge-pill">3</span>
 			</h4>
 
-			<!-- <form class="card p-2" action="#">
-				<div class="input-group">
-					<button type="submit" class="btn btn-primary">Import Contracts</button>
-				</div>
-			</form> -->
+			<%
+
+			%>
+			<textarea id="advertise"><%= advertiseText %></textarea>
+			<button type="submit" class="btn btn-primary">Copy to Clipboard</button>
+
 
 			<ul class="list-group mb-3">
 

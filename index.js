@@ -106,15 +106,15 @@ app.use((req, res, next) => {
 
 	let settings = {
 		season: 15,
-		amateur: false, 
-		contender: false,
-		prospect: false,
-		challenger: false,
-		rival: false,
-		veteran: false,
-		elite: false,
+		premier: false,
 		master: false,
-		premier: false
+		elite: false,
+		veteran: false,
+		rival: false,
+		challenger: false,
+		prospect: false,
+		contender: false,
+		amateur: false
 	};
 
 	res.locals.settings = settings;
