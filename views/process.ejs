@@ -152,9 +152,6 @@
 					%>
 					<div class="input-group">
 						<button type="submit" class="btn btn-primary">Generate <%= tier %> Teams</button>
-						
-						<input type="hidden" id="<%= tier %>_advertisement" value="RSC Dev League needs **<%= tiers[ tier.toLowerCase() ] %>** more signups -- https://rsc-devleague.herokuapp.com">
-						<button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('<%= tier %>_advertisement').value);">Copy Ad</button>
 					</div>
 				</form>
 				<%
@@ -167,6 +164,8 @@
 						<% if ( teamsBuilt ) { %>
 						<span class="text-muted m-2"><%= teamsBuilt %> Teams Generated</span>
 						<% } %>
+						<input type="hidden" id="<%= tier %>_advertisement" value="RSC Dev League needs **<%= tiers[ tier.toLowerCase() ] %>** more signups -- https://rsc-devleague.herokuapp.com">
+						<button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('<%= tier %>_advertisement').value);">Copy Ad</button>
 					</div>
 				</form>
 				<%		
