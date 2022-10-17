@@ -20,8 +20,10 @@
 		}
 
 		if ( tierName in signups && signups[tierName]['fa'].length ) { 
-			let player_count = (signups[tierName]['fa'].length);
+			let player_count = parseInt((signups[tierName]['fa'].length));
 
+			console.log(tierName + ' ' + player_count);
+			
 			// 6, 12, 18, 24, 30, 36
 			if ( player_count < 6 ) {
 				tiers[ tierName ] = 6 - player_count;
