@@ -22,8 +22,6 @@
 		if ( ucfirst(tierName) in signups && signups[ucfirst(tierName)]['fa'].length ) { 
 			let player_count = parseInt((signups[ucfirst(tierName)]['fa'].length));
 
-			console.log(tierName + ' ' + player_count);
-
 			// 6, 12, 18, 24, 30, 36
 			if ( player_count < 6 ) {
 				tiers[ tierName ] = 6 - player_count;
@@ -39,15 +37,13 @@
 		}
 	}
 
-	console.log('Settings:', settings);
-	console.log('Tiers:', tiers);
-
 	for ( let tierName in tiers ) {
 		if ( tiers[tierName] == 6 ) {
 			continue;
 		}
 		advertiseText += `**${ucfirst(tierName)}**: Needs ${tiers[tierName]} more.\n`;
 	}
+	advertiseText += "\n\nhttps://rsc-devleague.herokuapp.com";
 %> 
 
 <main class="container">
