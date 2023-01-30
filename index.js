@@ -295,9 +295,10 @@ app.get('/check_in/:match_day', (req, res) => {
 		let season = res.locals.settings.season;
 		let match_day = req.params.match_day;
 		let active = req.session.user['status'] == 'Free Agent' ? 1 : 0;
+		let status = req.session.user['status'];
 		connection.query(
-			'INSERT INTO signups (player_id, signup_dtg, season, match_day, active) VALUES (?, ?, ?, ?, ?)',
-			[ req.session.user_id, new Date(), season, match_day, active],
+			'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
+			[ req.session.user_id, new Date(), season, match_day, active, status],
 			function(err, results) {
 				if ( err ) throw err;
 
