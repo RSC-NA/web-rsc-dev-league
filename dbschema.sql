@@ -15,6 +15,7 @@ CREATE TABLE signups (
 	`match_day` INT UNSIGNED NOT NULL,
 	`active` TINYINT NOT NULL DEFAULT 0,
 	`rostered` TINYINT NOT NULL DEFAULT 0,
+	`status` varchar(20) not null default ''
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
