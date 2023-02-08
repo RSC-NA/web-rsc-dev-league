@@ -706,7 +706,6 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			players[ contractRows[i]['RSC Unique ID'] ]['status'] = contractRows[i]['Contract Status'];
 
-
 		}
 	}
 
@@ -717,6 +716,11 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		for ( let rsc_id in players ) {
 			let player = players[rsc_id];
 			// discord_id, rsc_id, mmr, tier, status
+			if ( player['tier'] == 'Master' ) {
+				player['tier'] = 'Premier';
+			} else if ( player['tier'] == 'Amateur' ) {
+				player['tier'] = 'Contender';
+			}
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'] ]);
 		}
 
