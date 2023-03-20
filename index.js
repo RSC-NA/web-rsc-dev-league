@@ -17,7 +17,7 @@ app.use( express.urlencoded({ extended: true }) );
 let title = 'RSC Development League';
 
 const matchDays = {
-	'2023-01-18': 69, // nice
+	'2023-03-20': 17, // nice - end of season blowout
 	'2023-01-23': 1,
 	'2023-01-25': 2,
 	'2023-01-30': 3,
