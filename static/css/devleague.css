@@ -1,8 +1,19 @@
 /* devleague specific styles */
+ul.dates {
+	font-size: .9rem;
+	list-style-type: none;
+}
+
 li.today {
 	font-weight: bold;
 	font-size: 1.1rem;
 	background-color: #b5ff00;
 	border-radius: 6px;
 	text-decoration: underline;
+	list-style-type: '⚽';
+}
+
+li.today.holiday {
+	list-style-type: '🏖️';
+	background-color: #ff4300;
 }

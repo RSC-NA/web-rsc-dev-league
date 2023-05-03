@@ -38,12 +38,12 @@
 				</div>
 				<div class="col-md-4">
 					<h4>Season <%= settings.season %> Dates</h4>
-					<ul style="font-size: .9rem;">
+					<ul class="dates">
 						<%
 							for ( let match_date in match_days ) {
 						%>
 
-						<li class="<%- match_date == today ? 'today' : '' %>">
+						<li class="<%- match_date == today ? 'today' : '' %> <%- match_date == today && match_day == 'holiday' ? 'holiday' : '' %>">
 							<%- match_date %> - 
 							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : match_days[match_date] %>
 						</li>
