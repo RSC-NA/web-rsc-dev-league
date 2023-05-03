@@ -18,11 +18,12 @@ let title = 'RSC Development League';
 
 const matchDays = {
 	//'2023-03-20': 17, // nice - end of season blowout
+	'2022-05-03': 'holiday',
 	'2023-05-15': 1,
 	'2023-05-17': 2,
 	'2023-05-22': 3,
 	'2023-05-24': 4,
-	/* 2022-05-29 - holiday */
+	'2022-05-29': 'holiday',
 	'2023-05-31': 5,
 	'2023-06-05': 6,
 	'2023-06-07': 7,
@@ -32,8 +33,8 @@ const matchDays = {
 	'2023-06-21': 11,
 	'2023-06-26': 12,
 	'2023-06-28': 13,
-	/* 2022-07-03 - holiday */
-	/* 2022-07-05 - holiday */
+	'2022-07-03': 'holiday',
+	'2022-07-05': 'holiday',
 	'2023-07-10': 14,
 	'2023-07-12': 15,
 	'2023-07-17': 16,
@@ -181,7 +182,7 @@ app.get('/', (req, res) => {
 		match_day = matchDays[date];
 	}
 
-	res.render('dashboard', { match_day: match_day });
+	res.render('dashboard', { match_day: match_day, match_days: matchDays });
 });
 
 app.get('/login', (req, res) => {
