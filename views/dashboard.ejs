@@ -13,37 +13,38 @@
 				active RSC season. It is open to all Free Agents and Permanent Free Agents as a way to showcase 
 				your talent and generate player statistics. 
 			</p>
-
-			<div class="col-md-8">
-				<p>
-					Players currently rostered inside of RSC Franchises are also <strong>strongly</strong>
-					encouraged to sign up and play as a sub so that we can ensure we have enough players in each tier
-					to have at least two teams playing every night. Free agents will always receive priority in being placed 
-					on a team, but anyone that signs up as a sub will be used on a first-come, first-served basis as needed
-					to fill out teams.
-				</p>
-				<p>
-					Games run every Monday and Wednesday night on active game days at <strong>8:15PM ET</strong> and are usually finished before 9:00PM
-					so that you can sub for active franchises if needed. If you wish to play tonight, please check in by clicking
-					the button below (must be signed in with your Discord account). 
-				</p>
-				<p>
-					<strong>Be aware...</strong> the RSC Development League is for FAs. Players checking in and then choosing at
-					the last minute not to play hurt our ability to provide this service. Only check in if you're 100% committed to 
-					playing a series of 4 games at 8:15PM. 
-				</p>
-			</div>
-			<div class="col-md-4">
-				<h3>Season <%= settings.season %> Dates</h3>
-				<ul>
-					<%
-						for ( let match_date in match_days ) {
-					%>
-					<li><%- match_date %> - <%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : match_days[match_date] %></li>
-					<%
-						}
-					%>
-				</ul>
+			<div class="row">
+				<div class="col-md-8">
+					<p>
+						Players currently rostered inside of RSC Franchises are also <strong>strongly</strong>
+						encouraged to sign up and play as a sub so that we can ensure we have enough players in each tier
+						to have at least two teams playing every night. Free agents will always receive priority in being placed 
+						on a team, but anyone that signs up as a sub will be used on a first-come, first-served basis as needed
+						to fill out teams.
+					</p>
+					<p>
+						Games run every Monday and Wednesday night on active game days at <strong>8:15PM ET</strong> and are usually finished before 9:00PM
+						so that you can sub for active franchises if needed. If you wish to play tonight, please check in by clicking
+						the button below (must be signed in with your Discord account). 
+					</p>
+					<p>
+						<strong>Be aware...</strong> the RSC Development League is for FAs. Players checking in and then choosing at
+						the last minute not to play hurt our ability to provide this service. Only check in if you're 100% committed to 
+						playing a series of 4 games at 8:15PM. 
+					</p>
+				</div>
+				<div class="col-md-4">
+					<h3>Season <%= settings.season %> Dates</h3>
+					<ul>
+						<%
+							for ( let match_date in match_days ) {
+						%>
+						<li><%- match_date %> - <%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : match_days[match_date] %></li>
+						<%
+							}
+						%>
+					</ul>
+				</div>
 			</div>
 		</div>
 
@@ -84,9 +85,9 @@
 
 		<% } else if ( match_day && match_day == 'holiday' ) { %>
 			
-			<h2>Happy Holidays from RSC</h2>
+			<h2>Happy Holidays 🎆 from RSC!</h2>
 			<p>
-				Today is a Holiday, so there will be no RSC matches. Please enjoy time with your loved ones. ❤️
+				Today is a Holiday RSC is taking a much-needed vacation. Please enjoy time with your loved ones. ❤️
 			</p>
 
 		<% } else { %>
