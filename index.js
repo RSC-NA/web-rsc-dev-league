@@ -719,7 +719,8 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'name': 'tehblister',
 			'discord_id': tehblister_discord_id,
 			'mmr': 1550,
-			'tier': 'elite',
+			'tier': 'Elite',
+			'status': 'Free Agent',
 		};
 	}
 
