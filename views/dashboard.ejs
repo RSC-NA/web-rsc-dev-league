@@ -57,7 +57,19 @@
 			<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] != 0 ) { %>
 
 			<!-- check in features -->	
-			<dialog id="confirmCheckIn" style="max-width:40vw;">
+			<style type="text/css">
+				dialog#confirmCheckIn {
+					background-color: #C2FFD7;
+					border-radius: 12px;
+					max-width: 50vw;
+				}
+
+				dialog#confirmCheckIn::backdrop {
+					background-color:  #FF3400aa;
+				}
+			</style>
+
+			<dialog id="confirmCheckIn">
 				<h4>Confirm Check In</h4>
 				<p>
 					<strong>Warning!</strong> - Dev League is a privilege. Only check in if you are committed to being
@@ -66,7 +78,7 @@
 				</p>
 				<h5>IF YOU CHECK IN AND ARE NOT PRESENT AT GAME TIME, YOU WILL BE <u>BANNED</u> FROM DEV LEAGUE!</h5>
 				<a class="btn btn-lg btn-primary" href="/check_in/<%= match_day %>" role="button">Confirm Check In!</a>
-				<a class="btn btn-lg btn-danger" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
+				<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 			</dialog>
 
 			<a class="btn btn-lg btn-primary" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
