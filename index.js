@@ -18,7 +18,7 @@ let title = 'RSC Development League';
 
 const matchDays = {
 	//'2023-03-20': 17, // nice - end of season blowout
-	'2022-05-03': 'holiday',
+	'2023-05-03': 'holiday',
 	'2023-05-15': 1,
 	'2023-05-17': 2,
 	'2023-05-22': 3,
