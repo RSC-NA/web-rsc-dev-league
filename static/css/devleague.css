@@ -1,4 +1,10 @@
 /* devleague specific styles */
+div.matchDates {
+	background-color: #cde4ff;
+	border-radius: 12px;
+	padding: 10px;
+}
+
 ul.dates {
 	font-size: .9rem;
 	list-style-type: none;

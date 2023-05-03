@@ -3,13 +3,14 @@
 
 	<main class="container">
 		<div class="bg-light p-3 rounded">
-			<% if ( user.name ) { %>
-				<h1>Welcome to the RSC Development League, <%= user.name %></h1>
-			<% } else { %>
-				<h1>Welcome to the RSC Development League</h1>
-			<% } %>
 			<div class="row">
-				<div class="col-md-8">
+				<div class="col-md-9">
+		
+			<% if ( user.name ) { %>
+					<h1>Welcome to the RSC Development League, <%= user.name %></h1>
+			<% } else { %>
+					<h1>Welcome to the RSC Development League</h1>
+			<% } %>
 
 					<p class="lead">
 						The RSC Development League is a Rocket League competitive league that runs concurrently to the 
@@ -36,7 +37,7 @@
 						playing a series of 4 games at 8:15PM. 
 					</p>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3 matchDates">
 					<h4>Season <%= settings.season %> Dates</h4>
 					<ul class="dates">
 						<%
