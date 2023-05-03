@@ -15,6 +15,7 @@
 			</p>
 			<div class="row">
 				<div class="col-md-8">
+					<h3>Dev League Info</h3>
 					<p>
 						Players currently rostered inside of RSC Franchises are also <strong>strongly</strong>
 						encouraged to sign up and play as a sub so that we can ensure we have enough players in each tier
@@ -52,7 +53,35 @@
 		<% if ( match_day && match_day != 'holiday' ) { %>
 
 			<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] != 0 ) { %>
-			<a class="btn btn-lg btn-primary" href="/check_in/<%= match_day %>" role="button">Check In!</a>
+
+			<!-- check in features -->	
+			<dialog id="confirmCheckIn">
+				<h5>Confirm Check In</h5>
+				<p>
+					<strong>Warning!</strong> - Dev League is a privilege. Only check in if you are committed to being
+					present in the discord at 8PM ET and actively want to participate. Not showing up when you've checked in
+					hurts our ability to provide this service for all other players. 
+				</p>
+				<p>
+					<strong>IF YOU CHECK IN AND ARE NOT PRESENT AT GAME TIME, YOU WILL BE BANNED FROM DEV LEAGUE!</strong>
+				</p>
+				<a class="btn btn-lg btn-primary" href="/check_in/<%= match_day %>" role="button">Confirm Check In!</a>
+				<a class="btn btn-lg btn-danger" href="javascript:void(0);" role="button">Cancel</a>
+			</dialog>
+
+			<a class="btn btn-lg btn-primary" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
+
+			<script type="text/javascript">
+				document.getElementById('checkInModal').addEventListener('click', function() {
+					document.getElementById('confirmCheckIn').showModal();
+				});
+
+				document.getElementById('backOut').addEventListener('click', function() {
+					document.getElementById('confirmCheckIn').close();
+				});
+			</script>
+
+
 			<% } else if ( nickname && checked_in && rostered && "rsc_id" in user && user['rsc_id'] != null ) { %>
 				<h2>Your Team is Ready to Play!</h2>
 				<p class="lead">
