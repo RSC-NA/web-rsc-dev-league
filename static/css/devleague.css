@@ -25,5 +25,5 @@ li.today {
 
 li.today.holiday {
 	list-style-type: '🏖️';
-	background-color: ##fa7b7b;
+	background-color: #fa7b7b;
 }
