@@ -1,1 +1,8 @@
 /* devleague specific styles */
+li.today {
+	font-weight: bold;
+	font-size: 1.1rem;
+	background-color: #b5ff00;
+	border-radius: 6px;
+	text-decoration: underline;
+}

@@ -37,12 +37,17 @@
 					</p>
 				</div>
 				<div class="col-md-4">
-					<h3>Season <%= settings.season %> Dates</h3>
-					<ul>
+					<h4>Season <%= settings.season %> Dates</h4>
+					<ul style="font-size: .9rem;">
 						<%
 							for ( let match_date in match_days ) {
 						%>
-						<li><%- match_date %> - <%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : match_days[match_date] %></li>
+
+						<li class="<%- match_date == today ? 'today' : '' %>">
+							<%- match_date %> - 
+							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : match_days[match_date] %>
+						</li>
+
 						<%
 							}
 						%>
@@ -62,6 +67,10 @@
 					background-color: #C2FFD7;
 					border-radius: 12px;
 					max-width: 50vw;
+				}
+
+				dialog#confirmCheckIn h4 {
+					text-decoration: underline;
 				}
 
 				dialog#confirmCheckIn::backdrop {

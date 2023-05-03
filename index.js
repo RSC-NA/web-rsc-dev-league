@@ -181,7 +181,7 @@ app.get('/', (req, res) => {
 		match_day = matchDays[date];
 	}
 
-	res.render('dashboard', { match_day: match_day, match_days: matchDays });
+	res.render('dashboard', { today: date, match_day: match_day, match_days: matchDays });
 });
 
 app.get('/login', (req, res) => {
