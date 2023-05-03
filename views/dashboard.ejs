@@ -46,7 +46,7 @@
 
 						<li class="<%- match_date == today ? 'today' : '' %> <%- match_date == today && match_day == 'holiday' ? 'holiday' : '' %>">
 							<%- match_date %> - 
-							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : match_days[match_date] %>
+							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : 'Match Day: <strong>' + match_days[match_date] + '</strong>' %>
 						</li>
 
 						<%
