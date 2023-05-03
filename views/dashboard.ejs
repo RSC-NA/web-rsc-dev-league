@@ -57,14 +57,14 @@
 			<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] != 0 ) { %>
 
 			<!-- check in features -->	
-			<dialog id="confirmCheckIn">
-				<h5>Confirm Check In</h5>
+			<dialog id="confirmCheckIn" style="max-width:40vw;">
+				<h4>Confirm Check In</h4>
 				<p>
-					<strong>Warning!</strong> - Dev League is a privilege. Only check in if you are committed to being<br>
-					present in the discord at 8PM ET and actively want to participate. Not showing up when you've checked in<br>
+					<strong>Warning!</strong> - Dev League is a privilege. Only check in if you are committed to being
+					present in the discord at 8PM ET and actively want to participate. Not showing up when you've checked in
 					hurts our ability to provide this service for all other players. 
 				</p>
-				<h5>IF YOU CHECK IN AND ARE NOT PRESENT AT GAME TIME, YOU WILL BE BANNED FROM DEV LEAGUE!</h5>
+				<h5>IF YOU CHECK IN AND ARE NOT PRESENT AT GAME TIME, YOU WILL BE <u>BANNED</u> FROM DEV LEAGUE!</h5>
 				<a class="btn btn-lg btn-primary" href="/check_in/<%= match_day %>" role="button">Confirm Check In!</a>
 				<a class="btn btn-lg btn-danger" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 			</dialog>
