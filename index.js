@@ -652,7 +652,7 @@ async function pull_stats(req, res) {
 	res.write(' ');
 	for ( let i = 0; i < PlayerStatsRows.length; i++ ) {
 		let row = PlayerStatsRows[i];
-		if ( row['Name'] == '' ) { // skip empty records
+		if ( row['Name'] === '' || row['Name'] === undefined ) { // skip empty records
 			continue;
 		}
 		playerStats.push({
