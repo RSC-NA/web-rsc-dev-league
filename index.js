@@ -436,6 +436,96 @@ app.get('/matches', (req, res) => {
 	});
 });
 
+/********************************************************
+ ********************** API Views ***********************
+ *******************************************************/
+let team = {
+	id: 51,
+	season: 17,
+	tier: "Elite",
+	franchise: "The Abyss",
+	teamName: "Anglers",
+	wins: 7,
+	loss: 5,
+	winPct: 58,
+	rank: 9,
+	gm: "Reverse Fridge",
+	conference: "Lunar",
+	division: "",
+	gamesPlayed: 12,
+	shotPct: 31.96,
+	points: 12826,
+	goals: 31,
+	assists: 28,
+	saves: 40,
+	shots: 97,
+	goalDiff: 13,
+	oppShotPct: 25,
+	oppPoints: 11155,
+	oppGoals: 18,
+	oppAssists: 12,
+	oppSaves: 53,
+	oppShots: 72
+};
+let player = {
+	id: 256,
+	season: 17,
+	tier: "Elite",
+	teamName: "Gelato",
+	playerName: "Stemantics",
+	gp: 11,
+	gw: 4,
+	gl: 7,
+	wPct: 36.36,
+	mvPs: 1,
+	pts: 3615,
+	goals: 7,
+	assists: 8,
+	saves: 18,
+	shots: 25,
+	shotPct: 28,
+	ppg: 328.6,
+	gpg: 0.64,
+	apg: 0.73,
+	svPG: 1.64,
+	soPG: 2.27,
+	cycles: 1,
+	hatTricks: 1,
+	playmakers: 0,
+	saviors: 2
+};
+app.get('/teams', (req, res) => {
+	let output = [];
+	output.push(team);
+
+	res.json(output);
+});
+app.get('/teams/:tier', (req, res) => {
+	let output = [];
+	output.push(team);
+
+	res.json(output);
+});
+app.get('/players', (req, res) => {
+	let output = [];
+	output.push(player);
+
+	res.json(player);
+});
+app.get('/players/:teamName', (req, res) => {
+	let output = [];
+	output.push(player);
+
+	res.json(player);
+});
+app.get('/tiers', (req, res) => {
+	let tiers = [];
+	for ( let tier in mmrRange ) {
+		tiers.push({ 'name': tier });
+	}
+
+	res.json(tiers);
+});
 
 /*******************************************************
  ******************** Admin Views *********************
