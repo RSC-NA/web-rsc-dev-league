@@ -577,7 +577,7 @@ app.get('/pull_stats', async (req, res) => {
 	let ranksByTeam =  {};
 	for ( let i = 0; i < StandingsRows.length; i++ ) {
 		let row =  StandingsRows[i];
-		if ( row['Div'].trim() != '' ) {
+		if ( 'Div' in row && row['Div'].trim() != '' ) {
 			divisionsByTeam[ row['Team'] ] = row['Div'].trim();	
 		}
 		ranksByTeam[ row['Team'] ] = row['Rank'];
