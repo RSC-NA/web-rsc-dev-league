@@ -498,7 +498,7 @@ let player = {
 app.get('/teams', (req, res) => {
 	let isTwos = req.get('league');
 	let output = [{'isTwos': isTwos}];
-	console.log(req.get('league');
+	console.log(req.get('league'));
 	res.json(output);
 });
 app.get('/teams/:tier', (req, res) => {
