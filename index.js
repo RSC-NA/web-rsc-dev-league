@@ -518,6 +518,8 @@ app.get('/teams/:tier', (req, res) => {
 	connection.query(query, [req.params.tier], (err, results) => {
 		res.json(results);
 	});
+
+	res.json({'error': 'Something went wrong'});
 });
 app.get('/players', (req, res) => {
 	let isTwos = req.get('league');
