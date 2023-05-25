@@ -624,7 +624,7 @@ app.get('/pull_stats', async (req, res) => {
 	// clear our tables
 	await conn2.execute('TRUNCATE StreamTeamStats');
 	output.push({ 'process': 'Truncating StreamTeamStats'});
-	let keys = Object.keys(teamStats[0]).join(', ');
+	let keys = Object.keys(teamStats[0]).map(el => '`' + el + '`').join(', ');
 	let placeholders = Object.keys(teamStats[0]).map(el => '?').join(', ');
 	let teamStatsQuery = `INSERT INTO StreamTeamStats (${keys}) VALUES (${placeholders})`;
 	console.log(teamStatsQuery);
