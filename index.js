@@ -525,7 +525,6 @@ app.get('/teams/:tier', (req, res) => {
 		res.json(results);
 	});
 
-	res.json({'error': 'Something went wrong'});
 });
 app.get('/players', (req, res) => {
 	let isTwos = req.get('league');
