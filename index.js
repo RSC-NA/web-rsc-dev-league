@@ -572,7 +572,9 @@ app.get('/pull_stats', async (req, res) => {
 	let teamStats = [];
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
+	let outputTest = null;
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
+		outputTest = TeamStatsRows[i];
 		teamStats.push({
 			'Season'     : TeamStatsRows[i]['Season'],
 			'Franchise'  : TeamStatsRows[i]['Franchise'],
@@ -609,7 +611,8 @@ app.get('/pull_stats', async (req, res) => {
 	output.push({ 'teams': teams });
 	output.push({ 'teamStats': teamStats });
 
-	res.json(output);
+	res.json(outputTest);
+	//	res.json(output);
 });
 
 /*******************************************************
