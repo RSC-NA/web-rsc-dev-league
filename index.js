@@ -311,7 +311,7 @@ app.get('/check_in/:match_day', (req, res) => {
 		res.redirect('/');
 	}
 });
- 
+
 app.get('/check_out/:match_day', (req, res) => {
 	if ( req.session.discord_id && req.session.checked_in ) {
 		// TODO(get season and match day from somewhere)
@@ -440,61 +440,6 @@ app.get('/matches', (req, res) => {
 /********************************************************
  ********************** API Views ***********************
  *******************************************************/
-let team = {
-	id: 51,
-	season: 17,
-	tier: "Elite",
-	franchise: "The Abyss",
-	teamName: "Anglers",
-	wins: 7,
-	loss: 5,
-	winPct: 58,
-	rank: 9,
-	gm: "Reverse Fridge",
-	conference: "Lunar",
-	division: "",
-	gamesPlayed: 12,
-	shotPct: 31.96,
-	points: 12826,
-	goals: 31,
-	assists: 28,
-	saves: 40,
-	shots: 97,
-	goalDiff: 13,
-	oppShotPct: 25,
-	oppPoints: 11155,
-	oppGoals: 18,
-	oppAssists: 12,
-	oppSaves: 53,
-	oppShots: 72
-};
-let player = {
-	id: 256,
-	season: 17,
-	tier: "Elite",
-	teamName: "Gelato",
-	playerName: "Stemantics",
-	gp: 11,
-	gw: 4,
-	gl: 7,
-	wPct: 36.36,
-	mvPs: 1,
-	pts: 3615,
-	goals: 7,
-	assists: 8,
-	saves: 18,
-	shots: 25,
-	shotPct: 28,
-	ppg: 328.6,
-	gpg: 0.64,
-	apg: 0.73,
-	svPG: 1.64,
-	soPG: 2.27,
-	cycles: 1,
-	hatTricks: 1,
-	playmakers: 0,
-	saviors: 2
-};
 app.get('/teams', (req, res) => {
 	let isTwos = req.get('league');
 	let tableName = 'StreamTeamStats';
@@ -563,6 +508,10 @@ app.get('/pull_stats', pull_stats);
 app.get('/pull_stats_2', pull_stats);
 
 async function pull_stats(req, res) {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
 	let sheetId          = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
 	let teamStatsTable   = 'StreamTeamStats';
 	let playerStatsTable = 'StreamPlayerStats';
@@ -583,11 +532,6 @@ async function pull_stats(req, res) {
 		connectionLimit: 10,
 		queueLimit: 0
 	});
-
-	if ( ! req.session.is_admin ) {
-		//return res.redirect('/');
-		console.log('Non-admin check skipped');
-	} 
 
 	// 1. create google sheets object
 	const doc = new GoogleSpreadsheet(sheetId);

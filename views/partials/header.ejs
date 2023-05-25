@@ -79,6 +79,36 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Manage League
 							</a>
+							
+							<div class="sb-sidenav-menu-heading">Stats API</div>
+							<a class="nav-link" href="#" id="run3sStats">
+								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+								Update 3s Stats
+							</a>
+							<a class="nav-link" href="#" id="run2sStats">
+								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+								Update 2s Stats
+							</a>
+							<dialog id="run3sModal">
+								<h3>Are you sure you want to run 3s stats? This takes a while.</h3>
+								<a href="/pull_stats" class="btn btn-primary">Confirm!</a>
+								<a href="/" class="btn btn-warning">Cancel</a>
+							</dialog>
+							<dialog id="run2sModal">
+								<h3>Are you sure you want to run 2s stats? This takes a while.</h3>
+								<a href="/pull_stats_2" class="btn btn-primary">Confirm!</a>
+								<a href="/" class="btn btn-warning">Cancel</a>
+							</dialog>
+							<script type="text/javascript">
+								document.getElementById('run3sStats').addEventListener('click', (ev) => {
+									ev.preventDefault;
+									document.getElementById('run3sModal').showModal();
+								});
+								document.getElementById('run2sStats').addEventListener('click', (ev) => {
+									ev.preventDefault;
+									document.getElementById('run2sModal').showModal();
+								});
+							</script>
 							<% } %>
 
 						</div>
