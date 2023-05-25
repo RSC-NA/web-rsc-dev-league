@@ -549,7 +549,7 @@ app.get('/tiers', (req, res) => {
 	if ( isTwos ) {
 		tiers = [ 'Premier', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender'];
 	}
-	res.json( tiers.map(el => { 'name': el }) );
+	res.json( tiers.map(el => { return {'name': el} }) );
 });
 
 app.get('/pull_stats', pull_stats);
