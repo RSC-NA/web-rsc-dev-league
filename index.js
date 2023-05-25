@@ -649,7 +649,7 @@ async function pull_stats(req, res) {
 	const PlayerStatsRows  = await PlayerStatsSheet.getRows();
 	// SELECT 
 	let playerStats = [];
-	res.write(' ');
+	//res.write(' ');
 	for ( let i = 0; i < PlayerStatsRows.length; i++ ) {
 		let row = PlayerStatsRows[i];
 		if ( row['Name'] === '' || row['Name'] === undefined ) { // skip empty records
@@ -694,7 +694,7 @@ async function pull_stats(req, res) {
 	console.log(playerStats.length);
 	console.log(playerStats[4]);
 	for ( let i = 0; i < playerStats.length; i++ ) {
-		if ( i % 100 == 0 ) { console.log(`Keepalive ping ${i}`); res.write(' '); } // make sure we keep our connection through heroku alive
+		if ( i % 100 == 0 ) { console.log(`Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
 		await conn2.execute(playerStatsQuery, Object.values(playerStats[i]));
 	}
 
