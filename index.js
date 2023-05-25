@@ -562,57 +562,70 @@ app.get('/pull_stats', async (req, res) => {
 	const TeamRows = await TeamSheet.getRows();
 
 	let teams = [];
+	let franchiseByTeam = {};
 	// Team Name, Franchise, Tier
 	// StreamTeamStats, StreamTeamStats2
 	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {tableName} ORDER BY TeamName
 	for ( let i = 0; i < TeamRows.length; i++ ) {
 		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
+		franchiseByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['Franchise'];
 	}
+
+	const StandingsSheet = doc.sheetsByTitle['Team Standings'];
+	const StandingsRows  = await StandingsSheet.getRows();
+	let divisionsByTeam = {};
+	let ranksByTeam =  {};
+	for ( let i = 0; i < StandingsRows.length; i++ ) {
+		let row =  StandingsRows[i];
+		if ( row['Div'].trim() != '' ) {
+			divisionsByTeam[ row['Team'] ] = row['Div'].trim();	
+		}
+		ranksByTeam[ row['Team'] ] = row['Rank'];
+	}
+
 
 	let teamStats = [];
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
-	let outputTest = null;
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
-		outputTest = TeamStatsRows[i];
 		teamStats.push({
-			'Season'     : TeamStatsRows[i]['Season'],
-			'Franchise'  : TeamStatsRows[i]['Franchise'],
-			'TeamName'   : TeamStatsRows[i]['TeamName'],
+			'Season'     : settings.season,// external
+			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ],
+			'TeamName'   : TeamStatsRows[i]['Team'],
 			'Tier'       : TeamStatsRows[i]['Tier'],
-			'Wins'       : TeamStatsRows[i]['Wins'],
-			'Loss'       : TeamStatsRows[i]['Loss'],
-			'WinPct'     : TeamStatsRows[i]['WinPct'],
-			'Rank'       : TeamStatsRows[i]['Rank'],
+			'Wins'       : TeamStatsRows[i]['W'],
+			'Loss'       : TeamStatsRows[i]['L'],
+			'WinPct'     : TeamStatsRows[i]['W%'],
+			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ], // TODO(erh) From Team Standings?
 			'GM'         : TeamStatsRows[i]['GM'],
 			'Conference' : TeamStatsRows[i]['Conference'],
-			'Division'   : TeamStatsRows[i]['Division'],
-			'GamesPlayed': TeamStatsRows[i]['GamesPlayed'],
-			'ShotPct'    : TeamStatsRows[i]['ShotPct'],
+			'Division'   : divisionsByTeam[ TeamStats[i]['Team'] ], // TODO(erh), from Team Standings
+			'GamesPlayed': TeamStatsRows[i]['GP'],
+			'ShotPct'    : TeamStatsRows[i]['Shot %'],
 			'Points'     : TeamStatsRows[i]['Points'],
 			'Goals'      : TeamStatsRows[i]['Goals'],
 			'Assists'    : TeamStatsRows[i]['Assists'],
 			'Saves'      : TeamStatsRows[i]['Saves'],
 			'Shots'      : TeamStatsRows[i]['Shots'],
-			'GoalDiff'   : TeamStatsRows[i]['GoalDiff'],
-			'OppShotPct' : TeamStatsRows[i]['OppShotPct'],
-			'OppPoints'  : TeamStatsRows[i]['OppPoints'],
-			'OppGoals'   : TeamStatsRows[i]['OppGoals'],
-			'OppAssists' : TeamStatsRows[i]['OppAssists'],
-			'OppSaves'   : TeamStatsRows[i]['OppSaves'],
-			'OppShots'   : TeamStatsRows[i]['OppShots'],
+			'GoalDiff'   : TeamStatsRows[i]['Goal Dif.'],
+			'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'],
+			'OppPoints'  : TeamStatsRows[i]['Opp. Points'],
+			'OppGoals'   : TeamStatsRows[i]['Opp. Goals'],
+			'OppAssists' : TeamStatsRows[i]['Opp. Assists'],
+			'OppSaves'   : TeamStatsRows[i]['Opp. Saves'],
+			'OppShots'   : TeamStatsRows[i]['Opp. Shots'],
 		});
 	}
 
 	// clear our tables
 	await conn2.execute('TRUNCATE StreamTeamStats');
 	output.push({ 'process': 'Truncating StreamTeamStats'});
+	output.push({'ranksByTeam': ranksByTeam});
+	output.push({'divisionsByTeam': divisionsByTeam});
+	//output.push({ 'teams': teams });
+	//output.push({ 'teamStats': teamStats });
 
-	output.push({ 'teams': teams });
-	output.push({ 'teamStats': teamStats });
-
-	res.json(outputTest);
-	//	res.json(output);
+	res.json(output);
 });
 
 /*******************************************************
