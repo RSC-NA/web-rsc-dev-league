@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 
-const mysql = require('mysql2');
+const mysql  = require('mysql2');
+const mysqlP = require('mysql2/promise');
 
 const btoa = require('btoa');
 const atob = require('atob');
@@ -527,6 +528,19 @@ app.get('/tiers', (req, res) => {
 	res.json(tiers);
 });
 app.get('/pull_stats', async (req, res) => {
+	let output = [];
+
+	const conn2 = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
 	if ( ! req.session.is_admin ) {
 		//return res.redirect('/');
 		console.log('Non-admin check skipped');
@@ -544,18 +558,58 @@ app.get('/pull_stats', async (req, res) => {
 	await doc.loadInfo();
 
 	// sheets = Team List, Team Stats, Player Stats, Team Standings, Variables
-	const sheet = doc.sheetsByTitle["Team List"];
-	const rows = await sheet.getRows();
+	const TeamSheet = doc.sheetsByTitle["Team List"];
+	const TeamRows = await sheet.getRows();
 
 	let teams = [];
 	// Team Name, Franchise, Tier
 	// StreamTeamStats, StreamTeamStats2
 	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {tableName} ORDER BY TeamName
-	for ( let i = 0; i < rows.length; i++ ) {
-		teams.push({ name: rows[i]['Team Name'], franchise: rows[i]['Franchise'], tier: rows[i]['Tier'] });
+	for ( let i = 0; i < TeamRows.length; i++ ) {
+		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
 	}
 
-	res.json(teams);
+	let teamStats = [];
+	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
+	const TeamStatsRows  = await sheet.getRows();
+	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
+		teamStats.push({
+			'Season'     : TeamStatsRows[i]['Season'],
+			'Franchise'  : TeamStatsRows[i]['Franchise'],
+			'TeamName'   : TeamStatsRows[i]['TeamName'],
+			'Tier'       : TeamStatsRows[i]['Tier'],
+			'Wins'       : TeamStatsRows[i]['Wins'],
+			'Loss'       : TeamStatsRows[i]['Loss'],
+			'WinPct'     : TeamStatsRows[i]['WinPct'],
+			'Rank'       : TeamStatsRows[i]['Rank'],
+			'GM'         : TeamStatsRows[i]['GM'],
+			'Conference' : TeamStatsRows[i]['Conference'],
+			'Division'   : TeamStatsRows[i]['Division'],
+			'GamesPlayed': TeamStatsRows[i]['GamesPlayed'],
+			'ShotPct'    : TeamStatsRows[i]['ShotPct'],
+			'Points'     : TeamStatsRows[i]['Points'],
+			'Goals'      : TeamStatsRows[i]['Goals'],
+			'Assists'    : TeamStatsRows[i]['Assists'],
+			'Saves'      : TeamStatsRows[i]['Saves'],
+			'Shots'      : TeamStatsRows[i]['Shots'],
+			'GoalDiff'   : TeamStatsRows[i]['GoalDiff'],
+			'OppShotPct' : TeamStatsRows[i]['OppShotPct'],
+			'OppPoints'  : TeamStatsRows[i]['OppPoints'],
+			'OppGoals'   : TeamStatsRows[i]['OppGoals'],
+			'OppAssists' : TeamStatsRows[i]['OppAssists'],
+			'OppSaves'   : TeamStatsRows[i]['OppSaves'],
+			'OppShots'   : TeamStatsRows[i]['OppShots'],
+		});
+	}
+
+	// clear our tables
+	await conn2.execute('TRUNCATE StreamTeamStats');
+	output.push({ 'process': 'Truncating StreamTeamStats'});
+
+	output.push({ 'teams': teams });
+	output.push({ 'teamStats': teamStats });
+
+	res.json(output);
 });
 
 /*******************************************************
@@ -983,4 +1037,4 @@ const connection = mysql.createPool({
 	queueLimit: 0
 });
 
-app.listen( process.env.PORT || 3000 );
+app.listen( process.env.PORT || 3000 , () => console.log("Server running..."));
