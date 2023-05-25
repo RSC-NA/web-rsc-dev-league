@@ -580,7 +580,7 @@ app.get('/pull_stats', async (req, res) => {
 		let team     = dataRows[i]._rawData[1];
 		let division = dataRows[i]._rawData[3];
 		let rank     = dataRows[i]._rawData[4];
-		console.log(team, division, rank);
+		//console.log(team, division, rank);
 		divisionsByTeam[ team ] = division;
 		ranksByTeam[ team ] = rank;
 	}
@@ -628,7 +628,8 @@ app.get('/pull_stats', async (req, res) => {
 	let teamStatsQuery = `INSERT INTO StreamTeamStats (${keys}) VALUES ?`;
 	console.log(teamStatsQuery);
 	for ( let i = 0; i < teamStats.length; i++ ) {
-		await conn2.execute(teamStatsQuery, Object.values(teamStats[i]));
+		console.log(Object.values(teamStats[i]));
+		//await conn2.execute(teamStatsQuery, Object.values(teamStats[i]));
 	}
 
 	//output.push({'ranksByTeam': ranksByTeam});
