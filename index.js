@@ -559,7 +559,7 @@ app.get('/pull_stats', async (req, res) => {
 
 	// sheets = Team List, Team Stats, Player Stats, Team Standings, Variables
 	const TeamSheet = doc.sheetsByTitle["Team List"];
-	const TeamRows = await sheet.getRows();
+	const TeamRows = await TeamSheet.getRows();
 
 	let teams = [];
 	// Team Name, Franchise, Tier
@@ -571,7 +571,7 @@ app.get('/pull_stats', async (req, res) => {
 
 	let teamStats = [];
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
-	const TeamStatsRows  = await sheet.getRows();
+	const TeamStatsRows  = await TeamStatsSheet.getRows();
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
 		teamStats.push({
 			'Season'     : TeamStatsRows[i]['Season'],

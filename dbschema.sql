@@ -72,3 +72,34 @@ CREATE TABLE contracts (
 	PRIMARY KEY(`id`),
 	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+/* API STUFF */
+CREATE TABLE `StreamTeamStats` (
+	`Id` int NOT NULL AUTO_INCREMENT,
+	`Season` int DEFAULT NULL,
+	`Franchise` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`TeamName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`Tier` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`Wins` int DEFAULT NULL,
+	`Loss` int DEFAULT NULL,
+	`WinPct` decimal(8,2) DEFAULT NULL,
+	`Rank` int DEFAULT NULL,
+	`GM` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`Conference` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`Division` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`GamesPlayed` int DEFAULT NULL,
+	`ShotPct` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`Points` int DEFAULT NULL,
+	`Goals` int DEFAULT NULL,
+	`Assists` int DEFAULT NULL,
+	`Saves` int DEFAULT NULL,
+	`Shots` int DEFAULT NULL,
+	`GoalDiff` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`OppShotPct` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+	`OppPoints` int DEFAULT NULL,
+	`OppGoals` int DEFAULT NULL,
+	`OppAssists` int DEFAULT NULL,
+	`OppSaves` int DEFAULT NULL,
+	`OppShots` int DEFAULT NULL,
+	PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
