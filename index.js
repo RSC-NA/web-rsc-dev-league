@@ -527,7 +527,11 @@ app.get('/tiers', (req, res) => {
 
 	res.json(tiers);
 });
-app.get('/pull_stats', async (req, res) => {
+
+app.get('/pull_stats', pull_stats);
+app.get('/pull_stats_2', pull_stats);
+
+async function pull_stats(req, res) {
 	let output = [];
 
 	const conn2 = await mysqlP.createPool({
@@ -563,12 +567,14 @@ app.get('/pull_stats', async (req, res) => {
 
 	let teams = [];
 	let franchiseByTeam = {};
+	let tierByTeam = {};
 	// Team Name, Franchise, Tier
 	// StreamTeamStats, StreamTeamStats2
 	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {tableName} ORDER BY TeamName
 	for ( let i = 0; i < TeamRows.length; i++ ) {
 		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
 		franchiseByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['Franchise'];
+		tierByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['tier'];
 	}
 
 	const StandingsSheet = doc.sheetsByTitle['Team Standings'];
@@ -594,7 +600,7 @@ app.get('/pull_stats', async (req, res) => {
 			'Season'     : res.locals.settings.season,// external
 			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
 			'TeamName'   : TeamStatsRows[i]['Team'] ?? '',
-			'Tier'       : TeamStatsRows[i]['Tier'] ?? '',
+			'Tier'       : tierByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
 			'Wins'       : TeamStatsRows[i]['W'] ?? '',
 			'Loss'       : TeamStatsRows[i]['L'] ?? '',
 			'WinPct'     : TeamStatsRows[i]['W%'] ?? '',
@@ -637,9 +643,9 @@ app.get('/pull_stats', async (req, res) => {
 	//output.push({'divisionsByTeam': divisionsByTeam});
 	// output.push({ 'teams': teams });
 	// output.push({ 'teamStats': teamStats });
-
+	output.push({ 'path': req.route.path });	
 	res.json(output);
-});
+}
 
 /*******************************************************
  ******************** Admin Views *********************
