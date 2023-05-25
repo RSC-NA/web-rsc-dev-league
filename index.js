@@ -497,32 +497,57 @@ let player = {
 };
 app.get('/teams', (req, res) => {
 	let isTwos = req.get('league');
-	let output = [{'isTwos': isTwos}];
-	console.log(req.get('league'));
-	res.json(output);
+	let tableName = 'StreamTeamStats';
+	if ( isTwos ) {
+		tableName = 'StreamTeamStats2';
+	}
+
+	let query = `SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, \`Rank\`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM ${tableName} ORDER BY TeamName`;
+	connection.query(query, (err, results) => {
+		res.json(results);
+	});
 });
 app.get('/teams/:tier', (req, res) => {
-	let output = [];
-	output.push(team);
+	let isTwos = req.get('league');
+	let tableName = 'StreamTeamStats';
+	if ( isTwos ) {
+		tableName = 'StreamTeamStats2';
+	}
 
-	res.json(output);
+	let query = `SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, \`Rank\`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM ${tableName} WHERE Tier = ? ORDER BY TeamName`;
+	connection.query(query, [req.params.tier], (err, results) => {
+		res.json(results);
+	});
 });
 app.get('/players', (req, res) => {
-	let output = [];
-	output.push(player);
+	let isTwos = req.get('league');
+	let tableName = 'StreamPlayerStats';
+	if ( isTwos ) {
+		tableName = 'StreamPlayerStats2';
+	}
 
-	res.json(output);
+	let query = `SELECT Id, Season, Tier, TeamName, PlayerName, GP, GW, GL, WPct, MVPs, Pts, Goals, Assists, Saves, Shots, ShotPct, PPG, GPG, APG, SvPG, SoPG, Cycles, HatTricks, Playmakers, Saviors FROM ${tableName} ORDER BY PlayerName`;
+	connection.query(query, (err, results) => {
+		res.json(results);
+	});
 });
 app.get('/players/:teamName', (req, res) => {
-	let output = [];
-	output.push(player);
+	let isTwos = req.get('league');
+	let tableName = 'StreamPlayerStats';
+	if ( isTwos ) {
+		tableName = 'StreamPlayerStats2';
+	}
 
-	res.json(output);
+	let query = `SELECT Id, Season, Tier, TeamName, PlayerName, GP, GW, GL, WPct, MVPs, Pts, Goals, Assists, Saves, Shots, ShotPct, PPG, GPG, APG, SvPG, SoPG, Cycles, HatTricks, Playmakers, Saviors FROM ${tableName} WHERE Team = ? ORDER BY PlayerName`;
+	connection.query(query, [req.params.teamName], (err, results) => {
+		res.json(results);
+	});
 });
 app.get('/tiers', (req, res) => {
-	let tiers = [];
-	for ( let tier in mmrRange ) {
-		tiers.push({ 'name': tier });
+	let isTwos = req.get('league');
+	let tableName = 'StreamPlayerStats';
+	if ( isTwos ) {
+		tableName = 'StreamPlayerStats2';
 	}
 
 	res.json(tiers);
@@ -580,8 +605,10 @@ async function pull_stats(req, res) {
 	for ( let i = 0; i < TeamRows.length; i++ ) {
 		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
 		franchiseByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['Franchise'];
-		tierByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['tier'];
+		tierByTeam[ TeamRows[i]['Team Name'] ]       = TeamRows[i]['tier'];
 	}
+	// log tiers
+	console.log(tierByTeam);
 
 	const StandingsSheet = doc.sheetsByTitle['Team Standings'];
 	const StandingsRows  = await StandingsSheet.getRows();
@@ -597,6 +624,8 @@ async function pull_stats(req, res) {
 		ranksByTeam[ team ] = rank;
 	}
 
+	// log divisions
+	console.log(divisionsByTeam);
 
 	let teamStats = [];
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
