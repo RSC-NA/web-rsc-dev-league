@@ -502,7 +502,7 @@ app.get('/teams', (req, res) => {
 		tableName = 'StreamTeamStats2';
 	}
 
-	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, opppShots FROM ${tableName} ORDER BY teamName`;
+	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, oppShots FROM ${tableName} ORDER BY teamName`;
 	connection.query(query, (err, results) => {
 		if (err) { 
 			res.json(err);
@@ -517,7 +517,7 @@ app.get('/teams/:tier', (req, res) => {
 		tableName = 'StreamTeamStats2';
 	}
 
-	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, opppShots FROM ${tableName} WHERE tier = ? ORDER BY teamName`;
+	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, oppShots FROM ${tableName} WHERE tier = ? ORDER BY teamName`;
 	connection.query(query, [req.params.tier], (err, results) => {
 		if (err) { 
 			res.json(err);
