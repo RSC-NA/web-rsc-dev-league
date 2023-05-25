@@ -692,7 +692,7 @@ async function pull_stats(req, res) {
 	let playerStatsQuery = `INSERT INTO ${playerStatsTable} (${playerKeys}) VALUES (${playerPlaceholders})`;
 	console.log(playerStatsQuery);
 	for ( let i = 0; i < playerStats.length; i++ ) {
-		if ( i % 10 ) { res.write(' '); } // make sure we keep our connection through heroku alive
+		if ( i % 20 == 0 ) { console.log(`Keepalive ping ${i}`); res.write(' '); } // make sure we keep our connection through heroku alive
 		await conn2.execute(playerStatsQuery, Object.values(playerStats[i]));
 	}
 
