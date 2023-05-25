@@ -605,7 +605,7 @@ async function pull_stats(req, res) {
 	for ( let i = 0; i < TeamRows.length; i++ ) {
 		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
 		franchiseByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['Franchise'];
-		tierByTeam[ TeamRows[i]['Team Name'] ]       = TeamRows[i]['tier'];
+		tierByTeam[ TeamRows[i]['Team Name'] ]       = TeamRows[i]['Tier'];
 	}
 	// log tiers
 	console.log(tierByTeam);
@@ -625,7 +625,7 @@ async function pull_stats(req, res) {
 	}
 
 	// log divisions
-	console.log(divisionsByTeam);
+	//console.log(divisionsByTeam);
 
 	let teamStats = [];
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
