@@ -502,7 +502,7 @@ app.get('/teams', (req, res) => {
 		tableName = 'StreamTeamStats2';
 	}
 
-	let query = `SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, \`Rank\`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM ${tableName} ORDER BY TeamName`;
+	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, opppShots FROM ${tableName} ORDER BY teamName`;
 	connection.query(query, (err, results) => {
 		res.json(results);
 	});
@@ -514,7 +514,7 @@ app.get('/teams/:tier', (req, res) => {
 		tableName = 'StreamTeamStats2';
 	}
 
-	let query = `SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, \`Rank\`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM ${tableName} WHERE Tier = ? ORDER BY TeamName`;
+	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, opppShots FROM ${tableName} WHERE tier = ? ORDER BY teamName`;
 	connection.query(query, [req.params.tier], (err, results) => {
 		res.json(results);
 	});
@@ -526,7 +526,7 @@ app.get('/players', (req, res) => {
 		tableName = 'StreamPlayerStats2';
 	}
 
-	let query = `SELECT Id, Season, Tier, TeamName, PlayerName, GP, GW, GL, WPct, MVPs, Pts, Goals, Assists, Saves, Shots, ShotPct, PPG, GPG, APG, SvPG, SoPG, Cycles, HatTricks, Playmakers, Saviors FROM ${tableName} ORDER BY PlayerName`;
+	let query = `SELECT id, season, tier, teamName, playerName, gp, gw, gl, wPct, mvPs, pts, goals, assists, saves, shots, shotPct, ppg, gpg, apg, svPG, soPG, cycles, hatTricks, playmakers, saviors FROM ${tableName} ORDER BY playerName`;
 	connection.query(query, (err, results) => {
 		res.json(results);
 	});
@@ -538,7 +538,7 @@ app.get('/players/:teamName', (req, res) => {
 		tableName = 'StreamPlayerStats2';
 	}
 
-	let query = `SELECT Id, Season, Tier, TeamName, PlayerName, GP, GW, GL, WPct, MVPs, Pts, Goals, Assists, Saves, Shots, ShotPct, PPG, GPG, APG, SvPG, SoPG, Cycles, HatTricks, Playmakers, Saviors FROM ${tableName} WHERE Team = ? ORDER BY PlayerName`;
+	let query = `SELECT id, season, tier, teamName, playerName, gp, gw, gl, wPct, mvPs, pts, goals, assists, saves, shots, shotPct, ppg, gpg, apg, svPG, soPG, cycles, hatTricks, playmakers, saviors FROM ${tableName} WHERE teamName = ? ORDER BY playerName`;
 	connection.query(query, [req.params.teamName], (err, results) => {
 		res.json(results);
 	});
