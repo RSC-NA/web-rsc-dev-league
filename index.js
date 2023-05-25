@@ -651,6 +651,9 @@ async function pull_stats(req, res) {
 	let playerStats = [];
 	for ( let i = 0; i < PlayerStatsRows.length; i++ ) {
 		let row = PlayerStatsRows[i];
+		if ( row['Name'] == '' ) { // skip empty records
+			continue;
+		}
 		playerStats.push({
 			Season: res.locals.settings.season, 
 			Tier: tierByTeam[ row['Team'] ] ?? '',
