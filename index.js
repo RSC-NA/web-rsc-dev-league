@@ -625,7 +625,8 @@ app.get('/pull_stats', async (req, res) => {
 	await conn2.execute('TRUNCATE StreamTeamStats');
 	output.push({ 'process': 'Truncating StreamTeamStats'});
 	let keys = Object.keys(teamStats[0]).join(', ');
-	let teamStatsQuery = `INSERT INTO StreamTeamStats (${keys}) VALUES ?`;
+	let placeholders = Object.keys(teamStats[0]).map(el => '?').join(', ');
+	let teamStatsQuery = `INSERT INTO StreamTeamStats (${keys}) VALUES (${placeholders})`;
 	console.log(teamStatsQuery);
 	for ( let i = 0; i < teamStats.length; i++ ) {
 		console.log(Object.values(teamStats[i]));
