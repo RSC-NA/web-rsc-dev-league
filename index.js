@@ -510,13 +510,13 @@ app.get('/players', (req, res) => {
 	let output = [];
 	output.push(player);
 
-	res.json(player);
+	res.json(output);
 });
 app.get('/players/:teamName', (req, res) => {
 	let output = [];
 	output.push(player);
 
-	res.json(player);
+	res.json(output);
 });
 app.get('/tiers', (req, res) => {
 	let tiers = [];
@@ -525,6 +525,37 @@ app.get('/tiers', (req, res) => {
 	}
 
 	res.json(tiers);
+});
+app.get('/pull_stats', async (req, res) => {
+	if ( ! req.session.is_admin ) {
+		//return res.redirect('/');
+		console.log('Non-admin check skipped');
+	} 
+
+	let sheetId = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
+
+	// 1. create google sheets object
+	const doc = new GoogleSpreadsheet(sheetId);
+
+	// 2. authenticate
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+
+	// 3. pull all relevant fields
+	await doc.loadInfo();
+
+	// sheets = Team List, Team Stats, Player Stats, Team Standings, Variables
+	const sheet = doc.sheetsByTitle["Team List"];
+	const rows = await sheet.getRows();
+
+	let teams = [];
+	// Team Name, Franchise, Tier
+	// StreamTeamStats, StreamTeamStats2
+	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {tableName} ORDER BY TeamName
+	for ( let i = 0; i < rows.length; i++ ) {
+		teams.push({ name: rows[i]['Team Name'], franchise: rows[i]['Franchise'], tier: rows[i]['Tier'] });
+	}
+
+	res.json(teams);
 });
 
 /*******************************************************
