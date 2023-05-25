@@ -573,25 +573,16 @@ app.get('/pull_stats', async (req, res) => {
 
 	const StandingsSheet = doc.sheetsByTitle['Team Standings'];
 	const StandingsRows  = await StandingsSheet.getRows();
-	const headerRow = StandingsSheet.headerValues;
-	const dataRows  = StandingsRows.slice(1); // exclude the fake "first row"
-	const mappedRows = dataRows.map(row => {
-		const mappedRow = {};
-		for ( let i = 0; i < headerRow.length; i++ ) {
-			const header = headerRow[i];
-			const value  = row._rawData[i];
-			mappedRow[header] = value;
-		}
-
-		return mappedRow;
-	});
-
+	const dataRows = StandingsRows.slice(1);
 	let divisionsByTeam = {};
 	let ranksByTeam =  {};
-	for ( let i = 0; i < mappedRows.length; i++ ) {
-		console.log(mappedRows[i]['Team'], mappedRows[i]['Div']);
-		divisionsByTeam[ mappedRows[i]['Team'] ] = mappedRows[i]['Div'];	
-		ranksByTeam[ mappedRows[i]['Team'] ] = mappedRows[i]['Rank'];
+	for ( let i = 0; i < dataRows.length; i++ ) {
+		let team     = dataRows[i]._rawData[1];
+		let division = dataRows[i]._rawData[3];
+		let rank     = dataRows[i]._rawData[4];
+		console.log(team, division, rank);
+		divisionsByTeam[ team ] = division;
+		ranksByTeam[ team ] = rank;
 	}
 
 
