@@ -496,9 +496,9 @@ let player = {
 	saviors: 2
 };
 app.get('/teams', (req, res) => {
-	let output = [];
-	output.push(team);
-
+	let isTwos = req.get('league');
+	let output = [{'isTwos': isTwos}];
+	console.log(req.get('league');
 	res.json(output);
 });
 app.get('/teams/:tier', (req, res) => {
