@@ -504,6 +504,9 @@ app.get('/teams', (req, res) => {
 
 	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, opppShots FROM ${tableName} ORDER BY teamName`;
 	connection.query(query, (err, results) => {
+		if (err) { 
+			res.json(err);
+		}
 		res.json(results);
 	});
 });
@@ -516,6 +519,9 @@ app.get('/teams/:tier', (req, res) => {
 
 	let query = `SELECT id, season, franchise, teamName, tier, wins, loss, winPct, \`rank\`, gm, conference, division, gamesPlayed, shotPct, points, goals, assists, saves, shots, goalDiff, oppShotPct, oppPoints, oppGoals, oppAssists, oppSaves, opppShots FROM ${tableName} WHERE tier = ? ORDER BY teamName`;
 	connection.query(query, [req.params.tier], (err, results) => {
+		if (err) { 
+			res.json(err);
+		}
 		res.json(results);
 	});
 
