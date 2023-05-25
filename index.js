@@ -649,6 +649,7 @@ async function pull_stats(req, res) {
 	const PlayerStatsRows  = await PlayerStatsSheet.getRows();
 	// SELECT 
 	let playerStats = [];
+	res.write(' ');
 	for ( let i = 0; i < PlayerStatsRows.length; i++ ) {
 		let row = PlayerStatsRows[i];
 		if ( row['Name'] == '' ) { // skip empty records
