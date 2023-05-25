@@ -629,7 +629,7 @@ app.get('/pull_stats', async (req, res) => {
 	console.log(teamStatsQuery);
 	for ( let i = 0; i < teamStats.length; i++ ) {
 		console.log(Object.values(teamStats[i]));
-		//await conn2.execute(teamStatsQuery, Object.values(teamStats[i]));
+		await conn2.execute(teamStatsQuery, Object.values(teamStats[i]));
 	}
 
 	//output.push({'ranksByTeam': ranksByTeam});
