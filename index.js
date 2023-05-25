@@ -619,13 +619,21 @@ app.get('/pull_stats', async (req, res) => {
 		});
 	}
 
+
+
 	// clear our tables
 	await conn2.execute('TRUNCATE StreamTeamStats');
 	output.push({ 'process': 'Truncating StreamTeamStats'});
-	output.push({'ranksByTeam': ranksByTeam});
-	output.push({'divisionsByTeam': divisionsByTeam});
-	//output.push({ 'teams': teams });
-	//output.push({ 'teamStats': teamStats });
+	let keys = Object.keys(teamStats[0]);
+	let teamStatsQuery = `INSERT INTO StreamTeamStats (${keys}) VALUES ?`;
+	for ( let i = 0; i < teamStats.length; i++ ) {
+		await conn2.execute(teamStatsQuery, [Object.values(teamStats[i])]);
+	}
+
+	//output.push({'ranksByTeam': ranksByTeam});
+	//output.push({'divisionsByTeam': divisionsByTeam});
+	// output.push({ 'teams': teams });
+	// output.push({ 'teamStats': teamStats });
 
 	res.json(output);
 });
