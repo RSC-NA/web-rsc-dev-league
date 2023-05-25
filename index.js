@@ -576,9 +576,7 @@ app.get('/pull_stats', async (req, res) => {
 	let divisionsByTeam = {};
 	let ranksByTeam =  {};
 	for ( let i = 0; i < StandingsRows.length; i++ ) {
-		if ( StandingsRows[i]['Div'] != '' ) {
-			divisionsByTeam[ StandingsRows[i]['Team'] ] = StandingRows[i]['Div'];	
-		}
+		divisionsByTeam[ StandingsRows[i]['Team'] ] = StandingsRows[i]['Div'];	
 		ranksByTeam[ StandingsRows[i]['Team'] ] = StandingsRows[i]['Rank'];
 	}
 
@@ -595,10 +593,10 @@ app.get('/pull_stats', async (req, res) => {
 			'Wins'       : TeamStatsRows[i]['W'],
 			'Loss'       : TeamStatsRows[i]['L'],
 			'WinPct'     : TeamStatsRows[i]['W%'],
-			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ], // TODO(erh) From Team Standings?
+			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ], 
 			'GM'         : TeamStatsRows[i]['GM'],
 			'Conference' : TeamStatsRows[i]['Conference'],
-			'Division'   : TeamStatsRows[i] in divisionsByTeam ? divisionsByTeam[ TeamStatsRows[i]['Team'] ] : '', // TODO(erh), from Team Standings
+			'Division'   : divisionsByTeam[ TeamStatsRows[i]['Team'] ], 
 			'GamesPlayed': TeamStatsRows[i]['GP'],
 			'ShotPct'    : TeamStatsRows[i]['Shot %'],
 			'Points'     : TeamStatsRows[i]['Points'],
