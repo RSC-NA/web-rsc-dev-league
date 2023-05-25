@@ -532,6 +532,14 @@ app.get('/pull_stats', pull_stats);
 app.get('/pull_stats_2', pull_stats);
 
 async function pull_stats(req, res) {
+	let sheetId          = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
+	let teamStatsTable   = 'StreamTeamStats';
+	let playerStatsTable = 'StreamPlayerStats';
+	if ( req.route.path == '/pull_stats_2' ) {
+		teamStatsTable   = 'StreamTeamStats2';
+		playerStatsTable = 'StreamPlayerStats2';
+		sheetId = '1CzIjrTdc7e7qK0blwl1rudhJxaCIxSI6WIiycHzMurY';
+	}
 	let output = [];
 
 	const conn2 = await mysqlP.createPool({
@@ -549,8 +557,6 @@ async function pull_stats(req, res) {
 		//return res.redirect('/');
 		console.log('Non-admin check skipped');
 	} 
-
-	let sheetId = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
 
 	// 1. create google sheets object
 	const doc = new GoogleSpreadsheet(sheetId);
@@ -570,7 +576,7 @@ async function pull_stats(req, res) {
 	let tierByTeam = {};
 	// Team Name, Franchise, Tier
 	// StreamTeamStats, StreamTeamStats2
-	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {tableName} ORDER BY TeamName
+	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {teamStatsTable} ORDER BY TeamName
 	for ( let i = 0; i < TeamRows.length; i++ ) {
 		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
 		franchiseByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['Franchise'];
@@ -625,32 +631,74 @@ async function pull_stats(req, res) {
 		});
 	}
 
-
-
 	// clear our tables
-	await conn2.execute('TRUNCATE StreamTeamStats');
-	output.push({ 'process': 'Truncating StreamTeamStats'});
+	await conn2.execute(`TRUNCATE ${teamStatsTable}`);
+	output.push({ 'process': `Truncating ${teamStatsTable}`});
+
+	// insert into ${teamStatsTable}
 	let keys = Object.keys(teamStats[0]).map(el => '`' + el + '`').join(', ');
 	let placeholders = Object.keys(teamStats[0]).map(el => '?').join(', ');
-	let teamStatsQuery = `INSERT INTO StreamTeamStats (${keys}) VALUES (${placeholders})`;
+	let teamStatsQuery = `INSERT INTO ${teamStatsTable} (${keys}) VALUES (${placeholders})`;
 	console.log(teamStatsQuery);
 	for ( let i = 0; i < teamStats.length; i++ ) {
-		console.log(Object.values(teamStats[i]));
+		//console.log(Object.values(teamStats[i]));
 		await conn2.execute(teamStatsQuery, Object.values(teamStats[i]));
 	}
 
-	//output.push({'ranksByTeam': ranksByTeam});
-	//output.push({'divisionsByTeam': divisionsByTeam});
-	// output.push({ 'teams': teams });
-	// output.push({ 'teamStats': teamStats });
-	output.push({ 'path': req.route.path });	
+	const PlayerStatsSheet = doc.sheetsByTitle['Player Stats'];
+	const PlayerStatsRows  = await PlayerStatsSheet.getRows();
+	// SELECT 
+	let playerStats = [];
+	for ( let i = 0; i < PlayerStatsRows.length; i++ ) {
+		let row = PlayerStatsRows[i];
+		playerStats.push({
+			Season: res.locals.settings.season, 
+			Tier: tierByTeam[ row['Team'] ] ?? '',
+			TeamName: row['Team'] ?? '', 
+			PlayerName: row['Name'] ?? '', 
+			GP: row['GP'] ?? 0, 
+			GW: row['GW'] ?? 0, 
+			GL: row['GL'] ?? 0, 
+			WPct: row['W%'] ?? 0, 
+			MVPs: row['MVPs'] ?? 0, 
+			Pts: row['Pts'] ?? 0, 
+			Goals: row['Goals'] ?? 0, 
+			Assists: row['Assists'] ?? 0, 
+			Saves: row['Saves'] ?? 0, 
+			Shots: row['Shots'] ?? 0, 
+			ShotPct: row['Shot Pct'] ?? 0, 
+			PPG: row['PPG'] ?? 0, 
+			GPG: row['GPG'] ?? 0, 
+			APG: row['APG'] ?? 0, 
+			SvPG: row['SvPG'] ?? 0, 
+			SoPG: row['SoPG'] ?? 0, 
+			Cycles: row['Cycles'] ?? 0,
+			HatTricks: row['Hat Tricks'] ?? 0, 
+			Playmakers: row['Playmakers'] ?? 0, 
+			Saviors: row['Saviors'] ?? 0,
+		});
+	}
+
+	await conn2.execute(`TRUNCATE ${playerStatsTable}`);
+	output.push({ 'process': `Truncating ${playerStatsTable}`});
+
+	// insert into ${playerStatsTable}
+	let playerKeys = Object.keys(playerStats[0]).map(el => '`' + el + '`').join(', ');
+	let playerPlaceholders = Object.keys(playerStats[0]).map(el => '?').join(', ');
+	let playerStatsQuery = `INSERT INTO ${playerStatsTable} (${playerKeys}) VALUES (${playerPlaceholders})`;
+	console.log(playerStatsQuery);
+	for ( let i = 0; i < playerStats.length; i++ ) {
+		await conn2.execute(playerStatsQuery, Object.values(playerStats[i]));
+	}
+
+	output.push({ 'process': 'Done!' });
+
 	res.json(output);
 }
 
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
-
 app.post('/generate_team/:tier', (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
