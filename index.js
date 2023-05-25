@@ -589,7 +589,7 @@ app.get('/pull_stats', async (req, res) => {
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
 		teamStats.push({
-			'Season'     : settings.season,// external
+			'Season'     : res.locals.settings.season,// external
 			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ],
 			'TeamName'   : TeamStatsRows[i]['Team'],
 			'Tier'       : TeamStatsRows[i]['Tier'],
