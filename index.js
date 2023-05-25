@@ -545,12 +545,11 @@ app.get('/players/:teamName', (req, res) => {
 });
 app.get('/tiers', (req, res) => {
 	let isTwos = req.get('league');
-	let tableName = 'StreamPlayerStats';
+	let tiers = [ 'Premier', 'Master', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender', 'Amateur'];
 	if ( isTwos ) {
-		tableName = 'StreamPlayerStats2';
+		tiers = [ 'Premier', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender'];
 	}
-
-	res.json(tiers);
+	res.json( tiers.map(el => { 'name': el }) );
 });
 
 app.get('/pull_stats', pull_stats);
