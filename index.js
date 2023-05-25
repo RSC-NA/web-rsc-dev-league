@@ -599,7 +599,7 @@ app.get('/pull_stats', async (req, res) => {
 			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ], // TODO(erh) From Team Standings?
 			'GM'         : TeamStatsRows[i]['GM'],
 			'Conference' : TeamStatsRows[i]['Conference'],
-			'Division'   : divisionsByTeam[ TeamStats[i]['Team'] ], // TODO(erh), from Team Standings
+			'Division'   : TeamStatsRows[i] in divisionsByTeam ? divisionsByTeam[ TeamStatsRows[i]['Team'] ] : '', // TODO(erh), from Team Standings
 			'GamesPlayed': TeamStatsRows[i]['GP'],
 			'ShotPct'    : TeamStatsRows[i]['Shot %'],
 			'Points'     : TeamStatsRows[i]['Points'],
