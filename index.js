@@ -576,12 +576,10 @@ app.get('/pull_stats', async (req, res) => {
 	let divisionsByTeam = {};
 	let ranksByTeam =  {};
 	for ( let i = 0; i < StandingsRows.length; i++ ) {
-		let row = StandingsRows[i];
-		console.log(row);
-		if ( 'Div' in row && row['Div'].trim() != '' ) {
-			divisionsByTeam[ row['Team'] ] = row['Div'].trim();	
+		if ( StandingsRows[i]['Div'] != '' ) {
+			divisionsByTeam[ StandingsRows[i]['Team'] ] = StandingRows[i]['Div'];	
 		}
-		ranksByTeam[ row['Team'] ] = row['Rank'];
+		ranksByTeam[ StandingsRows[i]['Team'] ] = StandingsRows[i]['Rank'];
 	}
 
 
