@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const session = require('express-session');
+const cors = require('cors');
 
 const mysql  = require('mysql2');
 const mysqlP = require('mysql2/promise');
@@ -92,6 +93,10 @@ app.use(session({
 	secret: 'rsc-dev-league',
 	resave: true,
 	saveUninitialized: true
+}));
+
+app.use(cors({
+	origin: '*'
 }));
 
 app.use((req, res, next) => {
