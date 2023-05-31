@@ -1004,7 +1004,7 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status) VALUES ?',
 			[ playersArray ],
 			(err, results) => {
-				if (err) { /*throw err;*/writeError(err); console.log('error!'); }
+				if (err) { /*throw err;*/writeError(err.toString()); console.log('error!'); }
 
 				res.redirect('/manage_league');
 		});
