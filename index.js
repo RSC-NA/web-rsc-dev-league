@@ -153,13 +153,12 @@ app.use((req, res, next) => {
 			};
 		}
 
-
 		if ( req.session.user_id ) {
 			connection.query(
 				'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
 				[ req.session.user_id ],
 				(err, results) => {
-					if ( results.length > 0 ) {
+					if ( results && results.length > 0 ) {
 						req.session.checked_in = true;
 						req.session.rostered = results[0].rostered;
 						res.locals.checked_in = req.session.checked_in;
@@ -999,7 +998,7 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status) VALUES ?',
 			[ playersArray ],
 			(err, results) => {
-				if (err) { throw err; }
+				if (err) { /*throw err;*/console.log('error?'); console.err(err); console.log('error!'); }
 
 				res.redirect('/manage_league');
 		});
