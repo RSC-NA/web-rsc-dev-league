@@ -651,6 +651,7 @@ async function pull_stats(req, res) {
 		if ( row['Name'] === '' || row['Name'] === undefined ) { // skip empty records
 			continue;
 		}
+		let shotPct = row['Shot Pct'].replace(/\%/, '');
 		playerStats.push({
 			Season: res.locals.settings.season, 
 			Tier: tierByTeam[ row['Team'] ] ?? '',
@@ -666,7 +667,7 @@ async function pull_stats(req, res) {
 			Assists: row['Assists'] ?? 0, 
 			Saves: row['Saves'] ?? 0, 
 			Shots: row['Shots'] ?? 0, 
-			ShotPct: row['Shot Pct'].replace(/\%/,'') ?? 0, 
+			ShotPct: shotPct != '' ? shotPct : 0, 
 			PPG: row['PPG'] ?? 0, 
 			GPG: row['GPG'] ?? 0, 
 			APG: row['APG'] ?? 0, 
