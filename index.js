@@ -990,10 +990,12 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		
 		let playersArray = [];
 		for ( let rsc_id in players ) {
-			if ( ! tier ) {
+			let player = players[rsc_id];
+
+			if ( ! player['tier'] ) {
 				continue;
 			}
-			let player = players[rsc_id];
+
 			// discord_id, rsc_id, mmr, tier, status
 			if ( player['tier'] == 'Master' ) {
 				player['tier'] = 'Premier';
