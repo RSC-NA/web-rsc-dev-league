@@ -106,7 +106,7 @@ app.use((req, res, next) => {
 		return res.redirect('https://devleague.rscstream.com');
 	}
 
-	res.locals.callbackUrl = encodeURIComponent('https://devleague.herokuapp.com/oauth2');
+	res.locals.callbackUrl = encodeURIComponent('https://devleague.rscstream.com/oauth2');
 
 	res.locals.user_id = req.session.user_id;
 	res.locals.nickname = req.session.nickname;
