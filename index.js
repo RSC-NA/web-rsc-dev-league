@@ -10,6 +10,12 @@ const btoa = require('btoa');
 const atob = require('atob');
 const e = require('express');
 
+const fs = require('fs');
+
+function writeError(error) {
+	fs.writeFileSync('./errors.log', error, { flag: 'a+' });
+}
+
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 require('dotenv').config();
@@ -998,7 +1004,7 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status) VALUES ?',
 			[ playersArray ],
 			(err, results) => {
-				if (err) { /*throw err;*/console.log('error?'); console.error(err); console.log('error!'); }
+				if (err) { /*throw err;*/writeError(err); console.log('error!'); }
 
 				res.redirect('/manage_league');
 		});
