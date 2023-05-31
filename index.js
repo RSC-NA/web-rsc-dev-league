@@ -997,6 +997,9 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			} else if ( player['tier'] == 'Amateur' ) {
 				player['tier'] = 'Contender';
 			}
+			if ( ! player['mmr'] ) {
+				player['mmr'] = 0;
+			}
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'] ]);
 		}
 
