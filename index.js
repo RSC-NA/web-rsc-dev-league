@@ -101,6 +101,11 @@ app.use(cors({
 
 app.use((req, res, next) => {
 
+	let host = req.headers.host;
+	if ( host != 'devleague.rscstream.com' ) {
+		return res.redirect('https://devleague.rscstream.com');
+	}
+
 	res.locals.user_id = req.session.user_id;
 	res.locals.nickname = req.session.nickname;
 	res.locals.discord_id = req.session.discord_id;
