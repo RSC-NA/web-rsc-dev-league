@@ -131,7 +131,7 @@
 				Discord.
 			</p>
 			<% } else { %>
-			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify" role="button">Log In with Discord</a>
+			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify" role="button">Log In with Discord</a>
 			<% } %>
 
 		<% } else if ( match_day && match_day == 'holiday' ) { %>

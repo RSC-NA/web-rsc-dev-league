@@ -41,7 +41,7 @@
 						<% } else { %>
 					<a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span>Login</span></a>
 					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-						<li><a class="dropdown-item" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=https%3A%2F%2Frsc-devleague.herokuapp.com%2Foauth2&response_type=token&scope=identify">Login w/ Discord</a></li>
+						<li><a class="dropdown-item" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify">Login w/ Discord</a></li>
 						<% } %>
 					</ul>
 				</li>
