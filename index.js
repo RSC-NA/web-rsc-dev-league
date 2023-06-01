@@ -108,7 +108,7 @@ app.use(cors({
 app.use((req, res, next) => {
 
 	let host = req.headers.host;
-	if ( host != 'devleague.rscstream.com' ) {
+	if ( host != 'devleague.rscstream.com' || host != 'api.rscstream.com' ) {
 		return res.redirect('https://devleague.rscstream.com');
 	}
 
