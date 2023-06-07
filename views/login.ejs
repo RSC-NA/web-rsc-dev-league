@@ -17,8 +17,8 @@
 			.then(result => result.json())
 			.then(response => {
 				const { username, discriminator, id } = response;
-				username = username.replace(/[^\x00-\x7F]/g,"");
-				let userString = btoa(`${username}:${discriminator}:${id}`);
+				let sanitized = username.replace(/[^\x00-\x7F]/g,"");
+				let userString = btoa(`${sanitized}:${discriminator}:${id}`);
 				document.getElementById('info').innerHTML += ` ${username}#${discriminator} - ${id} - If you're not redirected automatically please click <a href="/process_login?rsc=${userString}">here to finish logging in.</a>`;
 				if ( username && discriminator && id ) {
 					// redirect to login page
