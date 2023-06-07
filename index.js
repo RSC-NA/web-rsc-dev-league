@@ -112,7 +112,7 @@ app.use((req, res, next) => {
 		return res.redirect('https://devleague.rscstream.com');
 	}
 
-	console.log(`${host} - ${req.baseUrl}/${req.path}`);
+	//console.log(`${host} - ${req.path}`);
 
 	res.locals.callbackUrl = encodeURIComponent('https://devleague.rscstream.com/oauth2');
 
