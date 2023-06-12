@@ -870,6 +870,22 @@ app.get('/make_inactive/:signup_id', (req, res) => {
 	});
 });
 
+app.get('/activate_everyone/:match_day', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
+	if ( ! req.params.match_day ) {
+		return res.redirect('/');
+	}
+
+	let query = 'UPDATE signups SET active = 1 WHERE match_day = ? AND season = ?';
+	connection.query(query, [ req.params.match_day, res.locals.settings.season ], (err, results) => {
+		return res.redirect('/process_gameday');
+	});
+
+});
+
 app.get('/process_gameday', (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
@@ -895,8 +911,10 @@ app.get('/process_gameday', (req, res) => {
 		if ( err ) { throw err; }
 
 		let signups = {};
+		let match_day = null;
 		for ( let i = 0; i < results.length; i++ ) {
 			if ( ! ( results[i]['tier'] in signups ) ) {
+				match_day = results[i]['match_day'];
 				signups[ results[i]['tier'] ] = {
 					'season': results[i]['season'],
 					'match_day': results[i]['match_day'],
@@ -911,7 +929,7 @@ app.get('/process_gameday', (req, res) => {
 			}	
 		}
 		console.log(signups);
-		res.render('process', { signups: signups });
+		res.render('process', { signups: signups, match_day: match_day });
 	});
 
 });
