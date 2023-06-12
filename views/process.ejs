@@ -76,7 +76,14 @@
 			<ul class="list-group mb-3">
 
 				<% 
-					for ( let tier in signups ) { 
+					for ( let tier in settings ) { 
+						if ( tier == 'season' ) {
+							continue;
+						}
+
+						if ( ! ( tier in signups ) )  {
+							continue;
+						}
 				%>
 
 				<li class="list-group-item justify-content-between lh-condensed">
@@ -118,7 +125,16 @@
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">Signups By Tier</h4>
 			
-			<% for ( let tier in signups ) { %>
+			<%
+				for ( let tier in settings ) { 
+					if ( tier == 'season' ) {
+						continue;
+					}
+
+					if ( ! ( tier in signups ) )  {
+						continue;
+					}
+			%>
 
 			<div class="mb-3">
 				<h5><%= tier %></h5>
