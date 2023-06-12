@@ -80,7 +80,7 @@
 						if ( tier == 'season' ) {
 							continue;
 						}
-
+						tier = tier.charAt(0).toUpperCase() + tier.slice(1);
 						if ( ! ( tier in signups ) )  {
 							continue;
 						}
@@ -131,6 +131,7 @@
 						continue;
 					}
 
+					tier = tier.charAt(0).toUpperCase() + tier.slice(1);
 					if ( ! ( tier in signups ) )  {
 						continue;
 					}
