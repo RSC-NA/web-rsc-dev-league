@@ -526,6 +526,14 @@ app.get('/tiers', (req, res) => {
 app.get('/pull_stats', pull_stats);
 app.get('/pull_stats_2', pull_stats);
 
+function forceInt(val) {
+	if ( parseInt(val) == NaN ) {
+		return 0;
+	}
+
+	return parseInt(val);
+}
+
 async function pull_stats(req, res) {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
@@ -659,26 +667,26 @@ async function pull_stats(req, res) {
 			Tier: tierByTeam[ row['Team'] ] ?? '',
 			TeamName: row['Team'] ?? '', 
 			PlayerName: row['Name'] ?? '', 
-			GP: row['GP'] ?? 0, 
-			GW: row['GW'] ?? 0, 
-			GL: row['GL'] ?? 0, 
-			WPct: row['W%'].replace(/\%/,'') ?? 0, 
-			MVPs: row['MVPs'] ?? 0, 
-			Pts: row['Pts'] ?? 0, 
-			Goals: row['Goals'] ?? 0, 
-			Assists: row['Assists'] ?? 0, 
-			Saves: row['Saves'] ?? 0, 
-			Shots: row['Shots'] ?? 0, 
-			ShotPct: shotPct != '' ? shotPct : 0, 
+			GP: forceInt(row['GP']), 
+			GW: forceInt(row['GW']), 
+			GL: forceInt(row['GL']), 
+			WPct: row['W%'].replace(/\%/,''), 
+			MVPs: forceInt(row['MVPs']), 
+			Pts: forceInt(row['Pts']), 
+			Goals: forceInt(row['Goals']), 
+			Assists: forceInt(row['Assists']), 
+			Saves: forceInt(row['Saves']),
+			Shots: forceInt(row['Shots']),
+			ShotPct: shotPct != '' ? shotPct : 0.0, 
 			PPG: row['PPG'] ?? 0, 
 			GPG: row['GPG'] ?? 0, 
 			APG: row['APG'] ?? 0, 
 			SvPG: row['SvPG'] ?? 0, 
 			SoPG: row['SoPG'] ?? 0, 
-			Cycles: row['Cycles'] ?? 0,
-			HatTricks: row['Hat Tricks'] ?? 0, 
-			Playmakers: row['Playmakers'] ?? 0, 
-			Saviors: row['Saviors'] ?? 0,
+			Cycles: forceInt(row['Cycles']),
+			HatTricks: forceInt(row['Hat Tricks']), 
+			Playmakers: forceInt(row['Playmakers']),
+			Saviors: forceInt(row['Saviors']),
 		});
 	}
 
