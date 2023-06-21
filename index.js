@@ -1009,7 +1009,7 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	let domino_id = 'RSC000945';
 	let domino_discord_id = '500092285120282635';
 	if ( ! ( domino_id in players ) ) {
-		players[tehblister_id] = {
+		players[domino_id] = {
 			'rsc_id': domino_id,
 			'name': 'Domino',
 			'discord_id': domino_discord_id,
