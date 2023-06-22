@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const session = require('express-session');
 const cors = require('cors');
+const bodyParser = require('bodyParser');
+const fs = require('fs');
+
 
 const mysql  = require('mysql2');
 const mysqlP = require('mysql2/promise');
@@ -186,6 +189,8 @@ app.use((req, res, next) => {
 // express setup
 app.use( express.static('static') ); 
 app.set('view engine', 'ejs');
+
+app.use(bodyParser.json());
 
 /*******************************************************
  ******************** Player Views *********************
@@ -459,6 +464,19 @@ app.get('/matches', (req, res) => {
 /********************************************************
  ********************** API Views ***********************
  *******************************************************/
+app.post('/save_mmr', (req, res) => {
+	const postBody = req.body;
+	fs.appendFile('mmrs.json', JSON.stringify(postBody) + '\n', 'utf8', (err) => {
+		if ( err ) {
+			console.error('Error', err);
+			res.status(500).send('Error writing the file.');
+		} else {
+			console.log('Success!');
+			res.send('MMR Received!');
+		}
+	});
+});
+
 app.get('/teams', (req, res) => {
 	let isTwos = req.get('league');
 	let tableName = 'StreamTeamStats';
@@ -1059,7 +1077,6 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 				res.redirect('/manage_league');
 		});
 	});
-
 });
 
 app.get('/manage_league', (req, res) => {
