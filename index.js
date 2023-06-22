@@ -13,8 +13,6 @@ const btoa = require('btoa');
 const atob = require('atob');
 const e = require('express');
 
-const fs = require('fs');
-
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error, { flag: 'a+' });
 }
