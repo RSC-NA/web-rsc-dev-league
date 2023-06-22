@@ -464,15 +464,17 @@ app.get('/matches', (req, res) => {
  *******************************************************/
 app.post('/save_mmr', (req, res) => {
 	const postBody = req.body;
-	fs.appendFile('mmrs.json', JSON.stringify(postBody) + '\n', 'utf8', (err) => {
-		if ( err ) {
-			console.error('Error', err);
-			res.status(500).send('Error writing the file.');
-		} else {
-			console.log('Success!');
-			res.send('MMR Received!');
-		}
-	});
+	console.log(postBody);
+	res.json({ success: true });
+	// fs.appendFile('mmrs.json', JSON.stringify(postBody) + '\n', 'utf8', (err) => {
+	// 	if ( err ) {
+	// 		console.error('Error', err);
+	// 		res.status(500).send('Error writing the file.');
+	// 	} else {
+	// 		console.log('Success!');
+	// 		res.send('MMR Received!');
+	// 	}
+	// });
 });
 
 app.get('/teams', (req, res) => {
