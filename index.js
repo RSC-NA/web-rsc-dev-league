@@ -467,20 +467,6 @@ app.get('/store_trackers', (req, res) => {
 	// 	return res.redirect('/');
 	// } 
 
-	/*
-	1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s
-CREATE TABLE contracts (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`discord_id` VARCHAR(20) NOT NULL,
-	`rsc_id` VARCHAR(10) NOT NULL,
-	`name` VARCHAR(100) NOT NULL DEFAULT '',
-	`mmr` INT UNSIGNED NOT NULL DEFAULT 0,
-	`tier` VARCHAR(10) NOT NULL DEFAULT '',
-	`status` VARCHAR(20) NOT NULL DEFAULT '',
-	PRIMARY KEY(`id`),
-	INDEX `discord_id_idx` (`discord_id`)
-	*/
-
 	// fetch all active players from contracts
 	let active_players = {};
 	let contractsQuery = 'SELECT rsc_id,name FROM contracts';
@@ -503,11 +489,26 @@ CREATE TABLE contracts (
 		const rows = await sheet.getRows();
 		await sheet.loadCells('A:C');
 
+		let trackers = [];
 		for ( let i = 0; i < rows.length; i++ ) {
-			console.log(rows[i]);
-			res.json(rows[i]);
-			break;
+			let rsc_id = rows[i]._rawData[0];
+			let player_name = rows[i]._rawData[1];
+			let tracker = rows[i]._rawData[2];
+
+			if ( ! (rsc_id in active_players) ) {
+				continue;
+			}
+
+			trackers.push([ rsc_id, player_name, tracker ]);
 		}
+
+		connection.query('TRUNCATE trackers', (err, results) => {
+			if ( err ) { throw err; }
+
+			connection.query('INSERT INTO trackers (rsc_id, name, tracker) VALUES ?', [trackers], (err,results) => {
+				res.redirect('/');
+			});
+		});
 
 	});
 });
