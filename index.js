@@ -463,9 +463,9 @@ app.get('/matches', (req, res) => {
  ********************** API Views ***********************
  *******************************************************/
 app.get('/store_trackers', (req, res) => {
-	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
-	} 
+	// if ( ! req.session.is_admin ) {
+	// 	return res.redirect('/');
+	// } 
 
 	/*
 	1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s
