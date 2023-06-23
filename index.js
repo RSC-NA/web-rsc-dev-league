@@ -557,7 +557,7 @@ app.post('/save_mmr', (req, res) => {
 			connection.query(
 				query, 
 				[ d.psyonix_season, d.tracker_link.link, results[0].rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
-				d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.user_id ],
+				d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.pulled_by ],
 				(err, results) => {
 					if ( err ) { console.error('Insert error:', err); throw err; }
 
