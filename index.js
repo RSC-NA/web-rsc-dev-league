@@ -462,6 +462,55 @@ app.get('/matches', (req, res) => {
 /********************************************************
  ********************** API Views ***********************
  *******************************************************/
+app.get('/store_trackers', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
+	/*
+	1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s
+CREATE TABLE contracts (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`discord_id` VARCHAR(20) NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`name` VARCHAR(100) NOT NULL DEFAULT '',
+	`mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`tier` VARCHAR(10) NOT NULL DEFAULT '',
+	`status` VARCHAR(20) NOT NULL DEFAULT '',
+	PRIMARY KEY(`id`),
+	INDEX `discord_id_idx` (`discord_id`)
+	*/
+
+	// fetch all active players from contracts
+	let active_players = {};
+	let contractsQuery = 'SELECT rsc_id,name FROM contracts';
+	connection.query(contractsQuery, async (err, results) => {
+		if ( err ) { throw err; }
+
+		for ( let i = 0; i < results.length; ++i ) {
+			active_players[ results[i].rsc_id ] = results[i].name;
+		}
+
+		// 1. create google sheets object
+		const doc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
+		// 2. authenticate
+		doc.useApiKey(process.env.GOOGLE_API_KEY);
+
+		// 3. pull all relevant fields
+		await doc.loadInfo();
+
+		const sheet = doc.sheetsByTitle["Link List"];
+		const rows = await sheet.getRows();
+		await sheet.loadCells('A:C');
+
+		for ( let i = 0; i < rows.length; i++ ) {
+			console.log(rows[i]);
+			break;
+		}
+
+	});
+});
+
 app.post('/save_mmr', (req, res) => {
 	const postBody = req.body;
 	console.log(postBody);

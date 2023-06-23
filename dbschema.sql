@@ -1,3 +1,33 @@
+CREATE TABLE trackers (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`name` VARCHAR(100) NOT NULL DEFAULT '',
+	`tracker_link` VARCHAR(255) NOT NULL,
+	`active` tinyint(1) NOT NULL DEFAULT 1,
+	PRIMARY KEY(`id`),
+	INDEX `tracker_link_idx` (`tracker_link`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE tracker_data (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`psyonix_season` INT UNSIGNED NOT NULL,
+	`tracker_link` VARCHAR(255) NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`threes_games_played` INT UNSIGNED,
+	`threes_rating` INT UNSIGNED,
+	`threes_season_peak` INT UNSIGNED,
+	`twos_games_played` INT UNSIGNED,
+	`twos_rating` INT UNSIGNED,
+	`twos_season_peak` INT UNSIGNED,
+	`ones_games_played` INT UNSIGNED,
+	`ones_rating` INT UNSIGNED,
+	`ones_season_peak` INT UNSIGNED,
+	`date_pulled` DATETIME NOT NULL DEFAULT now(),
+	`pulled_by` VARCHAR(50) NOT NULL DEFAULT '',
+	`sent_to_api` tinyint(1) not null default 0,
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`nickname` VARCHAR(255) NOT NULL,
