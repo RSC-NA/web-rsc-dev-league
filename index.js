@@ -487,7 +487,7 @@ app.get('/store_trackers', (req, res) => {
 
 		const sheet = doc.sheetsByTitle["Link List"];
 		const rows = await sheet.getRows();
-		await sheet.loadCells('A:C');
+		//await sheet.loadCells('A:C');
 
 		let trackers = [];
 		for ( let i = 0; i < rows.length; i++ ) {
