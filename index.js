@@ -504,15 +504,13 @@ app.get('/store_trackers', (req, res) => {
 			trackers.push([ rsc_id, player_name, tracker ]);
 		}
 
-		console.log(trackers);
 		connection.query('TRUNCATE trackers', (err, results) => {
 			if ( err ) { throw err; }
 
-			console.log('inserting trackers', trackers.length);
-			connection.query('INSERT INTO trackers (rsc_id, name, tracker) VALUES ?', [trackers], (err,results) => {
+			console.log('Inserting trackers', trackers.length);
+			connection.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers], (err,results) => {
 				if ( err ) {
-					console.log("ERRRORORORORRORO");
-					console.error(err);
+					console.error('Error inserting:',err);
 				}
 				res.redirect('/');
 			});
