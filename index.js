@@ -534,9 +534,9 @@ app.post('/bad_tracker', (req, res) => {
 			res.json({'success': true });
 		});
 
-		res.json({'success': false, 'error': 'Could not save'});
+	} else {
+		res.json({'success': false, 'error': 'Must provide a tracker link'});
 	}
-	res.json({'success': false, 'error': "Must provide tracker_link"});
 });
 
 app.post('/save_mmr', (req, res) => {
