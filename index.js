@@ -556,10 +556,11 @@ CREATE TABLE tracker_data (
 				twos_games_played,twos_rating,twos_season_peak,ones_games_played,ones_rating,ones_season_peak)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`;
-			connection.query(query, 
+			connection.query(
+				query, 
 				[ d.psyonix_season, d.tracker_link.link, results[0].rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
 				d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak ],
-				(err, results) {
+				(err, results) => {
 					if ( err ) { console.error('Insert error:', err); throw err; }
 
 					res.json({ success: true });
