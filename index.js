@@ -552,7 +552,7 @@ app.post('/save_mmr', (req, res) => {
 			INSERT INTO tracker_data 
 				(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
 				twos_games_played,twos_rating,twos_season_peak,ones_games_played,ones_rating,ones_season_peak,pulled_by)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`;
 			connection.query(
 				query, 
