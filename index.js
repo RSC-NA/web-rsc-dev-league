@@ -505,6 +505,7 @@ CREATE TABLE contracts (
 
 		for ( let i = 0; i < rows.length; i++ ) {
 			console.log(rows[i]);
+			res.json(rows[i]);
 			break;
 		}
 
