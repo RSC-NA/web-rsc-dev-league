@@ -520,18 +520,55 @@ app.get('/store_trackers', (req, res) => {
 });
 
 app.post('/save_mmr', (req, res) => {
-	const postBody = req.body;
-	console.log(postBody);
-	res.json({ success: true });
-	// fs.appendFile('mmrs.json', JSON.stringify(postBody) + '\n', 'utf8', (err) => {
-	// 	if ( err ) {
-	// 		console.error('Error', err);
-	// 		res.status(500).send('Error writing the file.');
-	// 	} else {
-	// 		console.log('Success!');
-	// 		res.send('MMR Received!');
-	// 	}
-	// });
+	const d = req.body;
+	console.log(d);
+
+	connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link = ?', [ d.tracker_link.link ], (err, results) => {
+		if ( err ) { console.error('ERROR', err); throw err; }
+
+		if ( results && results.length ) {
+/*
+
+CREATE TABLE tracker_data (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`psyonix_season` INT UNSIGNED NOT NULL,
+	`tracker_link` VARCHAR(255) NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`threes_games_played` INT UNSIGNED,
+	`threes_rating` INT UNSIGNED,
+	`threes_season_peak` INT UNSIGNED,
+	`twos_games_played` INT UNSIGNED,
+	`twos_rating` INT UNSIGNED,
+	`twos_season_peak` INT UNSIGNED,
+	`ones_games_played` INT UNSIGNED,
+	`ones_rating` INT UNSIGNED,
+	`ones_season_peak` INT UNSIGNED,
+	`date_pulled` DATETIME NOT NULL DEFAULT now(),
+	`pulled_by` VARCHAR(50) NOT NULL DEFAULT '',
+	`sent_to_api` tinyint(1) not null default 0,
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+*/
+
+			let query = `
+			INSERT INTO tracker_data 
+				(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
+				twos_games_played,twos_rating,twos_season_peak,ones_games_played,ones_rating,ones_season_peak)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			`;
+			connection.query(query, 
+				[ d.psyonix_season, d.tracker_link.link, results[0].rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
+				d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak ],
+				(err, results) {
+					if ( err ) { console.error('Insert error:', err); throw err; }
+
+					res.json({ success: true });
+			});
+		} else {
+			res.json({ success: false, 'error': 'This tracker is not attached to an RSC player.' });
+		}
+	});
+
 });
 
 app.get('/teams', (req, res) => {
