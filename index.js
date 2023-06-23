@@ -543,7 +543,7 @@ app.post('/save_mmr', (req, res) => {
 	const d = req.body;
 	console.log(d);
 
-	connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
+	connection.query('SELECT rsc_id,name FROM trackers WHERE bad = 0 AND tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
 		if ( err ) { console.error('ERROR', err); throw err; }
 
 		if ( results && results.length ) {
