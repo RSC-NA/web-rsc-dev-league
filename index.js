@@ -527,11 +527,11 @@ app.post('/bad_tracker', (req, res) => {
 		tracker_parse = tracker_parse.split('/');
 		let platform = tracker_parse[1];
 		let player_id = tracker_parse[2];
-
-		connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ `%${platform}/${player_id}%` ], (err, results) => {
+		let queryVar = `%${platform}/${player_id}%`;
+		connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ queryVar ], (err, results) => {
 			if ( err ) { console.error('ERROR', err); throw err; }
 
-			res.json({'success': true });
+			res.json({'success': true, 'ref': queryVar });
 		});
 
 	} else {
