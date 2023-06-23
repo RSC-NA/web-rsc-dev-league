@@ -508,7 +508,12 @@ app.get('/store_trackers', (req, res) => {
 		connection.query('TRUNCATE trackers', (err, results) => {
 			if ( err ) { throw err; }
 
+			console.log('inserting trackers', trackers.length);
 			connection.query('INSERT INTO trackers (rsc_id, name, tracker) VALUES ?', [trackers], (err,results) => {
+				if ( err ) {
+					console.log("ERRRORORORORRORO");
+					console.error(err);
+				}
 				res.redirect('/');
 			});
 		});
