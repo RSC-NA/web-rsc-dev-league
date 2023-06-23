@@ -470,6 +470,7 @@ app.get('/store_trackers', (req, res) => {
 	// fetch all active players from contracts
 	let active_players = {};
 	let contractsQuery = 'SELECT rsc_id,name FROM contracts';
+	console.log('store trackers!');
 	connection.query(contractsQuery, async (err, results) => {
 		if ( err ) { throw err; }
 
@@ -490,6 +491,7 @@ app.get('/store_trackers', (req, res) => {
 		//await sheet.loadCells('A:C');
 
 		let trackers = [];
+
 		for ( let i = 0; i < rows.length; i++ ) {
 			let rsc_id = rows[i]._rawData[0];
 			let player_name = rows[i]._rawData[1];
@@ -502,6 +504,7 @@ app.get('/store_trackers', (req, res) => {
 			trackers.push([ rsc_id, player_name, tracker ]);
 		}
 
+		console.log(trackers);
 		connection.query('TRUNCATE trackers', (err, results) => {
 			if ( err ) { throw err; }
 
