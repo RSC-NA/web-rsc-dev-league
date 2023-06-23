@@ -4,6 +4,7 @@ CREATE TABLE trackers (
 	`name` VARCHAR(100) NOT NULL DEFAULT '',
 	`tracker_link` VARCHAR(255) NOT NULL,
 	`active` tinyint(1) NOT NULL DEFAULT 1,
+	`bad` tinyint(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`),
 	INDEX `tracker_link_idx` (`tracker_link`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

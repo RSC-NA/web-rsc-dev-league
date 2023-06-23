@@ -519,6 +519,26 @@ app.get('/store_trackers', (req, res) => {
 	});
 });
 
+app.post('/bad_tracker', (req, res) => {
+	const body = req.body;
+	let tracker_link = body.tracker_link;
+	if ( tracker_link && tracker_link.includes('profile') ) {
+		let tracker_parse = tracker_link.split('profile')[1];
+		tracker_parse = tracker_parse.split('/');
+		let platform = tracker_parse[1];
+		let player_id = tracker_parse[2];
+
+		connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ `%${platform}/${player_id}%` ], (err, results) => {
+			if ( err ) { console.error('ERROR', err); throw err; }
+
+			res.json({'success': true });
+		});
+
+		res.json({'success': false, 'error': 'Could not save'});
+	}
+	res.json({'success': false, 'error': "Must provide tracker_link"});
+});
+
 app.post('/save_mmr', (req, res) => {
 	const d = req.body;
 	console.log(d);
