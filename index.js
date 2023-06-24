@@ -201,7 +201,7 @@ app.get('/tracker', (req, res) => {
 			}
 		}
 
-		res.render('/tracker', { leaderboard: leaderboard });
+		res.render('tracker', { leaderboard: leaderboard });
 	});
 });
 
