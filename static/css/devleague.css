@@ -25,6 +25,7 @@ li.today {
 
 ol>li.today {
 	list-style-type: decimal;
+	text-decoration: none;
 }
 
 li.today.holiday {
