@@ -79,6 +79,7 @@ app.use((req, res, next) => {
 
 	console.log('url: ' + req.originalUrl);
 	let current_view = req.originalUrl.split('/')[1];
+	if ( current_view == '' ) { current_view = 'dashboard'; }
 	if ( current_view in res.locals.menu ) {
 		res.locals.menu[ current_view ] = 'active';
 	}
