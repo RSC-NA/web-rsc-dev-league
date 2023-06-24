@@ -200,6 +200,59 @@ app.get('/', (req, res) => {
 	res.render('dashboard', { match_days: matchDays });
 });
 
+app.get('/tracker/:rsc_name', (req, res) => {
+	let pulled_by = req.params.rsc_name;
+
+	let query = `
+SELECT
+	count(t.id) as pulls, c.name, t.pulled_by
+FROM tracker_data AS t
+LEFT JOIN contracts AS c ON t.pulled_by = c.name
+WHERE t.pulled_by = ?
+GROUP BY t.pulled_by
+ORDER BY pulls DESC
+	`;
+	connection.query(query, [ pulled_by ], (err, results) => {
+		if ( err ) { console.error('Leaderboard error:', err); throw err; }
+
+		let leaderboard = {};
+		if ( results && results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				leaderboard[ results[i].pulled_by ] = { count: results[i].pulls, name: results[i].name };
+			}
+		}
+
+		let badQuery = `
+SELECT
+	count(t.id) as pulls, c.name, t.pulled_by
+FROM bad_trackers AS t
+LEFT JOIN contracts AS c ON t.pulled_by = c.name
+WHERE t.pulled_by = ?
+GROUP BY t.pulled_by
+ORDER BY pulls DESC
+		`;
+		connection.query(badQuery, [ pulled_by ], (err, results) => {
+			if ( err ) { console.error('Leaderboard error:', err); throw err; }
+
+			if ( results && results.length ) {
+				for ( let i = 0; i < results.length; ++i ) {
+					if ( results[i].pulled_by in leaderboard ) {
+						leaderboard[ results[i].pulled_by ]['count'] += results[i].pulls;
+					} else {
+						leaderboard[ results[i].pulled_by ] = { count: results[i].pulls, name: results[i].name };
+					}
+				}
+			}
+
+			if ( leaderboard[ pulled_by ] ) {
+				res.json({ total: leaderboard[ pulled_by ]['total'] });
+			} else {
+				res.json({ total: 0 });
+			}
+		});
+	});
+});
+
 app.get('/tracker', (req, res) => {
 
 	let query = `
