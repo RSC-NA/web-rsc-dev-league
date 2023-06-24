@@ -183,6 +183,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/tracker', (req, res) => {
+
 	let query = `
 		SELECT
 			count(*) as pulls, c.name, t.pulled_by 
@@ -193,6 +194,8 @@ app.get('/tracker', (req, res) => {
 	`;
 	connection.query(query, (err, results) => {
 		if ( err ) { console.error('Leaderboard error:', err); throw err; }
+
+		res.locals.title = 'RSC MMR Leaderboard';
 
 		let leaderboard = {};
 		if ( results && results.length ) {
