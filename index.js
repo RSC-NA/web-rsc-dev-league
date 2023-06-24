@@ -13,6 +13,11 @@ const btoa = require('btoa');
 const atob = require('atob');
 const e = require('express');
 
+// pull in our two manually defined configuration objects
+// TODO(erh): this can probably be moved into a database table
+const matchDays = require('./matchDays');
+const { mmrRange, getTierFromMMR } = require('./mmrs');
+
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error, { flag: 'a+' });
 }
@@ -25,76 +30,6 @@ app.use( express.urlencoded({ extended: true }) );
 
 let title = 'RSC Development League';
 
-const matchDays = {
-	//'2023-05-03': 'holiday', // nice - end of season blowout
-	'2023-05-15': 1,
-	'2023-05-17': 2,
-	'2023-05-22': 3,
-	'2023-05-24': 4,
-	'2022-05-29': 'holiday',
-	'2023-05-31': 5,
-	'2023-06-05': 6,
-	'2023-06-07': 7,
-	'2023-06-12': 8,
-	'2023-06-14': 9,
-	'2023-06-19': 10,
-	'2023-06-21': 11,
-	'2023-06-26': 12,
-	'2023-06-28': 13,
-	'2022-07-03': 'holiday',
-	'2022-07-05': 'holiday',
-	'2023-07-10': 14,
-	'2023-07-12': 15,
-	'2023-07-17': 16,
-};
-
-const mmrRange = {
-	'Premier': { 
-		'max': 2010,
-		'min': 1750,
-	},
-	'Master': { 
-		'max': 1745,
-		'min': 1650,
-	},
-	'Elite': { 
-		'max': 1645,
-		'min': 1505,
-	},
-	'Veteran': { 
-		'max': 1500,
-		'min': 1415,
-	},
-	'Rival': { 
-		'max': 1410,
-		'min': 1300,
-	},
-	'Challenger': { 
-		'max': 1295,
-		'min': 1170,
-	},
-	'Prospect': { 
-		'max': 1165,
-		'min': 1050,
-	},
-	'Contender': { 
-		'max': 1045,
-		'min': 920,
-	},
-	'Amateur': { 
-		'max': 915,
-		'min': 500,
-	},
-};
-
-function getTierFromMMR(mmr) {
-	for ( let tier in mmrRange ) {
-		if ( mmr >= mmrRange[tier]['min'] && mmr <= mmrRange[tier]['max'] ) {
-			return tier;
-		}
-	}
-}
-
 // set up session
 app.use(session({
 	secret: 'rsc-dev-league',
@@ -106,15 +41,26 @@ app.use(cors({
 	origin: '*'
 }));
 
+// correct server URL middleware
+// TODO(erh): Once I shut down heroku, we can turn this off
 app.use((req, res, next) => {
-
+	// if you want to run this program locally, make sure you
+	// either comment this section out, or add a check for 'localhost'
+	// as the host
 	let host = req.headers.host;
 	if ( ! (host == 'devleague.rscstream.com' || host == 'api.rscstream.com') ) {
 		return res.redirect('https://devleague.rscstream.com');
 	}
 
-	//console.log(`${host} - ${req.path}`);
+	next();
+});
 
+// primary middleware -- check user session, set up local vars
+// for templates, etc. 
+//
+// this middleware also fetches the "settings" from the database
+// configured in the /manage_league route
+app.use((req, res, next) => {
 	res.locals.callbackUrl = encodeURIComponent('https://devleague.rscstream.com/oauth2');
 
 	res.locals.user_id = req.session.user_id;
@@ -126,8 +72,8 @@ app.use((req, res, next) => {
 
 	res.locals.title = title;
 
-	res.locals.checked_in = false;
-
+	// a count of how many trackers need to be
+	// "sent" to the official API.
 	let settings = {
 		season: 17,
 		premier: false,
@@ -161,27 +107,58 @@ app.use((req, res, next) => {
 				premier: results[0].premier,
 			};
 		}
-
-		if ( req.session.user_id ) {
-			connection.query(
-				'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
-				[ req.session.user_id ],
-				(err, results) => {
-					if ( results && results.length > 0 ) {
-						req.session.checked_in = true;
-						req.session.rostered = results[0].rostered;
-						res.locals.checked_in = req.session.checked_in;
-						res.locals.rostered = req.session.rostered;
-						next();
-					} else {
-						next();
-					}
-				}
-			);
-		} else {
-			next();
-		}
+		next();
 	});
+
+	next();
+});
+
+// checked in middleware.
+// only really needed if the user is logged in AND it's a game day
+app.use((req, res, next) => {
+	res.locals.checked_in = false;
+	
+	let date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
+	res.locals.match_day = false;
+	if ( date in matchDays ) {
+		res.locals.match_day = matchDays[date];
+	}
+
+	if ( res.locals.match_day && req.session.user_id ) {
+		connection.query(
+			'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
+			[ req.session.user_id ],
+			(err, results) => {
+				if ( results && results.length > 0 ) {
+					req.session.checked_in = true;
+					req.session.rostered = results[0].rostered;
+					res.locals.checked_in = req.session.checked_in;
+					res.locals.rostered = req.session.rostered;
+					next();
+				} else {
+					next();
+				}
+			}
+		);
+	}
+
+	next();
+});
+
+// fetch a count of pending trackers
+app.use((req, res, next) => {
+	res.locals.pending_trackers = 0;
+
+	if ( req.session.is_admin ) {
+		connection.query('SELECT count(id) AS pending_trackers FROM tracker_data WHERE sent_to_api = 0', (err, results) => {
+			if ( err ) { console.error('Error fetching tracker count:', err); throw err; }
+
+			res.locals.pending_trackers = results[0].pending_trackers;
+			next();
+		});
+	} else {
+		next();
+	}
 });
 
 // express setup
@@ -195,13 +172,7 @@ app.use(bodyParser.json());
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
-	let date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
-	let match_day = false;
-	if ( date in matchDays ) {
-		match_day = matchDays[date];
-	}
-
-	res.render('dashboard', { today: date, match_day: match_day, match_days: matchDays, server: req.headers });
+	res.render('dashboard', { today: date, match_days: matchDays });
 });
 
 app.get('/login', (req, res) => {

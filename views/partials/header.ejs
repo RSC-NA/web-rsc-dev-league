@@ -68,7 +68,17 @@
 								</a>
 							<% } %>
 
-							<% if ( is_admin ) {  /* admin-only functionality */ %>
+							<% 
+
+							if ( is_admin ) {  /* admin-only functionality */ 
+								let badge_class = 'bg-secondary';
+								let pending_count = 0;
+								if ( pending_trackers ) {
+									pending_count = pending_trackers;
+									badge_class = 'bg-danger';
+								}
+							%>
+
 							<div class="sb-sidenav-menu-heading">Admin</div>
 							<a class="nav-link" href="/process_gameday">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
@@ -90,7 +100,7 @@
 							<a class="nav-link" href="/send_tracker_data">
 								<div class="sb-nav-link-icon"><i class="fas fa-spreadsheet"></i></div>
 								Store Trackers
-								<span class="badge badge-primary">15</span>
+								<span class="badge m2-2 <%- badge_class %>"><%- pending_count %></span>
 							</a>
 							<div class="sb-sidenav-menu-heading">Stats API</div>
 							<a class="nav-link" href="#" id="run3sStats">
