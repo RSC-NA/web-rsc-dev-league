@@ -182,6 +182,29 @@ app.get('/', (req, res) => {
 	res.render('dashboard', { match_days: matchDays });
 });
 
+app.get('/tracker', (req, res) => {
+	let query = `
+		SELECT
+			count(*) as pulls, c.name, t.pulled_by 
+		FROM tracker_data AS t
+		LEFT JOIN contracts AS c ON t.pulled_by = c.name
+		GROUP BY t.pulled_by
+		ORDER BY pulls DESC
+	`;
+	connection.query(query, (err, results) => {
+		if ( err ) { console.error('Leaderboard error:', err); throw err; }
+
+		let leaderboard = {};
+		if ( results && results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				leaderboard[ results[i].pulled_by ] = { count: results[i].pulls, name: results[i].name };
+			}
+		}
+
+		res.render('/tracker', { leaderboard: leaderboard });
+	});
+});
+
 app.get('/login', (req, res) => {
 	res.render('login');
 });

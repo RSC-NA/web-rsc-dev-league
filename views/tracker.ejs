@@ -1,0 +1,122 @@
+
+<%- include('partials/header.ejs'); %>
+
+	<main class="container">
+		<div class="bg-light p-3 rounded">
+			<div class="row">
+				<div class="col-md-8">
+
+			<% if ( user.name ) { %>
+					<h1>RSC Needs Your Help, <%= user.name %>!</h1>
+			<% } else { %>
+					<h1>RSC Needs Your Help!</h1>
+			<% } %>
+
+					<p class="lead">
+						As RSC has grown, our access to Player Tracker data has become crucial to placing players correctly
+						in tiers. Because Psyonix refuses to provide us with a public MMR API, and the Rocket League Tracker
+						Network constantly breaks our efforts to grab MMR data from their servers, the RSC Development Committee
+						has developed a Chrome browser extension to outsource these efforts to anyone that wants to help.
+					</p>
+
+					<h3>How This Works</h3>
+					<p class="lead">
+						Anyone with this browser extension installed can click on the extension to automatically be sent to 
+						the Tracker Network to grab the latest tracker information for a player tracker that we need. These player
+						trackers are either from a new player that has recently signed up, or from an existing player that we need
+						to grab more recent data from.
+					</p>
+					<img src="/images/extension.png" alt="RSC MMR Fetcher Interface" style="float:left;">
+					<p class="lead">
+						Clicking the "Process Tracker" button will grab a player tracker we desperately need and open a new
+						browser tab to view that players tracker. Once the page finishes loading, the extension will send that 
+						MMR data to our servers so that Numbers Committee can correctly place a player in a tier.
+					</p>
+					<img src="/images/extension-tracker-status.png" alt="RSC MMR Fetcher Interface on the Page" style="float:right;">
+					<p class="lead">
+						A small yellow box will appear in the top-right corner of the Tracker Network page and will let you know
+						when the information has been saved to our servers. <strong>Don't worry</strong> if the tracker link is a 
+						broken link or has an error when you load the page. We're saving the fact that the link is broken as well,
+						so your participation helps us clean up our data.
+					</p>
+
+					<h3>Other Fun Facts</h3>
+					<p class="lead">
+						Every tracker you ever visit will also be sent to RSC for updating, so even if you don't click the button,
+						you'll still be helping us keep good data just by looking at your own tracker or scouting around for an upcoming 
+						season. This extension only "runs" on the Tracker Network rocket league pages, and no personal information about
+						you is sent to any of RSC's servers. 
+					</p>
+
+					<h3>Installation and Leaderboard</h3>
+					<p class="lead">
+						The first time you run the extension, it will prompt you to enter your name. You can enter whatever you want in this
+						box, but if you enter your name <strong>EXACTLY</strong> as it appears on Discord, your contributions will be 
+						displayed on the leaderboard on this page. 
+					</p>
+					<p>
+						To install this extension, send a request to <strong><code>@tehblister</code></strong> on Discord. This extension is
+						currently in Beta and awaiting approval on the Google Chrome Webstore.
+					</p>
+				</div>
+				<div class="col-md-4 matchDates">
+					<h4>Numbers Leaderboard</h4>
+					<ol class="dates">
+						<%
+							let count = 0;
+							let myPosition = null;
+							if ( user.name && user.name in leaderboard ) {
+								myPosition = Object.keys(leaderboard).indexOf(user.name);
+							}
+							for ( let player in leaderboard ) {
+								count++;
+
+								if ( count > 10 ) {
+									break;
+								}
+
+								if ( count === 1 ) {
+									top_class = 'fs-5 font-weight-bold';
+								} else if ( count === 2 ) {
+									top_class = 'fs-6 font-weight-bold';
+								}
+								let player_class = '';
+								if ( player === nickname ) {
+									player_class = 'today';
+								}
+								let display_name = leaderboard[ player ]['name'];
+								if ( display_name !== player ) {
+									if ( user.is_admin ) {
+										display_name = `<em title="${player}">former player</em>`;
+									} else {
+										display_name = '<em>former player</em>';
+									}
+								}
+						%>
+
+						<li class="<%- player_class  %> <%- top_class %>">
+							<%- display_name %> - <code><%- leaderboard[ player ] %></code>
+						</li>
+
+						<%
+							}
+
+							if ( myPosition && myPosition > 10 ) {
+						%>
+
+						<li class="today" value="<%- myPosition %>">
+							<%- user.name %> - <code><%- leaderboard[ user.name ] %></code>
+						</li>
+
+						<%
+							}
+						%>
+
+					</ol>
+				</div>
+			</div>
+		</div>
+	
+	</main>
+
+<%- include('partials/footer.ejs'); %>
