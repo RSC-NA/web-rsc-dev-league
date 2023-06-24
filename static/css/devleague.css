@@ -23,6 +23,10 @@ li.today {
 	list-style-type: '⚽';
 }
 
+ol>li.today {
+	list-style-type: decimal;
+}
+
 li.today.holiday {
 	list-style-type: '🏖️';
 	background-color: #fa7b7b;
