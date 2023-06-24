@@ -40,9 +40,7 @@
 				<div class="col-md-4 matchDates">
 					<h4>Season <%= settings.season %> Dates</h4>
 					<ul class="dates">
-						<pre><%- JSON.stringify(match_days, 4) %></pre>
 						<%
-							console.log('in template', match_days);
 							for ( let match_date in match_days ) {
 						%>
 
