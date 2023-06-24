@@ -34,6 +34,7 @@ CREATE TABLE bad_trackers (
 	`tracker_link` VARCHAR(255) NOT NULL,
 	`sent_to_api` tinyint(1) not null default 0,
 	`date_pulled` DATETIME NOT NULL DEFAULT now(),
+	`pulled_by` VARCHAR(50) NOT NULL DEFAULT '',
 	PRIMARY KEY(`id`),
 	INDEX `tracker_link_idx` (`tracker_link`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
