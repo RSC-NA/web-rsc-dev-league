@@ -448,10 +448,89 @@ app.get('/send_tracker_data', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	// get trackers that haven't been sent
-	// send them to api
-	// update the records to 1
+// get trackers that haven't been sent
+	let tracker_data_query = `
+		SELECT 
+			id,psyonix_season,tracker_link,rsc_id, date_pulled,
+			threes_games_played,threes_rating,threes_season_peak,
+			twos_games_played,twos_rating,twos_season_peak,
+			ones_games_played,ones_rating,ones_season_peak
+		FROM tracker_data
+		WHERE sent_to_api = 0
+		LIMIT 25
+	`;
+	connection.query(tracker_data_query, (err, results) => {
+		if ( err ) { console.error('Error grabbing tracker data:', err); throw err; }
 
+		let tracker_data = [];
+		let record_ids = [];
+		if ( results && results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				record_ids.push(results[i].id);
+				tracker_data.push({
+					psyonix_season: results[i].psyonix_season,
+					tracker_link: results[i].tracker_link,
+					rsc_id: results[i].rsc_id,
+					date_pulled: results[i].date_pulled,
+					threes_games_played: results[i].threes_games_played,
+					threes_rating: results[i].threes_rating,
+					threes_season_peak: results[i].threes_season_peak,
+					twos_games_played: results[i].twos_games_played,
+					twos_rating: results[i].twos_rating,
+					twos_season_peak: results[i].twos_season_peak,
+					ones_games_played: results[i].ones_games_played,
+					ones_rating: results[i].ones_rating,
+					ones_season_peak: results[i].ones_season_peak,
+				});
+			}
+		}
+
+		if ( tracker_data.length ) {
+// send them to api
+			// fetch()
+
+			// update the records to 1
+			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?)', [ record_ids.join(', ') ], (err, results) => {
+				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
+
+				res.redirect('/');
+			});
+
+		} else {
+			res.redirect('/');
+		}
+	});
+
+});
+
+// /send_bad_trackers fetches all bad tracker links and sends them
+// to the API to be removed from the sheet
+app.get('/send_bad_trackers', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+	
+// get trackers that haven't been sent
+	connection.query('SELECT id,tracker_link FROM bad_trackers WHERE sent_to_api = 0', (err, results) => {
+		if ( err ) { console.error("error grabbing bad trackers!", err); throw err; }
+
+		let bad_trackers = [];
+		if ( results && results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				bad_trackers.push({ 'tracker_link': results[i].tracker_link });
+			}
+		}
+
+// send them to api
+		// fetch()
+
+// update the records to 1
+		connection.query('UPDATE bad_trackers SET sent_to_api = 1', (err, results) => {
+			if ( err ) { console.error("error updating bad trackers!", err); throw err; }
+
+			res.redirect('/');
+		});
+	});
 });
 
 app.get('/store_trackers', (req, res) => {
