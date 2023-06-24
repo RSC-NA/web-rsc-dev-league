@@ -245,7 +245,7 @@ ORDER BY pulls DESC
 			}
 
 			if ( leaderboard[ pulled_by ] ) {
-				res.json({ total: leaderboard[ pulled_by ]['total'] });
+				res.json({ total: leaderboard[ pulled_by ]['count'] });
 			} else {
 				res.json({ total: 0 });
 			}
