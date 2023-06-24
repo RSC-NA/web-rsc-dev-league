@@ -119,6 +119,7 @@ app.use((req, res, next) => {
 	res.locals.checked_in = false;
 	
 	let date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
+	res.locals.today = date;
 	res.locals.match_day = false;
 	if ( date in matchDays ) {
 		res.locals.match_day = matchDays[date];
@@ -172,7 +173,7 @@ app.use(bodyParser.json());
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
-	res.render('dashboard', { today: date, match_days: matchDays });
+	res.render('dashboard', { match_days: matchDays });
 });
 
 app.get('/login', (req, res) => {
