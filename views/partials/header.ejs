@@ -77,6 +77,12 @@
 									pending_count = pending_trackers;
 									badge_class = 'bg-danger';
 								}
+								let bad_badge_class = 'bg-secondary';
+								let bad_pending_count = 0;
+								if ( bad_pending_trackers ) {
+									bad_pending_count = bad_pending_trackers;
+									bad_badge_class = 'bg-danger';
+								}
 							%>
 
 							<div class="sb-sidenav-menu-heading">Admin</div>
@@ -101,6 +107,11 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Store Trackers
 								<span class="badge ms-2 <%- badge_class %>"><%- pending_count %></span>
+							</a>
+							<a class="nav-link" href="/send_bad_trackers">
+								<div class="sb-nav-link-icon"><i class="fas fa-triangle-exclamation"></i></div>
+								Update Bad Trackers
+								<span class="badge ms-2 <%- bad_badge_class %>"><%- bad_pending_count %></span>
 							</a>
 							<div class="sb-sidenav-menu-heading">Stats API</div>
 							<a class="nav-link" href="#" id="run3sStats">

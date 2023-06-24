@@ -152,13 +152,20 @@ app.use((req, res, next) => {
 // fetch a count of pending trackers
 app.use((req, res, next) => {
 	res.locals.pending_trackers = 0;
-
+	res.locals.bad_pending_trackers = 0;
 	if ( req.session.is_admin ) {
 		connection.query('SELECT count(id) AS pending_trackers FROM tracker_data WHERE sent_to_api = 0', (err, results) => {
 			if ( err ) { console.error('Error fetching tracker count:', err); throw err; }
 
 			res.locals.pending_trackers = results[0].pending_trackers;
-			next();
+
+			connection.query('SELECT count(id) AS bad_pending_trackers FROM bad_trackers WHERE sent_to_api = 0', (err, results) => {
+				if ( err ) { console.error('Error fetching bad tracker count:', err); throw err; }
+			
+				res.locals.bad_pending_trackers = results[0].bad_pending_trackers;
+
+				next();
+			});
 		});
 	} else {
 		next();
@@ -430,13 +437,27 @@ app.get('/matches', (req, res) => {
 	});
 });
 
+
 /********************************************************
- ********************** API Views ***********************
+ ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
+// /send_tracker_data pushes all new trackers to the official RSC
+// API for storage
+app.get('/send_tracker_data', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
+	// get trackers that haven't been sent
+	// send them to api
+	// update the records to 1
+
+});
+
 app.get('/store_trackers', (req, res) => {
-	// if ( ! req.session.is_admin ) {
-	// 	return res.redirect('/');
-	// } 
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
 
 	// fetch all active players from contracts
 	let active_players = {};
@@ -499,12 +520,15 @@ app.post('/bad_tracker', (req, res) => {
 		let platform = tracker_parse[1];
 		let player_id = tracker_parse[2];
 		let queryVar = `%${platform}/${player_id}%`;
-		connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ queryVar ], (err, results) => {
+		connection.query('INSERT INTO bad_trackers (tracker_link) VALUES (?)', [ tracker_link ], (err, results) => {
 			if ( err ) { console.error('ERROR', err); throw err; }
 
-			res.json({'success': true, 'ref': queryVar });
-		});
+			connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ queryVar ], (err, results) => {
+				if ( err ) { console.error('ERROR', err); throw err; }
 
+				res.json({'success': true, 'ref': queryVar });
+			});
+		});
 	} else {
 		res.json({'success': false, 'error': 'Must provide a tracker link'});
 	}
@@ -538,9 +562,14 @@ app.post('/save_mmr', (req, res) => {
 			res.json({ success: false, not_found: true, 'error': 'This tracker is not attached to an RSC player.' });
 		}
 	});
-
 });
+/********************************************************
+ ****************** /TRACKER/MMR TOOL ********************
+ *******************************************************/
 
+/********************************************************
+ ********************** API Views ***********************
+ *******************************************************/
 app.get('/teams', (req, res) => {
 	let isTwos = req.get('league');
 	let tableName = 'StreamTeamStats';
@@ -607,6 +636,9 @@ app.get('/tiers', (req, res) => {
 
 app.get('/pull_stats', pull_stats);
 app.get('/pull_stats_2', pull_stats);
+/********************************************************
+ ********************** /API Views ***********************
+ *******************************************************/
 
 function forceInt(val) {
 	if ( parseInt(val) == NaN ) {

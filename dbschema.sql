@@ -29,6 +29,15 @@ CREATE TABLE tracker_data (
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE bad_trackers (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`tracker_link` VARCHAR(255) NOT NULL,
+	`sent_to_api` tinyint(1) not null default 0,
+	`date_pulled` DATETIME NOT NULL DEFAULT now(),
+	PRIMARY KEY(`id`),
+	INDEX `tracker_link_idx` (`tracker_link`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`nickname` VARCHAR(255) NOT NULL,
