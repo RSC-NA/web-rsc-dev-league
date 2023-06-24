@@ -173,6 +173,7 @@ app.use(bodyParser.json());
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
+	console.log(matchDays);
 	res.render('dashboard', { match_days: matchDays });
 });
 
