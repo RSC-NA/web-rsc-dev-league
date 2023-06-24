@@ -72,7 +72,7 @@ app.use((req, res, next) => {
 		'dashboard': '',
 		'tracker': '',
 		'match': '',
-		'process_gameday',
+		'process_gameday': '',
 		'matches': '',
 		'manage_league': '',
 	};
