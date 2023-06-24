@@ -3,7 +3,8 @@
 // this object needs to be updated with all official "game day" dates
 // for the season. This list is displayed on the dashboard, and is also
 // used in the dashboard template to show/hide the checkin button.
-exports.matchDays = {
+
+module.exports = {
 	//'2023-05-03': 'holiday', // nice - end of season blowout
 	'2023-05-15': 1,
 	'2023-05-17': 2,
