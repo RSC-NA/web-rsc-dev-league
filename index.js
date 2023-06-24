@@ -114,8 +114,6 @@ app.use((req, res, next) => {
 		}
 		next();
 	});
-
-	next();
 });
 
 // checked in middleware.
@@ -146,9 +144,9 @@ app.use((req, res, next) => {
 				}
 			}
 		);
+	} else {
+		next();
 	}
-
-	next();
 });
 
 // fetch a count of pending trackers
