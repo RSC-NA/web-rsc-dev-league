@@ -1,4 +1,16 @@
+<%
+	let menu = {
+		'dashboard': '',
+		'tracker': '',
+		'match': '',
+		'process_gameday',
+		'matches': '',
+		'manage_league': '',
+	};
 
+	let current_view = originalUrl;
+	console.log(current_view);
+%>
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -56,17 +68,17 @@
 					<div class="sb-sidenav-menu">
 						<div class="nav">
 							<div class="sb-sidenav-menu-heading">Core</div>
-							<a class="nav-link" href="/">
+							<a class="nav-link <%- menu['dashboard'] %>" href="/">
 								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
 								Dashboard
 							</a>
-							<a class="nav-link" href="/tracker">
+							<a class="nav-link <%- menu['tracker'] %>" href="/tracker">
 								<div class="sb-nav-link-icon"><i class="fas fa-award"></i></div>
 								Tracker Leaderboard
 							</a>
 
 							<% if ( rostered ) { %>
-								<a class="nav-link" href="/match">
+								<a class="nav-link <%- menu['match'] %>" href="/match">
 									<div class="sb-nav-link-icon"><i class="fas fa-gamepad"></i></div>
 									Match Info
 								</a>
@@ -90,15 +102,15 @@
 							%>
 
 							<div class="sb-sidenav-menu-heading">Admin</div>
-							<a class="nav-link" href="/process_gameday">
+							<a class="nav-link <%- menu['process_gameday'] %>" href="/process_gameday">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
 								Process Gameday
 							</a>
-							<a class="nav-link" href="/matches">
+							<a class="nav-link <%- menu['matches'] %>" href="/matches">
 								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
 								View Matches
 							</a>
-							<a class="nav-link" href="/manage_league">
+							<a class="nav-link <%- menu['manage_league'] %>" href="/manage_league">
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Manage League
 							</a>
