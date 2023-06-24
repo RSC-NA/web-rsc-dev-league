@@ -41,6 +41,11 @@ app.use(cors({
 	origin: '*'
 }));
 
+app.use( express.static('static') ); 
+app.set('view engine', 'ejs');
+
+app.use(bodyParser.json());
+
 // correct server URL middleware
 // TODO(erh): Once I shut down heroku, we can turn this off
 app.use((req, res, next) => {
@@ -163,10 +168,6 @@ app.use((req, res, next) => {
 });
 
 // express setup
-app.use( express.static('static') ); 
-app.set('view engine', 'ejs');
-
-app.use(bodyParser.json());
 
 /*******************************************************
  ******************** Player Views *********************
