@@ -564,7 +564,7 @@ app.post('/save_mmr', (req, res) => {
 					res.json({ success: true });
 			});
 		} else {
-			res.json({ success: false, 'error': 'This tracker is not attached to an RSC player.' });
+			res.json({ success: false, not_found: true, 'error': 'This tracker is not attached to an RSC player.' });
 		}
 	});
 
