@@ -68,6 +68,17 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
 	res.locals.requestUrl = req.originalUrl;
 
+	res.locals.menu = {
+		'dashboard': '',
+		'tracker': '',
+		'match': '',
+		'process_gameday',
+		'matches': '',
+		'manage_league': '',
+	};
+
+	console.log('url: ' + req.originalUrl);
+
 	res.locals.callbackUrl = encodeURIComponent('https://devleague.rscstream.com/oauth2');
 
 	res.locals.user_id = req.session.user_id;
