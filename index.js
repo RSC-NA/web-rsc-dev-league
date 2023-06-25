@@ -567,6 +567,10 @@ app.get('/send_tracker_data', (req, res) => {
 		return res.redirect('/');
 	} 
 
+	let limit = 25;
+	if ( 'limit' in req.query ) {
+		limit = parseInt(req.query.limit);
+	}
 // get trackers that haven't been sent
 	let tracker_data_query = `
 		SELECT 
@@ -576,9 +580,9 @@ app.get('/send_tracker_data', (req, res) => {
 			ones_games_played,ones_rating,ones_season_peak
 		FROM tracker_data
 		WHERE sent_to_api = 0
-		LIMIT 25
+		LIMIT ?
 	`;
-	connection.query(tracker_data_query, (err, results) => {
+	connection.query(tracker_data_query, [ limit ], (err, results) => {
 		if ( err ) { console.error('Error grabbing tracker data:', err); throw err; }
 
 		let tracker_data = [];
@@ -606,13 +610,22 @@ app.get('/send_tracker_data', (req, res) => {
 
 		if ( tracker_data.length ) {
 // send them to api
-			// fetch()
+			fetch('http://24.176.157.36:4443/api/v1/numbers/mmr/bulk_submit/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+				},
+				body: JSON.stringify({ mrrs: tracker_data })
+			})
+			.then(response => response.json())
+			.then(data => {
+				// update the records to 1
+				connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?)', [ record_ids ], (err, results) => {
+					if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 
-			// update the records to 1
-			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?)', [ record_ids ], (err, results) => {
-				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
-
-				res.redirect('/');
+					res.redirect('/');
+				});
 			});
 
 		} else {
