@@ -87,7 +87,7 @@
 								let display_name = leaderboard[ player ]['name'];
 								if ( display_name !== player ) {
 									if ( user.is_admin ) {
-										display_name = `<em title="${player}">former player</em>`;
+										display_name = `<em title="${player}">${player}</em>`;
 									} else if ( player === 'cakekyst' ) {
 										display_name = '<em>cakekyst</em>';
 									} else {
