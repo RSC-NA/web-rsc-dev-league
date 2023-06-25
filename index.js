@@ -641,6 +641,7 @@ app.get('/send_tracker_data', (req, res) => {
 						res.redirect('/');
 					});
 				} else {
+					console.log(tracker_data);
 					res.send(data);
 				}
 			}).catch(error => {
