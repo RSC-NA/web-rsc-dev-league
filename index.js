@@ -622,11 +622,9 @@ app.get('/send_tracker_data', (req, res) => {
 			.then(response => {
 				if ( response.ok ) {
 					console.log('here');
-					console.log(response.text());
 					return response.json();
 				} else {
-					console.log(response.text());
-					throw new Error('something broke');
+					return Promise.reject(response.text());
 				}
 			})
 			.then(data => {
