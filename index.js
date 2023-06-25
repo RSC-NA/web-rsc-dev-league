@@ -872,7 +872,7 @@ app.post('/bad_tracker', (req, res) => {
 
 app.post('/save_mmr', (req, res) => {
 	const d = req.body;
-	console.log(d);
+	//console.log(d);
 	let force_insert = false;
 	let from_button  = false;
 	if ( d.status && d.status == 'NEW' ) {
