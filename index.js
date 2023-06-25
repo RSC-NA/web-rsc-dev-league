@@ -1463,9 +1463,9 @@ app.get('/test_sheet', async (req, res) => {
 	await doc.loadInfo();
 	const sheet = doc.sheetsByTitle['test'];
 	const rows = await sheet.getRows();
-	await sheet.addRow(
-		{ 'date': new Date(), 'url': req.originalUrl, 'message': message }
-	);
+	// await sheet.addRow(
+	// 	{ 'date': new Date(), 'url': req.originalUrl, 'message': message }
+	// );
 
 	res.redirect('/');
 });
