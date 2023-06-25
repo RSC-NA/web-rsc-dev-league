@@ -885,7 +885,7 @@ app.post('/save_mmr', (req, res) => {
 		if ( results && results.length > 0 ) {
 			res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
 		} else {
-			connection.query('SELECT t.rsc_id,t.name FROM trackers WHERE bad = 0 AND tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
+			connection.query('SELECT rsc_id,name FROM trackers WHERE bad = 0 AND tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
 				if ( err ) { console.error('ERROR', err); throw err; }
 
 				if ( (results && results.length) || force_insert === true ) {
