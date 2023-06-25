@@ -608,8 +608,6 @@ app.get('/send_tracker_data', (req, res) => {
 			}
 		}
 
-		console.log(JSON.stringify({ mrrs: tracker_data }));
-
 		if ( tracker_data.length ) {
 // send them to api
 			fetch('http://24.176.157.36:4443/api/v1/numbers/mmr/bulk_submit/', {
@@ -618,7 +616,7 @@ app.get('/send_tracker_data', (req, res) => {
 					'Content-Type': 'application/json',
 					'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 				},
-				body: JSON.stringify({ mrrs: tracker_data })
+				body: JSON.stringify({ mmrs: tracker_data })
 			})
 			.then(response => response.json())
 			.then(data => {
