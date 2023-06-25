@@ -651,20 +651,31 @@ app.get('/send_bad_trackers', (req, res) => {
 		let bad_trackers = [];
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
-				bad_trackers.push({ 'tracker_link': results[i].tracker_link });
+				bad_trackers.push(results[i].tracker_link);
 			}
 		}
 
 // send them to api
 		// fetch()
-
+		fetch('http://24.176.157.36:4443/api/v1/tracker-links/invalidate-links/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+			},
+			body: JSON.stringify({ links: bad_trackers })
+		})
+		.then(response => response.json())
+		.then(data => {
 // update the records to 1
-		connection.query('UPDATE bad_trackers SET sent_to_api = 1', (err, results) => {
-			if ( err ) { console.error("error updating bad trackers!", err); throw err; }
+			console.log('api-response - bad trackers', data);
+			connection.query('UPDATE bad_trackers SET sent_to_api = 1', (err, results) => {
+				if ( err ) { console.error("error updating bad trackers!", err); throw err; }
 
-			res.redirect('/');
+				res.redirect('/');
+			});
 		});
-	});
+	});	
 });
 
 app.get('/store_trackers', (req, res) => {
