@@ -610,6 +610,7 @@ app.get('/send_tracker_data', (req, res) => {
 
 		if ( tracker_data.length ) {
 // send them to api
+			console.log(tracker_data);
 			fetch('http://24.176.157.36:4443/api/v1/numbers/mmr/bulk_submit/', {
 				method: 'POST',
 				headers: {
