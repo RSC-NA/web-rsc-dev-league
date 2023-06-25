@@ -24,7 +24,7 @@ const matchDays = require('./matchDays');
 const { mmrRange, getTierFromMMR } = require('./mmrs');
 
 function writeError(error) {
-	fs.writeFileSync('./errors.log', error, { flag: 'a+' });
+	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -574,7 +574,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data) {
 			'Content-Type': 'application/json',
 			'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 		},
-		body: JSON.stringify({ mmrs: tracker_data })
+		body: JSON.stringify({ mmrs: [tracker_data] })
 	})
 	.then(response => {
 		if ( response.ok ) {
