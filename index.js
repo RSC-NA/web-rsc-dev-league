@@ -1456,6 +1456,20 @@ app.get('/process_gameday', (req, res) => {
 
 });
 
+app.get('/test_sheet', async (req, res) => {
+	let message = req.query.message ? req.query.message : 'No message';
+	const doc = new GoogleSpreadsheet('1PJo2hdua38qOOMJzQyHw8X_bn6jB1nsVRznHOWd0jEo');
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+	await doc.loadInfo();
+	const sheet = doc.sheetsByTitle['test'];
+	const rows = await sheet.getRows();
+	await sheet.addRow(
+		{ 'date': new Date(), 'url': req.originalUrl, 'message': message }
+	);
+
+	res.redirect('/');
+});
+
 app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
