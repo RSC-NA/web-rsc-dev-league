@@ -574,7 +574,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data) {
 			'Content-Type': 'application/json',
 			'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 		},
-		body: JSON.stringify({ mmrs: [tracker_data] })
+		body: JSON.stringify({ mmrs: tracker_data })
 	})
 	.then(response => {
 		if ( response.ok ) {
@@ -911,7 +911,7 @@ app.post('/save_mmr', (req, res) => {
 							if ( SEND_TO_API_SERVER ) {
 								let tracker_data = {
 									psyonix_season: d.psyonix_season,
-									tracker_link: { link: d.tracker_link },
+									tracker_link: { link: d.tracker_link.link },
 									rsc_id: rsc_id,
 									date_pulled: new Date(),
 									threes_games_played: d.threes_games_played ?? 0,
