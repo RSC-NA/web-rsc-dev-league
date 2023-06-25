@@ -563,9 +563,9 @@ app.get('/matches', (req, res) => {
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
 app.get('/send_tracker_data', (req, res) => {
-	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
-	} 
+	// if ( ! req.session.is_admin ) {
+	// 	return res.redirect('/');
+	// } 
 
 	let limit = 25;
 	if ( 'limit' in req.query ) {
@@ -607,6 +607,8 @@ app.get('/send_tracker_data', (req, res) => {
 				});
 			}
 		}
+
+		console.log(JSON.stringify({ mrrs: tracker_data }));
 
 		if ( tracker_data.length ) {
 // send them to api
