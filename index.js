@@ -699,6 +699,38 @@ app.get('/send_tracker_data', (req, res) => {
 
 });
 
+function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
+	fetch('http://24.176.157.36:4443/api/v1/tracker-links/invalidate_links/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			//'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+		},
+		body: JSON.stringify({ links: [tracker_link] })
+	})
+	.then(response => {
+		if ( response.ok ) {
+			return response.json()
+		} else {
+			return response.text();
+		}
+	})
+	.then(data => {
+// update the records to 1
+		if ( typeof data !== 'string' ) {
+			console.log('BAD TRACKER', tracker_link);
+			connection.query('UPDATE bad_trackers SET sent_to_api = 1 WHERE id = ?', [ bad_tracker_id ], (err, results) => {
+				if ( err ) { console.error("error updating bad trackers!", err); throw err; }
+
+				return true;
+			});
+		} else {
+			console.log('Error saving bad tracker', tracker_link);
+			throw new Error('Error saving the bad tracker.');
+		}
+	});
+}
+
 // /send_bad_trackers fetches all bad tracker links and sends them
 // to the API to be removed from the sheet
 app.get('/send_bad_trackers', (req, res) => {
@@ -809,8 +841,25 @@ app.post('/bad_tracker', (req, res) => {
 		connection.query('INSERT INTO bad_trackers (tracker_link) VALUES (?)', [ tracker_link ], (err, results) => {
 			if ( err ) { console.error('ERROR', err); throw err; }
 
+			let bad_tracker_id = results.insertId;
+
 			connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ queryVar ], (err, results) => {
 				if ( err ) { console.error('ERROR', err); throw err; }
+
+				if ( SEND_TO_API_SERVER ) {
+					try {
+						send_bad_tracker_to_server(bad_tracker_id, tracker_link);
+					} catch(e) {
+						console.log('API SERVER ERROR!');
+						console.log('API SERVER ERROR!');
+						console.log('API SERVER ERROR!');
+						console.log('Error:', e);
+						SEND_TO_API_SERVER = false;
+						console.log('API SERVER ERROR!');
+						console.log('API SERVER ERROR!');
+						console.log('API SERVER ERROR!');
+					}
+				}
 
 				res.json({'success': true, 'ref': queryVar });
 			});
