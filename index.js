@@ -619,7 +619,14 @@ app.get('/send_tracker_data', (req, res) => {
 				},
 				body: JSON.stringify({ mmrs: tracker_data })
 			})
-			.then(response => response.json())
+			.then(response => {
+				if ( response.ok ) {
+					return response.json();
+				} else {
+					console.log(response.text());
+					throw new Error('something broke');
+				}
+			})
 			.then(data => {
 				console.log(data);
 				// update the records to 1
@@ -630,6 +637,8 @@ app.get('/send_tracker_data', (req, res) => {
 					//res.json({ mmrs: tracker_data });
 					res.redirect('/');
 				});
+			}).catch(error => {
+				console.error(error);
 			});
 
 		} else {
