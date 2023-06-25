@@ -593,17 +593,17 @@ app.get('/send_tracker_data', (req, res) => {
 				tracker_data.push({
 					psyonix_season: results[i].psyonix_season,
 					tracker_link: results[i].tracker_link,
-					rsc_id: results[i].rsc_id,
+					rsc_id: results[i].rsc_id ?? '',
 					date_pulled: results[i].date_pulled,
-					threes_games_played: results[i].threes_games_played,
-					threes_rating: results[i].threes_rating,
-					threes_season_peak: results[i].threes_season_peak,
-					twos_games_played: results[i].twos_games_played,
-					twos_rating: results[i].twos_rating,
-					twos_season_peak: results[i].twos_season_peak,
-					ones_games_played: results[i].ones_games_played,
-					ones_rating: results[i].ones_rating,
-					ones_season_peak: results[i].ones_season_peak,
+					threes_games_played: results[i].threes_games_played ?? 0,
+					threes_rating: results[i].threes_rating ?? 0,
+					threes_season_peak: results[i].threes_season_peak ?? 0,
+					twos_games_played: results[i].twos_games_played ?? 0,
+					twos_rating: results[i].twos_rating ?? 0,
+					twos_season_peak: results[i].twos_season_peak ?? 0,
+					ones_games_played: results[i].ones_games_played ?? 0,
+					ones_rating: results[i].ones_rating ?? 0,
+					ones_season_peak: results[i].ones_season_peak ?? 0,
 				});
 			}
 		}
