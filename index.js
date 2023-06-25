@@ -661,14 +661,13 @@ app.get('/send_bad_trackers', (req, res) => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+				//'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 			},
 			body: JSON.stringify({ links: bad_trackers })
 		})
 		.then(response => response.json())
 		.then(data => {
 // update the records to 1
-			console.log(bad_trackers);
 			console.log('api-response - bad trackers', data);
 			connection.query('UPDATE bad_trackers SET sent_to_api = 1', (err, results) => {
 				if ( err ) { console.error("error updating bad trackers!", err); throw err; }
