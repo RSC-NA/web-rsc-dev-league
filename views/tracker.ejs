@@ -88,11 +88,11 @@
 								if ( display_name !== player ) {
 									if ( user.is_admin ) {
 										display_name = `<em title="${player}">former player</em>`;
+									} else if ( player === 'cakekyst' ) {
+										display_name = '<em>cakekyst</em>';
 									} else {
 										display_name = '<em>former player</em>';
 									}
-								} else if ( player === 'cakekyst' ) {
-									display_name = 'cakekyst';
 								}
 						%>
 
