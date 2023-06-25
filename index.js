@@ -750,12 +750,18 @@ app.post('/bad_tracker', (req, res) => {
 app.post('/save_mmr', (req, res) => {
 	const d = req.body;
 	console.log(d);
-
+	let force_insert = false;
+	if ( d.status && d.status == 'NEW' ) {
+		force_insert = true;
+	}
 	connection.query('SELECT rsc_id,name FROM trackers WHERE bad = 0 AND tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
 		if ( err ) { console.error('ERROR', err); throw err; }
 
-		if ( results && results.length ) {
-
+		if ( (results && results.length) || force_insert === true ) {
+			let rsc_id = '';
+			if ( results && results.length ) {
+				rsc_id = results[0].rsc_id;
+			}
 			let query = `
 			INSERT INTO tracker_data 
 				(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
@@ -764,12 +770,12 @@ app.post('/save_mmr', (req, res) => {
 			`;
 			connection.query(
 				query, 
-				[ d.psyonix_season, d.tracker_link.link, results[0].rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
+				[ d.psyonix_season, d.tracker_link.link, rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
 				d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.pulled_by ],
 				(err, results) => {
 					if ( err ) { console.error('Insert error:', err); throw err; }
 
-					res.json({ success: true });
+					res.json({ success: true, status: d.status });
 			});
 		} else {
 			res.json({ success: false, not_found: true, 'error': 'This tracker is not attached to an RSC player.' });
