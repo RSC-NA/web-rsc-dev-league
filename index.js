@@ -600,6 +600,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data) {
 		} else {
 			//console.log(tracker_data);
 			console.error('Something went wrong');
+			writeError(data);
 			console.log(tracker_data);
 		}
 	}).catch(error => {
