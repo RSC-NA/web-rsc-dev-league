@@ -627,7 +627,7 @@ app.get('/send_tracker_data', (req, res) => {
 				connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?) AND 0', [ record_ids ], (err, results) => {
 					if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 					//res.json(data);
-					res.json(JSON.stringif({ mmrs: tracker_data }));
+					res.json(JSON.stringify({ mmrs: tracker_data }));
 					//res.redirect('/');
 				});
 			});
