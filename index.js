@@ -635,7 +635,7 @@ app.get('/send_tracker_data', (req, res) => {
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
 				record_ids.push(results[i].id);
-				tracker_data.push({
+				let td = {
 					psyonix_season: results[i].psyonix_season,
 					tracker_link: { link: results[i].tracker_link },
 					rsc_id: results[i].rsc_id ?? '',
@@ -649,7 +649,15 @@ app.get('/send_tracker_data', (req, res) => {
 					ones_games_played: results[i].ones_games_played ?? 0,
 					ones_rating: results[i].ones_rating ?? 0,
 					ones_season_peak: results[i].ones_season_peak ? results[i].ones_season_peak : results[i].ones_rating,
-				});
+				};
+				for ( let key in td ) {
+					if ( key.includes('_peak') || key.includes('_rating') ) {
+						if ( ! td[ key ] ) {
+							td[ key ] = 0;
+						}
+					}
+				}
+				tracker_data.push(td);
 			}
 		}
 
