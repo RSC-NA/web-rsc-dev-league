@@ -640,7 +640,7 @@ app.get('/send_tracker_data', (req, res) => {
 						res.redirect('/');
 					});
 				} else {
-					res.send(data.error);
+					res.send(data);
 				}
 			}).catch(error => {
 				console.error(error);
