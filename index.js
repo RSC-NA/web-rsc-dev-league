@@ -924,6 +924,14 @@ app.post('/save_mmr', (req, res) => {
 									ones_rating: d.ones_rating ?? 0,
 									ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
 								};
+								for ( let field in tracker_data ) {
+									if ( field.includes('_peak') || field.includes('_rating') ) {
+										if ( ! tracker_data[ field ] ) {
+											tracker_data[ field ] = 0;
+										}
+									} 
+								}
+
 								try {
 									send_tracker_data_to_server(results.insertId, [tracker_data]);
 								} catch(e) {
