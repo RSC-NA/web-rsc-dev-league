@@ -1,10 +1,15 @@
+// FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
+// THIS WILL BE SET TO true AT RUNTIME, AND IF 
+// THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
+let SEND_TO_API_SERVER = true;
+
+// Server app code below
 const express = require('express');
 const app = express();
 const session = require('express-session');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-
 
 const mysql  = require('mysql2');
 const mysqlP = require('mysql2/promise');
@@ -562,6 +567,45 @@ app.get('/matches', (req, res) => {
  *******************************************************/
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
+function send_tracker_data_to_server(tracker_id, tracker_data) {
+	fetch('http://24.176.157.36:4443/api/v1/numbers/mmr/bulk_submit/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+		},
+		body: JSON.stringify({ mmrs: tracker_data })
+	})
+	.then(response => {
+		if ( response.ok ) {
+			console.log('tracker sent', tracker_data.tracker_link.link);
+			return response.json();
+		} else {
+			return response.text();
+			throw new Error('Processing failed');
+		}
+	})
+	.then(data => {
+		//console.log(data);
+		// update the records to 1
+		//res.json(data);
+		if (  typeof data !== 'string' ) {
+			//console.log(data);
+			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
+				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
+				//res.json(data);
+				//res.json({ mmrs: tracker_data });
+				return true;
+			});
+		} else {
+			//console.log(tracker_data);
+			console.error('Something went wrong');
+			console.log(tracker_data);
+		}
+	}).catch(error => {
+		console.error(error);
+	});
+}
 app.get('/send_tracker_data', (req, res) => {
 	// if ( ! req.session.is_admin ) {
 	// 	return res.redirect('/');
@@ -812,6 +856,37 @@ app.post('/save_mmr', (req, res) => {
 						d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.pulled_by ],
 						(err, results) => {
 							if ( err ) { console.error('Insert error:', err); throw err; }
+
+							// send it to the server immediately
+							if ( SEND_TO_API_SERVER ) {
+								let tracker_data = {
+									psyonix_season: d.psyonix_season,
+									tracker_link: { link: d.tracker_link },
+									rsc_id: rsc_id,
+									date_pulled: new Date(),
+									threes_games_played: d.threes_games_played ?? 0,
+									threes_rating: d.threes_rating ?? 0,
+									threes_season_peak: d.threes_season_peak ? d.threes_season_peak : d.threes_rating,
+									twos_games_played: d.twos_games_played ?? 0,
+									twos_rating: d.twos_rating ?? 0,
+									twos_season_peak: d.twos_season_peak ? d.twos_season_peak : d.twos_rating,
+									ones_games_played: d.ones_games_played ?? 0,
+									ones_rating: d.ones_rating ?? 0,
+									ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
+								};
+								try {
+									send_tracker_data_to_server(results.insertId, tracker_data);
+								} catch(e) {
+									console.log('API SERVER ERROR!');
+									console.log('API SERVER ERROR!');
+									console.log('API SERVER ERROR!');
+									console.log('Error:', e);
+									SEND_TO_API_SERVER = false;
+									console.log('API SERVER ERROR!');
+									console.log('API SERVER ERROR!');
+									console.log('API SERVER ERROR!');
+								}
+							}
 
 							res.json({ success: true, status: d.status });
 					});
