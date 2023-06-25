@@ -668,6 +668,7 @@ app.get('/send_bad_trackers', (req, res) => {
 		.then(response => response.json())
 		.then(data => {
 // update the records to 1
+			console.log(bad_trackers);
 			console.log('api-response - bad trackers', data);
 			connection.query('UPDATE bad_trackers SET sent_to_api = 1', (err, results) => {
 				if ( err ) { console.error("error updating bad trackers!", err); throw err; }
