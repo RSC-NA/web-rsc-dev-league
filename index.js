@@ -882,7 +882,7 @@ app.post('/save_mmr', (req, res) => {
 	connection.query('SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)', [ d.tracker_link.link ], (err, results) => {
 		if ( err ) { console.error('Error!', err); throw err; }
 
-		if ( results && results.length > 0 ) {
+		if ( results && results.length > 4 ) {
 			res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
 		} else {
 			connection.query('SELECT rsc_id,name FROM trackers WHERE bad = 0 AND tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
