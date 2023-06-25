@@ -925,7 +925,7 @@ app.post('/save_mmr', (req, res) => {
 									ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
 								};
 								try {
-									send_tracker_data_to_server(results.insertId, tracker_data);
+									send_tracker_data_to_server(results.insertId, [tracker_data]);
 								} catch(e) {
 									console.log('API SERVER ERROR!');
 									console.log('API SERVER ERROR!');
