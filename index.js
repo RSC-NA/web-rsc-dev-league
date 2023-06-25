@@ -624,7 +624,7 @@ app.get('/send_tracker_data', (req, res) => {
 					console.log('here');
 					return response.json();
 				} else {
-					console.log(Promise.resolve(response.text()));
+					return { 'error': true, 'error': response.text()};
 					throw new Error('Processing failed');
 				}
 			})
@@ -632,12 +632,16 @@ app.get('/send_tracker_data', (req, res) => {
 				console.log(data);
 				// update the records to 1
 				//res.json(data);
-				connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?)', [ record_ids ], (err, results) => {
-					if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
-					//res.json(data);
-					//res.json({ mmrs: tracker_data });
-					res.redirect('/');
-				});
+				if ( ! ('error' in data) ) {
+					connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?)', [ record_ids ], (err, results) => {
+						if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
+						//res.json(data);
+						//res.json({ mmrs: tracker_data });
+						res.redirect('/');
+					});
+				} else {
+					res.send(data.error);
+				}
 			}).catch(error => {
 				console.error(error);
 			});
