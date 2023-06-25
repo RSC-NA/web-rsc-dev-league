@@ -839,7 +839,7 @@ app.post('/bad_tracker', (req, res) => {
 		let platform = tracker_parse[1];
 		let player_id = tracker_parse[2];
 		let queryVar = `%${platform}/${player_id}%`;
-		connection.query('INSERT INTO bad_trackers (tracker_link) VALUES (?)', [ tracker_link ], (err, results) => {
+		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ tracker_link, body.pulled_by ], (err, results) => {
 			if ( err ) { console.error('ERROR', err); throw err; }
 
 			let bad_tracker_id = results.insertId;
