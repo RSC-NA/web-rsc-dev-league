@@ -657,7 +657,7 @@ app.get('/send_bad_trackers', (req, res) => {
 
 // send them to api
 		// fetch()
-		fetch('http://24.176.157.36:4443/api/v1/tracker-links/invalidate-links/', {
+		fetch('http://24.176.157.36:4443/api/v1/tracker-links/invalidate_links/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
