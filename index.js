@@ -629,10 +629,11 @@ app.get('/send_tracker_data', (req, res) => {
 				}
 			})
 			.then(data => {
-				console.log(data);
+				//console.log(data);
 				// update the records to 1
 				//res.json(data);
 				if (  typeof data !== 'string' ) {
+					console.log(data);
 					connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id in (?)', [ record_ids ], (err, results) => {
 						if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 						//res.json(data);
