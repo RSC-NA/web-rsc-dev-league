@@ -624,7 +624,8 @@ app.get('/send_tracker_data', (req, res) => {
 					console.log('here');
 					return response.json();
 				} else {
-					return Promise.reject(response.text());
+					console.log(Promise.resolve(response.text()));
+					throw new Error('Processing failed');
 				}
 			})
 			.then(data => {
