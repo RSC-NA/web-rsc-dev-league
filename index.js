@@ -597,13 +597,13 @@ app.get('/send_tracker_data', (req, res) => {
 					date_pulled: results[i].date_pulled,
 					threes_games_played: results[i].threes_games_played ?? 0,
 					threes_rating: results[i].threes_rating ?? 0,
-					threes_season_peak: results[i].threes_season_peak ?? 0,
+					threes_season_peak: results[i].threes_season_peak ? results[i].threes_season_peak : results[i].threes_rating,
 					twos_games_played: results[i].twos_games_played ?? 0,
 					twos_rating: results[i].twos_rating ?? 0,
-					twos_season_peak: results[i].twos_season_peak ?? 0,
+					twos_season_peak: results[i].twos_season_peak ? results[i].twos_season_peak : results[i].twos_rating,
 					ones_games_played: results[i].ones_games_played ?? 0,
 					ones_rating: results[i].ones_rating ?? 0,
-					ones_season_peak: results[i].ones_season_peak ?? 0,
+					ones_season_peak: results[i].ones_season_peak ? results[i].ones_season_peak : results[i].ones_rating,
 				});
 			}
 		}
