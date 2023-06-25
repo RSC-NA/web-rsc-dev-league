@@ -578,7 +578,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data) {
 	})
 	.then(response => {
 		if ( response.ok ) {
-			console.log('tracker sent', tracker_data.tracker_link.link);
+			console.log('tracker sent', tracker_data[0].tracker_link.link);
 			return response.json();
 		} else {
 			return response.text();
