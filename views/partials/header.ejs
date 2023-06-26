@@ -102,17 +102,14 @@
 								Manage League
 							</a>
 							<div class="sb-sidenav-menu-heading">Trackers</div>
-							<a class="nav-link" href="/store_trackers">
+							<a class="nav-link" href="/bump_api">
 								<div class="sb-nav-link-icon"><i class="fas fa-power-off"></i></div>
 								Toggle API
 								<% if ( ! SEND_TO_API_SERVER ) { %>
 								<span class="badge ms-2 bg-danger">off</span>
 								<% } %>
 							</a>
-							<a class="nav-link" href="/store_trackers">
-								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-								Import Trackers
-							</a>
+							<hr>
 							<a class="nav-link" href="/send_tracker_data">
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Store Trackers
@@ -123,7 +120,7 @@
 								Store Bad
 								<span class="badge ms-2 <%- bad_badge_class %>"><%- bad_pending_count %></span>
 							</a>
-							<div class="sb-sidenav-menu-heading">Stats API</div>
+							<div class="sb-sidenav-menu-heading">Slow Actions</div>
 							<a class="nav-link" href="#" id="run3sStats">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
 								Update 3s Stats
@@ -131,6 +128,10 @@
 							<a class="nav-link" href="#" id="run2sStats">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
 								Update 2s Stats
+							</a>
+							<a class="nav-link" href="/store_trackers">
+								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+								Import Trackers
 							</a>
 							<dialog id="run3sModal">
 								<h3>Are you sure you want to run 3s stats? This takes a while.</h3>
