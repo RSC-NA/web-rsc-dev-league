@@ -565,6 +565,8 @@ app.get('/matches', (req, res) => {
 /********************************************************
  ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
+
+const EXTENSION_VERSION = '2.2.2';
 const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
 	let len = Object.keys(tracker_queue).length;
@@ -573,7 +575,9 @@ app.get('/get_tracker', async (req, res) => {
 		await grabMoreTrackers();
 	}
 
-	let output = {};
+	let output = {
+		version: EXTENSION_VERSION,
+	};
 	if ( len ) {
 		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
 		output.tracker = tracker_queue[ tracker_key ];
