@@ -587,21 +587,25 @@ app.get('/get_tracker', async (req, res) => {
 });
 
 async function grabMoreTrackers() {
-	console.log(`Grabbing more trackers [${tracker_queue.length}]`);
+	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
 	let response = await fetch(url);
 	let trackers = await response.json();
 
 	let trackers_by_link = {};
+	console.log('grabbed some trackers = ' + trackers.length);
 	for ( let i = 0; i < trackers.length; ++i ) {
 		if ( trackers[i].link in tracker_queue ) {
 			continue;
 		}
 		trackers_by_link[ trackers[i].link ] = trackers[i];
 	}
+	console.log('have ' + Object.keys(trackers_by_link).length + ' trackers to use');
 	let tracker_links = Object.keys(trackers_by_link);
 	connection.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], async (err, results) => {
 		if ( err ) { console.error('Error with the query!', err); throw err; }
+
+		console.log('in query');
 
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
@@ -619,6 +623,7 @@ async function grabMoreTrackers() {
 			tracker_queue[ tracker_link ] = trackers_by_link[ tracker_link ];
 		}
 
+		console.log('finished! ' + Object.keys(tracker_queue).length);	
 		return true;
 	});
 }
