@@ -579,10 +579,11 @@ app.get('/get_tracker', async (req, res) => {
 		output.tracker = tracker_queue[ tracker_key ];
 		delete tracker_queue[ tracker_key ];
 		output.remaining = len - 1;
-		res.json(output);
+		return res.json(output);
 	} else {
 		output.tracker = false;
 		output.remaining = len;
+		return res.json(output);
 	}
 });
 
@@ -627,6 +628,7 @@ async function grabMoreTrackers() {
 		return true;
 	});
 }
+await grabMoreTrackers();
 
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
