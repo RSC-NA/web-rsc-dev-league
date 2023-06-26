@@ -661,7 +661,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data) {
 		// update the records to 1
 		//res.json(data);
 		if (  typeof data !== 'string' ) {
-			console.log(data);
+			//console.log(data);
 			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id);
 			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
 				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
@@ -799,6 +799,7 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 	.then(data => {
 // update the records to 1
 		if ( typeof data !== 'string' ) {
+			console.log(data);
 			console.log('BAD TRACKER', tracker_link);
 			connection.query('UPDATE bad_trackers SET sent_to_api = 1 WHERE id = ?', [ bad_tracker_id ], (err, results) => {
 				if ( err ) { console.error("error updating bad trackers!", err); throw err; }
