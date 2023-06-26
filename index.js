@@ -628,7 +628,7 @@ async function grabMoreTrackers() {
 		return true;
 	});
 }
-await grabMoreTrackers();
+grabMoreTrackers();
 
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
