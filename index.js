@@ -565,7 +565,7 @@ app.get('/matches', (req, res) => {
 /********************************************************
  ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
-let tracker_queue = {};
+const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
 	let len = Object.keys(tracker_queue).length;
 	console.log('getting tracker --> [' + len + ']');
