@@ -602,7 +602,7 @@ async function grabMoreTrackers() {
 	}
 	console.log('have ' + Object.keys(trackers_by_link).length + ' trackers to use');
 	let tracker_links = Object.keys(trackers_by_link);
-	connection.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], async (err, results) => {
+	connection.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], (err, results) => {
 		if ( err ) { console.error('Error with the query!', err); throw err; }
 
 		console.log('in query');
