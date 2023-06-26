@@ -910,6 +910,10 @@ app.get('/store_trackers', (req, res) => {
 });
 
 app.get('/bump_api', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	}
+
 	console.log(`SEND_TO_API_SERVER = ${SEND_TO_API_SERVER}`);
 	SEND_TO_API_SERVER = ! SEND_TO_API_SERVER;
 	console.log(`Done! = ${SEND_TO_API_SERVER}`);
