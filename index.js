@@ -98,6 +98,8 @@ app.use((req, res, next) => {
 	res.locals.user = req.session.user || {};
 	res.locals.rostered = req.session.rostered;
 
+	res.locals.SEND_TO_API_SERVER = SEND_TO_API_SERVER;
+
 	res.locals.title = title;
 
 	// a count of how many trackers need to be
@@ -905,6 +907,13 @@ app.get('/store_trackers', (req, res) => {
 		});
 
 	});
+});
+
+app.get('/bump_api', (req, res) => {
+	console.log(`SEND_TO_API_SERVER = ${SEND_TO_API_SERVER}`);
+	SEND_TO_API_SERVER = ! SEND_TO_API_SERVER;
+	console.log(`Done! = ${SEND_TO_API_SERVER}`);
+	res.redirect('/');
 });
 
 app.post('/bad_tracker', (req, res) => {
