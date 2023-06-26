@@ -565,6 +565,64 @@ app.get('/matches', (req, res) => {
 /********************************************************
  ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
+let tracker_queue = {};
+app.get('/get_tracker', async (req, res) => {
+	let len = Object.keys(tracker_queue).length;
+	console.log('getting tracker --> [' + len + ']');
+	if ( len < 5 ) {
+		await grabMoreTrackers();
+	}
+
+	let output = {};
+	if ( len ) {
+		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
+		output.tracker = tracker_queue[ tracker_key ];
+		delete tracker_queue[ tracker_key ];
+		output.remaining = len - 1;
+		res.json(output);
+	} else {
+		output.tracker = false;
+		output.remaining = len;
+	}
+});
+
+async function grabMoreTrackers() {
+	console.log(`Grabbing more trackers [${tracker_queue.length}]`);
+	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
+	let response = await fetch(url);
+	let trackers = await response.json();
+
+	let trackers_by_link = {};
+	for ( let i = 0; i < trackers.length; ++i ) {
+		if ( trackers[i].link in tracker_queue ) {
+			continue;
+		}
+		trackers_by_link[ trackers[i].link ] = trackers[i];
+	}
+	let tracker_links = Object.keys(trackers_by_link);
+	connection.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], async (err, results) => {
+		if ( err ) { console.error('Error with the query!', err); throw err; }
+
+		if ( results && results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				if ( results[i].tracker_link in trackers_by_link ) {
+					// any record we have in our database is an existing player. force it to 
+					// "stale"
+					trackers_by_link[ results[i].tracker_link ].status = 'STALE';
+					trackers_by_link[ results[i].tracker_link ].rsc_id = results[i].rsc_id;
+					trackers_by_link[ results[i].tracker_link ].name = results[i].name;
+				}
+			}
+		}
+
+		for ( let tracker_link in trackers_by_link ) {
+			tracker_queue[ tracker_link ] = trackers_by_link[ tracker_link ];
+		}
+
+		return true;
+	});
+}
+
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
 function send_tracker_data_to_server(tracker_id, tracker_data) {
