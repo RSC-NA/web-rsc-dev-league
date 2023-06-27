@@ -638,7 +638,7 @@ grabMoreTrackers();
 
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
-function send_tracker_data_to_server(tracker_id, tracker_data) {
+function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 	fetch('http://24.176.157.36:4443/api/v1/numbers/mmr/bulk_submit/', {
 		method: 'POST',
 		headers: {
@@ -662,7 +662,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data) {
 		//res.json(data);
 		if (  typeof data !== 'string' ) {
 			//console.log(data);
-			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id);
+			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
 			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
 				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 				//res.json(data);
@@ -1029,7 +1029,7 @@ app.post('/save_mmr', (req, res) => {
 								}
 
 								try {
-									send_tracker_data_to_server(results.insertId, [tracker_data]);
+									send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
 								} catch(e) {
 									SEND_TO_API_SERVER = false;
 									console.log('API SERVER ERROR!');
