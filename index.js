@@ -1,7 +1,7 @@
 // FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
-let SEND_TO_API_SERVER = true;
+let SEND_TO_API_SERVER = false;
 
 // Server app code below
 const express = require('express');
@@ -571,6 +571,9 @@ app.get('/matches', (req, res) => {
 const EXTENSION_VERSION = '2.3.0';
 const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
+	if ( ! SEND_TO_API_SERVER ) {
+		return res.json({ tracker: false, remaining: 0 });
+	}
 	let len = Object.keys(tracker_queue).length;
 	console.log('getting tracker --> [' + len + ']');
 	if ( len < 5 ) {
@@ -634,7 +637,9 @@ async function grabMoreTrackers() {
 		return true;
 	});
 }
-grabMoreTrackers();
+if ( SEND_TO_API_SERVER ) {
+	grabMoreTrackers();
+}
 
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
