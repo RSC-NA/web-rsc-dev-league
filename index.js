@@ -568,7 +568,7 @@ app.get('/matches', (req, res) => {
  ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
 
-const EXTENSION_VERSION = '2.2.2';
+const EXTENSION_VERSION = '2.3.0';
 const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
 	let len = Object.keys(tracker_queue).length;
