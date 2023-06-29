@@ -1,7 +1,7 @@
 // FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
-let SEND_TO_API_SERVER = false;
+let SEND_TO_API_SERVER = true;
 
 // Server app code below
 const express = require('express');
@@ -572,6 +572,7 @@ const EXTENSION_VERSION = '2.3.0';
 const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
 	if ( ! SEND_TO_API_SERVER ) {
+		console.log('API is Off', SEND_TO_API_SERVER);
 		return res.json({ tracker: false, remaining: 0 });
 	}
 	let len = Object.keys(tracker_queue).length;
