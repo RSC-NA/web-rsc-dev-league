@@ -882,6 +882,7 @@ app.get('/import_trackers', async (req, res) => {
 			'name': rows[i]._rawData[1],
 			'3s': rows[i]._rawData[3],
 			'2s': rows[i]._rawData[4],
+			'active': (rows[i]._rawData[3] || rows[i].rawData[4]),
 		};
 	}
 
