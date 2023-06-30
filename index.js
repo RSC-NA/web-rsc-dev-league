@@ -876,14 +876,21 @@ app.get('/import_trackers', async (req, res) => {
 	const rows = await sheet.getRows();
 	
 	for ( let i = 0; i < rows.length; ++i ) {
-		console.log(rows[i]._rawData[0], rows[i]._rawData[1], rows[i]._rawData[3], rows[i]._rawData[4]);
-		active_players[ rows[i]._rawData[0] ] = {
-			'rscid': rows[i]._rawData[0],
-			'name': rows[i]._rawData[1],
-			'3s': rows[i]._rawData[3],
-			'2s': rows[i]._rawData[4],
-			'active': (rows[i]._rawData[3] || rows[i].rawData[4]),
-		};
+		if ( ! rows[i]._rawData[0] ) {
+			console.log(`Exiting at ${i}`);
+			break;
+		}
+
+		let active = (rows[i]._rawData[3] || rows[i]._rawData[4]);
+		if ( active ) {
+			active_players[ rows[i]._rawData[0] ] = {
+				'rscid': rows[i]._rawData[0],
+				'name': rows[i]._rawData[1],
+				'3s': rows[i]._rawData[3],
+				'2s': rows[i]._rawData[4],
+				'active': active,
+			};
+		}
 	}
 
 	res.json(active_players);
