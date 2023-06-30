@@ -892,56 +892,46 @@ app.get('/import_trackers', async (req, res) => {
 			};
 		}
 	}
+	console.log(`${Object.keys(active_players).length} active players across both leagues`);
+	console.log('grabbing trackers from sheet');
 
-	res.json(active_players);
-	// let contractsQuery = 'SELECT rsc_id,name FROM contracts';
-	// console.log('store trackers!');
-	// connection.query(contractsQuery, async (err, results) => {
-	// 	if ( err ) { throw err; }
+	// 1. create google sheets object
+	const trackerDoc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
+	// 2. authenticate
+	trackerDoc.useApiKey(process.env.GOOGLE_API_KEY);
 
-	// 	for ( let i = 0; i < results.length; ++i ) {
-	// 		active_players[ results[i].rsc_id ] = results[i].name;
-	// 	}
+	// 3. pull all relevant fields
+	await trackerDoc.loadInfo();
 
-	// 	// 1. create google sheets object
-	// 	const doc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
-	// 	// 2. authenticate
-	// 	doc.useApiKey(process.env.GOOGLE_API_KEY);
+	const trackerSheet = trackerDoc.sheetsByTitle["Link List"];
+	const trackerRows = await trackerSheet.getRows();
 
-	// 	// 3. pull all relevant fields
-	// 	await doc.loadInfo();
+	let trackers = [];
 
-	// 	const sheet = doc.sheetsByTitle["Link List"];
-	// 	const rows = await sheet.getRows();
-	// 	//await sheet.loadCells('A:C');
+	for ( let i = 0; i < trackerRows.length; i++ ) {
+		let rsc_id = trackerRows[i]._rawData[0];
+		let player_name = trackerRows[i]._rawData[1];
+		let tracker = trackerRows[i]._rawData[2];
 
-	// 	let trackers = [];
+		if ( ! (rsc_id in active_players) ) {
+			continue;
+		}
 
-	// 	for ( let i = 0; i < rows.length; i++ ) {
-	// 		let rsc_id = rows[i]._rawData[0];
-	// 		let player_name = rows[i]._rawData[1];
-	// 		let tracker = rows[i]._rawData[2];
+		trackers.push([ rsc_id, player_name, tracker ]);
+	}
 
-	// 		if ( ! (rsc_id in active_players) ) {
-	// 			continue;
-	// 		}
+	connection.query('TRUNCATE trackers', (err, results) => {
+		if ( err ) { throw err; }
 
-	// 		trackers.push([ rsc_id, player_name, tracker ]);
-	// 	}
+		console.log('Inserting trackers', trackers.length);
+		connection.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers], (err,results) => {
+			if ( err ) {
+				console.error('Error inserting:',err);
+			}
+			res.redirect('/');
+		});
+	});
 
-	// 	connection.query('TRUNCATE trackers', (err, results) => {
-	// 		if ( err ) { throw err; }
-
-	// 		console.log('Inserting trackers', trackers.length);
-	// 		connection.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers], (err,results) => {
-	// 			if ( err ) {
-	// 				console.error('Error inserting:',err);
-	// 			}
-	// 			res.redirect('/');
-	// 		});
-	// 	});
-
-	// });
 });
 
 app.get('/bump_api', (req, res) => {
