@@ -965,26 +965,22 @@ app.post('/bad_tracker', (req, res) => {
 
 			let bad_tracker_id = results.insertId;
 
-			connection.query('UPDATE trackers SET bad = 1 WHERE tracker_link like ?', [ queryVar ], (err, results) => {
-				if ( err ) { console.error('ERROR', err); throw err; }
-
-				if ( SEND_TO_API_SERVER ) {
-					try {
-						send_bad_tracker_to_server(bad_tracker_id, tracker_link);
-					} catch(e) {
-						console.log('API SERVER ERROR!');
-						console.log('API SERVER ERROR!');
-						console.log('API SERVER ERROR!');
-						console.log('Error:', e);
-						SEND_TO_API_SERVER = false;
-						console.log('API SERVER ERROR!');
-						console.log('API SERVER ERROR!');
-						console.log('API SERVER ERROR!');
-					}
+			if ( SEND_TO_API_SERVER ) {
+				try {
+					send_bad_tracker_to_server(bad_tracker_id, tracker_link);
+				} catch(e) {
+					console.log('API SERVER ERROR!');
+					console.log('API SERVER ERROR!');
+					console.log('API SERVER ERROR!');
+					console.log('Error:', e);
+					SEND_TO_API_SERVER = false;
+					console.log('API SERVER ERROR!');
+					console.log('API SERVER ERROR!');
+					console.log('API SERVER ERROR!');
 				}
+			}
 
-				res.json({'success': true, 'ref': queryVar });
-			});
+			res.json({'success': true, 'ref': queryVar });
 		});
 	} else {
 		res.json({'success': false, 'error': 'Must provide a tracker link'});
@@ -1007,7 +1003,7 @@ app.post('/save_mmr', (req, res) => {
 		if ( results && results.length > 4 ) {
 			res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
 		} else {
-			connection.query('SELECT rsc_id,name FROM trackers WHERE bad = 0 AND tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
+			connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
 				if ( err ) { console.error('ERROR', err); throw err; }
 
 				if ( (results && results.length) || force_insert === true ) {
