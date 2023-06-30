@@ -634,7 +634,7 @@ async function grabMoreTrackers() {
 				if ( results[i].tracker_link in trackers_by_link ) {
 					// any record we have in our database is an existing player. force it to 
 					// "stale"
-					trackers_by_link[ results[i].tracker_link ].status = 'STALE';
+					//trackers_by_link[ results[i].tracker_link ].status = 'STALE';
 					trackers_by_link[ results[i].tracker_link ].rsc_id = results[i].rsc_id;
 					trackers_by_link[ results[i].tracker_link ].name = results[i].name;
 				}
