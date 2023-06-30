@@ -860,61 +860,80 @@ app.get('/send_bad_trackers', (req, res) => {
 	});	
 });
 
-app.get('/store_trackers', (req, res) => {
+app.get('/import_trackers', async (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
 	} 
 
 	// fetch all active players from contracts
 	let active_players = {};
-	let contractsQuery = 'SELECT rsc_id,name FROM contracts';
-	console.log('store trackers!');
-	connection.query(contractsQuery, async (err, results) => {
-		if ( err ) { throw err; }
+	
+	// check to see if the player is active in MMS
+	const doc = new GoogleSpreadsheet('1u74mgGPFPWfEiXyCnU2yj6BO9PNCKhIfyGliJvTsZw4');
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+	await doc.loadInfo();
+	const sheet = doc.sheetsByTitle['Members'];
+	const rows = await sheet.getRows();
+	
+	for ( let i = 0; i < rows.length; ++i ) {
+		console.log(rows[i]._rawData[0], rows[i]._rawData[1], rows[i]._rawData[3], rows[i]._rawData[4]);
+		active_players[ rows[i]._rawData[0] ] = {
+			'rscid': rows[i]._rawData[0],
+			'name': rows[i]._rawData[1],
+			'3s': rows[i]._rawData[3],
+			'2s': rows[i]._rawData[4],
+		};
+	}
 
-		for ( let i = 0; i < results.length; ++i ) {
-			active_players[ results[i].rsc_id ] = results[i].name;
-		}
+	res.json(active_players);
+	// let contractsQuery = 'SELECT rsc_id,name FROM contracts';
+	// console.log('store trackers!');
+	// connection.query(contractsQuery, async (err, results) => {
+	// 	if ( err ) { throw err; }
 
-		// 1. create google sheets object
-		const doc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
-		// 2. authenticate
-		doc.useApiKey(process.env.GOOGLE_API_KEY);
+	// 	for ( let i = 0; i < results.length; ++i ) {
+	// 		active_players[ results[i].rsc_id ] = results[i].name;
+	// 	}
 
-		// 3. pull all relevant fields
-		await doc.loadInfo();
+	// 	// 1. create google sheets object
+	// 	const doc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
+	// 	// 2. authenticate
+	// 	doc.useApiKey(process.env.GOOGLE_API_KEY);
 
-		const sheet = doc.sheetsByTitle["Link List"];
-		const rows = await sheet.getRows();
-		//await sheet.loadCells('A:C');
+	// 	// 3. pull all relevant fields
+	// 	await doc.loadInfo();
 
-		let trackers = [];
+	// 	const sheet = doc.sheetsByTitle["Link List"];
+	// 	const rows = await sheet.getRows();
+	// 	//await sheet.loadCells('A:C');
 
-		for ( let i = 0; i < rows.length; i++ ) {
-			let rsc_id = rows[i]._rawData[0];
-			let player_name = rows[i]._rawData[1];
-			let tracker = rows[i]._rawData[2];
+	// 	let trackers = [];
 
-			if ( ! (rsc_id in active_players) ) {
-				continue;
-			}
+	// 	for ( let i = 0; i < rows.length; i++ ) {
+	// 		let rsc_id = rows[i]._rawData[0];
+	// 		let player_name = rows[i]._rawData[1];
+	// 		let tracker = rows[i]._rawData[2];
 
-			trackers.push([ rsc_id, player_name, tracker ]);
-		}
+	// 		if ( ! (rsc_id in active_players) ) {
+	// 			continue;
+	// 		}
 
-		connection.query('TRUNCATE trackers', (err, results) => {
-			if ( err ) { throw err; }
+	// 		trackers.push([ rsc_id, player_name, tracker ]);
+	// 	}
 
-			console.log('Inserting trackers', trackers.length);
-			connection.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers], (err,results) => {
-				if ( err ) {
-					console.error('Error inserting:',err);
-				}
-				res.redirect('/');
-			});
-		});
+	// 	connection.query('TRUNCATE trackers', (err, results) => {
+	// 		if ( err ) { throw err; }
 
-	});
+	// 		console.log('Inserting trackers', trackers.length);
+	// 		connection.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers], (err,results) => {
+	// 			if ( err ) {
+	// 				console.error('Error inserting:',err);
+	// 			}
+	// 			res.redirect('/');
+	// 		});
+	// 	});
+
+	// });
 });
 
 app.get('/bump_api', (req, res) => {
