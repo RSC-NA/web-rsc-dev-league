@@ -568,9 +568,14 @@ app.get('/matches', (req, res) => {
  ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
 
-const EXTENSION_VERSION = '2.3.0';
+const EXTENSION_VERSION = '2.4.0';
 const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
+	let DELETE = false;
+	if ( req.query.delete ) {
+		DELETE = true;
+	}
+
 	if ( ! SEND_TO_API_SERVER ) {
 		console.log('API is Off', SEND_TO_API_SERVER);
 		return res.json({ tracker: false, remaining: 0 });
@@ -587,7 +592,13 @@ app.get('/get_tracker', async (req, res) => {
 	if ( len ) {
 		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
 		output.tracker = tracker_queue[ tracker_key ];
-		delete tracker_queue[ tracker_key ];
+
+		// only "delete" the record if we're actually trying to process
+		// a tracker. If I'm just testing, leave it in the array.	
+		if ( DELETE ) {
+			delete tracker_queue[ tracker_key ];
+		}
+
 		output.remaining = len - 1;
 		return res.json(output);
 	} else {
@@ -862,7 +873,7 @@ app.get('/send_bad_trackers', (req, res) => {
 
 app.get('/import_trackers', async (req, res) => {
 	if ( ! req.session.is_admin ) {
-		//return res.redirect('/');
+		return res.redirect('/');
 	} 
 
 	// fetch all active players from contracts
