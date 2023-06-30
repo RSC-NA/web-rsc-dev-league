@@ -862,7 +862,7 @@ app.get('/send_bad_trackers', (req, res) => {
 
 app.get('/import_trackers', async (req, res) => {
 	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
+		//return res.redirect('/');
 	} 
 
 	// fetch all active players from contracts
