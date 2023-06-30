@@ -881,13 +881,13 @@ app.get('/import_trackers', async (req, res) => {
 			break;
 		}
 
-		let active = (rows[i]._rawData[3] || rows[i]._rawData[4]);
+		let active = (rows[i]._rawData[3] === "TRUE" || rows[i]._rawData[4] === "TRUE" );
 		if ( active ) {
 			active_players[ rows[i]._rawData[0] ] = {
 				'rscid': rows[i]._rawData[0],
 				'name': rows[i]._rawData[1],
-				'3s': rows[i]._rawData[3],
-				'2s': rows[i]._rawData[4],
+				'3s': rows[i]._rawData[3] === "TRUE",
+				'2s': rows[i]._rawData[4] === "TRUE",
 				'active': active,
 			};
 		}
