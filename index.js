@@ -593,6 +593,7 @@ app.get('/get_tracker', async (req, res) => {
 		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
 		output.tracker = tracker_queue[ tracker_key ];
 
+		console.log(output.tracker.name, output.tracker.link, `Status: ${output.tracker.status}`); 
 		// only "delete" the record if we're actually trying to process
 		// a tracker. If I'm just testing, leave it in the array.	
 		if ( DELETE ) {
@@ -610,7 +611,7 @@ app.get('/get_tracker', async (req, res) => {
 
 async function grabMoreTrackers() {
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
-	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
+	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=5';
 	let response = await fetch(url);
 	let trackers = await response.json();
 
