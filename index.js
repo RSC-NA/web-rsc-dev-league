@@ -590,6 +590,7 @@ app.get('/get_tracker', async (req, res) => {
 		version: EXTENSION_VERSION,
 	};
 	let force_tracker = null;
+	console.log(tracker_queue);
 	for (let i = 0; i < Object.keys(tracker_queue).length; ++i ) {
 		console.log(i, tracker_queue[i]);
 		if ( tracker_queue[ i ].name == 'Mickstery' ) {
