@@ -1021,82 +1021,87 @@ app.post('/save_mmr', (req, res) => {
 		from_button  = true;
 	}
 
-	connection.query('SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)', [ d.tracker_link.link ], (err, results) => {
-		if ( err ) { console.error('Error!', err); throw err; }
+	if ( d.psyonix_season === null ) {
+		return res.json({ success: false, error: 'This tracker contained no data.' });
+	} else {
 
-		if ( results && results.length > 1 && ! force_insert ) {
-			res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
-		} else if ( results && results.length > 5 && force_insert ) {
-			res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
-		} else {
-			connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
-				if ( err ) { console.error('ERROR', err); throw err; }
+		connection.query('SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)', [ d.tracker_link.link ], (err, results) => {
+			if ( err ) { console.error('Error!', err); throw err; }
 
-				if ( (results && results.length) || force_insert === true ) {
-					let rsc_id = '';
-					if ( results && results.length ) {
-						rsc_id = results[0].rsc_id;
+			if ( results && results.length > 1 && ! force_insert ) {
+				res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
+			} else if ( results && results.length > 5 && force_insert ) {
+				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
+			} else {
+				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
+					if ( err ) { console.error('ERROR', err); throw err; }
+
+					if ( (results && results.length) || force_insert === true ) {
+						let rsc_id = '';
+						if ( results && results.length ) {
+							rsc_id = results[0].rsc_id;
+						}
+						let query = `
+						INSERT INTO tracker_data 
+							(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
+							twos_games_played,twos_rating,twos_season_peak,ones_games_played,ones_rating,ones_season_peak,pulled_by)
+						VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+						`;
+						connection.query(
+							query, 
+							[ d.psyonix_season, d.tracker_link.link, rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
+							d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.pulled_by ],
+							(err, results) => {
+								if ( err ) { console.error('Insert error:', err); throw err; }
+
+								// send it to the server immediately
+								if ( SEND_TO_API_SERVER ) {
+									let tracker_data = {
+										psyonix_season: d.psyonix_season,
+										tracker_link: { link: d.tracker_link.link },
+										rsc_id: rsc_id,
+										date_pulled: new Date(),
+										threes_games_played: d.threes_games_played ?? 0,
+										threes_rating: d.threes_rating ?? 0,
+										threes_season_peak: d.threes_season_peak ? d.threes_season_peak : d.threes_rating,
+										twos_games_played: d.twos_games_played ?? 0,
+										twos_rating: d.twos_rating ?? 0,
+										twos_season_peak: d.twos_season_peak ? d.twos_season_peak : d.twos_rating,
+										ones_games_played: d.ones_games_played ?? 0,
+										ones_rating: d.ones_rating ?? 0,
+										ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
+									};
+									for ( let field in tracker_data ) {
+										if ( field.includes('_peak') || field.includes('_rating') ) {
+											if ( ! tracker_data[ field ] ) {
+												tracker_data[ field ] = 0;
+											}
+										} 
+									}
+
+									try {
+										send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
+									} catch(e) {
+										SEND_TO_API_SERVER = false;
+										console.log('API SERVER ERROR!');
+										console.log('API SERVER ERROR!');
+										console.log('API SERVER ERROR!');
+										console.log('Error:', e);
+										console.log('API SERVER ERROR!');
+										console.log('API SERVER ERROR!');
+										console.log('API SERVER ERROR!');
+									}
+								}
+
+								res.json({ success: true, status: d.status });
+						});
+					} else {
+						res.json({ success: false, not_found: true, 'error': 'This tracker is not attached to an RSC player.' });
 					}
-					let query = `
-					INSERT INTO tracker_data 
-						(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
-						twos_games_played,twos_rating,twos_season_peak,ones_games_played,ones_rating,ones_season_peak,pulled_by)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-					`;
-					connection.query(
-						query, 
-						[ d.psyonix_season, d.tracker_link.link, rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
-						d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.pulled_by ],
-						(err, results) => {
-							if ( err ) { console.error('Insert error:', err); throw err; }
-
-							// send it to the server immediately
-							if ( SEND_TO_API_SERVER ) {
-								let tracker_data = {
-									psyonix_season: d.psyonix_season,
-									tracker_link: { link: d.tracker_link.link },
-									rsc_id: rsc_id,
-									date_pulled: new Date(),
-									threes_games_played: d.threes_games_played ?? 0,
-									threes_rating: d.threes_rating ?? 0,
-									threes_season_peak: d.threes_season_peak ? d.threes_season_peak : d.threes_rating,
-									twos_games_played: d.twos_games_played ?? 0,
-									twos_rating: d.twos_rating ?? 0,
-									twos_season_peak: d.twos_season_peak ? d.twos_season_peak : d.twos_rating,
-									ones_games_played: d.ones_games_played ?? 0,
-									ones_rating: d.ones_rating ?? 0,
-									ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
-								};
-								for ( let field in tracker_data ) {
-									if ( field.includes('_peak') || field.includes('_rating') ) {
-										if ( ! tracker_data[ field ] ) {
-											tracker_data[ field ] = 0;
-										}
-									} 
-								}
-
-								try {
-									send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
-								} catch(e) {
-									SEND_TO_API_SERVER = false;
-									console.log('API SERVER ERROR!');
-									console.log('API SERVER ERROR!');
-									console.log('API SERVER ERROR!');
-									console.log('Error:', e);
-									console.log('API SERVER ERROR!');
-									console.log('API SERVER ERROR!');
-									console.log('API SERVER ERROR!');
-								}
-							}
-
-							res.json({ success: true, status: d.status });
-					});
-				} else {
-					res.json({ success: false, not_found: true, 'error': 'This tracker is not attached to an RSC player.' });
-				}
-			});
-		}
-	});
+				});
+			}
+		});
+	} // end of null data check
 });
 /********************************************************
  ****************** /TRACKER/MMR TOOL ********************
