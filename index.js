@@ -679,7 +679,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 		// update the records to 1
 		//res.json(data);
 		if (  typeof data !== 'string' ) {
-			//console.log(data);
+			console.log(data);
 			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
 			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
 				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
