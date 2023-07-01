@@ -1022,7 +1022,7 @@ app.post('/save_mmr', (req, res) => {
 	}
 
 	if ( d.psyonix_season === null ) {
-		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link, d.pulled_by ], (err, results) => {
+		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
 			return res.json({ success: false, error: 'This tracker contained no data.' });
 		});
 	} else {
