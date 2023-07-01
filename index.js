@@ -591,6 +591,7 @@ app.get('/get_tracker', async (req, res) => {
 	};
 	let force_tracker = null;
 	for (let i = 0; i < Object.keys(tracker_queue).length; ++i ) {
+		console.log(i, tracker_queue[i]);
 		if ( tracker_queue[ i ].name == 'Mickstery' ) {
 			force_tracker = tracker_queue[i];
 		}
