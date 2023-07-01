@@ -1014,6 +1014,8 @@ app.post('/save_mmr', (req, res) => {
 
 		if ( results && results.length > 1 && ! force_insert ) {
 			res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
+		} else if ( results && results.length > 5 && force_insert ) {
+			res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
 		} else {
 			connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
 				if ( err ) { console.error('ERROR', err); throw err; }
