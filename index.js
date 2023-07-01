@@ -596,7 +596,7 @@ app.get('/get_tracker', async (req, res) => {
 		console.log(output.tracker.name, output.tracker.link, `Status: ${output.tracker.status}`); 
 		// only "delete" the record if we're actually trying to process
 		// a tracker. If I'm just testing, leave it in the array.	
-		if ( ! force_tracker && DELETE ) {
+		if ( DELETE ) {
 			delete tracker_queue[ tracker_key ];
 		}
 
