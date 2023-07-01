@@ -589,21 +589,9 @@ app.get('/get_tracker', async (req, res) => {
 	let output = {
 		version: EXTENSION_VERSION,
 	};
-	let force_tracker = null;
-	for (let i = 0; i < Object.keys(tracker_queue).length; ++i ) {
-		let key = Object.keys(tracker_queue)[i];
-		console.log(i, tracker_queue[key]);
-		if ( tracker_queue[ key ].name == 'Mickstery' ) {
-			force_tracker = tracker_queue[key];
-		}
-	}
 	if ( len ) {
-		if ( force_tracker ) {
-			output.tracker = force_tracker;
-		} else {
-			let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
-			output.tracker = tracker_queue[ tracker_key ];
-		}
+		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
+		output.tracker = tracker_queue[ tracker_key ];
 
 		console.log(output.tracker.name, output.tracker.link, `Status: ${output.tracker.status}`); 
 		// only "delete" the record if we're actually trying to process
