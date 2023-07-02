@@ -568,7 +568,7 @@ app.get('/matches', (req, res) => {
  ****************** TRACKER/MMR TOOL ********************
  *******************************************************/
 
-const EXTENSION_VERSION = '2.4.0';
+const EXTENSION_VERSION = '2.4.1';
 const tracker_queue = {};
 app.get('/get_tracker', async (req, res) => {
 	let DELETE = false;
