@@ -303,8 +303,13 @@ ORDER BY pulls DESC
 				}
 			}
 
-			leaderboard.sort((a, b) => { console.log(a,b); return a['count'] - b['count'] });
-			res.render('tracker', { leaderboard: leaderboard });
+			let leaderboard_arr = [];
+			for ( let name in leaderboard ) {
+				leaderboard_arr.push(leaderboard[name]);
+			}
+
+			leaderboard_arr.sort((a, b) => { console.log(a,b); return a['count'] - b['count'] });
+			res.render('tracker', { leaderboard: leaderboard, leaderboard_arr: leaderboard_arr });
 		});
 	});
 });
