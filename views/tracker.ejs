@@ -69,15 +69,18 @@
 							// 	myPosition = Object.keys(leaderboard).indexOf(user.name);
 							// }
 							for ( let i = 0; i < leaderboard_arr.length; ++i ) {
-								if ( leaderboard_arr[i].name == user.name ) {
-									myPosition = i + 1;
+								if ( 'name' in leaderboard_arr[i] ) {
+									if ( leaderboard_arr[i].name == user.name ) {
+										myPosition = i + 1;
+									}
 								}
 							}
 							for ( let i = 0; i < leaderboard_arr.length; ++i ) {
-								let player =  leaderboard_arr[i].name;
-
-
-							//for ( let player in leaderboard ) {
+								let player = 'former player';
+								if ( 'name' in leaderboard_arr[i] ) {
+									let player =  leaderboard_arr[i].name;
+								}
+								
 								count++;
 
 								if ( count > 10 ) {
