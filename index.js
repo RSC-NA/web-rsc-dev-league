@@ -252,6 +252,7 @@ ORDER BY pulls DESC
 			}
 
 			if ( leaderboard[ pulled_by ] ) {
+				leaderboard.sort((a, b) => a['count'] - b['count']);
 				res.json({ total: leaderboard[ pulled_by ]['count'] });
 			} else {
 				res.json({ total: 0 });
