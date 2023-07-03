@@ -264,11 +264,13 @@ app.get('/tracker', (req, res) => {
 
 	let query = `
 SELECT
-	count(t.id) as pulls, c.name, t.pulled_by
+	count(t.id) as pulls, count(bt.id) as bad_pulls, count(t.id) + count(bt.id) as total, c.name, t.pulled_by
 FROM tracker_data AS t
+LEFT JOIN bad_trackers AS bt
+	ON t.pulled_by = bt.pulled_by
 LEFT JOIN contracts AS c ON t.pulled_by = c.name
 GROUP BY t.pulled_by
-ORDER BY pulls DESC
+ORDER BY total DESC
 	`;
 	connection.query(query, (err, results) => {
 		if ( err ) { console.error('Leaderboard error:', err); throw err; }
@@ -278,39 +280,11 @@ ORDER BY pulls DESC
 		let leaderboard = {};
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
-				leaderboard[ results[i].pulled_by ] = { count: results[i].pulls, name: results[i].name };
+				leaderboard[ results[i].pulled_by ] = { count: results[i].total, name: results[i].name };
 			}
 		}
 
-		let badQuery = `
-SELECT
-	count(t.id) as pulls, c.name, t.pulled_by
-FROM bad_trackers AS t
-LEFT JOIN contracts AS c ON t.pulled_by = c.name
-GROUP BY t.pulled_by
-ORDER BY pulls DESC
-		`;
-		connection.query(badQuery, (err, results) => {
-			if ( err ) { console.error('Leaderboard error:', err); throw err; }
-
-			if ( results && results.length ) {
-				for ( let i = 0; i < results.length; ++i ) {
-					if ( results[i].pulled_by in leaderboard ) {
-						leaderboard[ results[i].pulled_by ]['count'] += results[i].pulls;
-					} else {
-						leaderboard[ results[i].pulled_by ] = { count: results[i].pulls, name: results[i].name };
-					}
-				}
-			}
-
-			let leaderboard_arr = [];
-			for ( let name in leaderboard ) {
-				leaderboard_arr.push(leaderboard[name]);
-			}
-
-			leaderboard_arr.sort((a, b) => { console.log(a,b); return a['count'] - b['count'] });
-			res.render('tracker', { leaderboard: leaderboard, leaderboard_arr: leaderboard_arr });
-		});
+		res.render('tracker', { leaderboard: leaderboard });
 	});
 });
 
