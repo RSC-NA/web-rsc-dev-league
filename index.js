@@ -1000,6 +1000,17 @@ app.post('/bad_tracker', (req, res) => {
 });
 
 app.post('/save_mmr', (req, res) => {
+
+	const old_platforms = {
+		'xbox': 'xbl',
+		'xbl': 'xbox',
+		'psn': 'ps',
+		'ps': 'psn',
+		'epic': 'epic',
+		'steam': 'steam',
+		'switch': 'switch',
+	};
+
 	const d = req.body;
 	//console.log(d);
 	let force_insert = false;
@@ -1026,7 +1037,7 @@ app.post('/save_mmr', (req, res) => {
 			} else if ( results && results.length > 5 && force_insert ) {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
 			} else {
-				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ?', [ `%${d.platform}/${d.user_id}%` ], (err, results) => {
+				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ? OR tracker_link LIKE ?', [ `%${d.platform}/${d.user_id}%`, `%${old_platforms[d.platform]}/${d.user_id}%` ], (err, results) => {
 					if ( err ) { console.error('ERROR', err); throw err; }
 
 					if ( (results && results.length) || force_insert === true ) {
