@@ -264,13 +264,11 @@ app.get('/tracker', (req, res) => {
 
 	let query = `
 SELECT
-	count(t.id) as pulls, count(bt.id) as bad_pulls, count(t.id) + count(bt.id) as total, c.name, t.pulled_by
+	count(t.id) as good, t.pulled_by,
+	(SELECT count(bt.pulled_by) FROM bad_trackers AS bt WHERE bt.pulled_by = t.pulled_by GROUP by bt.pulled_by) AS bad
 FROM tracker_data AS t
-LEFT JOIN bad_trackers AS bt
-	ON t.pulled_by = bt.pulled_by
-LEFT JOIN contracts AS c ON t.pulled_by = c.name
 GROUP BY t.pulled_by
-ORDER BY total DESC
+ORDER BY good + bad DESC
 	`;
 	connection.query(query, (err, results) => {
 		if ( err ) { console.error('Leaderboard error:', err); throw err; }
@@ -280,7 +278,7 @@ ORDER BY total DESC
 		let leaderboard = {};
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
-				leaderboard[ results[i].pulled_by ] = { count: results[i].total, name: results[i].name };
+				leaderboard[ results[i].pulled_by ] = { count: results[i].good + results[i].bad, name: results[i].name };
 			}
 		}
 
