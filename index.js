@@ -11,7 +11,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
-const connection = require('./core/database.js').databaseConnection;
+const connection = require('./core/database').databaseConnection;
+
+// controllers
+const auth_controller = require('./controllers/authentication');
 
 const mysqlP = require('mysql2/promise');
 
@@ -51,6 +54,13 @@ app.use( express.static('static') );
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
+
+// grab a DB handle and attach it to our req
+app.use((req, res, next) => {
+	req.db = connection;
+
+	next();
+});
 
 // correct server URL middleware
 // TODO(erh): Once I shut down heroku, we can turn this off
@@ -208,6 +218,9 @@ app.get('/', (req, res) => {
 	res.render('dashboard', { match_days: matchDays });
 });
 
+// Authentication handled by /controllers/authentication.js
+app.use(auth_controller);
+
 app.get('/tracker/:rsc_name', (req, res) => {
 	let pulled_by = req.params.rsc_name;
 
@@ -285,113 +298,6 @@ ORDER BY good + bad DESC
 
 		res.render('tracker', { leaderboard: leaderboard });
 	});
-});
-
-app.get('/login', (req, res) => {
-	res.render('login');
-});
-
-app.get('/logout', (req, res) => {
-	if ( req.session ) {
-		req.session.destroy(err => {
-			if ( err ) {
-				res.status(400).send('Unable to log out');
-			} else {
-				res.redirect('/');
-			}
-		});
-	} else {
-		res.redirect('/');
-	}
-});
-
-app.get('/oauth2', async (req, res) => {
-	res.render('login');
-});
-
-app.get('/callback', (req, res) => {
-	res.json(req.body);
-});
-
-app.get('/process_login', (req, res) => {
-	if ( ! req.query.rsc ) {
-		res.redirect('/');
-	}
-
-	let token = atob(req.query.rsc).split(':');
-
-	// 1. check DB for existing user, if it exists, create session and redirect
-	let nickname = token[0] + '#' + token[1];
-	let discord_id = token[2];
-
-	connection.query(
-		'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
-		[ discord_id ],
-		function(err, results) {
-			if ( err ) {
-				console.error(err);
-				throw err;
-			}
-
-			let exists = false;
-			if ( results.length ) {
-				exists = true;
-				req.session.nickname = nickname;
-				req.session.discord_id = discord_id;
-				req.session.user_id = results[0].id;
-
-				let user = {
-					user_id: results[0].id,
-					nickname: nickname,
-					name: results[0].name,
-					mmr: results[0].mmr,
-					tier: results[0].tier,
-					status: results[0].status,
-					rsc_id: results[0].rsc_id,
-					discord_id: discord_id,
-					is_admin: results[0].admin ? true: false,
-				};
-
-				req.session.user = user;
-				console.log(user);
-
-				req.session.is_admin = results[0].admin ? true : false;
-				res.redirect('/');
-				//res.redirect('/player/' + discord_id);
-			}
-
-			// user doesn't exist, create the account.
-			if ( ! exists ) {
-				connection.query(
-					'INSERT INTO players (nickname,discord_id) VALUES (?, ?)',
-					[ nickname, discord_id ],
-					function (err, results) {
-						if (err) throw err;
-
-						connection.query(
-							'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
-							[ discord_id ],
-							(err, results) => {
-								let user = {
-									user_id: results[0].id,
-									nickname: nickname,
-									name: results[0].name,
-									mmr: results[0].mmr,
-									tier: results[0].tier,
-									status: results[0].status,
-									rsc_id: results[0].rsc_id,
-									discord_id: discord_id,
-									is_admin: results[0].admin ? true: false,
-								};
-				
-								req.session.user = user;
-								res.redirect('/');
-						});
-					}
-				);
-			}
-		}
-	);
 });
 
 app.get('/check_in/:match_day', (req, res) => {
