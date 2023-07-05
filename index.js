@@ -11,7 +11,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
-const mysql  = require('mysql2');
+const connection = require('./core/database.js').databaseConnection;
+
 const mysqlP = require('mysql2/promise');
 
 const btoa = require('btoa');
@@ -1697,8 +1698,7 @@ app.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	});
 });
 
-app.get('/manage_league', (req, res) => {
-	if ( ! req.session.is_admin ) {
+app.get('/manage_league', (req, res) => { if ( ! req.session.is_admin ) {
 		return res.redirect('/');
 	} 
 
@@ -1795,17 +1795,6 @@ app.get('/test', (req, res) => {
 			res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
 		}
 	)
-});
-
-const connection = mysql.createPool({
-	host: process.env.DB_HOST,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASS,
-	port: process.env.DB_PORT,
-	database: process.env.DB_SCHEMA,
-	waitForConnections: true,
-	connectionLimit: 10,
-	queueLimit: 0
 });
 
 app.listen( process.env.PORT || 3000 , () => console.log("Server running..."));
