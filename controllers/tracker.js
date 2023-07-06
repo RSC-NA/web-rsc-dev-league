@@ -226,7 +226,7 @@ router.get('/get_tracker', async (req, res) => {
 		console.log('API is Off', module.exports.SEND_TO_API_SERVER);
 		return res.json({ tracker: false, remaining: 0 });
 	}
-	let len = Object.keys(tracker_queue).length;
+	let len = Object.keys(module.exports.tracker_queue).length;
 	console.log('getting tracker --> [' + len + ']');
 	if ( len < 5 ) {
 		await grabMoreTrackers(req.db);
@@ -236,8 +236,8 @@ router.get('/get_tracker', async (req, res) => {
 		version: module.exports.EXTENSION_VERSION,
 	};
 	if ( len ) {
-		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
-		output.tracker = tracker_queue[ tracker_key ];
+		let tracker_key = Object.keys(module.exports.tracker_queue)[ Math.floor(Math.random() * len) ];
+		output.tracker = module.exports.tracker_queue[ tracker_key ];
 
 		console.log(output.tracker.name, output.tracker.link, `Status: ${output.tracker.status}`); 
 		// only "delete" the record if we're actually trying to process
