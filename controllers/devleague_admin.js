@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const { mmrRange, getTierFromMMR } = require('./mmrs');
+const { mmrRange, getTierFromMMR } = require('../mmrs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
