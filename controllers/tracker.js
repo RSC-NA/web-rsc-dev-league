@@ -10,6 +10,8 @@ const router  = express.Router();
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
+const connection = require('../core/database').dbConnection;
+
 require('dotenv').config();
 
 async function grabMoreTrackers() {
@@ -28,7 +30,7 @@ async function grabMoreTrackers() {
 	}
 	console.log('have ' + Object.keys(trackers_by_link).length + ' trackers to use');
 	let tracker_links = Object.keys(trackers_by_link);
-	req.db.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], (err, results) => {
+	connection.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], (err, results) => {
 		if ( err ) { console.error('Error with the query!', err); throw err; }
 
 		console.log('in query');
@@ -81,7 +83,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 		if (  typeof data !== 'string' ) {
 			//console.log(data);
 			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
-			req.db.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
+			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
 				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 				//res.json(data);
 				//res.json({ mmrs: tracker_data });
@@ -119,7 +121,7 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 		if ( typeof data !== 'string' ) {
 			console.log(data);
 			console.log('BAD TRACKER', tracker_link);
-			req.db.query('UPDATE bad_trackers SET sent_to_api = 1 WHERE id = ?', [ bad_tracker_id ], (err, results) => {
+			connection.query('UPDATE bad_trackers SET sent_to_api = 1 WHERE id = ?', [ bad_tracker_id ], (err, results) => {
 				if ( err ) { console.error("error updating bad trackers!", err); throw err; }
 
 				return true;
