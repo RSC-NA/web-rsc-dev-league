@@ -222,8 +222,8 @@ router.get('/get_tracker', async (req, res) => {
 		DELETE = true;
 	}
 
-	if ( ! SEND_TO_API_SERVER ) {
-		console.log('API is Off', SEND_TO_API_SERVER);
+	if ( ! module.exports.SEND_TO_API_SERVER ) {
+		console.log('API is Off', module.exports.SEND_TO_API_SERVER);
 		return res.json({ tracker: false, remaining: 0 });
 	}
 	let len = Object.keys(tracker_queue).length;
@@ -233,7 +233,7 @@ router.get('/get_tracker', async (req, res) => {
 	}
 
 	let output = {
-		version: EXTENSION_VERSION,
+		version: module.exports.EXTENSION_VERSION,
 	};
 	if ( len ) {
 		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
