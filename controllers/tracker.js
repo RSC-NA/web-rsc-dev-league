@@ -13,7 +13,8 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 require('dotenv').config();
 
 const dbConnection = require('../core/database').dbConnection;
-
+console.log('loading trackers script');
+console.log(dbConnection);
 async function grabMoreTrackers(connection) {
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
