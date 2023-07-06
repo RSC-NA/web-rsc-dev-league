@@ -1,9 +1,3 @@
-// FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
-// THIS WILL BE SET TO true AT RUNTIME, AND IF 
-// THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
-let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.4.1';
-const tracker_queue = {};
 
 // Server app code below
 const express = require('express');
@@ -19,9 +13,9 @@ const connection = require('./core/database').databaseConnection;
 const auth_controller = require('./controllers/authentication');
 const devleague_controller = require('./controllers/devleague');
 const devleague_admin_controller = require('./controllers/devleague_admin');
-const tracker_controller = require('./controllers/tracker');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
+const { SEND_TO_API_SERVER, EXTENSION_VERSION, tracker_queue, tracker_controller } = require('./controllers/tracker');
 
 const mysqlP = require('mysql2/promise');
 
