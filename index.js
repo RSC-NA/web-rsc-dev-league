@@ -225,9 +225,6 @@ app.use(auth_controller);
 app.use(devleague_controller);
 app.use(devleague_admin_controller);
 
-// tracker chrome extension routes
-app.use(tracker_controller);
-
 // stats api routes handled by /controllers/api.js
 app.use(stats_api_controller);
 
