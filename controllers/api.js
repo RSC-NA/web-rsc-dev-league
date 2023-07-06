@@ -68,8 +68,6 @@ router.get('/tiers', (req, res) => {
 	res.json( tiers.map(el => { return {'name': el} }) );
 });
 
-router.get('/pull_stats', pull_stats);
-router.get('/pull_stats_2', pull_stats);
 /********************************************************
  ********************** /API Views ***********************
  *******************************************************/
