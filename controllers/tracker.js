@@ -12,9 +12,6 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 require('dotenv').config();
 
-const dbConnection = require('../core/database').dbConnection;
-console.log('loading trackers script');
-console.log(dbConnection);
 async function grabMoreTrackers(connection) {
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
@@ -134,10 +131,10 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 	});
 }
 
-// when we load for the first time, grab 25 trackers
-if ( SEND_TO_API_SERVER ) {
-	grabMoreTrackers(dbConnection);
-}
+// // when we load for the first time, grab 25 trackers
+// if ( SEND_TO_API_SERVER ) {
+// 	grabMoreTrackers(dbConnection);
+// }
 
 router.get('/tracker/:rsc_name', (req, res) => {
 	let pulled_by = req.params.rsc_name;
