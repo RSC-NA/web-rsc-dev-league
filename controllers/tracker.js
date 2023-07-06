@@ -1,9 +1,3 @@
-// FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
-// THIS WILL BE SET TO true AT RUNTIME, AND IF 
-// THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
-let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.4.1';
-const tracker_queue = {};
 
 const express = require('express');
 const router  = express.Router();
