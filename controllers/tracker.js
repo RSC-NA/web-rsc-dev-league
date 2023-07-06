@@ -1,9 +1,6 @@
 // FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
-let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.4.1';
-const tracker_queue = {};
 
 const express = require('express');
 const router  = express.Router();
@@ -639,8 +636,8 @@ router.post('/save_mmr', (req, res) => {
  *******************************************************/
 
 module.exports = {
-	SEND_TO_API_SERVER,
-	EXTENSION_VERSION,
-	tracker_queue,
-	router,
+	SEND_TO_API_SERVER: true,
+	EXTENSION_VERSION: '2.4.1',
+	tracker_queue: {},
+	router: router,
 };
