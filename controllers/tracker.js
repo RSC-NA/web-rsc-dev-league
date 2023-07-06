@@ -12,9 +12,9 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 require('dotenv').config();
 
-const connection = require('../core/database').dbConnection;
+const dbConnection = require('../core/database').dbConnection;
 
-async function grabMoreTrackers() {
+async function grabMoreTrackers(connection) {
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
 	let response = await fetch(url);
@@ -135,7 +135,7 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 
 // when we load for the first time, grab 25 trackers
 if ( SEND_TO_API_SERVER ) {
-	grabMoreTrackers();
+	grabMoreTrackers(dbConnection);
 }
 
 router.get('/tracker/:rsc_name', (req, res) => {
@@ -234,7 +234,7 @@ router.get('/get_tracker', async (req, res) => {
 	let len = Object.keys(tracker_queue).length;
 	console.log('getting tracker --> [' + len + ']');
 	if ( len < 5 ) {
-		await grabMoreTrackers();
+		await grabMoreTrackers(req.db);
 	}
 
 	let output = {
