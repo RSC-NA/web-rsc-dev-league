@@ -10,7 +10,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 require('dotenv').config();
 
 async function grabMoreTrackers(connection) {
-	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
+	console.log(`Grabbing more trackers [${Object.keys(module.exports.tracker_queue).length}]`);
 	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
 	let response = await fetch(url);
 	let trackers = await response.json();
@@ -18,7 +18,7 @@ async function grabMoreTrackers(connection) {
 	let trackers_by_link = {};
 	console.log('grabbed some trackers = ' + trackers.length);
 	for ( let i = 0; i < trackers.length; ++i ) {
-		if ( trackers[i].link in tracker_queue ) {
+		if ( trackers[i].link in module.exports.tracker_queue ) {
 			continue;
 		}
 		trackers_by_link[ trackers[i].link ] = trackers[i];
@@ -43,10 +43,10 @@ async function grabMoreTrackers(connection) {
 		}
 
 		for ( let tracker_link in trackers_by_link ) {
-			tracker_queue[ tracker_link ] = trackers_by_link[ tracker_link ];
+			module.exports.tracker_queue[ tracker_link ] = trackers_by_link[ tracker_link ];
 		}
 
-		console.log('finished! ' + Object.keys(tracker_queue).length);	
+		console.log('finished! ' + Object.keys(module.exports.tracker_queue).length);	
 		return true;
 	});
 }
@@ -77,7 +77,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 		//res.json(data);
 		if (  typeof data !== 'string' ) {
 			//console.log(data);
-			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
+			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', module.exports.SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
 			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
 				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 				//res.json(data);
@@ -476,9 +476,9 @@ router.get('/bump_api', (req, res) => {
 		return res.redirect('/');
 	}
 
-	console.log(`SEND_TO_API_SERVER = ${SEND_TO_API_SERVER}`);
-	SEND_TO_API_SERVER = ! SEND_TO_API_SERVER;
-	console.log(`Done! = ${SEND_TO_API_SERVER}`);
+	console.log(`SEND_TO_API_SERVER = ${module.exports.SEND_TO_API_SERVER}`);
+	module.exports.SEND_TO_API_SERVER = ! module.exports.SEND_TO_API_SERVER;
+	console.log(`Done! = ${module.exports.SEND_TO_API_SERVER}`);
 	res.redirect('/');
 });
 
@@ -502,7 +502,7 @@ router.post('/bad_tracker', (req, res) => {
 
 			let bad_tracker_id = results.insertId;
 
-			if ( SEND_TO_API_SERVER ) {
+			if ( module.exports.SEND_TO_API_SERVER ) {
 				try {
 					send_bad_tracker_to_server(bad_tracker_id, tracker_link);
 				} catch(e) {
@@ -510,7 +510,7 @@ router.post('/bad_tracker', (req, res) => {
 					console.log('API SERVER ERROR!');
 					console.log('API SERVER ERROR!');
 					console.log('Error:', e);
-					SEND_TO_API_SERVER = false;
+					module.exports.SEND_TO_API_SERVER = false;
 					console.log('API SERVER ERROR!');
 					console.log('API SERVER ERROR!');
 					console.log('API SERVER ERROR!');
@@ -546,7 +546,7 @@ router.post('/save_mmr', (req, res) => {
 
 	if ( d.psyonix_season === null ) {
 		req.db.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
-			if ( SEND_TO_API_SERVER ) {
+			if ( module.exports.SEND_TO_API_SERVER ) {
 				send_bad_tracker_to_server(results.insertId, d.tracker_link.link); 
 			}
 			return res.json({ success: false, error: 'This tracker contained no data.' });
@@ -583,7 +583,7 @@ router.post('/save_mmr', (req, res) => {
 								if ( err ) { console.error('Insert error:', err); throw err; }
 
 								// send it to the server immediately
-								if ( SEND_TO_API_SERVER ) {
+								if ( module.exports.SEND_TO_API_SERVER ) {
 									let tracker_data = {
 										psyonix_season: d.psyonix_season,
 										tracker_link: { link: d.tracker_link.link },
@@ -610,7 +610,7 @@ router.post('/save_mmr', (req, res) => {
 									try {
 										send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
 									} catch(e) {
-										SEND_TO_API_SERVER = false;
+										module.exports.SEND_TO_API_SERVER = false;
 										console.log('API SERVER ERROR!');
 										console.log('API SERVER ERROR!');
 										console.log('API SERVER ERROR!');
