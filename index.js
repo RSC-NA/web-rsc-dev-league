@@ -15,7 +15,9 @@ const devleague_controller = require('./controllers/devleague');
 const devleague_admin_controller = require('./controllers/devleague_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
-const { SEND_TO_API_SERVER, EXTENSION_VERSION, tracker_queue, tracker_controller } = require('./controllers/tracker');
+const trackerOutput = require('./controllers/tracker');
+console.log(trackerOutput);
+const tracker_controller = trackerOutput.router;
 
 const mysqlP = require('mysql2/promise');
 
