@@ -17,6 +17,9 @@ const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 const trackerOutput = require('./controllers/tracker');
 console.log(trackerOutput);
+let SEND_TO_API_SERVER = trackerOutput.SEND_TO_API_SERVER;
+const EXTENSION_VERSION = trackerOutput.EXTENSION_VERSION;
+const tracker_queue     = trackerOuput.tracker_queue;
 const tracker_controller = trackerOutput.router;
 
 const mysqlP = require('mysql2/promise');
