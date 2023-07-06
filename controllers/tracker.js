@@ -10,7 +10,7 @@ const router  = express.Router();
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
-const connection = require('../core/database').dbConnection;
+const connection = require('./core/database').dbConnection;
 
 require('dotenv').config();
 
