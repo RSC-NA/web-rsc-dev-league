@@ -245,7 +245,7 @@ app.get('/test', (req, res) => {
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
 let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.4.1';
+const EXTENSION_VERSION = '2.4.2';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
@@ -353,6 +353,12 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 	.then(data => {
 // update the records to 1
 		if ( typeof data !== 'string' ) {
+			if ( 'count' in data && data.count === 0 ) {
+				console.log('fixing url?', tracker_link);
+				if ( tracker_link.includes('/overview') ) {
+					return send_back_tracker_to_server(bad_tracker_id, tracker_link.replace('/overview', ''));
+				}
+			}
 			console.log(data);
 			console.log('BAD TRACKER', tracker_link);
 			connection.query('UPDATE bad_trackers SET sent_to_api = 1 WHERE id = ?', [ bad_tracker_id ], (err, results) => {
