@@ -356,7 +356,7 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 			if ( 'count' in data && data.count === 0 ) {
 				console.log('fixing url?', tracker_link);
 				if ( tracker_link.includes('/overview') ) {
-					return send_back_tracker_to_server(bad_tracker_id, tracker_link.replace('/overview', ''));
+					return send_bad_tracker_to_server(bad_tracker_id, tracker_link.replace('/overview', ''));
 				}
 			}
 			console.log(data);
