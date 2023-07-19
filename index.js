@@ -789,6 +789,8 @@ app.post('/save_mmr', (req, res) => {
 		from_button  = true;
 	}
 
+	let decoded_user_id = decodeURIComponent(req.body.user_id);
+
 	if ( d.psyonix_season === null ) {
 		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
 			if ( SEND_TO_API_SERVER ) {
@@ -806,7 +808,8 @@ app.post('/save_mmr', (req, res) => {
 			} else if ( results && results.length > 5 && force_insert ) {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
 			} else {
-				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ? OR tracker_link LIKE ?', [ `%${d.platform}/${d.user_id}%`, `%${old_platforms[d.platform]}/${d.user_id}%` ], (err, results) => {
+				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ? OR tracker_link LIKE ? OR tracker_link LIKE ?', 
+					[ `%${d.platform}/${d.user_id}%`, `%${old_platforms[d.platform]}/${d.user_id}%`, `%${d.platform}/${decoded_user_id}%` ], (err, results) => {
 					if ( err ) { console.error('ERROR', err); throw err; }
 
 					if ( (results && results.length) || force_insert === true ) {
