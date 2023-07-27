@@ -249,6 +249,7 @@ const EXTENSION_VERSION = '2.4.2';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
+	return 0;
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
 	let response = await fetch(url);

@@ -14,7 +14,7 @@ function forceInt(val) {
 
 async function pull_stats(req, res) {
 	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
+		//return res.redirect('/');
 	} 
 
 	let sheetId          = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
@@ -50,7 +50,6 @@ async function pull_stats(req, res) {
 	// sheets = Team List, Team Stats, Player Stats, Team Standings, Variables
 	const TeamSheet = doc.sheetsByTitle["Team List"];
 	const TeamRows = await TeamSheet.getRows();
-
 	let teams = [];
 	let franchiseByTeam = {};
 	let tierByTeam = {};
@@ -58,13 +57,16 @@ async function pull_stats(req, res) {
 	// StreamTeamStats, StreamTeamStats2
 	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {teamStatsTable} ORDER BY TeamName
 	for ( let i = 0; i < TeamRows.length; i++ ) {
-		teams.push({ name: TeamRows[i]['Team Name'], franchise: TeamRows[i]['Franchise'], tier: TeamRows[i]['Tier'] });
-		franchiseByTeam[ TeamRows[i]['Team Name'] ]  = TeamRows[i]['Franchise'];
-		tierByTeam[ TeamRows[i]['Team Name'] ]       = TeamRows[i]['Tier'];
+		let teamRow = TeamRows[i];
+		let teamName = teamRow._rawData[0];
+		let franchise = teamRow._rawData[1];
+		let tierName = teamRow._rawData[2];
+		teams.push({ name: teamName, franchise: franchise, tier: tierName });
+		franchiseByTeam[ teamName ]  = franchise;
+		tierByTeam[ teamName ]       = tierName;
 	}
 	// log tiers
-	console.log(tierByTeam);
-
+	//
 	const StandingsSheet = doc.sheetsByTitle['Team Standings'];
 	const StandingsRows  = await StandingsSheet.getRows();
 	const dataRows = StandingsRows.slice(1);
