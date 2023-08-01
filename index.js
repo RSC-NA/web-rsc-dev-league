@@ -307,7 +307,6 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 			return response.json();
 		} else {
 			return response.text();
-			throw new Error('Processing failed');
 		}
 	})
 	.then(data => {
@@ -316,13 +315,18 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 		//res.json(data);
 		if (  typeof data !== 'string' ) {
 			//console.log(data);
-			console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
-			connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
-				if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
-				//res.json(data);
-				//res.json({ mmrs: tracker_data });
+			if ( tracker_id !== 'from_api' ) {
+				console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
+				connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
+					if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
+					//res.json(data);
+					//res.json({ mmrs: tracker_data });
+					return true;
+				});
+			} else {
+				console.log("From API, skipping updates");
 				return true;
-			});
+			}
 		} else {
 			//console.log(tracker_data);
 			console.error('Something went wrong');
@@ -784,12 +788,13 @@ app.post('/save_mmr', (req, res) => {
 	//console.log(d);
 	let force_insert = false;
 	let from_button  = false;
+	const from_api = req.body?.from_api ? req.body.from_api : false;
 	if ( d.status && d.status == 'NEW' ) {
 		force_insert = true;
 		from_button  = true;
 	}
 
-	let decoded_user_id = decodeURIComponent(req.body.user_id);
+	const decoded_user_id = decodeURIComponent(req.body.user_id);
 
 	if ( d.psyonix_season === null ) {
 		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
@@ -871,6 +876,27 @@ app.post('/save_mmr', (req, res) => {
 
 								res.json({ success: true, status: d.status });
 						});
+					} else if ( from_api ) {
+							try {
+								// We are going to force the update to the API
+								// even though we don't have this record locally.
+								send_tracker_data_to_server('from_api', [tracker_data], d.pulled_by);
+							} catch(e) {
+								SEND_TO_API_SERVER = false;
+								console.log('API SERVER ERROR!');
+								console.log('API SERVER ERROR!');
+								console.log('API SERVER ERROR!');
+								console.log('Error:', e);
+								console.log('API SERVER ERROR!');
+								console.log('API SERVER ERROR!');
+								console.log('API SERVER ERROR!');
+							}
+							res.json({ 
+								success: true, 
+								status: d.status, 
+								from_api: from_api,
+								message: 'Forced an update to API because it came from them.',
+							});
 					} else {
 						res.json({ success: false, not_found: true, 'error': 'This tracker is not attached to an RSC player.' });
 					}
