@@ -799,7 +799,7 @@ app.post('/save_mmr', (req, res) => {
 	const tracker_data = {
 		psyonix_season: d.psyonix_season,
 		tracker_link: { link: d.tracker_link.link },
-		rsc_id: rsc_id,
+		rsc_id: null,
 		date_pulled: new Date(),
 		threes_games_played: d.threes_games_played ?? 0,
 		threes_rating: d.threes_rating ?? 0,
@@ -845,7 +845,7 @@ app.post('/save_mmr', (req, res) => {
 						if ( results && results.length ) {
 							rsc_id = results[0].rsc_id;
 						}
-						let query = `
+						const query = `
 						INSERT INTO tracker_data 
 							(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
 							twos_games_played,twos_rating,twos_season_peak,ones_games_played,ones_rating,ones_season_peak,pulled_by)
@@ -859,6 +859,7 @@ app.post('/save_mmr', (req, res) => {
 								if ( err ) { console.error('Insert error:', err); throw err; }
 
 								// send it to the server immediately
+								tracker_data.rsc_id = rsc_id;
 								if ( SEND_TO_API_SERVER ) {
 									try {
 										send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
