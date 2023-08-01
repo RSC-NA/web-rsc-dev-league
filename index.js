@@ -68,7 +68,7 @@ app.use((req, res, next) => {
 	// if you want to run this program locally, make sure you
 	// either comment this section out, or add a check for 'localhost'
 	// as the host
-	let host = req.headers.host;
+	const host = req.headers.host;
 	if ( ! (host == 'devleague.rscstream.com' || host == 'api.rscstream.com') ) {
 		return res.redirect('https://devleague.rscstream.com');
 	}
@@ -249,13 +249,12 @@ const EXTENSION_VERSION = '2.4.2';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
-	return 0;
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
-	let url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
-	let response = await fetch(url);
-	let trackers = await response.json();
+	const url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
+	const response = await fetch(url);
+	const trackers = await response.json();
 
-	let trackers_by_link = {};
+	const trackers_by_link = {};
 	console.log('grabbed some trackers = ' + trackers.length);
 	for ( let i = 0; i < trackers.length; ++i ) {
 		if ( trackers[i].link in tracker_queue ) {
@@ -264,7 +263,7 @@ async function grabMoreTrackers() {
 		trackers_by_link[ trackers[i].link ] = trackers[i];
 	}
 	console.log('have ' + Object.keys(trackers_by_link).length + ' trackers to use');
-	let tracker_links = Object.keys(trackers_by_link);
+	const tracker_links = Object.keys(trackers_by_link);
 	connection.query('SELECT rsc_id,name,tracker_link FROM trackers WHERE tracker_link IN (?)', [ tracker_links ], (err, results) => {
 		if ( err ) { console.error('Error with the query!', err); throw err; }
 
@@ -282,7 +281,7 @@ async function grabMoreTrackers() {
 			}
 		}
 
-		for ( let tracker_link in trackers_by_link ) {
+		for ( const tracker_link in trackers_by_link ) {
 			tracker_queue[ tracker_link ] = trackers_by_link[ tracker_link ];
 		}
 
@@ -472,17 +471,17 @@ app.get('/get_tracker', async (req, res) => {
 		console.log('API is Off', SEND_TO_API_SERVER);
 		return res.json({ tracker: false, remaining: 0 });
 	}
-	let len = Object.keys(tracker_queue).length;
+	const len = Object.keys(tracker_queue).length;
 	console.log('getting tracker --> [' + len + ']');
 	if ( len < 5 ) {
 		await grabMoreTrackers();
 	}
 
-	let output = {
+	const output = {
 		version: EXTENSION_VERSION,
 	};
 	if ( len ) {
-		let tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
+		const tracker_key = Object.keys(tracker_queue)[ Math.floor(Math.random() * len) ];
 		output.tracker = tracker_queue[ tracker_key ];
 
 		console.log(output.tracker.name, output.tracker.link, `Status: ${output.tracker.status}`); 
@@ -613,7 +612,7 @@ app.get('/send_bad_trackers', (req, res) => {
 	connection.query('SELECT id,tracker_link FROM bad_trackers WHERE sent_to_api = 0', (err, results) => {
 		if ( err ) { console.error("error grabbing bad trackers!", err); throw err; }
 
-		let bad_trackers = [];
+		const bad_trackers = [];
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
 				bad_trackers.push(results[i].tracker_link);
@@ -649,7 +648,7 @@ app.get('/import_trackers', async (req, res) => {
 	} 
 
 	// fetch all active players from contracts
-	let active_players = {};
+	const active_players = {};
 	
 	// check to see if the player is active in MMS
 	const doc = new GoogleSpreadsheet('1u74mgGPFPWfEiXyCnU2yj6BO9PNCKhIfyGliJvTsZw4');
