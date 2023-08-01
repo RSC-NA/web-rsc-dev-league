@@ -231,11 +231,11 @@ app.use(stats_api_controller);
 // stats admin api routes handled by /controllers/api_admin.js
 app.use(stats_api_admin_controller);
 
-app.get('/test', (req, res) => {
+app.get('/test', (_req, res) => {
 	connection.query(
 		'INSERT INTO test (server_date) VALUES (?)',
 		[ new Date() ],
-		(err, results) => {
+		(_err, _results) => {
 			res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
 		}
 	)
@@ -245,7 +245,7 @@ app.get('/test', (req, res) => {
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
 let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.4.2';
+const EXTENSION_VERSION = '2.5.0';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
