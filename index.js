@@ -796,6 +796,29 @@ app.post('/save_mmr', (req, res) => {
 
 	const decoded_user_id = decodeURIComponent(req.body.user_id);
 
+	const tracker_data = {
+		psyonix_season: d.psyonix_season,
+		tracker_link: { link: d.tracker_link.link },
+		rsc_id: rsc_id,
+		date_pulled: new Date(),
+		threes_games_played: d.threes_games_played ?? 0,
+		threes_rating: d.threes_rating ?? 0,
+		threes_season_peak: d.threes_season_peak ? d.threes_season_peak : d.threes_rating,
+		twos_games_played: d.twos_games_played ?? 0,
+		twos_rating: d.twos_rating ?? 0,
+		twos_season_peak: d.twos_season_peak ? d.twos_season_peak : d.twos_rating,
+		ones_games_played: d.ones_games_played ?? 0,
+		ones_rating: d.ones_rating ?? 0,
+		ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
+	};
+	for ( const field in tracker_data ) {
+		if ( field.includes('_peak') || field.includes('_rating') ) {
+			if ( ! tracker_data[ field ] ) {
+				tracker_data[ field ] = 0;
+			}
+		} 
+	}
+
 	if ( d.psyonix_season === null ) {
 		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
 			if ( SEND_TO_API_SERVER ) {
@@ -837,29 +860,6 @@ app.post('/save_mmr', (req, res) => {
 
 								// send it to the server immediately
 								if ( SEND_TO_API_SERVER ) {
-									let tracker_data = {
-										psyonix_season: d.psyonix_season,
-										tracker_link: { link: d.tracker_link.link },
-										rsc_id: rsc_id,
-										date_pulled: new Date(),
-										threes_games_played: d.threes_games_played ?? 0,
-										threes_rating: d.threes_rating ?? 0,
-										threes_season_peak: d.threes_season_peak ? d.threes_season_peak : d.threes_rating,
-										twos_games_played: d.twos_games_played ?? 0,
-										twos_rating: d.twos_rating ?? 0,
-										twos_season_peak: d.twos_season_peak ? d.twos_season_peak : d.twos_rating,
-										ones_games_played: d.ones_games_played ?? 0,
-										ones_rating: d.ones_rating ?? 0,
-										ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
-									};
-									for ( let field in tracker_data ) {
-										if ( field.includes('_peak') || field.includes('_rating') ) {
-											if ( ! tracker_data[ field ] ) {
-												tracker_data[ field ] = 0;
-											}
-										} 
-									}
-
 									try {
 										send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
 									} catch(e) {
