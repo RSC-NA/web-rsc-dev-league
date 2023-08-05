@@ -832,7 +832,7 @@ app.post('/save_mmr', (req, res) => {
 		connection.query('SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)', [ d.tracker_link.link ], (err, results) => {
 			if ( err ) { console.error('Error!', err); throw err; }
 
-			if ( results && results.length > 10 && ! force_insert ) {
+			if ( results && results.length > 15 && ! force_insert ) {
 				res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
 			} else if ( results && results.length > 5 && force_insert ) {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
