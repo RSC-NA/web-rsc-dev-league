@@ -5,7 +5,7 @@ const mysqlP = require('mysql2/promise');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 function forceInt(val) {
-	if ( parseInt(val) == NaN ) {
+	if ( isNaN(parseInt(val)) ) {
 		return 0;
 	}
 
@@ -25,7 +25,7 @@ async function pull_stats(req, res) {
 		playerStatsTable = 'StreamPlayerStats2';
 		sheetId = '1CzIjrTdc7e7qK0blwl1rudhJxaCIxSI6WIiycHzMurY';
 	}
-	let output = [];
+	const output = [];
 
 	const conn2 = await mysqlP.createPool({
 		host: process.env.DB_HOST,

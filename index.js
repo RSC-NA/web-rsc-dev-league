@@ -16,11 +16,12 @@ const devleague_admin_controller = require('./controllers/devleague_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 
+/* DEPRECATED. REMOVE SOON 
 const mysqlP = require('mysql2/promise');
-
 const btoa = require('btoa');
 const atob = require('atob');
 const e = require('express');
+*/
 
 // pull in our two manually defined configuration objects
 // TODO(erh): this can probably be moved into a database table
@@ -831,7 +832,7 @@ app.post('/save_mmr', (req, res) => {
 		connection.query('SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)', [ d.tracker_link.link ], (err, results) => {
 			if ( err ) { console.error('Error!', err); throw err; }
 
-			if ( results && results.length > 1 && ! force_insert ) {
+			if ( results && results.length > 10 && ! force_insert ) {
 				res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
 			} else if ( results && results.length > 5 && force_insert ) {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
