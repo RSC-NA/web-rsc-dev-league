@@ -279,6 +279,7 @@ WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 		const stringifier = stringify({ header: true, columns: columns });
 		stringifier.pipe(res);
 		for ( let i = 0; i < results.length; ++i ) {
+			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
 			stringifier.write(results[i]);
 		}
 		stringifier.end();
