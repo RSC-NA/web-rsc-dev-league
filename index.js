@@ -261,7 +261,7 @@ FROM
 	tracker_data AS t
 LEFT JOIN
 	players AS p ON t.rsc_id = p.rsc_id 
-WHERE t.date_pulled > date
+WHERE t.date_pulled > ? 
 	`;
 	connection.query(query, [ date ], (err, results) => {
 		if ( err ) {
