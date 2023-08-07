@@ -252,16 +252,16 @@ app.get('/numbers/:date', (req, res) => {
 	const date = req.params?.date ?? '2023-01-01';
 	const query = `
 SELECT 
-	t.rsc_id,p.nickname,t.tracker_link,
+	t.rsc_id,t.name,td.tracker_link,
 	ones_rating,ones_season_peak,ones_games_played,
 	twos_rating,twos_season_peak,twos_games_played,
 	threes_rating,threes_season_peak,threes_games_played,
-	t.date_pulled
+	td.date_pulled
 FROM 
-	tracker_data AS t
+	tracker_data AS td
 LEFT JOIN
-	players AS p ON t.rsc_id = p.rsc_id 
-WHERE t.date_pulled > ? 
+	trackers AS t ON td.tracker_link = t.tracker_link 
+WHERE td.date_pulled > ? 
 	`;
 	connection.query(query, [ date ], (err, results) => {
 		if ( err ) {
@@ -697,7 +697,7 @@ app.get('/import_trackers', async (req, res) => {
 			break;
 		}
 
-		let active = (rows[i]._rawData[3] === "TRUE" || rows[i]._rawData[4] === "TRUE" );
+		const active = (rows[i]._rawData[3] === "TRUE" || rows[i]._rawData[4] === "TRUE" );
 		if ( active ) {
 			active_players[ rows[i]._rawData[0] ] = {
 				'rscid': rows[i]._rawData[0],
