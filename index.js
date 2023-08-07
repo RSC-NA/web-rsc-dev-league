@@ -267,7 +267,21 @@ WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 		if ( err ) {
 			res.send(err);
 		}
-		res.json(results);
+		res.header('Content-type', 'text/csv');
+		res.attachment(`MMR Pull from ${date}.csv`);
+		const columns = [
+			'RSC ID', 'Player Name', 'Tracker Link', 
+			'1s MMR', '1s Season Peak', '1s GP',
+			'2s MMR', '2s Season Peak', '2s GP',
+			'3s MMR', '3s Season Peak', '3s GP',
+			'Date Pulled',
+		];
+		const stringifier = stringify({ header: true, columns: columns });
+		stringifier.pipe(res);
+		for ( let i = 0; i < results.length; ++i ) {
+			stringifier.write(row);
+		}
+		stringifier.end();
 	});
 });
 
