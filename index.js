@@ -252,11 +252,11 @@ app.get('/numbers/:date', (req, res) => {
 	const date = req.params?.date ?? '2023-01-01';
 	const query = `
 SELECT 
-	t.rsc_id,t.name,td.tracker_link,
-	ones_rating,ones_season_peak,ones_games_played,
-	twos_rating,twos_season_peak,twos_games_played,
-	threes_rating,threes_season_peak,threes_games_played,
-	td.date_pulled
+	t.rsc_id as "RSC ID",t.name AS "Player Name",td.tracker_link AS "Tracker Link",
+	ones_rating AS "1s MMR",ones_season_peak AS "1s Season Peak",ones_games_played AS "1s GP",
+	twos_rating AS "2s MMR",twos_season_peak AS "2s Season Peak",twos_games_played AS "2s GP",
+	threes_rating AS "3s MMR",threes_season_peak AS "3s Season Peak",threes_games_played AS "3s GP",
+	td.date_pulled AS "Date Pulled"
 FROM 
 	tracker_data AS td
 LEFT JOIN
