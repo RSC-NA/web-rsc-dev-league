@@ -16,6 +16,9 @@ const devleague_admin_controller = require('./controllers/devleague_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 
+// csv output
+const { stringify } = require('csv-stringify');
+
 /* DEPRECATED. REMOVE SOON 
 const mysqlP = require('mysql2/promise');
 const btoa = require('btoa');
@@ -240,6 +243,32 @@ app.get('/test', (_req, res) => {
 			res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
 		}
 	)
+});
+
+/*
+ * RSC ID Player Name Tracker Link 1s MMR 1s Season Peak 1s GP 2s MMR 2s Season Peak 2s GP 3s MMR 3s Season Peak 3s GP Date Pulled
+ */ 
+app.get('/numbers/:date', (req, res) => {
+	const date = req.params?.date ?? '2023-01-01';
+	const query = `
+SELECT 
+	t.rsc_id,p.nickname,t.tracker_link,
+	ones_rating,ones_season_peak,ones_games_played,
+	twos_rating,twos_season_peak,twos_games_played,
+	threes_rating,threes_season_peak,threes_games_played,
+	t.date_pulled
+FROM 
+	tracker_data AS t
+LEFT JOIN
+	players AS p ON t.rsc_id = p.rsc_id 
+WHERE t.date_pulled > date
+	`;
+	connection.query(query, [ date ], (err, results) => {
+		if ( err ) {
+			res.send(err);
+		}
+		res.json(results);
+	});
 });
 
 // FLAG TO SEND TRACKER DATA STRAIGHT TO THE API.
