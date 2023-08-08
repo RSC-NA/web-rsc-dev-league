@@ -256,7 +256,7 @@ SELECT
 	ones_rating AS "1s MMR",ones_season_peak AS "1s Season Peak",ones_games_played AS "1s GP",
 	twos_rating AS "2s MMR",twos_season_peak AS "2s Season Peak",twos_games_played AS "2s GP",
 	threes_rating AS "3s MMR",threes_season_peak AS "3s Season Peak",threes_games_played AS "3s GP",
-	td.date_pulled AS "Date Pulled", td.psyonix_season
+	td.date_pulled AS "Date Pulled", td.psyonix_season AS "Psyonix Season"
 FROM 
 	tracker_data AS td
 LEFT JOIN
