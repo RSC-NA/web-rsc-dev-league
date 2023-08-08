@@ -256,7 +256,7 @@ SELECT
 	ones_rating AS "1s MMR",ones_season_peak AS "1s Season Peak",ones_games_played AS "1s GP",
 	twos_rating AS "2s MMR",twos_season_peak AS "2s Season Peak",twos_games_played AS "2s GP",
 	threes_rating AS "3s MMR",threes_season_peak AS "3s Season Peak",threes_games_played AS "3s GP",
-	td.date_pulled AS "Date Pulled"
+	td.date_pulled AS "Date Pulled", td.psyonix_season
 FROM 
 	tracker_data AS td
 LEFT JOIN
@@ -274,12 +274,17 @@ WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 			'1s MMR', '1s Season Peak', '1s GP',
 			'2s MMR', '2s Season Peak', '2s GP',
 			'3s MMR', '3s Season Peak', '3s GP',
-			'Date Pulled',
+			'Date Pulled', 'Psyonix Season'
 		];
 		const stringifier = stringify({ header: true, columns: columns });
 		stringifier.pipe(res);
 		for ( let i = 0; i < results.length; ++i ) {
 			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
+			if ( parseInt(results[i]['Psyonix Season']) < 23 ) {
+				results[i]['1s GP'] = 0;
+				results[i]['2s GP'] = 0;
+				results[i]['3s GP'] = 0;
+			}
 			stringifier.write(results[i]);
 		}
 		stringifier.end();
