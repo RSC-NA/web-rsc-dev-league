@@ -260,7 +260,7 @@ SELECT
 FROM 
 	tracker_data AS td
 LEFT JOIN
-	trackers AS t ON td.tracker_link = t.tracker_link OR td.tracker_link like concat(t.tracker_link, '%')
+	trackers AS t ON td.rsc_id = t.rsc_id
 WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL 
 	`;
 	connection.query(query, [ date ], (err, results) => {
