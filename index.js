@@ -280,7 +280,7 @@ WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 		stringifier.pipe(res);
 		for ( let i = 0; i < results.length; ++i ) {
 			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
-			if ( parseInt(results[i]['Psyonix Season']) < 23 ) {
+			if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
 				results[i]['1s GP'] = 0;
 				results[i]['2s GP'] = 0;
 				results[i]['3s GP'] = 0;
