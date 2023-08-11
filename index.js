@@ -295,7 +295,7 @@ WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
 let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.5.1';
+const EXTENSION_VERSION = '2.6.0';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
