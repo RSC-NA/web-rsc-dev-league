@@ -827,6 +827,7 @@ app.post('/save_mmr', (req, res) => {
 
 	let delete_today = false;
 	if ( 'first' in req.query ) {
+		console.log("WE'RE GOING TO DELETE!");
 		delete_today = true;
 	}
 
@@ -885,6 +886,7 @@ app.post('/save_mmr', (req, res) => {
 	} else {
 		let recent_query = 'SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';	
 		if ( delete_today ) {
+			console.log('prepare for deleting... :)');
 			recent_query = 'DELETE FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';
 		}
 		connection.query(recent_query, [ d.tracker_link.link ], (err, results) => {
