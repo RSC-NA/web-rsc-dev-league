@@ -897,6 +897,7 @@ app.post('/save_mmr', (req, res) => {
 			} else if ( ! delete_today && results && results.length > 15 && force_insert ) {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
 			} else {
+				console.log('Huh?', d.platform, d.user_id, `%${d.platform}/${d.user_id}%`);
 				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ? OR tracker_link LIKE ? OR tracker_link LIKE ?', 
 					[ `%${d.platform}/${d.user_id}%`, `%${old_platforms[d.platform]}/${d.user_id}%`, `%${d.platform}/${decoded_user_id}%` ], (err, results) => {
 					if ( err ) { console.error('ERROR', err); throw err; }
