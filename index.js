@@ -824,6 +824,12 @@ app.post('/bad_tracker', (req, res) => {
 });
 
 app.post('/save_mmr', (req, res) => {
+
+	let delete_today = false;
+	if ( 'first' in req.query ) {
+		delete_today = true;
+	}
+
 	const old_platforms = {
 		'xbox': 'xbl',
 		'xbl': 'xbox',
@@ -877,13 +883,16 @@ app.post('/save_mmr', (req, res) => {
 			return res.json({ success: false, error: 'This tracker contained no data.' });
 		});
 	} else {
-
-		connection.query('SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)', [ d.tracker_link.link ], (err, results) => {
+		let recent_query = 'SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';	
+		if ( delete_today ) {
+			recent_query = 'DELETE FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';
+		}
+		connection.query(recent_query, [ d.tracker_link.link ], (err, results) => {
 			if ( err ) { console.error('Error!', err); throw err; }
 
-			if ( results && results.length > 15 && ! force_insert ) {
+			if ( ! delete_today && results && results.length > 5 && ! force_insert ) {
 				res.json({ success: false, recent: true, error: 'This tracker was recently pulled.' });
-			} else if ( results && results.length > 15 && force_insert ) {
+			} else if ( ! delete_today && results && results.length > 15 && force_insert ) {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
 			} else {
 				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ? OR tracker_link LIKE ? OR tracker_link LIKE ?', 
@@ -895,6 +904,7 @@ app.post('/save_mmr', (req, res) => {
 						if ( results && results.length ) {
 							rsc_id = results[0].rsc_id;
 						}
+
 						const query = `
 						INSERT INTO tracker_data 
 							(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
