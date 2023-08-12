@@ -252,7 +252,7 @@ app.get('/numbers/:date', (req, res) => {
 	const date = req.params?.date ?? '2023-01-01';
 	const query = `
 SELECT 
-	t.rsc_id as "RSC ID",t.name AS "Player Name",td.tracker_link AS "Tracker Link",
+	td.id, t.rsc_id as "RSC ID",t.name AS "Player Name",td.tracker_link AS "Tracker Link",
 	ones_rating AS "1s MMR",ones_season_peak AS "1s Season Peak",ones_games_played AS "1s GP",
 	twos_rating AS "2s MMR",twos_season_peak AS "2s Season Peak",twos_games_played AS "2s GP",
 	threes_rating AS "3s MMR",threes_season_peak AS "3s Season Peak",threes_games_played AS "3s GP",
@@ -261,7 +261,9 @@ FROM
 	tracker_data AS td
 LEFT JOIN
 	trackers AS t ON td.tracker_link = t.tracker_link OR td.rsc_id = t.rsc_id
-WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL 
+WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
+GROUP BY td.id, t.rsc_id, t.name
+ORDER BY td.psyonix_season
 	`;
 	connection.query(query, [ date ], (err, results) => {
 		if ( err ) {
