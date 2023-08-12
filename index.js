@@ -263,7 +263,7 @@ LEFT JOIN
 	trackers AS t ON td.tracker_link = t.tracker_link OR td.rsc_id = t.rsc_id
 WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 GROUP BY td.id, t.rsc_id, t.name
-ORDER BY td.psyonix_season
+ORDER BY td.rsc_id, td.psyonix_season
 	`;
 	connection.query(query, [ date ], (err, results) => {
 		if ( err ) {
