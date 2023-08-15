@@ -246,6 +246,27 @@ app.get('/test', (_req, res) => {
 });
 
 /*
+ * RSC_ID -> Numbers output
+ */
+app.get('/mmr/:rsc_id', (req, res) => {
+	const query = `
+SELECT 
+	pysonix_season,tracker_link,rsc_id,
+	threes_games_played as gp_3s, threes_rating as mmr_3s, threes_season_peak as peak_3s,
+	twos_games_played as gp_2s, twos_rating as mmr_2s, twos_season_peak as peak_2s,
+	ones_games_played as gp_1s, ones_rating as mmr_1s, ones_season_peak as peak_1s,
+	date_pulled, pulled_by
+FROM tracker_data
+WHERE rsc_id = ?
+	`;
+	connection.query(query, [ req.params.rsc_id ], (err, results) => {
+		if ( err ) { return res.send('Error:', err); }
+
+		return res.json(results);
+	});
+});
+
+/*
  * RSC ID Player Name Tracker Link 1s MMR 1s Season Peak 1s GP 2s MMR 2s Season Peak 2s GP 3s MMR 3s Season Peak 3s GP Date Pulled
  */ 
 app.get('/numbers/:date', (req, res) => {
