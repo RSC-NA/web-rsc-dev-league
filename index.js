@@ -251,7 +251,7 @@ app.get('/test', (_req, res) => {
 app.get('/mmr/:rsc_id', (req, res) => {
 	const query = `
 SELECT 
-	pysonix_season,tracker_link,rsc_id,
+	psyonix_season,tracker_link,rsc_id,
 	threes_games_played as gp_3s, threes_rating as mmr_3s, threes_season_peak as peak_3s,
 	twos_games_played as gp_2s, twos_rating as mmr_2s, twos_season_peak as peak_2s,
 	ones_games_played as gp_1s, ones_rating as mmr_1s, ones_season_peak as peak_1s,
