@@ -260,7 +260,7 @@ FROM tracker_data
 WHERE rsc_id = ?
 	`;
 	connection.query(query, [ req.params.rsc_id ], (err, results) => {
-		if ( err ) { return res.send('Error:', err); }
+		if ( err ) { return res.send(`Error: ${err}`); }
 
 		return res.json(results);
 	});
