@@ -88,35 +88,33 @@ async function pull_stats(req, res) {
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
-		if ( TeamStatsRows[i]['Team'] ) {
-			teamStats.push({
-				'Season'     : res.locals.settings.season,// external
-				'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
-				'TeamName'   : TeamStatsRows[i]['Team'] ?? '',
-				'Tier'       : tierByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
-				'Wins'       : TeamStatsRows[i]['W'] ?? 0,
-				'Loss'       : TeamStatsRows[i]['L'] ?? 0,
-				'WinPct'     : TeamStatsRows[i]['W%'].replace(/\%/,'') ?? 0,
-				'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ] ?? 0, 
-				'GM'         : TeamStatsRows[i]['GM'] ?? '',
-				'Conference' : TeamStatsRows[i]['Conference'] ?? '',
-				'Division'   : divisionsByTeam[ TeamStatsRows[i]['Team'] ] ?? '', 
-				'GamesPlayed': TeamStatsRows[i]['GP'] ?? 0,
-				'ShotPct'    : TeamStatsRows[i]['Shot %'].replace(/\%/,'') ?? 0,
-				'Points'     : TeamStatsRows[i]['Points'] ?? 0,
-				'Goals'      : TeamStatsRows[i]['Goals'] ?? 0,
-				'Assists'    : TeamStatsRows[i]['Assists'] ?? 0,
-				'Saves'      : TeamStatsRows[i]['Saves'] ?? 0,
-				'Shots'      : TeamStatsRows[i]['Shots'] ?? 0,
-				'GoalDiff'   : TeamStatsRows[i]['Goal Dif.'] ?? 0,
-				'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'].replace(/\%/,'') ?? 0,
-				'OppPoints'  : TeamStatsRows[i]['Opp. Points'] ?? 0,
-				'OppGoals'   : TeamStatsRows[i]['Opp. Goals'] ?? 0,
-				'OppAssists' : TeamStatsRows[i]['Opp. Assists'] ?? 0,
-				'OppSaves'   : TeamStatsRows[i]['Opp. Saves'] ?? 0,
-				'OppShots'   : TeamStatsRows[i]['Opp. Shots'] ?? 0,
-			});
-		}
+		teamStats.push({
+			'Season'     : res.locals.settings.season,// external
+			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
+			'TeamName'   : TeamStatsRows[i]['Team'] ?? '',
+			'Tier'       : tierByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
+			'Wins'       : TeamStatsRows[i]['W'] ?? 0,
+			'Loss'       : TeamStatsRows[i]['L'] ?? 0,
+			'WinPct'     : TeamStatsRows[i]['W%'].replace(/\%/,'') ?? 0,
+			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ] ?? 0, 
+			'GM'         : TeamStatsRows[i]['GM'] ?? '',
+			'Conference' : TeamStatsRows[i]['Conference'] ?? '',
+			'Division'   : divisionsByTeam[ TeamStatsRows[i]['Team'] ] ?? '', 
+			'GamesPlayed': TeamStatsRows[i]['GP'] ?? 0,
+			'ShotPct'    : TeamStatsRows[i]['Shot %'].replace(/\%/,'') ?? 0,
+			'Points'     : TeamStatsRows[i]['Points'] ?? 0,
+			'Goals'      : TeamStatsRows[i]['Goals'] ?? 0,
+			'Assists'    : TeamStatsRows[i]['Assists'] ?? 0,
+			'Saves'      : TeamStatsRows[i]['Saves'] ?? 0,
+			'Shots'      : TeamStatsRows[i]['Shots'] ?? 0,
+			'GoalDiff'   : TeamStatsRows[i]['Goal Dif.'] ?? 0,
+			'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'].replace(/\%/,'') ?? 0,
+			'OppPoints'  : TeamStatsRows[i]['Opp. Points'] ?? 0,
+			'OppGoals'   : TeamStatsRows[i]['Opp. Goals'] ?? 0,
+			'OppAssists' : TeamStatsRows[i]['Opp. Assists'] ?? 0,
+			'OppSaves'   : TeamStatsRows[i]['Opp. Saves'] ?? 0,
+			'OppShots'   : TeamStatsRows[i]['Opp. Shots'] ?? 0,
+		});
 	}
 
 	// clear our tables

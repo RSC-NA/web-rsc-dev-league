@@ -258,11 +258,16 @@ SELECT
 	date_pulled, pulled_by
 FROM tracker_data
 WHERE rsc_id = ?
+ORDER BY psyonix_season DESC
 	`;
 	connection.query(query, [ req.params.rsc_id ], (err, results) => {
 		if ( err ) { return res.send(`Error: ${err}`); }
+			
+		if ( 'json' in req.query ) {
+			return res.json(results);
+		}
 
-		return res.json(results);
+		return res.render('mmr', { pulls: results });
 	});
 });
 
@@ -322,9 +327,14 @@ const EXTENSION_VERSION = '2.6.2';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
+	let error = false;
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	const url = 'http://24.176.157.36:4443/api/v1/tracker-links/next/?format=json&limit=25';
-	const response = await fetch(url);
+	const response = await fetch(url).catch(e => {console.log(`Error: ${e}`); error = true; });
+	if ( error ) {
+		console.log("Error fetching more trackers. Aborting...");
+		return false;
+	}
 	const trackers = await response.json();
 
 	const trackers_by_link = {};
