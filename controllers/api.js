@@ -6,6 +6,9 @@ const router  = express.Router();
  *******************************************************/
 router.get('/teams', (req, res) => {
 	let isTwos = req.get('league');
+	if ( 'league' in req.query ) {
+		isTwos = true;
+	}
 	let tableName = 'StreamTeamStats';
 	if ( isTwos ) {
 		tableName = 'StreamTeamStats2';
@@ -21,6 +24,9 @@ router.get('/teams', (req, res) => {
 });
 router.get('/teams/:tier', (req, res) => {
 	let isTwos = req.get('league');
+	if ( 'league' in req.query ) {
+		isTwos = true;
+	}
 	let tableName = 'StreamTeamStats';
 	if ( isTwos ) {
 		tableName = 'StreamTeamStats2';
@@ -37,6 +43,9 @@ router.get('/teams/:tier', (req, res) => {
 });
 router.get('/players', (req, res) => {
 	let isTwos = req.get('league');
+	if ( 'league' in req.query ) {
+		isTwos = true;
+	}
 	let tableName = 'StreamPlayerStats';
 	if ( isTwos ) {
 		tableName = 'StreamPlayerStats2';
@@ -49,6 +58,9 @@ router.get('/players', (req, res) => {
 });
 router.get('/players/:teamName', (req, res) => {
 	let isTwos = req.get('league');
+	if ( 'league' in req.query ) {
+		isTwos = true;
+	}
 	let tableName = 'StreamPlayerStats';
 	if ( isTwos ) {
 		tableName = 'StreamPlayerStats2';
@@ -61,6 +73,9 @@ router.get('/players/:teamName', (req, res) => {
 });
 router.get('/tiers', (req, res) => {
 	let isTwos = req.get('league');
+	if ( 'league' in req.query ) {
+		isTwos = true;
+	}
 	let tiers = [ 'Premier', 'Master', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender', 'Amateur'];
 	if ( isTwos ) {
 		tiers = [ 'Premier', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender'];
