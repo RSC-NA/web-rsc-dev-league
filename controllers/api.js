@@ -78,7 +78,7 @@ router.get('/tiers', (req, res) => {
 	}
 	let tiers = [ 'Premier', 'Master', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender', 'Amateur'];
 	if ( isTwos ) {
-		tiers = [ 'Premier', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender'];
+		tiers = [ 'Premier', 'Elite', 'Veteran', 'Rival', 'Challenger', 'Prospect', 'Contender', 'Amateur'];
 	}
 	res.json( tiers.map(el => { return {'name': el} }) );
 });
