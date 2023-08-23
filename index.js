@@ -457,6 +457,8 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 			console.log('Error saving bad tracker', tracker_link);
 			throw new Error('Error saving the bad tracker.');
 		}
+	}).catch(e => {
+		console.log('Error sending back tracker to server.');
 	});
 }
 
