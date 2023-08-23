@@ -727,6 +727,8 @@ app.get('/send_bad_trackers', (req, res) => {
 
 				res.redirect('/');
 			});
+		}).catch(e => {
+			console.log('ERROR SENDING TRACKERS TO API SERVER:', e);
 		});
 	});	
 });
