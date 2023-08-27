@@ -6,7 +6,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 router.get('/player/:rsc_id', (req, res) => {
 	if ( ! req.session.discord_id ) {
-		return res.redirect('/login');
+		//return res.redirect('/login');
 	}
 
 	const query = `
@@ -26,27 +26,27 @@ WHERE c.rsc_id = ?
 		pulls:    [],
 	};
 
-	console.log(`RSC_ID: ${req.param.rsc_id}`);
-	req.db.query(query, [ req.param.rsc_id ], (err, results) => {
+	console.log(`RSC_ID: ${req.params.rsc_id}`);
+	req.db.query(query, [ req.params.rsc_id ], (err, results) => {
 		if ( err ) { return res.send(`Error: ${err}`); }
 		
 		console.log(`results:`, results);
 
 		if ( ! results || results.length === 0 ) {
 			return res.render('404_player', {
-				rsc_id: req.param.rsc_id,
+				rsc_id: req.params.rsc_id,
 				name: '',
 			});
 		}
 
-		player.rsc_id = req.param.rsc_id;
+		player.rsc_id = req.params.rsc_id;
 		player.name   = results[0].name;
 		player.tier   = results[0].tier;
 		player.mmr    = results[0].mmr;
 		player.status = results[0].status;
 		
 		const tracker_query = 'SELECT tracker_link FROM trackers WHERE rsc_id = ?';
-		req.db.query(tracker_query, [ req.param.rsc_id ], (err, results) => {
+		req.db.query(tracker_query, [ req.params.rsc_id ], (err, results) => {
 			if ( err ) { return res.send(`Error: ${err}`); }
 
 			for ( let i = 0; i < results.length; ++i ) {
@@ -68,7 +68,7 @@ WHERE rsc_id = ?
 ORDER BY psyonix_season DESC
 			`;
 			
-			req.db.query(data_query, [ req.param.rsc_id ], (err, results) => {
+			req.db.query(data_query, [ req.params.rsc_id ], (err, results) => {
 				if ( err ) { return res.send(`Error: ${err}`); }
 	
 				for ( let i = 0; i < results.length; ++i ) {
