@@ -115,7 +115,7 @@
 					%>
 						<tr>
 							<td><%= pull.season %></td>
-							<td><%= pull.date_pulled; %></td>
+							<td><%= pull.date_pulled.toLocaleString(); %></td>
 							<td><a href="<%- pull.tracker_link; %>"><%= short_link; %></a></td>
 							<td><%- pull.gp_3s; %></td>
 							<td><%- pull.mmr_3s; %></td>
