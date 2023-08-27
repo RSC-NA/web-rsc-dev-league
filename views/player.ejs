@@ -123,7 +123,7 @@
 									row_class = '';
 								}
 					%>
-						<tr>
+						<tr class="<%- row_class; %>">
 							<td><%= pull.season %></td>
 							<td><%= pull.date_pulled.toLocaleString(); %></td>
 							<td><a href="<%- pull.tracker_link; %>"><%= short_link; %></a></td>
