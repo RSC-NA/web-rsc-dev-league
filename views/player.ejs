@@ -36,6 +36,7 @@
 			<div class="mb-3">
 				<ul>
 				<%
+					console.log(player.trackers);
 					if ( Object.keys(player.trackers).count ) {
 						for ( let tracker_link in player.trackers ) {
 							let tracker = player.trackers[ tracker_link ];
