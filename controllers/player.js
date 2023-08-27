@@ -86,7 +86,7 @@ ORDER BY psyonix_season DESC
 
 				const sorted_trackers = Object.keys(player.trackers)
 					.sort((link_1, link_2) => 
-						player.trackers[ link_1 ].pulls - player.trackers[ link_2 ].pulls
+						player.trackers[ link_2 ].pulls - player.trackers[ link_1 ].pulls
 					)
 					.reduce((obj, key) => ({
 						...obj,
