@@ -61,7 +61,7 @@ router.get('/match', (req, res) => {
 	let matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
-			tp.team_id, tp.player_id, c.name, c.mmr
+			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id
 		FROM
 			matches AS m
 		LEFT JOIN
@@ -106,7 +106,7 @@ router.get('/match/:match_id', (req, res) => {
 	let matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
-			tp.team_id, tp.player_id, c.name, c.mmr
+			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id
 		FROM
 			matches AS m
 		LEFT JOIN

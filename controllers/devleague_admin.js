@@ -111,7 +111,7 @@ router.post('/generate_team/:tier', (req, res) => {
 						teams[ team ].match_day,
 						insertId,
 						null,
-						'fa_' + team,
+						team,
 						null
 					];
 				} else if ( teams[ team ].away ) {

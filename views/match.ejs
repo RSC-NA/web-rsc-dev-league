@@ -40,17 +40,41 @@
 			<div class="col-md-4">
 				<h3 class="bg-primary text-white rounded p-2"><%= is_admin ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user.substring(3) %></h3>
 				<ul>
-					<li><%= is_admin ? '[' + players[0].mmr + '] ' : '' %><strong><%= players[0].name %></strong> [Makes lobby]</li>
-					<li><%= is_admin ? '[' + players[1].mmr + '] ' : '' %><%= players[1].name %></li>
-					<li><%= is_admin ? '[' + players[2].mmr + '] ' : '' %><%= players[2].name %></li>
+					<li>
+						<%= is_admin ? '[' + players[0].mmr + '] ' : '' %>
+						<strong>
+						<a href="/player/<%= player[0].rsc_id; %>"><%= players[0].name %></a>
+						</strong> 
+						[Makes lobby]
+					</li>
+					<li>
+						<%= is_admin ? '[' + players[1].mmr + '] ' : '' %>
+						<a href="/player/<%= player[1].rsc_id; %>"><%= players[1].name %></a>
+					</li>
+					<li>
+						<%= is_admin ? '[' + players[2].mmr + '] ' : '' %>
+						<a href="/player/<%= player[2].rsc_id; %>"><%= players[2].name %></a>
+					</li>
 				</ul>
 			</div>
 			<div class="col-md-4">
 				<h3 class="bg-warning rounded p-2"><%= is_admin ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass.substring(3) %></h3>
 				<ul>
-					<li><%= is_admin ? '[' + players[3].mmr + '] ' : '' %><strong><%= players[3].name %></strong> [Uploads replays/screenshots]</li>
-					<li><%= is_admin ? '[' + players[4].mmr + '] ' : '' %><%= players[4].name %></li>
-					<li><%= is_admin ? '[' + players[5].mmr + '] ' : '' %><%= players[5].name %></li>
+					<li>
+						<%= is_admin ? '[' + players[3].mmr + '] ' : '' %>
+						<strong>
+						<a href="/player/<%= player[3].rsc_id; %>"><%= players[3].name %></a>
+						</strong> 
+						[Uploads replays/screenshots]
+					</li>
+					<li>
+						<%= is_admin ? '[' + players[4].mmr + '] ' : '' %>
+						<a href="/player/<%= player[4].rsc_id; %>"><%= players[4].name %></a>
+					</li>
+					<li>
+						<%= is_admin ? '[' + players[5].mmr + '] ' : '' %>
+						<a href="/player/<%= player[5].rsc_id; %>"><%= players[5].name %></a>
+					</li>
 				</ul>
 			</div>
 		</div>
