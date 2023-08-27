@@ -94,6 +94,9 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 					}), {});
 				player.trackers = sorted_trackers;
 
+				if ( 'json' in req.query ) {
+					return res.json(player);
+				} 
 				return res.render('player', { player: player });
 			});
 		});
