@@ -15,6 +15,7 @@ const devleague_controller = require('./controllers/devleague');
 const devleague_admin_controller = require('./controllers/devleague_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
+const player_controller = require('./controllers/player');
 
 // csv output
 const { stringify } = require('csv-stringify');
@@ -120,7 +121,7 @@ app.use((req, res, next) => {
 	// a count of how many trackers need to be
 	// "sent" to the official API.
 	let settings = {
-		season: 17,
+		season: 18,
 		premier: false,
 		master: false,
 		elite: false,
@@ -235,14 +236,11 @@ app.use(stats_api_controller);
 // stats admin api routes handled by /controllers/api_admin.js
 app.use(stats_api_admin_controller);
 
+// player routes controlled by /controllers/players.js
+app.use(player_controller);
+
 app.get('/test', (_req, res) => {
-	connection.query(
-		'INSERT INTO test (server_date) VALUES (?)',
-		[ new Date() ],
-		(_err, _results) => {
-			res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
-		}
-	)
+	res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
 });
 
 /*
