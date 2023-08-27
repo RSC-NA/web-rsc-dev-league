@@ -20,8 +20,31 @@
 			<ul class="list-group mb-3">
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
 					<div>
-						<h6 class="my-0">Pulls</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
+						<h6 class="my-0">Player Name</h6>
+					</div>
+					<span class="text-muted"><%- player.name; %></span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between lh-condensed">
+					<div>
+						<h6 class="my-0">RSC ID</h6>
+					</div>
+					<span class="text-muted"><%- player.rsc_id; %></span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between lh-condensed">
+					<div>
+						<h6 class="my-0">Current Tier</h6>
+					</div>
+					<span class="text-muted"><%- player.tier; %></span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between lh-condensed">
+					<div>
+						<h6 class="my-0">Current RSC MMR</h6>
+					</div>
+					<span class="text-muted"><%- player.mmr; %></span>
+				</li>
+				<li class="list-group-item d-flex justify-content-between lh-condensed">
+					<div>
+						<h6 class="my-0">Total Pulls</h6>
 					</div>
 					<span class="text-muted"><%- player.pulls.length; %></span>
 				</li>
