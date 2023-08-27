@@ -46,6 +46,7 @@ WHERE c.rsc_id = ?
 		player.status = results[0].status;
 		
 		res.locals.title = `${player.rsc_id}: ${player.name} [${player.tier}]`;
+		resl.locals.description = `RSC Player profile and MMR pulls for ${player.name}.`;
 
 		const tracker_query = 'SELECT tracker_link FROM trackers WHERE rsc_id = ?';
 		req.db.query(tracker_query, [ req.params.rsc_id ], (err, results) => {

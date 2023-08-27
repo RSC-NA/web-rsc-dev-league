@@ -42,7 +42,8 @@ require('dotenv').config();
 
 app.use( express.urlencoded({ extended: true }) );
 
-let title = 'RSC Development League';
+const title = 'RSC Development League';
+const description = 'Welcome to the RSC Development League! Matches are open to all active players in RSC and run at 8:15 on match nights.';
 
 // set up session
 app.use(session({
@@ -117,6 +118,7 @@ app.use((req, res, next) => {
 	res.locals.SEND_TO_API_SERVER = SEND_TO_API_SERVER;
 
 	res.locals.title = title;
+	res.locals.description = description;
 
 	// a count of how many trackers need to be
 	// "sent" to the official API.
