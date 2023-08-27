@@ -87,4 +87,4 @@ ORDER BY psyonix_season DESC
 	});
 });
 
-modue.exports = router;
+module.exports = router;
