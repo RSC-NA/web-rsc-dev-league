@@ -84,6 +84,16 @@ ORDER BY psyonix_season DESC
 					player.pulls.push(results[i]);
 				}
 
+				const sorted_trackers = Object.keys(player.trackers)
+					.sort((link_1, link_2) => 
+						player.trackers[ link_1 ].pulls - player.trackers[ link_2 ].pulls
+					)
+					.reduce((obj, key) => ({
+						...obj,
+						[key]: player.trackers[ key ]
+					}), {});
+				player.trackers = sorted_trackers;
+
 				return res.render('player', { player: player });
 			});
 		});
