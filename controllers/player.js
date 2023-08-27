@@ -65,7 +65,7 @@ SELECT
 FROM
 	tracker_data 
 WHERE rsc_id = ?
-ORDER BY psyonix_season DESC
+ORDER BY psyonix_season DESC, date_pulled DESC
 			`;
 			
 			req.db.query(data_query, [ req.params.rsc_id ], (err, results) => {
