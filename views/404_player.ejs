@@ -1,0 +1,11 @@
+
+<%- include('partials/header.ejs'); %>
+
+				<main>
+					<p>Player not found!</p>
+					<% if ( rsc_id ) { %>
+						<%= rsc_id %> was not found in the database.
+					<% } %>
+				</main>
+
+<%- include('partials/footer.ejs'); %>
