@@ -26,8 +26,11 @@ WHERE c.rsc_id = ?
 		pulls:    [],
 	};
 
+	console.log(`RSC_ID: ${req.param.rsc_id}`);
 	req.db.query(query, [ req.param.rsc_id ], (err, results) => {
 		if ( err ) { return res.send(`Error: ${err}`); }
+		
+		console.log(`results:`, results);
 
 		if ( ! results || results.length === 0 ) {
 			return res.render('404_player', {
