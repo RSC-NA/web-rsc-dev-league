@@ -27,7 +27,7 @@ const atob = require('atob');
 const e = require('express');
 */
 
-const API_HOST = 'sprode.us';
+const API_HOST = '24.151.184.156';
 
 // pull in our two manually defined configuration objects
 // TODO(erh): this can probably be moved into a database table
