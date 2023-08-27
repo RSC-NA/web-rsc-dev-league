@@ -109,9 +109,19 @@
 					<tbody>
 					<%
 						if ( player.pulls.length ) {
+							let cur_season = 0;
+							let row_class = 'table-success';
 							for ( let i = 0; i < player.pulls.length; ++i ) {
 								const pull = player.pulls[i];
 								const short_link = pull.tracker_link.split('profile/')[1].replace('/overview', '');
+								if ( pull.season != cur_season ) {
+									if ( cur_season !== 0 ) {
+										row_class = 'table-primary';
+									}
+									cur_season = pull.season;
+								} else {
+									row_class = '';
+								}
 					%>
 						<tr>
 							<td><%= pull.season %></td>
