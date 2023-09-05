@@ -71,6 +71,30 @@
 		<div class="row">
 			<div class="col">
 				<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
+				<p class="lead">
+					Make sure you're ready to go on the tournament start date.
+				</p>
+				<ul>
+					<li>
+						Check In: 
+							<strong
+							class="timeago"
+							datetime="<%= check_in; %>"
+							title="<%= check_in; %>"
+							><%= check_in; %></strong>
+					</li>
+					<li>
+						Start Time: 
+							<strong
+							class="timeago"
+							datetime="<%= tournament['start_dtg']; %>"
+							title="<%= tournament['start_dtg']; %>"
+							><%= tournament['start_dtg'];  %></strong>
+					</li>
+					<li>
+						Team: None Assigned
+					</li>
+				</ul>
 			</div>
 		</div>
 		<%
