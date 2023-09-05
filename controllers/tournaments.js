@@ -58,10 +58,48 @@ router.get('/tournament/:t_id', (req, res) => {
 		} 
 
 		const tournament = results[0];
-		tournament.teams   = {};
-		tournament.players = {};
 
-		res.render('tournament', { tournament: tournament });
+		const teamsQuery = `
+			SELECT 
+				id,name,checked_in,assigned,signup_dtg 
+			FROM tournament_teams 
+			WHERE t_id = ?
+		`;
+		req.db.query(teamsQuery, [ req.params.t_id ], (err, results) => {
+			if ( err ) { throw err; }
+			
+			tournament.teams   = {};
+			tournament.players = {};
+			for ( let i = 0; i < results.length; ++i ) {
+				const team = results[i];
+				tournament.teams[ team.id ] = team;
+				tournament.teams[ team.id ]['players'] = {};
+			}
+
+			const playersQuery = `
+				SELECT
+					id,team_id,discord_id,name,rsc_id,tier,
+					cap_value,mmr,tracker_link,signup_date
+				FROM tournament_players
+				WHERE t_id = ?
+			`;
+			req.db.query(playersQuery, [ req.params.t_id ], (err, results) => {
+				if ( err ) { throw err; }
+
+				if ( results && results.length ) {
+					for ( let i = 0; i < results.length; ++i ) {
+						const player = results[i];
+						if ( player.team_id ) {
+							tournament.teams[ player.team_id ] = player;
+						} else {
+							tournament.players[ player.id ] = player;
+						}
+					}
+				}
+
+				res.render('tournament', { tournament: tournament });
+			});
+		});
 	});
 });
 
