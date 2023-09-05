@@ -28,13 +28,10 @@ CREATE TABLE tournament_players (
 	`t_id` BIGINT(11) UNSIGNED NOT NULL,
 	`player_id` BIGINT(11) UNSIGNED NOT NULL,
 	`team_id` BIGINT(11) UNSIGNED,
-	`discord_id` VARCHAR(20) NOT NULL,
-	`name` VARCHAR(20) NOT NULL,
-	`rsc_id` VARCHAR(10),
-	`tier` VARCHAR(20) NOT NULL,
+	`tier` VARCHAR(20),
 	`cap_value` INT UNSIGNED NOT NULL DEFAULT 0,
 	`mmr` INT UNSIGNED,
-	`tracker_link` VARCHAR(255) NOT NULL,
+	`tracker_link` VARCHAR(255),
 	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
