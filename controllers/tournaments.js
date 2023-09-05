@@ -96,7 +96,7 @@ router.get('/tournament/:t_id', (req, res) => {
 						}
 					}
 				}
-
+				console.log(tournament);
 				res.render('tournament', { tournament: tournament });
 			});
 		});
