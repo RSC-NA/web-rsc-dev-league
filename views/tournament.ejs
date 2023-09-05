@@ -1,0 +1,67 @@
+<%- include('partials/header.ejs'); %>
+
+<main class="container mt-2 p-2">
+	<div class="bg-light p-2 rounded">
+		<h1><%= tournament['title']; %></h1>
+		<p class="lead">
+			<%= tournament['description']; %>
+		</p>
+		<h2>Tournament Format and Rules</h2>
+		<ul>
+			<li><%= tournament['format']; %></li>
+			<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
+			<li><%= tournament['team_cap']; %> Team Cap</li>
+		</ul>
+		<h2>Tournament Dates</h2>
+		<ul>
+			<li>
+				Signup:
+				<strong
+					class="timeago"
+					datetime="<%= tournament['signup_close_dtg']; %>"
+					title="<%= tournament['signup_close_dtg']; %>"
+				><%= tournament['signup_close_dtg']; %></strong>
+			</li>
+			<%
+				const check_in = new Date(tournament['start_dtg']);
+				check_in.setHours( check_in.getHours() - 1 );
+			%>
+			<li>
+				Check In:
+				<strong
+					class="timeago"
+					datetime="<%= check_in; %>"
+					title="<%= check_in; %>"
+				><%= check_in; %></strong>
+			</li>
+			<li>
+				Start:
+				<strong
+					class="timeago"
+					datetime="<%= tournament['start_dtg']; %>"
+					title="<%= tournament['start_dtg']; %>"
+				><%= tournament['start_dtg']; %></strong>
+			</li>
+		</ul>
+	</div>
+
+	<hr class="mb-4">
+
+	<div class="bg-light p-2 rounded">
+		<h2>Lobby Info</h2>
+		<p class="lead">This is a 4-game series.</p>
+		<div class="row">
+			<div class="col-md-4">
+				<h3 class="bg-primary text-white rounded p-2">Something Else</h3>
+			</div>
+			<div class="col-md-4">
+				<h3 class="bg-warning rounded p-2">Something</h3>
+				<ul>
+				</ul>
+			</div>
+		</div>
+	
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>
