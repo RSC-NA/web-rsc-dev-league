@@ -21,13 +21,14 @@
 		<div class="col-md-8 order-md-1">
 
 			<%
-				const ACTIVE   = Object.keys(tournaments.active).length;
-				const OPEN     = Object.keys(tournaments.open).length;
-				const UPCOMING = Object.keys(tournaments.upcoming).length;
-				if ( ACTIVE ) {
+				for ( let key in tournaments ) {
+					if ( Object.keys(tournaments[key]).length === 0 ) {
+						continue;
+					}
+					const niceKey = key[0].toUpperCase() + key.slice(1);
 
 			%>
-			<h4 class="mb-3">MD <%= matchDay %></h4>
+			<h4 class="mb-3"><%= niceKey %></h4>
 			<ul class="list-group mb-3">
 
 			<%	
