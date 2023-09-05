@@ -17,6 +17,10 @@ const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 const player_controller = require('./controllers/player');
 
+/* tournament controllers */
+const tournaments_controller = require('./controllers/tournaments');
+const tournaments_admin_controller = require('./controllers/tournaments_admin');
+
 // csv output
 const { stringify } = require('csv-stringify');
 
@@ -242,6 +246,10 @@ app.use(stats_api_admin_controller);
 
 // player routes controlled by /controllers/players.js
 app.use(player_controller);
+
+// tournaments
+app.use(tournaments_controller);
+app.use(tournaments_admin_controller);
 
 app.get('/test', (_req, res) => {
 	res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());

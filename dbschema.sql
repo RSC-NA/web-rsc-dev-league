@@ -1,3 +1,43 @@
+CREATE TABLE tournaments (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`title` VARCHAR(255) NOT NULL,
+	`format` varchar(50) not null default 'double elimination', /* single elimination, double elimination, swiss, round robin */
+	`open` tinyint(1) unsigned not null default 0, 
+	`active` tinyint(1) unsigned not null default 0, 
+	`start_dtg` DATETIME NOT NULL DEFAULT now(),
+	`signup_close_dtg` DATETIME NOT NULL DEFAULT now(),
+	`team_size` int unsigned not null default 3,
+	`team_cap` int unsigned not null default 14,
+	`allow_external` tinyint(1) unsigned not null default 0, /* external players */
+	`description` TEXT,
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE tournament_teams (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`t_id` BIGINT(11) UNSIGNED NOT NULL,
+	`name` VARCHAR(20) NOT NULL,
+	`checked_in` tinyint(1) unsigned not null default 0, 
+	`assigned` tinyint(1) unsigned not null default 0, 
+	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE tournament_players (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`t_id` BIGINT(11) UNSIGNED NOT NULL,
+	`team_id` BIGINT(11) UNSIGNED,
+	`discord_id` VARCHAR(20) NOT NULL,
+	`name` VARCHAR(20) NOT NULL,
+	`rsc_id` VARCHAR(10),
+	`tier` VARCHAR(20) NOT NULL,
+	`cap_value` INT UNSIGNED NOT NULL DEFAULT 0,
+	`mmr` INT UNSIGNED,
+	`tracker_link` VARCHAR(255) NOT NULL,
+	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE trackers (
 	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`rsc_id` VARCHAR(10) NOT NULL,
