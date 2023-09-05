@@ -61,7 +61,7 @@ router.get('/tournament/:t_id', (req, res) => {
 		tournament.teams   = {};
 		tournament.players = {};
 
-		res.render('tournement', { tournament: tournament });
+		res.render('tournament', { tournament: tournament });
 	});
 });
 
