@@ -32,8 +32,8 @@
 			<ul class="list-group mb-3">
 
 			<%	
-					for ( let t_id in tournaments.active ) {
-						const tourney = tournaments.active[ t_id ];
+					for ( let t_id in tournaments[key] ) {
+						const tourney = tournaments[key][ t_id ];
 			%>
 				<li class="list-group-item d-flex justify-content-between 1h-condensed">
 					<div>
