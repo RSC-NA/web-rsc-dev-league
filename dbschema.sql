@@ -26,6 +26,7 @@ CREATE TABLE tournament_teams (
 CREATE TABLE tournament_players (
 	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`t_id` BIGINT(11) UNSIGNED NOT NULL,
+	`player_id` BIGINT(11) UNSIGNED NOT NULL,
 	`team_id` BIGINT(11) UNSIGNED,
 	`discord_id` VARCHAR(20) NOT NULL,
 	`name` VARCHAR(20) NOT NULL,

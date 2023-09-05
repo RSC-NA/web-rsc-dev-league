@@ -54,6 +54,9 @@
 			you sign up alone, you <strong>might</strong> not be placed on a team, depending
 			on number of open signups.
 		</p>
+		<%
+			if ( ! (tournament['id'] in my_tournaments) ) {
+		%>
 		<div class="row">
 			<div class="col-md-4">
 				<h3 class="bg-primary text-white rounded p-2">Team Signup</h3>
@@ -62,6 +65,20 @@
 				<h3 class="bg-warning rounded p-2">Solo Signup</h3>
 			</div>
 		</div>
+		<%
+			} else {
+		%>
+		<div class="row">
+			<div class="col">
+				<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
+			</div>
+		</div>
+		<%
+			} else {
+		%>
+		<%
+			} 
+		%>
 	
 	</div>
 </main>

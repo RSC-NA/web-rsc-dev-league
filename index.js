@@ -167,7 +167,32 @@ app.use((req, res, next) => {
 
 // tournaments middleware
 app.use((req, res, next) => {
-	next();
+	res.locals.my_tournaments = {};
+	if ( req.session.user_id ) {
+		const query = `
+			SELECT
+				p.t_id,p.player_id,p.team_id,
+				t.format,t.title,t.start_dtg
+			FROM tournament_players AS p
+			LEFT JOIN tournaments AS t
+			ON p.t_id = t.id
+			WHERE p.player_id = ? AND (t.start_dtg > now() OR t.active = 1)
+		`;
+		connection.query(query, [ req.session.user_id ], (err, results) => {
+			if ( err ) { throw err; }
+
+			if ( results ) {
+				for ( let i = 0; i < results.length; ++i ) {
+					const tourney = results[i];
+					res.locals.my_tournaments[ tourney.t_id ] = tourney;
+				}
+			}
+
+			next();
+		});
+	} else {
+		next();
+	}
 });
 
 // checked in middleware.
