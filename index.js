@@ -170,7 +170,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
 	res.locals.checked_in = false;
 	
-	let date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
+	const date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
 	res.locals.today = date;
 	res.locals.match_day = false;
 	if ( date in matchDays ) {
@@ -181,7 +181,7 @@ app.use((req, res, next) => {
 		connection.query(
 			'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
 			[ req.session.user_id ],
-			(err, results) => {
+			(_err, results) => {
 				if ( results && results.length > 0 ) {
 					req.session.checked_in = true;
 					req.session.rostered = results[0].rostered;

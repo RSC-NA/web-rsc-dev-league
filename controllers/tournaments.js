@@ -21,8 +21,8 @@ router.get('/tournaments', (req, res) => {
 		if ( err ) { throw err; }
 
 		const tournaments = {
-			'open': {},
-			'active': {},
+			'open':     {},
+			'active':   {},
 			'upcoming': {},
 		};	
 		for ( let i = 0; i < results.length; ++i ) {
@@ -41,7 +41,8 @@ router.get('/tournaments', (req, res) => {
 
 router.get('/tournament/:t_id', (req, res) => {
 	res.locals.title = `RSC Tournaments`;
-	
+
+	console.log(req.session);
 	const query = `
 		SELECT
 			id,title,format,open,active,start_dtg,
