@@ -79,7 +79,7 @@ router.get('/tournament/:t_id', (req, res) => {
 			const playersQuery = `
 				SELECT
 					id,team_id,discord_id,name,rsc_id,tier,
-					cap_value,mmr,tracker_link,signup_date
+					cap_value,mmr,tracker_link,signup_dtg
 				FROM tournament_players
 				WHERE t_id = ?
 			`;
