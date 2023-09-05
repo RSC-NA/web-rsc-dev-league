@@ -39,4 +39,30 @@ router.get('/tournaments', (req, res) => {
 	});
 });
 
+router.get('/tournament/:t_id', (req, res) => {
+	res.locals.title = `RSC Tournaments`;
+	
+	const query = `
+		SELECT
+			id,title,format,open,active,start_dtg,
+			signup_close_dtg,team_size,team_cap,allow_external,
+			description
+		FROM tournaments
+		WHERE id = ?
+	`;
+	req.db.query(query, [ req.params.t_id ], (err, results) => {
+		if ( err ) { throw err; }
+		
+		if ( results && results.length === 0 ) {
+			return res.send('Tournament not found.');
+		} 
+
+		const tournament = results[0];
+		tournament.teams   = {};
+		tournament.players = {};
+
+		res.render('tournement', { tournament: tournament });
+	});
+});
+
 module.exports = router;
