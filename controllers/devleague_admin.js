@@ -295,6 +295,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// always add "tehblister" to the list in case he isn't playing
 	// Added for development in S17 so that I could test things 
 	// while non-playing.
+	/*
 	let tehblister_id = 'RSC000302';
 	let tehblister_discord_id = '207266416355835904';
 	if ( ! (tehblister_id in players) ) {
@@ -307,6 +308,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'status': 'Free Agent',
 		};
 	}
+	*/
 
 	let domino_id = 'RSC000945';
 	let domino_discord_id = '500092285120282635';

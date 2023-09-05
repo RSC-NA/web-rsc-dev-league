@@ -165,6 +165,11 @@ app.use((req, res, next) => {
 	});
 });
 
+// tournaments middleware
+app.use((req, res, next) => {
+	next();
+});
+
 // checked in middleware.
 // only really needed if the user is logged in AND it's a game day
 app.use((req, res, next) => {
