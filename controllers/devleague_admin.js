@@ -269,6 +269,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'discord_id': rows[i]['Discord ID'],
 			'active_2s': false,
 			'active_3s': false,
+			'status': 'Non-playing',
 		};
 		if ( rows[i]['3v3 Active/ Returning'] == "TRUE" ) { 
 			players[ rows[i]['RSC Unique ID'] ].active_3s = true;
