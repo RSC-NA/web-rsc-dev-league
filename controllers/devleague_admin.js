@@ -352,7 +352,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status, active_3s, active_2s) VALUES ?',
 			[ playersArray ],
 			(err, results) => {
-				if (err) { /*throw err;*/writeError(err.toString()); console.log('error!'); }
+				if (err) { /*throw err;*/ console.log('error!', err); }
 
 				res.redirect('/manage_league');
 		});
