@@ -71,7 +71,8 @@
 				</ul>
 			</div>
 			<div class="col-6 matchDates">
-				<h4>Team Signups</h4>
+				<h3>Signups</h3>
+				<h5>Team Signups</h5>
 				<ul>
 					<li>
 						Full Teams:
@@ -86,7 +87,7 @@
 						</strong>
 					</li>
 				</ul>
-				<h4>Solo Signups</h4>
+				<h5>Solo Signups</h5>
 				<ul>
 					<li>
 						Solo Signups:
@@ -94,6 +95,21 @@
 							<%= Object.keys(tournament.players).length; %>
 						</strong>
 					</li>
+				</ul>
+				<hr>
+				<h4>Cap Restrictions</h4>
+				
+				<ul>
+					<li class="mb-2 border-bottom">Total Allows Points: <strong><%= tournament['team_cap']; %></strong></li>
+					<li>Premier: <strong>9</strong> points</li>
+					<li>Master: <strong>8</strong> points</li>
+					<li>Elite: <strong>7</strong> points</li>
+					<li>Veteran: <strong>6</strong> points</li>
+					<li>Rival: <strong>5</strong> points</li>
+					<li>Challenger: <strong>4</strong> points</li>
+					<li>Prospect: <strong>3</strong> points</li>
+					<li>Contender: <strong>2</strong> points</li>
+					<li>Amateur: <strong>1</strong> points</li>
 				</ul>
 			</div>
 		</div>
