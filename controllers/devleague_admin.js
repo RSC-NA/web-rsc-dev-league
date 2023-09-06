@@ -255,6 +255,9 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	let players = {};
 
 	for ( let i = 0; i < rows.length; i++ ) {
+		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC Unique ID'] || ! rows[i]['Discord ID'] ) {
+			continue;
+		}
 		players[ rows[i]['RSC Unique ID'] ] = {
 			'rsc_id': rows[i]['RSC Unique ID'],
 			'name': rows[i]['Player Name'],
