@@ -110,8 +110,8 @@ router.get('/process_login', (req, res) => {
 									status: results[0].status,
 									rsc_id: results[0].rsc_id,
 									discord_id: discord_id,
-									active_3s: results[0].active_3s,
-									active_2s: results[0].active_2s,
+									active_3s: results[0].active_3s ? true : false,
+									active_2s: results[0].active_2s ? true : false,
 									is_admin: results[0].admin ? true: false,
 								};
 				
