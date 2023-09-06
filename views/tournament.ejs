@@ -6,43 +6,73 @@
 		<p class="lead">
 			<%= tournament['description']; %>
 		</p>
-		<h2>Tournament Format and Rules</h2>
-		<ul>
-			<li><%= tournament['format']; %></li>
-			<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
-			<li><%= tournament['team_cap']; %> Team Cap</li>
-		</ul>
-		<h2>Tournament Dates</h2>
-		<ul>
-			<li>
-				Signup:
-				<strong
-					class="timeago"
-					datetime="<%= tournament['signup_close_dtg']; %>"
-					title="<%= tournament['signup_close_dtg']; %>"
-				><%= tournament['signup_close_dtg']; %></strong>
-			</li>
-			<%
-				const check_in = new Date(tournament['start_dtg']);
-				check_in.setHours( check_in.getHours() - 1 );
-			%>
-			<li>
-				Check In:
-				<strong
-					class="timeago"
-					datetime="<%= check_in; %>"
-					title="<%= check_in; %>"
-				><%= check_in; %></strong>
-			</li>
-			<li>
-				Start:
-				<strong
-					class="timeago"
-					datetime="<%= tournament['start_dtg']; %>"
-					title="<%= tournament['start_dtg']; %>"
-				><%= tournament['start_dtg']; %></strong>
-			</li>
-		</ul>
+		<div class="row">
+			<div class="col-6">
+				<h2>Tournament Format and Rules</h2>
+				<ul>
+					<li><%= tournament['format']; %></li>
+					<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
+					<li><%= tournament['team_cap']; %> Team Cap</li>
+				</ul>
+				<h2>Tournament Dates</h2>
+				<ul>
+					<li>
+						Signup:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['signup_close_dtg']; %>"
+							title="<%= tournament['signup_close_dtg']; %>"
+						><%= tournament['signup_close_dtg']; %></strong>
+					</li>
+					<%
+						const check_in = new Date(tournament['start_dtg']);
+						check_in.setHours( check_in.getHours() - 1 );
+					%>
+					<li>
+						Check In:
+						<strong
+							class="timeago"
+							datetime="<%= check_in; %>"
+							title="<%= check_in; %>"
+						><%= check_in; %></strong>
+					</li>
+					<li>
+						Start:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['start_dtg']; %>"
+							title="<%= tournament['start_dtg']; %>"
+						><%= tournament['start_dtg']; %></strong>
+					</li>
+				</ul>
+			</div>
+			<div class="col-6 matchDates">
+				<h4>Team Signups</h4>
+				<ul>
+					<li>
+						Full Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.full).length; %>
+						</strong>
+					</li>
+					<li>
+						Open Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.open).length; %>
+						</strong>
+					</li>
+				</ul>
+				<h4>Solo Signups</h4>
+				<ul>
+					<li>
+						Solo Signups:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.players).length; %>
+						</strong>
+					</li>
+				</ul>
+			</div>
+		</div>
 	</div>
 
 	<hr class="mb-4">

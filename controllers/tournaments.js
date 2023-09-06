@@ -45,6 +45,9 @@ router.get('/tournament/', (_req, res) => {
 router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req, res) => {
 	res.locals.title = `RSC Tournaments`;
 
+	const SIGNUP = req.url.split('/').pop().includes('signup');
+	const SOLO   = req.url.split('/').pop().includes('solo');
+
 	console.log(req.session);
 	const query = `
 		SELECT
@@ -62,6 +65,8 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 		} 
 
 		const tournament = results[0];
+		tournament.SIGNUP = SIGNUP;
+		tournament.SOLO   = SOLO;
 
 		const teamsQuery = `
 			SELECT 
@@ -72,12 +77,12 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 		req.db.query(teamsQuery, [ req.params.t_id ], (err, results) => {
 			if ( err ) { throw err; }
 			
-			tournament.teams   = {};
+			tournament.teams   = { full: {}, open: {}, unsorted: {} };
 			tournament.players = {};
 			for ( let i = 0; i < results.length; ++i ) {
 				const team = results[i];
-				tournament.teams[ team.id ] = team;
-				tournament.teams[ team.id ]['players'] = {};
+				tournament.teams.unsorted[ team.id ] = team;
+				tournament.teams.unsorted[ team.id ]['players'] = {};
 			}
 
 			const playersQuery = `
@@ -93,15 +98,32 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 				if ( results && results.length ) {
 					for ( let i = 0; i < results.length; ++i ) {
 						const player = results[i];
-						if ( player.team_id ) {
-							tournament.teams[ player.team_id ] = player;
+						if ( player.team_id && player.team_id in tournament.teams.unsorted ) {
+							tournament.teams.unsorted[ player.team_id ].players[ player.id ] = player;
 						} else {
 							tournament.players[ player.id ] = player;
 						}
 					}
+
 				}
+
+				const team_size = tournament.team_size;
+				for ( const team_id in tournament.teams.unsorted ) {
+					const team = tournament.teams.unsorted[ team_id ];
+					const cur_team_size = Object.keys(team.players).length;
+					if ( cur_team_size === team_size ) {
+						tournament.teams.full[ team_id ] = team;
+					} else {
+						tournament.teams.open[ team_id ] = team;
+					}
+				}
+
 				console.log(tournament);
-				res.render('tournament', { tournament: tournament });
+				if ( SIGNUP ) {
+					res.render('tournament_signup', { tournament: tournament });
+				} else {
+					res.render('tournament', { tournament: tournament });
+				}
 			});
 		});
 	});
