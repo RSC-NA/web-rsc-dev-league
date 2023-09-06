@@ -333,7 +333,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			let player = players[rsc_id];
 
 			if ( ! player['tier'] ) {
-				continue;
+				player['tier'] = 'Non-Playing';
 			}
 
 			// discord_id, rsc_id, mmr, tier, status
