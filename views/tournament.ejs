@@ -2,7 +2,10 @@
 
 <main class="container mt-2 p-2">
 	<div class="bg-light p-2 rounded">
-		<h1><%= tournament['title']; %></h1>
+		<h1>
+			<%- tournament.allow_external ? '<i class="fas fa-lock-open"></i>' : '<i class="fas fa-lock"></i>'; %>
+			<%= tournament['title']; %>
+		</h1>
 		<p class="lead">
 			<%= tournament['description']; %>
 		</p>
