@@ -130,7 +130,10 @@
 				Your tier, <%= user.tier %>, is not currently enabled for the RSC Development League. Check back next season or ask about it in 
 				Discord.
 			</p>
-			<% } else { %>
+			<% 
+			} else { 
+				console.log('user:', nickname,user,user['active_3s']);
+			%>
 			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify" role="button">Log In with Discord</a>
 			<% } %>
 
