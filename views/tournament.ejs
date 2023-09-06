@@ -138,7 +138,7 @@
 		<p class="lead">
 			Please sign in with Discord to interact with this tournament.
 		</p>
-		<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify" role="button">Log In with Discord</a>
+		<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
 		<%
 			} else {
 				if ( ! (tournament['id'] in my_tournaments) ) {
