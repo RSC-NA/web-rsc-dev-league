@@ -12,8 +12,27 @@
 				<ul>
 					<li><%= tournament['format']; %></li>
 					<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
-					<li><%= tournament['team_cap']; %> Team Cap</li>
+					<li><%= tournament['team_cap']; %> Point Team Cap</li>
 				</ul>
+				<%
+					if ( tournament.allow_external ) {
+				%>
+				<p class="lead">
+					This tournament <strong>DOES</strong> allow non-RSC players
+					to join, though they will be required to provide a tracker link 
+					for placement.
+				</p>
+				<%
+					} else {
+				%>
+				<p class="lead">
+					This tournament <strong>DOES NOT</strong> allow non-RSC players
+					to join. All participants must be an active member of RSC
+					and exist in the Contracts Sheet of 3s or 2s.
+				</p>
+				<%
+					}
+				%>
 				<h2>Tournament Dates</h2>
 				<ul>
 					<li>
@@ -82,7 +101,14 @@
 		<p class="lead">
 			Sign up to play in this tournament, either as a team or by yourself. If
 			you sign up alone, you <strong>might</strong> not be placed on a team, depending
-			on number of open signups.
+			on number of open signups. If you create a team and don't have a full roster, we will
+			try to assign the correct number of players for you. If there are no available
+			players, your team may be broken up or excluded completely.
+		</p>
+		<p class="lead">
+			Creating a team will also provide you with an invite link to allow
+			other players to join your team. All cap restrictions will apply to
+			these players.
 		</p>
 		<%
 			if ( ! (tournament['id'] in my_tournaments) ) {
