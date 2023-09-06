@@ -794,7 +794,7 @@ app.get('/import_trackers', async (req, res) => {
 			break;
 		}
 
-		const active = (rows[i]._rawData[3] === "TRUE" || rows[i]._rawData[4] === "TRUE" );
+		const active = true; //(rows[i]._rawData[3] === "TRUE" || rows[i]._rawData[4] === "TRUE" );
 		if ( active ) {
 			active_players[ rows[i]._rawData[0] ] = {
 				'rscid': rows[i]._rawData[0],
