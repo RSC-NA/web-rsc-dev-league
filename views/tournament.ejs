@@ -100,7 +100,7 @@
 				<h4>Cap Restrictions</h4>
 				
 				<ul>
-					<li class="mb-2 border-bottom">Total Allows Points: <strong><%= tournament['team_cap']; %></strong></li>
+					<li class="mb-1 pb-1 border-bottom border-primary">Total Points Allowed: <strong><%= tournament['team_cap']; %></strong></li>
 					<li>Premier: <strong>9</strong> points</li>
 					<li>Master: <strong>8</strong> points</li>
 					<li>Elite: <strong>7</strong> points</li>
@@ -132,7 +132,16 @@
 			these players.
 		</p>
 		<%
-			if ( ! (tournament['id'] in my_tournaments) ) {
+			if ( ! user_id ) {
+		%>
+		<h3>Sign in with Discord</h3>
+		<p class="lead">
+			Please sign in with Discord to interact with this tournament.
+		</p>
+		<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify" role="button">Log In with Discord</a>
+		<%
+			} else {
+				if ( ! (tournament['id'] in my_tournaments) ) {
 		%>
 		<div class="row">
 			<div class="col-md-4">
@@ -143,7 +152,7 @@
 			</div>
 		</div>
 		<%
-			} else {
+				} else {
 		%>
 		<div class="row">
 			<div class="col">
@@ -175,7 +184,8 @@
 			</div>
 		</div>
 		<%
-			} 
+				} 
+			}
 		%>
 	
 	</div>

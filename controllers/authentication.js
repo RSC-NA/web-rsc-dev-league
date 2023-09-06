@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 
+router.get('/login_with_discord', (req, res) => {
+	const referrer = req.get('Referrer');
+	if ( referrer ) {
+		req.session.login_return_url = referrer;
+	}
+	const discord_url = `https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=${res.locals.callbackUrl}&response_type=token&scope=identify`;
+	res.redirect(discord_url);
+});
+
 router.get('/login', (req, res) => {
 	res.render('login');
 });
@@ -71,8 +80,11 @@ router.get('/process_login', (req, res) => {
 				console.log(user);
 
 				req.session.is_admin = results[0].admin ? true : false;
-				res.redirect('/');
-				//res.redirect('/player/' + discord_id);
+				if ( req.session.login_return_url ) {
+					res.redirect(req.session.login_return_url);
+				} else {
+					res.redirect('/');
+				}
 			}
 
 			// user doesn't exist, create the account.
@@ -100,7 +112,11 @@ router.get('/process_login', (req, res) => {
 								};
 				
 								req.session.user = user;
-								res.redirect('/');
+								if ( req.session.login_return_url ) {
+									res.redirect(req.session.login_return_url);
+								} else {
+									res.redirect('/');
+								}
 						});
 					}
 				);
