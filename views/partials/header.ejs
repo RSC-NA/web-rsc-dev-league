@@ -111,17 +111,33 @@
 								<span class="badge ms-2 bg-danger">off</span>
 								<% } %>
 							</a>
+							<%
+								if ( pending_count || bad_pending_count ) {
+							%>
 							<hr>
+							<%
+								}
+						
+								if ( pending_count ) {
+							%>
 							<a class="nav-link" href="/send_tracker_data">
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Store Trackers
 								<span class="badge ms-2 <%- badge_class %>"><%- pending_count %></span>
 							</a>
+							<%
+								}
+							
+								if ( pending_count ) {
+							%>
 							<a class="nav-link" href="/send_bad_trackers">
 								<div class="sb-nav-link-icon"><i class="fas fa-triangle-exclamation"></i></div>
 								Store Bad
 								<span class="badge ms-2 <%- bad_badge_class %>"><%- bad_pending_count %></span>
 							</a>
+							<%
+								}
+							%>
 							<div class="sb-sidenav-menu-heading">Slow Actions</div>
 							<a class="nav-link" href="#" id="run3sStats">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
