@@ -255,12 +255,15 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	let players = {};
 
 	for ( let i = 0; i < rows.length; i++ ) {
+		players[ rows[i]['RSC Unique ID'] ] = {
+			'rsc_id': rows[i]['RSC Unique ID'],
+			'name': rows[i]['Player Name'],
+			'discord_id': rows[i]['Discord ID'],
+			'active_2s': false,
+			'active_3s': false,
+		};
 		if ( rows[i]['3v3 Active/ Returning'] == "TRUE" ) { 
-			players[ rows[i]['RSC Unique ID'] ] = {
-				'rsc_id': rows[i]['RSC Unique ID'],
-				'name': rows[i]['Player Name'],
-				'discord_id': rows[i]['Discord ID'],
-			};
+			players[ rows[i]['RSC Unique ID'] ].active_3s = true;
 		}
 	}
 
@@ -308,8 +311,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'status': 'Free Agent',
 		};
 	}
-	*/
-
 	let domino_id = 'RSC000945';
 	let domino_discord_id = '500092285120282635';
 	if ( ! ( domino_id in players ) ) {
@@ -322,6 +323,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'status': 'Free Agent',
 		};
 	}
+	*/
 
 	req.db.query('TRUNCATE TABLE contracts', (err,results) => {
 		if ( err ) {  throw err; }
@@ -343,11 +345,11 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			if ( ! player['mmr'] ) {
 				player['mmr'] = 0;
 			}
-			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'] ]);
+			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'], player['active_3s'], player['active_2s'] ]);
 		}
 
 		req.db.query(
-			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status) VALUES ?',
+			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status, active_3s, active_2s) VALUES ?',
 			[ playersArray ],
 			(err, results) => {
 				if (err) { /*throw err;*/writeError(err.toString()); console.log('error!'); }

@@ -49,7 +49,7 @@ router.get('/process_login', (req, res) => {
 	let discord_id = token[2];
 
 	req.db.query(
-		'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
+		'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
 		[ discord_id ],
 		function(err, results) {
 			if ( err ) {
@@ -73,6 +73,8 @@ router.get('/process_login', (req, res) => {
 					status: results[0].status,
 					rsc_id: results[0].rsc_id,
 					discord_id: discord_id,
+					active_3s: results[0].active_3s,
+					active_2s: results[0].active_2s,
 					is_admin: results[0].admin ? true: false,
 				};
 
@@ -96,7 +98,7 @@ router.get('/process_login', (req, res) => {
 						if (err) throw err;
 
 						req.db.query(
-							'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
+							'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
 							[ discord_id ],
 							(err, results) => {
 								let user = {
@@ -108,6 +110,8 @@ router.get('/process_login', (req, res) => {
 									status: results[0].status,
 									rsc_id: results[0].rsc_id,
 									discord_id: discord_id,
+									active_3s: results[0].active_3s,
+									active_2s: results[0].active_2s,
 									is_admin: results[0].admin ? true: false,
 								};
 				

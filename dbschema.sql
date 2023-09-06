@@ -148,6 +148,8 @@ CREATE TABLE contracts (
 	`mmr` INT UNSIGNED NOT NULL DEFAULT 0,
 	`tier` VARCHAR(10) NOT NULL DEFAULT '',
 	`status` VARCHAR(20) NOT NULL DEFAULT '',
+	`active_2s` tinyint(1) NOT NULL DEFAULT 0,
+	`active_3s` tinyint(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`),
 	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

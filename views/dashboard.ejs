@@ -118,13 +118,13 @@
 				<strong>At 8:00PM, your match information will be available at THIS website.</strong>
 			</p>
 			<a class="btn btn-lg btn-danger" href="/check_out/<%= match_day %>" role="button">Check Out</a>
-			<% } else if ( nickname && user['rsc_id'] == null ) { %>
+			<% } else if ( nickname && user && ! user['active_3s'] ) { %>
 			<h2>You are not an active player</h2>
 			<p>
 				This league is only available to valid members of RSC with an active contract. Please sign up for the league
 				at <a href="https://discord.gg/rsc" rel="nofollow">https://discord.gg/rsc</a>
 			</p>
-			<% } else if ( nickname &&  "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] == 0) { %>
+			<% } else if ( nickname && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] == 0) { %>
 			<h2>Your tier is not available in the RSC Development League</h2>
 			<p>
 				Your tier, <%= user.tier %>, is not currently enabled for the RSC Development League. Check back next season or ask about it in 

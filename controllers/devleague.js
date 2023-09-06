@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/check_in/:match_day', (req, res) => {
-	if ( req.session.discord_id && ! req.session.checked_in ) {
+	if ( req.session.discord_id && ! req.session.checked_in && req.session.user.active_3s ) {
 		// TODO(get season and match day from somewhere)
 		let season = res.locals.settings.season;
 		let match_day = req.params.match_day;
