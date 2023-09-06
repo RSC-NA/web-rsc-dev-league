@@ -354,6 +354,10 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			if ( ! player['mmr'] ) {
 				player['mmr'] = 0;
 			}
+			if ( ! player['status'] ) {
+				player['status'] = 'Non-playing';
+			}
+
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'], player['active_3s'], player['active_2s'] ]);
 		}
 
