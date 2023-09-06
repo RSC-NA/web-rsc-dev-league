@@ -39,7 +39,10 @@ router.get('/tournaments', (req, res) => {
 	});
 });
 
-router.get('/tournament/:t_id', (req, res) => {
+router.get('/tournament/', (_req, res) => {
+	return res.redirect('/tournaments');
+});
+router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req, res) => {
 	res.locals.title = `RSC Tournaments`;
 
 	console.log(req.session);
@@ -102,6 +105,10 @@ router.get('/tournament/:t_id', (req, res) => {
 			});
 		});
 	});
+});
+
+router.get('/tournament/:t_id/signup', (req, res) => {
+	
 });
 
 module.exports = router;
