@@ -378,7 +378,7 @@ router.get('/manage_league', (req, res) => { if ( ! req.session.is_admin ) {
 
 	res.locals.title = `Manage League - ${res.locals.title}`;
 
-	let counts_query = 'select count(*) AS count,tier,status from contracts where tier != "" group by tier,status order by tier,status';
+	let counts_query = 'select count(*) AS count,tier,status from contracts where tier != "" OR tier != "None" group by tier,status order by tier,status';
 	req.db.query(counts_query, (err, results) => {
 		if ( err ) { throw err; }
 
