@@ -60,7 +60,7 @@
 		<div class="bg-light p-3 rounded">
 		<% if ( match_day && match_day != 'holiday' ) { %>
 
-			<% if ( nickname && ! checked_in && "rsc_id" in user && user['rsc_id'] != null && settings[ user.tier.toLowerCase() ] != 0 ) { %>
+			<% if ( nickname && ! checked_in && user && user['active_3s'] && settings[ user.tier.toLowerCase() ] != 0 ) { %>
 
 			<!-- check in features -->	
 			<style type="text/css">
@@ -130,10 +130,7 @@
 				Your tier, <%= user.tier %>, is not currently enabled for the RSC Development League. Check back next season or ask about it in 
 				Discord.
 			</p>
-			<% 
-			} else { 
-				console.log('user:', nickname,user,user['active_3s']);
-			%>
+			<% } else { %>
 			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify" role="button">Log In with Discord</a>
 			<% } %>
 
