@@ -86,7 +86,8 @@ router.get('/championship', (req, res) => {
 				return players[b].points - players[a].points;
 			});
 
-			for ( const p_id = sorted_players.pop() ) {
+			while ( sorted_players.length ) {
+				const p_id = sorted_players.pop();
 				const player = players[ p_id ];
 				if ( leaderboards[player.tier] === null ) {
 					leaderboards[player.tier] = [];
