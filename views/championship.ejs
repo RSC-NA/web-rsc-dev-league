@@ -1,0 +1,107 @@
+
+<%- include('partials/header.ejs'); %>
+
+	<main class="container">
+		<div class="bg-light p-3 rounded">
+			<div class="row">
+				<div class="col-md-7">
+
+					<h1>RSC Development League Season <%= settings.season; %> Championship</h1>
+
+					<p class="lead">
+						Development League has Champions now! Competing in <strong>any</strong> 
+						Dev League matches during the season gives you an entry into the end-of-season
+						Invitational Championship match. This match will take the best 6 people from
+						each tier and put them head to head in a final BO5 showdown to claim the 
+						trophy <i class="fas fa-trophy"></i> and earn permanent bragging rights
+						as the "Best Free Agent in RSC". 
+					</p>
+
+					<h3>Eligibility and Invitations</h3>
+					<p class="lead">
+						This Championship match is open to <strong>ALL</strong> active RSC players in
+						a given season. If you've played in any Dev League matches, you've already
+						earned a chance for glory!
+					</p>
+					<ul>
+						<li><strong>1 Point</strong> is earned for each Dev League match you play in.</li>
+						<li><strong>0.5 Points</strong> for every <strong>game win</strong>.</li>
+					</ul>
+					<p class="lead">
+						For example, if <code>tehblister</code> plays in Dev League Match Day 1 in Elite, he
+						automatically earns <strong>1 Point</strong> for getting placed on a roster. If he
+						wins all four matches of the night, he'll earn an additional <strong>2 Points (0.5 * 4)</strong>.
+					</p>
+					<p>
+						At the end of the season, we'll invite players to a (hopefully) streamed Championship Invitational
+						Match in the order of the total number of points they've won.
+					</p>
+
+					<h3>Other Fun Facts</h3>
+					<p class="lead">
+						Every tracker you ever visit will also be sent to RSC for updating, so even if you don't click the button,
+						you'll still be helping us keep good data just by looking at your own tracker or scouting around for an upcoming 
+						season. This extension only "runs" on the Tracker Network rocket league pages, and no personal information about
+						you is sent to any of RSC's servers. 
+					</p>
+
+				</div>
+				<div class="col-md-4 matchDates">
+					<h3>S<%= settings.season; %> Leaderboard</h3>
+					<%
+						for ( const tier in leaderboards ) {
+							const leaderboard = leaderboards[ tier ];
+					%>
+					<h4><%= tier; %></h4>
+					<ol class="dates">
+						<%
+							let count = 0;
+							let myPosition = null;
+							if ( user.name && user.name in leaderboard ) {
+								myPosition = Object.keys(leaderboard).indexOf(user.name);
+							}
+							for ( let player in leaderboard ) {
+								count++;
+
+								if ( count > 10 ) {
+									break;
+								}
+
+								if ( count === 1 ) {
+									top_class = 'fs-5 font-weight-bold';
+								} else if ( count === 2 ) {
+									top_class = 'fs-6 font-weight-bold';
+								}
+								let player_class = '';
+								if ( player === user.name ) {
+									player_class = 'today';
+								}
+								let display_name = leaderboard[ player ]['name'];
+						%>
+
+						<li class="<%- player_class  %> <%- top_class %>">
+							<%- display_name %> - <code><%- leaderboard[ player ]['points']; %></code>
+						</li>
+
+						<%
+							}
+
+							if ( myPosition && myPosition > 10 ) {
+						%>
+
+						<li class="today" value="<%- myPosition %>">
+							<%- user.name %> - <code><%- leaderboard[ user.name ]['points']; %></code>
+						</li>
+
+						<%
+							}
+						%>
+
+					</ol>
+				</div>
+			</div>
+		</div>
+	
+	</main>
+
+<%- include('partials/footer.ejs'); %>

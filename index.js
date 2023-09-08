@@ -99,6 +99,7 @@ app.use((req, res, next) => {
 	res.locals.menu = {
 		'dashboard': '',
 		'tracker': '',
+		'championship': '',
 		'match': '',
 		'process_gameday': '',
 		'matches': '',
@@ -128,7 +129,7 @@ app.use((req, res, next) => {
 
 	// a count of how many trackers need to be
 	// "sent" to the official API.
-	let settings = {
+	const settings = {
 		season: 18,
 		premier: false,
 		master: false,
