@@ -38,7 +38,7 @@ router.get('/championship', (req, res) => {
 		const playerQuery = `
 			SELECT
 				c.name,c.rsc_id,c.discord_id,c.tier,c.status,c.mmr,
-				tp.team_id, p.name
+				tp.team_id, p.nickname
 			FROM team_players AS tp
 			LEFT JOIN players AS p ON tp.player_id = p.id
 			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
