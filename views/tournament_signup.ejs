@@ -1,0 +1,207 @@
+<%- include('partials/header.ejs'); %>
+
+<main class="container mt-2 p-2">
+	<div class="bg-light p-2 rounded">
+		<h1>
+			<%= tournament['title']; %>
+		</h1>
+		<p class="lead">
+			<%= tournament['description']; %>
+		</p>
+		<div class="row">
+			<div class="col-8">
+				<h2>Tournament Format and Rules</h2>
+				<ul>
+					<li><%= tournament['format']; %></li>
+					<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
+					<li><%= tournament['team_cap']; %> Point Team Cap</li>
+				</ul>
+				<%
+					if ( tournament.allow_external ) {
+				%>
+				<p class="lead">
+					<i class="fas fa-lock-open"></i>
+					This tournament <strong>DOES</strong> allow non-RSC players
+					to join, though they will be required to provide a tracker link 
+					for placement.
+				</p>
+				<%
+					} else {
+				%>
+				<p class="lead">
+					<i class="fas fa-lock"></i>
+					This tournament <strong>DOES NOT</strong> allow non-RSC players
+					to join. All participants must be an active member of RSC
+					and exist in the Contracts Sheet of 3s or 2s.
+				</p>
+				<%
+					}
+				%>
+				<h2>Tournament Dates</h2>
+				<ul>
+					<li>
+						Signup:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['signup_close_dtg']; %>"
+							title="<%= tournament['signup_close_dtg']; %>"
+						><%= tournament['signup_close_dtg']; %></strong>
+					</li>
+					<%
+						const check_in = new Date(tournament['start_dtg']);
+						check_in.setHours( check_in.getHours() - 1 );
+					%>
+					<li>
+						Check In:
+						<strong
+							class="timeago"
+							datetime="<%= check_in; %>"
+							title="<%= check_in; %>"
+						><%= check_in; %></strong>
+					</li>
+					<li>
+						Start:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['start_dtg']; %>"
+							title="<%= tournament['start_dtg']; %>"
+						><%= tournament['start_dtg']; %></strong>
+					</li>
+				</ul>
+			</div>
+			<div class="col-4 matchDates">
+				<h3>Signups</h3>
+				<h5>Team Signups</h5>
+				<ul>
+					<li>
+						Full Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.full).length; %>
+						</strong>
+					</li>
+					<li>
+						Open Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.open).length; %>
+						</strong>
+					</li>
+				</ul>
+				<h5>Solo Signups</h5>
+				<ul>
+					<li>
+						Solo Signups:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.players).length; %>
+						</strong>
+					</li>
+				</ul>
+				<hr>
+				<h4>Cap Restrictions</h4>
+				
+				<ul>
+					<li class="mb-1 pb-1 border-bottom border-primary">Total Points Allowed: <strong><%= tournament['team_cap']; %></strong></li>
+					<li>Premier: <strong>9</strong> points</li>
+					<li>Master: <strong>8</strong> points</li>
+					<li>Elite: <strong>7</strong> points</li>
+					<li>Veteran: <strong>6</strong> points</li>
+					<li>Rival: <strong>5</strong> points</li>
+					<li>Challenger: <strong>4</strong> points</li>
+					<li>Prospect: <strong>3</strong> points</li>
+					<li>Contender: <strong>2</strong> points</li>
+					<li>Amateur: <strong>1</strong> points</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<hr class="mb-4">
+
+	<div class="bg-light p-2 rounded">
+		<h2>Play</h2>
+		<%
+			if ( ! (tournament['id'] in my_tournaments) ) {
+		%>
+		<p class="lead">
+			Sign up to play in this tournament, either as a team or by yourself. If
+			you sign up alone, you <strong>might not be placed on a team</strong>, depending
+			on number of open signups. If you create a team and don't have a full roster, we will
+			try to assign the correct number of players for you. If there are no available
+			players, your team may be broken up or excluded completely.
+		</p>
+		<p class="lead">
+			Creating a team will also provide you with an invite link to allow
+			other players to join your team. All cap restrictions will apply to
+			these players.
+		</p>
+		<%
+			}
+
+			if ( ! user_id ) {
+		%>
+		<h3>Sign in with Discord</h3>
+		<p class="lead">
+			Please sign in with Discord to interact with this tournament.
+		</p>
+		<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+		<%
+			} else {
+				if ( ! (tournament['id'] in my_tournaments) ) {
+		%>
+		<div class="row">
+			<div class="col-md-4">
+				<h3 class="bg-secondary text-white rounded p-2">Team Signup</h3>
+				<a class="btn btn-lg btn-primary" href="/tournament/<%- tournament.id %>/signup" role="button">
+					<i class="fas fa-users"></i>
+					Create a Team
+				</a>
+			</div>
+			<div class="col-md-2"></div>
+			<div class="col-md-4">
+				<h3 class="bg-secondary text-white rounded p-2">Solo Signup</h3>
+				<a class="btn btn-lg btn-warning" href="/tournament/<%- tournament.id %>/signup_solo" role="button">
+					<i class="fas fa-user"></i>
+					Sign up Individually
+				</a>
+			</div>
+		</div>
+		<%
+				} else {
+		%>
+		<div class="row">
+			<div class="col">
+				<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
+				<p class="lead">
+					Make sure you're ready to go on the tournament start date.
+				</p>
+				<ul>
+					<li>
+						Check In: 
+							<strong
+							class="timeago"
+							datetime="<%= check_in; %>"
+							title="<%= check_in; %>"
+							><%= check_in; %></strong>
+					</li>
+					<li>
+						Start Time: 
+							<strong
+							class="timeago"
+							datetime="<%= tournament['start_dtg']; %>"
+							title="<%= tournament['start_dtg']; %>"
+							><%= tournament['start_dtg'];  %></strong>
+					</li>
+					<li>
+						Team: None Assigned
+					</li>
+				</ul>
+			</div>
+		</div>
+		<%
+				} 
+			}
+		%>
+	
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>

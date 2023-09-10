@@ -217,9 +217,16 @@ router.get('/process_gameday', (req, res) => {
 	req.db.query(signups_query, (err, results) => {
 		if ( err ) { throw err; }
 
-		let signups = {};
+		const signups = {};
 		let match_day = null;
 		for ( let i = 0; i < results.length; i++ ) {
+			// combine master/prem, ammy/contender
+			if ( results[i]['active'] == 1 ) {
+				signups[ results[i]['tier'] ]['fa'].push(results[i]);
+			} else {
+				signups[ results[i]['tier'] ]['sub'].push(results[i]);
+			}
+
 			if ( ! ( results[i]['tier'] in signups ) ) {
 				match_day = results[i]['match_day'];
 				signups[ results[i]['tier'] ] = {
@@ -229,11 +236,13 @@ router.get('/process_gameday', (req, res) => {
 					'sub': [],
 				};
 			}
-			if ( results[i]['active'] == 1 ) {
-				signups[ results[i]['tier'] ]['fa'].push(results[i]);
-			} else {
-				signups[ results[i]['tier'] ]['sub'].push(results[i]);
-			}	
+
+			if ( results[i]['tier'] === 'Master' ) {
+				results[i]['tier'] = 'Premier';
+			} else if ( results[i]['tier'] === 'Amateur' ) {
+				results[i]['tier'] = 'Contender';
+			}
+
 		}
 		console.log(signups);
 		res.render('process', { signups: signups, match_day: match_day });
@@ -347,9 +356,9 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			// discord_id, rsc_id, mmr, tier, status
 			if ( player['tier'] == 'Master' ) {
-				player['tier'] = 'Premier';
+				//player['tier'] = 'Premier';
 			} else if ( player['tier'] == 'Amateur' ) {
-				player['tier'] = 'Contender';
+				//player['tier'] = 'Contender';
 			}
 			if ( ! player['mmr'] ) {
 				player['mmr'] = 0;
