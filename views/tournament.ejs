@@ -166,6 +166,7 @@
 		</div>
 		<%
 				} else {
+					const my_tourney = my_tournaments[ tournament['id'] ];
 		%>
 		<div class="row">
 			<div class="col">
@@ -191,9 +192,26 @@
 							><%= tournament['start_dtg'];  %></strong>
 					</li>
 					<li>
-						Team: None Assigned
+						Team: 
+						<%
+							if ( my_tourney['team_id'] !== null ) {
+								const team = tournament.teams.unsorted[ my_tourney['team_id'] ];
+						%>
+							<strong><%= team['name']; %></strong>
+						<%
+							} else {
+						%>
+							<em>No team assigned</em>
+						<%
+							}
+						%>
 					</li>
 				</ul>
+
+				<form action="/tournament/<%= tournament.id %>/leave" method="post">
+					<input type="hidden" name="discord_id" value="<%= discord_id %>">
+					<button type="submit" class="btn btn-lg btn-danger">Leave Tournament</button>
+				</form>
 			</div>
 		</div>
 		<%

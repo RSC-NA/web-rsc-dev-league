@@ -1,0 +1,241 @@
+<%- include('partials/header.ejs'); %>
+
+<main class="container mt-2 p-2">
+	<div class="bg-light p-2 rounded">
+		<h1>
+			<%= team.name %> - <%= tournament['title']; %>
+		</h1>
+		<p class="lead">
+			<%= tournament['description']; %>
+		</p>
+		<div class="row">
+			<div class="col-8">
+				<h2>Tournament Format and Rules</h2>
+				<ul>
+					<li><%= tournament['format']; %></li>
+					<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
+					<li><%= tournament['team_cap']; %> Point Team Cap</li>
+				</ul>
+				<%
+					if ( tournament.allow_external ) {
+				%>
+				<p class="lead">
+					<i class="fas fa-lock-open"></i>
+					This tournament <strong>DOES</strong> allow non-RSC players
+					to join, though they will be required to provide a tracker link 
+					for placement.
+				</p>
+				<%
+					} else {
+				%>
+				<p class="lead">
+					<i class="fas fa-lock"></i>
+					This tournament <strong>DOES NOT</strong> allow non-RSC players
+					to join. All participants must be an active member of RSC
+					and exist in the Contracts Sheet of 3s or 2s.
+				</p>
+				<%
+					}
+				%>
+				<h2>Tournament Dates</h2>
+				<ul>
+					<li>
+						Signups End:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['signup_close_dtg']; %>"
+							title="<%= tournament['signup_close_dtg']; %>"
+						><%= tournament['signup_close_dtg']; %></strong>
+					</li>
+					<%
+						if ( new Date().getTime() < tournament.times.check_in.start.getTime() ) {
+					%>
+					<li style="background-color:<%- tournament.times.check_in.color; %>;">
+						Check in Start:
+						<strong
+							class="timeago"
+							datetime="<%= tournament.times.check_in.start; %>"
+							title="<%= tournament.times.check_in.start; %>"
+						><%= tournament.times.check_in.start; %></strong>
+					</li>
+					<%
+						} else if ( new Date().getTime() < tournament.times.check_in.dtg ) {
+					%>
+					<li style="background-color:<%- tournament.times.check_in.color; %>;">
+						Check In Cutoff:
+						<strong
+							class="timeago"
+							datetime="<%= tournament.times.check_in.dtg; %>"
+							title="<%= tournament.times.check_in.dtg; %>"
+						><%= tournament.times.check_in.dtg; %></strong>
+					</li>
+					<%
+						}
+					%>
+					<li>
+						Start Time:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['start_dtg']; %>"
+							title="<%= tournament['start_dtg']; %>"
+						><%= tournament['start_dtg']; %></strong>
+					</li>
+				</ul>
+			</div>
+			<div class="col-4 matchDates">
+				<h3>Team Info</h3>
+				<h5>Roster</h5>
+				<h6>Current Salary: <%= team.salary; %> (<%= tournament.team_cap - team.salary; %> remaining)</h6>
+				<ul>
+					<%
+						for ( const p_id in team.players ) {
+							const player = team.players[ p_id ];
+					%>
+					<li>
+						<strong><%= player.name ? player.name : player.nickname; %></strong>
+						[<%= player.tier ?? 'none'; %> (<%= player.mmr ?? '0'; %>)]
+						<% 
+							if ( new Date().getTime() > tournament.times.check_in.start.getTime() ) {
+						%>
+						<%- player.check_in_dtg ? '✅' : '❌'; %>
+						<%
+							}
+						%>
+					</li>
+					<%
+						}
+					%>
+				</ul>
+				<hr>
+				<h4>Cap Restrictions</h4>
+				
+				<ul>
+					<li>
+						Total Points Allowed: <strong><%= tournament['team_cap']; %></strong>
+					</li>
+					<li class="mb-1 pb-1 border-bottom border-primary">
+						Total Points Used: <strong><%= team.salary; %></strong>
+					</li>
+					<li style="list-style-type:none;" class="mt-2"><strong>Remaining Choices:</strong></li>
+					<%
+						for ( const tier in POINTS ) {
+							if ( POINTS[tier] >= team.salary ) {
+								continue;
+							}
+					%>
+					<li><%- tier %>: <strong><%- POINTS[tier]; %></strong> points</li>
+					<%
+						}
+					%>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<hr class="mb-4">
+
+	<div class="bg-light p-2 rounded">
+		<%
+			if ( ! user_id ) {
+		%>
+		<h3>Sign in with Discord to Manage Team</h3>
+		<p class="lead">
+			Please sign in with Discord to interact with this team.
+		</p>
+		<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+		<%
+			} else {
+				if ( tournament['id'] in my_tournaments ) {
+					const my_tourney = my_tournaments[ tournament['id'] ];
+
+					if ( my_tourney.team_id === team.id ) {
+						console.log('my team!');
+						if ( tournament.team_size > Object.keys(team.players).length ) {
+		%>
+
+		<h2>Invite the Squad</h2>
+		<div class="row">
+			<div class="col">
+				<p class="lead">
+					This team currently has <strong><%- tournament.team_cap - team.salary; %> Salary Cap</strong>
+					available. You can send the following URL to invite players to join this team:
+				</p>
+				<div class="p-4 m-4 bg-dark bg-opacity-10 font-monospace text-danger border fs-4" id="team_url">
+					<div class="float-end text-end">
+						<a href="javascript:void(0);" id="copy_team_url" class="ms-auto"><i class="fas fa-copy"></i></a>
+					</div>
+					https://devleague.rscstream.com/tournament/<%- tournament.id %>/signup/<%- btoa(team.id); %>
+				</div>
+				<p>
+					<strong>Warning:</strong> Anyone with this link can join your team. Only give this out to
+					people that you <strong>WANT</strong> to play with.
+				</p>
+			</div>
+		</div>
+
+		<%
+						} // end of can invite more people check
+				
+						if ( tournament.times.check_in.active ) {
+		%>
+
+		<h2>Check In</h2>
+		<p class="lead">
+			<strong>ALL</strong> players on this team must check in prior to
+			<%- tournament.times.check_in.dtg %>.
+		</p>
+		<p>
+			If anyone on the team has not checked in, they will be replaced or
+			the team may not get a chance to play in this tournament.
+		</p>
+						<%
+							if ( ! me.check_in_dtg ) {
+						%>
+
+		<div class="row">
+			<div class="col">
+				<a
+					href="/tournament/<%- tournament.id %>/team/<%- team.id %>/check_in"
+					class="btn btn-lg btn-primary"
+				>Check In</a>
+			</div>
+		</div>
+
+						<%
+							} else if ( team.checked_in ) {
+						%>
+		
+		<div class="row">
+			<div class="col">
+				<button disabled class="btn btn-lg btn-primary">Your Team is Ready! 😀</button>
+			</div>
+		</div>
+
+						<%
+							} else if ( me.check_in_dtg ) {
+						%>
+
+		<div class="row">
+			<div class="col">
+				<button disabled class="btn btn-lg btn-primary">You Are Checked In! 😀</button>
+			</div>
+		</div>
+
+						<%
+							}
+						%>
+		<%
+						} // end of "can I check in soon?" check
+		%>
+		<%
+					} // end of "this is my team" check
+				} // end of "Am I even in this tournament" check
+		%>
+		<%
+			} // end of "Am I logged in?" check.
+		%>
+	
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>

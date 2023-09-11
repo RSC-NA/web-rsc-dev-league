@@ -69,126 +69,144 @@
 					</li>
 				</ul>
 
-	<hr class="mb-4">
+				<hr class="mb-4">
 
-	<div class="p-4 rounded" style="background-color:#bcffbc;">
-		<%
-			if ( ! user_id ) {
-		%>
+				<div class="p-4 rounded" style="background-color:#bcffbc;">
+					<%
+						if ( ! user_id ) {
+					%>
 
-		<h3>Sign in with Discord</h3>
-		<p class="lead">
-			Please sign in with Discord to interact with this tournament.
-		</p>
-		<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+					<h3>Sign in with Discord</h3>
+					<p class="lead">
+						Please sign in with Discord to interact with this tournament.
+					</p>
+					<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
 
-		<%
-			} else { // user is logged in
-				if ( tournament['id'] in my_tournaments ) {
-					const my_tourney = my_tournaments[ tournament['id'] ];
-		%>
-		<div class="row">
-			<div class="col">
-				<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
-				<p class="lead">
-					Make sure you're ready to go on the tournament start date.
-				</p>
-				<ul>
-					<li>
-						Check In: 
-							<strong
-							class="timeago"
-							datetime="<%= check_in; %>"
-							title="<%= check_in; %>"
-							><%= check_in; %></strong>
-					</li>
-					<li>
-						Start Time: 
-							<strong
-							class="timeago"
-							datetime="<%= tournament['start_dtg']; %>"
-							title="<%= tournament['start_dtg']; %>"
-							><%= tournament['start_dtg'];  %></strong>
-					</li>
-					<li>
-						Team: 
-						<%
-							if ( my_tourney['team_id'] !== null ) {
-								const team = tournament.teams.unsorted[ my_tourney['team_id'] ];
+					<%
+						} else { // user is logged in
+							if ( tournament['id'] in my_tournaments ) {
+								const my_tourney = my_tournaments[ tournament['id'] ];
+					%>
+					<div class="row">
+						<div class="col">
+							<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
+							<p class="lead">
+								Make sure you're ready to go on the tournament start date.
+							</p>
+							<ul>
+								<li>
+									Check In: 
+										<strong
+										class="timeago"
+										datetime="<%= check_in; %>"
+										title="<%= check_in; %>"
+										><%= check_in; %></strong>
+								</li>
+								<li>
+									Start Time: 
+										<strong
+										class="timeago"
+										datetime="<%= tournament['start_dtg']; %>"
+										title="<%= tournament['start_dtg']; %>"
+										><%= tournament['start_dtg'];  %></strong>
+								</li>
+								<li>
+									Team: 
+									<%
+										if ( my_tourney['team_id'] !== null ) {
+											const team = tournament.teams.unsorted[ my_tourney['team_id'] ];
+									%>
+										<strong><%= team['name']; %></strong>
+									<%
+										} else {
+									%>
+										<em>No team assigned</em>
+									<%
+										}
+									%>
+								</li>
+							</ul>
+							<form action="/tournament/<%= tournament.id; %>/leave" method="post">
+								<input type="hidden" name="discord_id" value="<%= discord_id; %>">
+								<button type="submit" class="btn btn-lg btn-danger">Leave Tournament</button>
+							</form>
+						</div>
+					</div>
+					<%
+							} else {
+								const path = tournament.SOLO ? 'signup_solo' : 'signup';
+					%>
+
+					<h2>Signup <%= tournament.SOLO ? 'Solo' : ' a Team'; %></h2>
+					<form action="/tournament/<%= tournament['id']; %>/<%= path %>" method="post">
+						<input type="hidden" name="discord_id" value="<%= discord_id %>">
+
+						<% 
+							if ( ! tournament.SOLO ) {
 						%>
-							<strong><%= team['name']; %></strong>
+
+						<div class="mb-3">
+							<label for="name">Team Name</label>
+							<div class="input-group">
+								<input type="text" class="form-control" name="name" id="team_name" placeholder="" value="" required>
+							</div>
+						</div>
+
+						<%
+							} // end of team name for non-solo signups
+
+							if ( user && user.rsc_id && user.tier && user.mmr ) {
+						%>
+						<h4>Your Info</h4>
+						<div class="mb-3">
+							<ul>
+								<li>Name: <strong><%= user.name; %></strong></li>
+								<li>Tier: <strong><%= user.tier; %></strong></li>
+								<li>MMR: <strong><%= user.mmr; %></strong></li>
+								<li>RSCID: <strong><%= user.rsc_id; %></strong></li>
+								<li>Salary Points: <strong><%= POINTS[user.tier]; %></strong></li>
+							</ul>
+						</div>
+
 						<%
 							} else {
 						%>
-							<em>No team assigned</em>
+
+						<h4>Your Info</h4>
+						<p>
+							In order for us to place you correctly, you need to provide your <strong>PRIMARY</strong>
+							tracker link.
+						</p>
+
+						<div class="mb-3">
+							<label for="tracker_link">Tracker Link</label>
+							<div class="input-group">
+								<input
+									type="text"
+									class="form-control"
+									name="tracker_link"
+									id="tracker_link"
+									placeholder="https://rocketleague.tracker.network/profile/steam/76561197996673327/overview"
+									value=""
+									required
+								>
+							</div>
+						</div>
+
 						<%
 							}
 						%>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<%
-				} else if ( tournament.SOLO ) {
-		%>
+						
+						<input type="submit" class="btn btn-lg btn-primary" value="Signup for Tournament">
 
-		<h2>Signup Solo</h2>
-		<form action="/tournament/<%= tournament['id']; %>/signup_solo" method="post">
-			<input type="hidden" name="player_id" value="<%= user_id %>">
-			
-			<%
-				if ( user && user.rsc_id && user.tier && user.mmr ) {
-			%>
-			<h4>Your Info</h4>
-			<div class="mb-3">
-				<ul>
-					<li>Name: <strong><%= user.name; %></strong></li>
-					<li>Tier: <strong><%= user.tier; %></strong></li>
-					<li>MMR: <strong><%= user.mmr; %></strong></li>
-					<li>RSCID: <strong><%= user.rsc_id; %></strong></li>
-					<li>Salary Points: <strong><%= POINTS[user.tier]; %></strong></li>
-				</ul>
-			</div>
+					</form>
+				<%
 
-			<input type="submit" class="btn btn-lg btn-primary" value="Signup for Tournament">
-			<%
-				}
-			%>
-
-		</form>
-
-		<%
-				} else {
-		%>
-
-		<h2>Signup a Team</h2>
-		<form action="/tournament/<%= tournament['id']; %>/signup" method="post">
-			<input type="hidden" name="player_id" value="<%= user_id %>">
-
-			<div class="mb-3">
-				<label for="name">Team Name</label>
-				<div class="input-group">
-					<input type="text" class="form-control" name="name" id="team_name" placeholder="" value="" required>
+						}
+					}
+				%>
+				
 				</div>
-			</div>
-
-			<hr>
-			
-			<h4>Add Players</h4>
-			<div class="mb-3">
-				<label for="player_2">Player Name</label>
-				<div class="input-group">
-				</div>
-			</div>
-
-		</form>
-
-		<% 
-				}
-			}
-		%>
-	
-	</div>
 
 			</div>
 			<div class="col-4 matchDates">

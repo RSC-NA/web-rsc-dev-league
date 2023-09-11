@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		for ( let i = 0; i < timeEls.length; ++i ) {
 			const dateStr = timeEls[i].getAttribute('datetime');
 			if ( dateStr ) {
-				const d = new Date(dateStr).getTime() - (new Date().getTimezoneOffset() * 60000);
+				// uncomment the line of server is set to UTC
+				const d = new Date(dateStr).getTime(); // - (new Date().getTimezoneOffset() * 60000);
 				timeEls[i].setAttribute('datetime', d);
 			}
 		}

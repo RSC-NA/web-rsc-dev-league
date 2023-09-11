@@ -33,6 +33,7 @@ CREATE TABLE tournament_players (
 	`cap_value` INT UNSIGNED NOT NULL DEFAULT 0,
 	`mmr` INT UNSIGNED,
 	`tracker_link` VARCHAR(255),
+	`check_in_dtg` DATETIME,
 	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -2,12 +2,15 @@
 // Server app code below
 const express = require('express');
 const app = express();
+const connection = require('./core/database').databaseConnection;
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const sessionStore = new MySQLStore({}, connection);
+
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
-const connection = require('./core/database').databaseConnection;
 
 // controllers
 const auth_controller = require('./controllers/authentication');
@@ -44,8 +47,6 @@ function writeError(error) {
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
-require('dotenv').config();
-
 app.use( express.urlencoded({ extended: true }) );
 
 const title = 'RSC Development League';
@@ -53,9 +54,11 @@ const description = 'Welcome to the RSC Development League! Matches are open to 
 
 // set up session
 app.use(session({
+	store: sessionStore,
+	key: 'rsc-dev-league',
 	secret: 'rsc-dev-league',
-	resave: true,
-	saveUninitialized: true
+	resave: false,
+	saveUninitialized: false,
 }));
 
 app.use(cors({
@@ -1052,4 +1055,4 @@ app.post('/save_mmr', (req, res) => {
  ****************** /TRACKER/MMR TOOL ********************
  *******************************************************/
 
-app.listen( process.env.PORT || 3000 , () => console.log("Server running..."));
+app.listen(3030, () => console.log("Server running... on port", process.env.PORT));
