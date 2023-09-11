@@ -43,7 +43,7 @@
 					<%
 						for ( const tier in leaderboards ) {
 							const leaderboard = leaderboards[ tier ];
-							if ( leaderboard && Object.keys(leaderboard).length === 0 ) {
+							if ( leaderboard === null ) {
 								continue;
 							}
 					%>
