@@ -28,6 +28,7 @@ CREATE TABLE tournament_players (
 	`t_id` BIGINT(11) UNSIGNED NOT NULL,
 	`player_id` BIGINT(11) UNSIGNED NOT NULL,
 	`team_id` BIGINT(11) UNSIGNED,
+	`discord_id` VARCHAR(20) NOT NULL,
 	`tier` VARCHAR(20),
 	`cap_value` INT UNSIGNED NOT NULL DEFAULT 0,
 	`mmr` INT UNSIGNED,

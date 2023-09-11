@@ -68,55 +68,10 @@
 						><%= tournament['start_dtg']; %></strong>
 					</li>
 				</ul>
-			</div>
-			<div class="col-4 matchDates">
-				<h3>Signups</h3>
-				<h5>Team Signups</h5>
-				<ul>
-					<li>
-						Full Teams:
-						<strong id="full_teams">
-							<%= Object.keys(tournament.teams.full).length; %>
-						</strong>
-					</li>
-					<li>
-						Open Teams:
-						<strong id="full_teams">
-							<%= Object.keys(tournament.teams.open).length; %>
-						</strong>
-					</li>
-				</ul>
-				<h5>Solo Signups</h5>
-				<ul>
-					<li>
-						Solo Signups:
-						<strong id="full_teams">
-							<%= Object.keys(tournament.players).length; %>
-						</strong>
-					</li>
-				</ul>
-				<hr>
-				<h4>Cap Restrictions</h4>
-				
-				<ul>
-					<li class="mb-1 pb-1 border-bottom border-primary">Total Points Allowed: <strong><%= tournament['team_cap']; %></strong></li>
-					<li>Premier: <strong>9</strong> points</li>
-					<li>Master: <strong>8</strong> points</li>
-					<li>Elite: <strong>7</strong> points</li>
-					<li>Veteran: <strong>6</strong> points</li>
-					<li>Rival: <strong>5</strong> points</li>
-					<li>Challenger: <strong>4</strong> points</li>
-					<li>Prospect: <strong>3</strong> points</li>
-					<li>Contender: <strong>2</strong> points</li>
-					<li>Amateur: <strong>1</strong> points</li>
-				</ul>
-			</div>
-		</div>
-	</div>
 
 	<hr class="mb-4">
 
-	<div class="bg-light p-2 rounded">
+	<div class="p-4 rounded" style="background-color:#bcffbc;">
 		<%
 			if ( ! user_id ) {
 		%>
@@ -177,14 +132,56 @@
 				} else if ( tournament.SOLO ) {
 		%>
 
-		<h2>Signup as a Solo</h2>
+		<h2>Signup Solo</h2>
+		<form action="/tournament/<%= tournament['id']; %>/signup_solo" method="post">
+			<input type="hidden" name="player_id" value="<%= user_id %>">
+			
+			<%
+				if ( user && user.rsc_id && user.tier && user.mmr ) {
+			%>
+			<h4>Your Info</h4>
+			<div class="mb-3">
+				<ul>
+					<li>Name: <strong><%= user.name; %></strong></li>
+					<li>Tier: <strong><%= user.tier; %></strong></li>
+					<li>MMR: <strong><%= user.mmr; %></strong></li>
+					<li>RSCID: <strong><%= user.rsc_id; %></strong></li>
+					<li>Salary Points: <strong><%= POINTS[user.tier]; %></strong></li>
+				</ul>
+			</div>
 
+			<input type="submit" class="btn btn-lg btn-primary" value="Signup for Tournament">
+			<%
+				}
+			%>
+
+		</form>
 
 		<%
 				} else {
 		%>
 
 		<h2>Signup a Team</h2>
+		<form action="/tournament/<%= tournament['id']; %>/signup" method="post">
+			<input type="hidden" name="player_id" value="<%= user_id %>">
+
+			<div class="mb-3">
+				<label for="name">Team Name</label>
+				<div class="input-group">
+					<input type="text" class="form-control" name="name" id="team_name" placeholder="" value="" required>
+				</div>
+			</div>
+
+			<hr>
+			
+			<h4>Add Players</h4>
+			<div class="mb-3">
+				<label for="player_2">Player Name</label>
+				<div class="input-group">
+				</div>
+			</div>
+
+		</form>
 
 		<% 
 				}
@@ -192,6 +189,54 @@
 		%>
 	
 	</div>
+
+			</div>
+			<div class="col-4 matchDates">
+				<h3>Signups</h3>
+				<h5>Team Signups</h5>
+				<ul>
+					<li>
+						Full Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.full).length; %>
+						</strong>
+					</li>
+					<li>
+						Open Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.open).length; %>
+						</strong>
+					</li>
+				</ul>
+				<h5>Solo Signups</h5>
+				<ul>
+					<li>
+						Solo Signups:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.players).length; %>
+						</strong>
+					</li>
+				</ul>
+				<hr>
+				<h4>Cap Restrictions</h4>
+				
+				<ul>
+					<li class="mb-1 pb-1 border-bottom border-primary">Total Points Allowed: <strong><%= tournament['team_cap']; %></strong></li>
+					<li>Premier: <strong>9</strong> points</li>
+					<li>Master: <strong>8</strong> points</li>
+					<li>Elite: <strong>7</strong> points</li>
+					<li>Veteran: <strong>6</strong> points</li>
+					<li>Rival: <strong>5</strong> points</li>
+					<li>Challenger: <strong>4</strong> points</li>
+					<li>Prospect: <strong>3</strong> points</li>
+					<li>Contender: <strong>2</strong> points</li>
+					<li>Amateur: <strong>1</strong> points</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
 </main>
 
 <%- include('partials/footer.ejs'); %>
