@@ -21,7 +21,7 @@ router.get('/championship', (req, res) => {
 	};
 	const team_wins = {};
 	const team_match_map = {};
-	const team_ids = [];
+	const team_ids = [0];
 	const players = {};
 	req.db.query(query, [season], (err, results) => {
 		if ( err ) { throw err; }
