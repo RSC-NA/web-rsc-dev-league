@@ -50,6 +50,9 @@
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {
+							if ( Object.keys(leaderboards[tier]).length === 0 ) {
+								continue;
+							}
 							const leaderboard = leaderboards[ tier ];
 					%>
 					<h4><%= tier; %></h4>
