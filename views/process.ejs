@@ -81,6 +81,9 @@
 		if ( tiers[tierName] == 6 ) {
 			continue;
 		}
+		if ( tierName === 'season' ) {
+			continue;
+		}
 		let niceTierName = ucfirst(tierName);
 		if ( niceTierName in tierNameMap ) {
 			niceTierName = tierNameMap[niceTierName];
