@@ -3,6 +3,37 @@
 
 <% 
 
+	const tierChange = {
+		Premier: {
+			up: 'Premier',
+			down: 'Elite',
+		},
+		Elite: {
+			up: 'Premier',
+			down: 'Veteran',
+		},
+		Veteran: {
+			up: 'Elite',
+			down: 'Rival',
+		},
+		Rival: {
+			up: 'Veteran',
+			down: 'Challenger',
+		},
+		Challenger: {
+			up: 'Rival',
+			down: 'Prospect',
+		},
+		Prospect: {
+			up: 'Challenger',
+			down: 'Contender',
+		},
+		Contender: {
+			up: 'Prospect',
+			down: 'Contender',
+		},
+	};
+
 	function ucfirst(str) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
@@ -198,6 +229,14 @@
 					%>
 
 					<li class="list-group-item d-flex justify-content-between lh-condensed">
+						<div style="width:48px;">
+							<a href="/change_tier/<%= player['rsc_id'] %>/<%= changeTier[ tier ]['up'] %>">
+							⬆️
+							</a>
+							<a href="/change_tier/<%= player['rsc_id'] %>/<%= changeTier[ tier ]['down'] %>">
+							⬇️
+							</a>
+						</div>
 						<div>
 							<h6 class="my-0"><%= player['name'] %></h6>
 							<small class="text-muted"><%= player['status'] %> - <a href="/make_inactive/<%= player['id'] %>">Deactivate Sub</a></small>
