@@ -50,11 +50,10 @@
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {
-							if ( leaderboards[tier] && leaderboards[tier].length === 0 ) {
+							const leaderboard = leaderboards[ tier ];
+							if ( leaderboard && Object.keys(leaderboard).length === 0 ) {
 								continue;
 							}
-							const leaderboard = leaderboards[ tier ];
-							console.log(leaderboard.length);
 					%>
 					<h4><%= tier; %></h4>
 					<ol class="dates">
