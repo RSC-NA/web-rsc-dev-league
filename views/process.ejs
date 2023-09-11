@@ -75,7 +75,9 @@
 		}
 	}
 
-	for ( let tierName in tiers ) {
+	const tierListOrder = Object.keys(settings).reverse();
+	for ( let i = 0; i < tierListOrder.length; ++i ) { 
+		let tierName = tierListOrder[i];
 		if ( tiers[tierName] == 6 ) {
 			continue;
 		}

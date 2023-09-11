@@ -2,7 +2,7 @@
 <%- include('partials/header.ejs'); %>
 
 <%
-	console.log('Dashboard time',new Date());
+		
 %>
 
 	<main class="container">
@@ -125,7 +125,13 @@
 				If you are unable to play, you may check out using the check out button below. 
 				<strong>At 8:00PM, your match information will be available at THIS website.</strong>
 			</p>
+			<%
+				if ( new Date().getHours() < 24 ) {
+			%>
 			<a class="btn btn-lg btn-danger" href="/check_out/<%= match_day %>" role="button">Check Out</a>
+			<%
+				}
+			%>
 			<% } else if ( nickname && user && ! user['active_3s'] ) { %>
 			<h2>You are not an active player</h2>
 			<p>
