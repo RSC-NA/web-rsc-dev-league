@@ -12,6 +12,19 @@ function writeError(error) {
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
+router.get('/change_tier/:rsc_id/:new_tier', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	}
+
+	const query = 'UPDATE contracts SET tier = ? WHERE rsc_id = ?';
+	req.db.query(query, [ req.params.new_tier, req.params.rsc_id], (err, _results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect('/process_gameplay');
+	});
+});
+
 router.post('/generate_team/:tier', (req, res) => {
 	if ( ! req.session.is_admin ) {
 		return res.redirect('/');
