@@ -95,6 +95,7 @@ router.get('/championship', (req, res) => {
 
 				leaderboards[player.tier].push(player);
 			}
+			console.log(leaderboards);
 			res.render('championship', { leaderboards: leaderboards });
 		});
 	});
