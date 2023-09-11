@@ -38,7 +38,7 @@ router.get('/championship', (req, res) => {
 		const playerQuery = `
 			SELECT
 				c.name,c.rsc_id,c.discord_id,c.tier,c.status,c.mmr,
-				tp.team_id, p.nickname
+				tp.player_id,tp.team_id, p.nickname
 			FROM team_players AS tp
 			LEFT JOIN players AS p ON tp.player_id = p.id
 			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
@@ -61,8 +61,8 @@ router.get('/championship', (req, res) => {
 						break;
 				}
 
-				if ( ! (player.id in players) ) {
-					players[ player.id ] = {
+				if ( ! (player.player_id in players) ) {
+					players[ player.player_id ] = {
 						name: player.name,
 						rsc_id: player.rsc_id,
 						discord_id: player.discord_id,
@@ -74,11 +74,11 @@ router.get('/championship', (req, res) => {
 					};
 				}
 
-				players[ player.id ].points++;
-				players[ player.id ].series++;
-				players[ player.id ].wins += team_wins[ player.team_id ];
+				players[ player.player_id ].points++;
+				players[ player.player_id ].series++;
+				players[ player.player_id ].wins += team_wins[ player.team_id ];
 				const win_points = team_wins[ player.team_id ] * .5;
-				players[ player.id ].points += win_points;
+				players[ player.player_id ].points += win_points;
 			}
 			
 			let sorted_players = Object.keys(players);
@@ -95,7 +95,6 @@ router.get('/championship', (req, res) => {
 
 				leaderboards[player.tier].push(player);
 			}
-			console.log(leaderboards);
 			res.render('championship', { leaderboards: leaderboards });
 		});
 	});

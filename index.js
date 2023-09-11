@@ -81,7 +81,8 @@ app.use((req, res, next) => {
 	// either comment this section out, or add a check for 'localhost'
 	// as the host
 	const host = req.headers.host;
-	if ( ! (host == 'devleague.rscstream.com' || host == 'api.rscstream.com') ) {
+	console.log(host);
+	if ( ! (host == 'devleague.rscstream.com' || host == 'api.rscstream.com' || host === 'localhost:3030' ) ) {
 		return res.redirect('https://devleague.rscstream.com');
 	}
 
@@ -112,8 +113,8 @@ app.use((req, res, next) => {
 	if ( current_view in res.locals.menu ) {
 		res.locals.menu[ current_view ] = 'active';
 	}
-
-	res.locals.callbackUrl = encodeURIComponent('https://devleague.rscstream.com/oauth2');
+	const httpPre = req.headers.host.includes('localhost') ? 'http' : 'https';
+	res.locals.callbackUrl = encodeURIComponent(`${httpPre}://${req.headers.host}/oauth2`);
 
 	res.locals.user_id = req.session.user_id;
 	res.locals.nickname = req.session.nickname;
