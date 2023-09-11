@@ -41,6 +41,13 @@
 	let tiers = {};
 	let advertiseText = '';
 
+	const tierNameMap = {
+		'Premier': 'PreMaster',
+		'Master': 'PreMaster',
+		'Contender': 'ContAmmy',
+		'Amateur': 'ContAmmy',
+	};
+
 	for ( let tierName in settings ) {
 		if ( tierName == 'season' ) {
 			continue;
@@ -72,7 +79,11 @@
 		if ( tiers[tierName] == 6 ) {
 			continue;
 		}
-		advertiseText += `**${ucfirst(tierName)}**: Needs ${tiers[tierName]} more.\n`;
+		let niceTierName = ucfirst(tierName);
+		if ( niceTierName in tierNameMap ) {
+			niceTierName = tierNameMap[niceTierName];
+		}
+		advertiseText += `**${niceTierName}**: Needs ${tiers[tierName]} more.\n`;
 	}
 	advertiseText += "\nhttps://devleague.rscstream.com";
 %> 
@@ -213,7 +224,7 @@
 						<% if ( teamsBuilt ) { %>
 						<span class="text-muted m-2"><%= teamsBuilt %> Teams Generated</span>
 						<% } %>
-						<input type="hidden" id="<%= tier %>_advertisement" value="RSC Dev League needs **<%= tiers[ tier.toLowerCase() ] %>** more <%= tier %> signups -- https://devleague.rscstream.com">
+						<input type="hidden" id="<%= tier %>_advertisement" value="RSC Dev League needs **<%= tiers[ tier.toLowerCase() ] %>** more <%= tier in tierNameMap ? tierNameMap[tier] : tier; %> signups -- https://devleague.rscstream.com">
 						<button type="button" class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('<%= tier %>_advertisement').value);">Copy Ad</button>
 					</div>
 				</form>
