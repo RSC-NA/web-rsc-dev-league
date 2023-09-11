@@ -117,55 +117,20 @@
 	<hr class="mb-4">
 
 	<div class="bg-light p-2 rounded">
-		<h2>Play</h2>
 		<%
-			if ( ! (tournament['id'] in my_tournaments) ) {
-		%>
-		<p class="lead">
-			Sign up to play in this tournament, either as a team or by yourself. If
-			you sign up alone, you <strong>might not be placed on a team</strong>, depending
-			on number of open signups. If you create a team and don't have a full roster, we will
-			try to assign the correct number of players for you. If there are no available
-			players, your team may be broken up or excluded completely.
-		</p>
-		<p class="lead">
-			Creating a team will also provide you with an invite link to allow
-			other players to join your team. All cap restrictions will apply to
-			these players.
-		</p>
-		<%
-			}
-
 			if ( ! user_id ) {
 		%>
+
 		<h3>Sign in with Discord</h3>
 		<p class="lead">
 			Please sign in with Discord to interact with this tournament.
 		</p>
 		<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+
 		<%
-			} else {
-				if ( ! (tournament['id'] in my_tournaments) ) {
-		%>
-		<div class="row">
-			<div class="col-md-4">
-				<h3 class="bg-secondary text-white rounded p-2">Team Signup</h3>
-				<a class="btn btn-lg btn-primary" href="/tournament/<%- tournament.id %>/signup" role="button">
-					<i class="fas fa-users"></i>
-					Create a Team
-				</a>
-			</div>
-			<div class="col-md-2"></div>
-			<div class="col-md-4">
-				<h3 class="bg-secondary text-white rounded p-2">Solo Signup</h3>
-				<a class="btn btn-lg btn-warning" href="/tournament/<%- tournament.id %>/signup_solo" role="button">
-					<i class="fas fa-user"></i>
-					Sign up Individually
-				</a>
-			</div>
-		</div>
-		<%
-				} else {
+			} else { // user is logged in
+				if ( tournament['id'] in my_tournaments ) {
+					const my_tourney = my_tournaments[ tournament['id'] ];
 		%>
 		<div class="row">
 			<div class="col">
@@ -191,13 +156,38 @@
 							><%= tournament['start_dtg'];  %></strong>
 					</li>
 					<li>
-						Team: None Assigned
+						Team: 
+						<%
+							if ( my_tourney['team_id'] !== null ) {
+								const team = tournament.teams.unsorted[ my_tourney['team_id'] ];
+						%>
+							<strong><%= team['name']; %></strong>
+						<%
+							} else {
+						%>
+							<em>No team assigned</em>
+						<%
+							}
+						%>
 					</li>
 				</ul>
 			</div>
 		</div>
 		<%
-				} 
+				} else if ( tournament.SOLO ) {
+		%>
+
+		<h2>Signup as a Solo</h2>
+
+
+		<%
+				} else {
+		%>
+
+		<h2>Signup a Team</h2>
+
+		<% 
+				}
 			}
 		%>
 	
