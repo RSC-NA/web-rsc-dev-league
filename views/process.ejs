@@ -157,9 +157,9 @@
 			<h4 class="mb-3">Signups By Tier</h4>
 			
 			<%
-				const tiers = Object.keys(settings).reverse();
-				for ( let i = 0; i < tiers.length; ++i ) { 
-					const tier = tiers[i];
+				const tierList = Object.keys(settings).reverse();
+				for ( let i = 0; i < tierList.length; ++i ) { 
+					const tier = tierList[i];
 					if ( tier == 'season' ) {
 						continue;
 					}
