@@ -221,10 +221,10 @@ router.get('/process_gameday', (req, res) => {
 		let match_day = null;
 		for ( let i = 0; i < results.length; i++ ) {
 			// combine master/prem, ammy/contender
-			if ( results[i]['active'] == 1 ) {
-				signups[ results[i]['tier'] ]['fa'].push(results[i]);
-			} else {
-				signups[ results[i]['tier'] ]['sub'].push(results[i]);
+			if ( results[i]['tier'] === 'Master' ) {
+				results[i]['tier'] = 'Premier';
+			} else if ( results[i]['tier'] === 'Amateur' ) {
+				results[i]['tier'] = 'Contender';
 			}
 
 			if ( ! ( results[i]['tier'] in signups ) ) {
@@ -236,12 +236,13 @@ router.get('/process_gameday', (req, res) => {
 					'sub': [],
 				};
 			}
-
-			if ( results[i]['tier'] === 'Master' ) {
-				results[i]['tier'] = 'Premier';
-			} else if ( results[i]['tier'] === 'Amateur' ) {
-				results[i]['tier'] = 'Contender';
+			
+			if ( results[i]['active'] == 1 ) {
+				signups[ results[i]['tier'] ]['fa'].push(results[i]);
+			} else {
+				signups[ results[i]['tier'] ]['sub'].push(results[i]);
 			}
+
 
 		}
 		console.log(signups);
