@@ -52,7 +52,7 @@
 						<%
 							let count = 0;
 							let myPosition = null;
-							if ( user.name && user.name in leaderboard ) {
+							if ( leaderboard && user.name && user.name in leaderboard ) {
 								myPosition = Object.keys(leaderboard).indexOf(user.name);
 							}
 							for ( let player in leaderboard ) {
