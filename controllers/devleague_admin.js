@@ -208,7 +208,7 @@ router.get('/activate_everyone/:match_day', (req, res) => {
 
 router.get('/process_gameday', (req, res) => {
 	if ( ! req.session.is_admin ) {
-		return res.redirect('/');
+		//return res.redirect('/');
 	} 
 
 	res.locals.title = `Process Gameday - ${res.locals.title}`;
