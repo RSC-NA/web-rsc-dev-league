@@ -228,12 +228,14 @@
 							let player = signups[tier]['fa'][i]; 
 					%>
 
-					<li class="list-group-item d-flex justify-content-between lh-condensed">
-						<div style="width:48px;">
-							<a href="/change_tier/<%= player['rsc_id'] %>/<%= changeTier[ tier ]['up'] %>">
+					<li class="list-group-item d-flex lh-condensed">
+						<div style="width:32px;">
+							<a href="/change_tier/<%= player['rsc_id'] %>/<%= changeTier[ tier ]['up'] %>"
+								title="Move <%= player['name']; %> to <%= changeTier[tier]['up']; %>">
 							⬆️
 							</a>
-							<a href="/change_tier/<%= player['rsc_id'] %>/<%= changeTier[ tier ]['down'] %>">
+							<a href="/change_tier/<%= player['rsc_id'] %>/<%= changeTier[ tier ]['down'] %>"
+								title="Move <%= player['name']; %> to <%= changeTier[tier]['down']; %>">
 							⬇️
 							</a>
 						</div>
@@ -241,7 +243,7 @@
 							<h6 class="my-0"><%= player['name'] %></h6>
 							<small class="text-muted"><%= player['status'] %> - <a href="/make_inactive/<%= player['id'] %>">Deactivate Sub</a></small>
 						</div>
-						<span class="text-muted"><%= player['mmr'] %> MMR</span>
+						<div class="ms-auto text-muted"><%= player['mmr'] %> MMR</div>
 					</li>
 
 					<% } // end of player for loop %>
