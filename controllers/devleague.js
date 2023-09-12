@@ -160,7 +160,8 @@ router.get('/match', (req, res) => {
 	const matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
-			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id
+			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id,
+			m.home_wins, m.away_wins
 		FROM
 			matches AS m
 		LEFT JOIN
@@ -192,9 +193,12 @@ router.get('/match', (req, res) => {
 		res.render('match', { 
 			season: results[0].season, 
 			match_day: results[0].match_day, 
+			match_id: id,
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
-			players: results 
+			home_wins: results[0].home_wins,
+			away_wins: results[0].away_wins,
+			players: results,
 		});
 	});
 });
@@ -233,13 +237,13 @@ router.get('/match/:match_id', (req, res) => {
 			m.id = ?
 		ORDER BY tp.team_id ASC, c.mmr DESC
 	`;
-
+	const match_id = req.params.match_id;
 	req.db.query(matchQuery, [ req.params.match_id ], (err, results) => {
 		if ( err ) { throw err; }
 
 		res.render('match', { 
 			season: results[0].season, 
-			match_id: req.params.match_id,
+			match_id: match_id,
 			match_day: results[0].match_day, 
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
