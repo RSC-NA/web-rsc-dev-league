@@ -38,7 +38,7 @@
 
 		<div class="row">
 			<div class="col-md-4">
-				<h3 class="bg-primary text-white rounded p-2"><%= is_admin ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user.substring(3) %></h3>
+				<h3 class="bg-primary text-white rounded p-2"><%= is_admin ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %></h3>
 				<ul>
 					<li>
 						<%= is_admin ? '[' + players[0].mmr + '] ' : '' %>
@@ -58,7 +58,7 @@
 				</ul>
 			</div>
 			<div class="col-md-4">
-				<h3 class="bg-warning rounded p-2"><%= is_admin ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass.substring(3) %></h3>
+				<h3 class="bg-warning rounded p-2"><%= is_admin ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
 				<ul>
 					<li>
 						<%= is_admin ? '[' + players[3].mmr + '] ' : '' %>
