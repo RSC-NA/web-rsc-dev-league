@@ -35,10 +35,18 @@
 			let teamOneMmr = players[0].mmr + players[1].mmr + players[2].mmr;
 			let teamTwoMmr = players[3].mmr + players[4].mmr + players[5].mmr;
 		%> 
-
+		<form action="/score/<%- match_id %>" method="post">
 		<div class="row">
 			<div class="col-md-4">
 				<h3 class="bg-primary text-white rounded p-2"><%= is_admin ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %></h3>
+				<div class="mb-3">
+					<label for="name">Home Team Series Score</label>
+					<div class="input-group">
+						<input type="number" class="form-control" name="home_wins" id="home_wins" placeholder="2" value="<%- home_wins %>" required max="4">
+					</div>
+					<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
+				</div>
+					
 				<ul>
 					<li>
 						<%= is_admin ? '[' + players[0].mmr + '] ' : '' %>
@@ -59,6 +67,13 @@
 			</div>
 			<div class="col-md-4">
 				<h3 class="bg-warning rounded p-2"><%= is_admin ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
+				<div class="mb-3">
+					<label for="name">Away Team Series Score</label>
+					<div class="input-group">
+						<input type="number" class="form-control" name="away_wins" id="away_wins" placeholder="2" value="<%- away_wins %>" required max="4">
+					</div>
+					<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
+				</div>
 				<ul>
 					<li>
 						<%= is_admin ? '[' + players[3].mmr + '] ' : '' %>
@@ -78,6 +93,7 @@
 				</ul>
 			</div>
 		</div>
+		</form>
 	
 	</div>
 </main>

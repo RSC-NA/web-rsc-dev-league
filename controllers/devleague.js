@@ -199,13 +199,25 @@ router.get('/match', (req, res) => {
 	});
 });
 
+router.post('/score/:match_id', (req, res) => {
+	const home_wins = req.body.home_wins;
+	const away_wins = req.body.away_wins;
+	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ? WHERE id = ?';
+	req.db.query(scoreQuery, [ home_wins, away_wins, req.params.match_id ], (err, _results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect(`/match/${req.params.match_id}`);
+	});
+});
+
 router.get('/match/:match_id', (req, res) => {
 	res.locals.title = `Match ${req.params.match_id} Info - ${res.locals.title}`;
 
 	const matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
-			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id
+			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id, c.discord_id,
+			m.home_wins, m.away_wins
 		FROM
 			matches AS m
 		LEFT JOIN
@@ -227,9 +239,12 @@ router.get('/match/:match_id', (req, res) => {
 
 		res.render('match', { 
 			season: results[0].season, 
+			match_id: req.params.match_id,
 			match_day: results[0].match_day, 
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
+			home_wins: results[0].home_wins,
+			away_wins: results[0].away_wins,
 			players: results 
 		});
 	});
