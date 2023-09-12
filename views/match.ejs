@@ -70,9 +70,9 @@
 					<label for="name">Away Team Series Score</label>
 					<div class="input-group">
 						<input type="number" class="form-control" name="away_wins" id="away_wins" placeholder="2" value="<%- away_wins %>" required max="4">
+						<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
 					</div>
 				</div>
-				<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
 				<ul>
 					<li>
 						<%= is_admin ? '[' + players[3].mmr + '] ' : '' %>
