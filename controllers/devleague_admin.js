@@ -134,7 +134,7 @@ router.post('/generate_team/:tier', (req, res) => {
 					];
 				} else if ( teams[ team ].away ) {
 					matchInfo[4] = insertId;
-					matchInfo[6] = 'fa_' + team;
+					matchInfo[6] = team;
 					matchParams.push(matchInfo);
 				}
 				
