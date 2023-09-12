@@ -193,7 +193,7 @@ router.get('/match', (req, res) => {
 		res.render('match', { 
 			season: results[0].season, 
 			match_day: results[0].match_day, 
-			match_id: id,
+			match_id: results[0].id,
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
 			home_wins: results[0].home_wins,
