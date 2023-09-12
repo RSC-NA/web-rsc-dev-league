@@ -82,6 +82,7 @@ router.get('/championship', (req, res) => {
 			}
 			
 			let sorted_players = Object.keys(players);
+			console.log(sorted_players);
 			sorted_players.sort((a, b) => {
 				return players[a].points - players[b].points;
 			});
@@ -92,8 +93,11 @@ router.get('/championship', (req, res) => {
 				if ( leaderboards[player.tier] === null ) {
 					leaderboards[player.tier] = [];
 				}
-
-				leaderboards[player.tier].push(player);
+				if ( player.tier in leaderboards ) {
+					leaderboards[player.tier].push(player);
+				} else {
+					console.log('wtf?', player.tier);
+				}
 			}
 			console.log(leaderboards);
 			res.render('championship', { leaderboards: leaderboards });
