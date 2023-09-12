@@ -57,7 +57,7 @@ router.get('/championship', (req, res) => {
 						break;
 					case 'Contender':
 					case 'Amateur':
-						player.tier = 'AmmyTender';
+						player.tier = 'ContAmmy';
 						break;
 				}
 
@@ -83,7 +83,7 @@ router.get('/championship', (req, res) => {
 			
 			let sorted_players = Object.keys(players);
 			sorted_players.sort((a, b) => {
-				return players[b].points - players[a].points;
+				return players[a].points - players[b].points;
 			});
 
 			while ( sorted_players.length ) {
