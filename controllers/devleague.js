@@ -17,7 +17,7 @@ router.get('/championship', (req, res) => {
 		'Rival': null,
 		'Challenger': null,
 		'Prospect': null,
-		'AmmyTender': null,
+		'ContAmmy': null,
 	};
 	const team_wins = {};
 	const team_match_map = {};
@@ -82,7 +82,6 @@ router.get('/championship', (req, res) => {
 			}
 			
 			let sorted_players = Object.keys(players);
-			console.log(sorted_players);
 			sorted_players.sort((a, b) => {
 				return players[a].points - players[b].points;
 			});
@@ -99,7 +98,6 @@ router.get('/championship', (req, res) => {
 					console.log('wtf?', player.tier);
 				}
 			}
-			console.log(leaderboards);
 			res.render('championship', { leaderboards: leaderboards });
 		});
 	});
