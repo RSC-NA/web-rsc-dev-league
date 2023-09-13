@@ -326,7 +326,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 		}
 	}
-
+	
+	console.log('import processing finished');
 	// always add "tehblister" to the list in case he isn't playing
 	// Added for development in S17 so that I could test things 
 	// while non-playing.
@@ -363,6 +364,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	req.db.query('TRUNCATE TABLE contracts', (err,results) => {
 		if ( err ) {  throw err; }
+		console.log('truncate table');
 		
 		let playersArray = [];
 		for ( let rsc_id in players ) {
