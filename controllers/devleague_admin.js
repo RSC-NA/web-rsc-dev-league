@@ -393,7 +393,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			[ playersArray ],
 			(err, results) => {
 				if (err) { /*throw err;*/ writeError(err.toString()); console.log('error!', err); }
-
+				console.log(`Inserting records`, results);
 				res.redirect('/manage_league');
 		});
 	});
