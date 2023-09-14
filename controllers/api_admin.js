@@ -114,7 +114,7 @@ async function pull_stats(req, res) {
 			'Saves'      : TeamStatsRows[i]['Saves'] ?? 0,
 			'Shots'      : TeamStatsRows[i]['Shots'] ?? 0,
 			'GoalDiff'   : TeamStatsRows[i]['Goal Dif.'] ?? 0,
-			'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'] ? TeamStatsRows[i]['Opp Shot %'].replace(/\%/,'') : 0,
+			'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'] ? TeamStatsRows[i]['Opp. Shot %'].replace(/\%/,'') : 0,
 			'OppPoints'  : TeamStatsRows[i]['Opp. Points'] ?? 0,
 			'OppGoals'   : TeamStatsRows[i]['Opp. Goals'] ?? 0,
 			'OppAssists' : TeamStatsRows[i]['Opp. Assists'] ?? 0,
