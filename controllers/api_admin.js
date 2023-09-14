@@ -93,6 +93,7 @@ async function pull_stats(req, res) {
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
+
 		teamStats.push({
 			'Season'     : res.locals.settings.season,// external
 			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
@@ -106,14 +107,14 @@ async function pull_stats(req, res) {
 			'Conference' : TeamStatsRows[i]['Conference'] ?? '',
 			'Division'   : divisionsByTeam[ TeamStatsRows[i]['Team'] ] ?? '', 
 			'GamesPlayed': TeamStatsRows[i]['GP'] ?? 0,
-			'ShotPct'    : TeamStatsRows[i]['Shot %'].replace(/\%/,'') ?? 0,
+			'ShotPct'    : TeamStatsRows[i]['Shot %'] ? TeamStatsRows[i]['Shot %'].replace(/\%/,'') : 0,
 			'Points'     : TeamStatsRows[i]['Points'] ?? 0,
 			'Goals'      : TeamStatsRows[i]['Goals'] ?? 0,
 			'Assists'    : TeamStatsRows[i]['Assists'] ?? 0,
 			'Saves'      : TeamStatsRows[i]['Saves'] ?? 0,
 			'Shots'      : TeamStatsRows[i]['Shots'] ?? 0,
 			'GoalDiff'   : TeamStatsRows[i]['Goal Dif.'] ?? 0,
-			'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'].replace(/\%/,'') ?? 0,
+			'OppShotPct' : TeamStatsRows[i]['Opp. Shot %'] ? TeamStatsRows[i]['Opp Shot %'].replace(/\%/,'') : 0,
 			'OppPoints'  : TeamStatsRows[i]['Opp. Points'] ?? 0,
 			'OppGoals'   : TeamStatsRows[i]['Opp. Goals'] ?? 0,
 			'OppAssists' : TeamStatsRows[i]['Opp. Assists'] ?? 0,
