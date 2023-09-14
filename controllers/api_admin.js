@@ -102,7 +102,7 @@ async function pull_stats(req, res) {
 			'Wins'       : TeamStatsRows[i]['W'] ?? 0,
 			'Loss'       : TeamStatsRows[i]['L'] ?? 0,
 			'WinPct'     : TeamStatsRows[i]['W%'] ? TeamStatsRows[i]['W%'].replace(/\%/,'') : 0, 
-			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ] ?? 0, 
+			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ] ? ranksByTeam[ TeamStatsRows[i]['Team'] ] : 0, 
 			'GM'         : TeamStatsRows[i]['GM'] ?? '',
 			'Conference' : TeamStatsRows[i]['Conference'] ?? '',
 			'Division'   : divisionsByTeam[ TeamStatsRows[i]['Team'] ] ?? '', 
