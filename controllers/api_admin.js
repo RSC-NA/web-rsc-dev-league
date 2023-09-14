@@ -38,6 +38,8 @@ async function pull_stats(req, res) {
 		queueLimit: 0
 	});
 
+	console.log('Starting stats pull...');
+
 	// 1. create google sheets object
 	const doc = new GoogleSpreadsheet(sheetId);
 
@@ -50,41 +52,44 @@ async function pull_stats(req, res) {
 	// sheets = Team List, Team Stats, Player Stats, Team Standings, Variables
 	const TeamSheet = doc.sheetsByTitle["Team List"];
 	const TeamRows = await TeamSheet.getRows();
-	let teams = [];
-	let franchiseByTeam = {};
-	let tierByTeam = {};
+	const teams = [];
+	const franchiseByTeam = {};
+	const tierByTeam = {};
 	// Team Name, Franchise, Tier
 	// StreamTeamStats, StreamTeamStats2
 	// SELECT Id, Season, Franchise, TeamName, Tier, Wins, Loss, WinPct, `Rank`, GM, Conference, Division, GamesPlayed, ShotPct, Points, Goals, Assists, Saves, Shots, GoalDiff, OppShotPct, OppPoints, OppGoals, OppAssists, OppSaves, OppShots FROM {teamStatsTable} ORDER BY TeamName
 	for ( let i = 0; i < TeamRows.length; i++ ) {
-		let teamRow = TeamRows[i];
-		let teamName = teamRow._rawData[0];
-		let franchise = teamRow._rawData[1];
-		let tierName = teamRow._rawData[2];
+		const teamRow = TeamRows[i];
+		const teamName = teamRow._rawData[0];
+		const franchise = teamRow._rawData[1];
+		const tierName = teamRow._rawData[2];
 		teams.push({ name: teamName, franchise: franchise, tier: tierName });
 		franchiseByTeam[ teamName ]  = franchise;
 		tierByTeam[ teamName ]       = tierName;
 	}
+
+	console.log("Teams loaded...");
 	// log tiers
 	//
 	const StandingsSheet = doc.sheetsByTitle['Team Standings'];
 	const StandingsRows  = await StandingsSheet.getRows();
 	const dataRows = StandingsRows.slice(1);
-	let divisionsByTeam = {};
-	let ranksByTeam =  {};
+	const divisionsByTeam = {};
+	const ranksByTeam =  {};
 	for ( let i = 0; i < dataRows.length; i++ ) {
-		let team     = dataRows[i]._rawData[1];
-		let division = dataRows[i]._rawData[3];
-		let rank     = dataRows[i]._rawData[4];
+		const team     = dataRows[i]._rawData[1];
+		const division = dataRows[i]._rawData[3];
+		const rank     = dataRows[i]._rawData[4];
 		//console.log(team, division, rank);
 		divisionsByTeam[ team ] = division;
 		ranksByTeam[ team ] = rank;
 	}
+	console.log('Ranks loaded...');
 
 	// log divisions
 	//console.log(divisionsByTeam);
 
-	let teamStats = [];
+	const teamStats = [];
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
@@ -116,6 +121,7 @@ async function pull_stats(req, res) {
 			'OppShots'   : TeamStatsRows[i]['Opp. Shots'] ?? 0,
 		});
 	}
+	console.log('Team Stats loaded...');
 
 	// clear our tables
 	await conn2.execute(`TRUNCATE ${teamStatsTable}`);
