@@ -827,8 +827,8 @@ app.get('/import_trackers', async (req, res) => {
 	const trackerSheet = trackerDoc.sheetsByTitle["Link List"];
 	const trackerRows = await trackerSheet.getRows();
 
-	let trackers = [];
-
+	const trackers = [];
+	console.log('Getting ready to start loop', trackerRows.length);
 	for ( let i = 0; i < trackerRows.length; i++ ) {
 		if ( i % 100 == 0 ) { console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
 		let rsc_id = trackerRows[i]._rawData[0];
