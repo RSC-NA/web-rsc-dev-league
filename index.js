@@ -783,6 +783,8 @@ app.get('/import_trackers', async (req, res) => {
 		return res.redirect('/');
 	} 
 
+	console.log('Starting tracker import...');
+
 	// fetch all active players from contracts
 	const active_players = {};
 	
@@ -794,6 +796,7 @@ app.get('/import_trackers', async (req, res) => {
 	const rows = await sheet.getRows();
 	
 	for ( let i = 0; i < rows.length; ++i ) {
+		if ( i % 500 == 0 ) { console.log(`Member Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
 		if ( ! rows[i]._rawData[0] ) {
 			console.log(`Exiting at ${i}`);
 			break;
@@ -827,6 +830,7 @@ app.get('/import_trackers', async (req, res) => {
 	let trackers = [];
 
 	for ( let i = 0; i < trackerRows.length; i++ ) {
+		if ( i % 100 == 0 ) { console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
 		let rsc_id = trackerRows[i]._rawData[0];
 		let player_name = trackerRows[i]._rawData[1];
 		let tracker = trackerRows[i]._rawData[2];
