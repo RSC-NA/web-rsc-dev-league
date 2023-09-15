@@ -825,18 +825,19 @@ app.get('/import_trackers', async (req, res) => {
 	trackerDoc.useApiKey(process.env.GOOGLE_API_KEY);
 
 	// 3. pull all relevant fields
+	console.log('trackerDoc.loadInfo()');
 	await trackerDoc.loadInfo();
+	console.log('trackerDoc.loadInfo() DONE');
 
 	const trackerSheet = trackerDoc.sheetsByTitle["Link List"];
 	const trackerRows = await trackerSheet.getRows();
-
 	const trackers = [];
 	console.log('Getting ready to start loop', trackerRows.length);
 	for ( let i = 0; i < trackerRows.length; i++ ) {
 		if ( i % 100 == 0 ) { console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
-		let rsc_id = trackerRows[i]._rawData[0];
-		let player_name = trackerRows[i]._rawData[1];
-		let tracker = trackerRows[i]._rawData[2];
+		const rsc_id = trackerRows[i]._rawData[0];
+		const player_name = trackerRows[i]._rawData[1];
+		const tracker = trackerRows[i]._rawData[2];
 
 		if ( ! (rsc_id in active_players) ) {
 			continue;
