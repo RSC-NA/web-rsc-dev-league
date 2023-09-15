@@ -791,9 +791,12 @@ app.get('/import_trackers', async (req, res) => {
 	// check to see if the player is active in MMS
 	const doc = new GoogleSpreadsheet('1u74mgGPFPWfEiXyCnU2yj6BO9PNCKhIfyGliJvTsZw4');
 	doc.useApiKey(process.env.GOOGLE_API_KEY);
-	//await doc.loadInfo();
+	console.log('doc.loadInfo()');
+	await doc.loadInfo();
+	console.log('doc.loadInfo() DONE');
 	const sheet = await doc.sheetsByTitle['Members'];
 	const rows = await sheet.getRows();
+	console.log('have the rows', rows.length);
 	
 	for ( let i = 0; i < rows.length; ++i ) {
 		if ( i % 500 == 0 ) { console.log(`Member Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
