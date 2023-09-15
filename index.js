@@ -791,8 +791,8 @@ app.get('/import_trackers', async (req, res) => {
 	// check to see if the player is active in MMS
 	const doc = new GoogleSpreadsheet('1u74mgGPFPWfEiXyCnU2yj6BO9PNCKhIfyGliJvTsZw4');
 	doc.useApiKey(process.env.GOOGLE_API_KEY);
-	await doc.loadInfo();
-	const sheet = doc.sheetsByTitle['Members'];
+	//await doc.loadInfo();
+	const sheet = await doc.sheetsByTitle['Members'];
 	const rows = await sheet.getRows();
 	
 	for ( let i = 0; i < rows.length; ++i ) {
