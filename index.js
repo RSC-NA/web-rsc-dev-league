@@ -11,6 +11,13 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
+// if we're running in node, pull in our .env
+// we also have to fix out "password" to strip out 
+// any escaping that we need for Bun .env reading
+if ( typeof Bun === 'undefined' ) {
+	require('dotenv').config();
+	process.env.DB_PASS = process.env.DB_PASS.replaceAll('\\','');
+}
 
 // controllers
 const auth_controller = require('./controllers/authentication');

@@ -282,6 +282,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	let players = {};
 
+	console.log('Importing contracts...');
+
 	for ( let i = 0; i < rows.length; i++ ) {
 		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC Unique ID'] || ! rows[i]['Discord ID'] ) {
 			continue;
@@ -299,6 +301,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		}
 	}
 
+	console.log(`    Players populated...${Object.keys(players).length}`);
+
 	const mmrSheet = doc.sheetsByTitle["Count/Keeper"];
 	const mmrRows = await mmrSheet.getRows();
 
@@ -308,6 +312,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			players[ mmrRows[i]['RSC ID'] ]['tier'] = mmrRows[i]['Tier'];
 		}
 	}
+
+	console.log(`     MMRs/tiers loaded`);
 
 	const contractSheet = doc.sheetsByTitle['Master Contracts'];
 	const contractRows = await contractSheet.getRows();
