@@ -70,14 +70,38 @@
 								Tracker Leaderboard
 							</a>
 
-							<% if ( rostered ) { %>
-								<a class="nav-link <%- menu['match'] %>" href="/match">
-									<div class="sb-nav-link-icon"><i class="fas fa-gamepad"></i></div>
-									Match Info
-								</a>
-							<% } %>
+						<% if ( rostered ) { %>
+							<a class="nav-link <%- menu['match'] %>" href="/match">
+								<div class="sb-nav-link-icon"><i class="fas fa-gamepad"></i></div>
+								Match Info
+							</a>
+						<% } %>
 
-							<% 
+						<%
+							console.log('Future Tournaments:', future_tournaments);
+							console.log('My Tournaments:', my_tournaments);
+							if ( future_tournaments.total ) {
+						%>
+							<div class="sb-sidenav-menu-heading">Tournaments</div>
+							<a class="nav-link <%- menu['tournaments'] %>" href="/match">
+								<div class="sb-nav-link-icon"><i class="fas fa-trophy"></i></div>
+								Tournaments
+							</a>
+						<%
+								if ( Object.keys(my_tournaments).length ) {
+									for ( const t_id in my_tournaments ) { 
+										const tourney = my_tournaments[t_id];
+										const team_name = tourney.team_id ? tourney.team.name : '';
+						%>
+							<a class="nav-link <%- menu['tournament'] %>" href="/tournament/<%- tourney.t_id; %>">
+								<div class="sb-nav-link-icon"><i class="fas fa-trophy"></i></div>
+								<%= tourney.title; %>		
+							</a>
+							
+						<% 
+									}
+								}
+							}
 
 							if ( is_admin ) {  /* admin-only functionality */ 
 								let badge_class = 'bg-secondary';
@@ -92,7 +116,7 @@
 									bad_pending_count = bad_pending_trackers;
 									bad_badge_class = 'bg-danger';
 								}
-							%>
+						%>
 
 							<div class="sb-sidenav-menu-heading">Admin</div>
 							<a class="nav-link <%- menu['process_gameday'] %>" href="/process_gameday">

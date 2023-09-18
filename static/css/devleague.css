@@ -1,7 +1,12 @@
+.border-round,
+.border-rounded {
+	border-radius: 0.5rem;
+}
+
 /* devleague specific styles */
 div.matchDates {
 	background-color: #cde4ff;
-	border-radius: 12px;
+	border-radius: 0.5rem;
 	padding: 10px;
 }
 

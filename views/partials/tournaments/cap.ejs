@@ -1,0 +1,59 @@
+<%
+	/*
+	{
+		salary: (MMR/points used),
+		team_cap: (total allowed in tourney),
+		team_id: null | team_id (if **I** am on a team)
+		POINTS: (POINTS definition object)
+		cap_type: ('tier points', 'mmr', 'tier', 'none')
+	}
+	*/
+	
+	console.log('SALARY', salary);
+	if ( cap_type === 'tier points' ) {
+%>
+<h4>Cap Restrictions [Tier Points]</h4>
+<p>
+	Total Points Allowed: <strong><%= team_cap; %></strong>
+</p>
+<% 
+	if ( team_id && salary ) {
+%>
+<p>
+	Total Points Used: <strong><%= salary; %></strong>
+</p>
+<h5>Remaining Team Options:</h5>
+<% 
+	}
+%>
+<hr>
+<ul>
+	<%
+		for ( const tier in POINTS ) {
+			if ( POINTS[tier] >= salary ) {
+				continue;
+			}
+	%>
+	<li><%- tier %>: <strong><%- POINTS[tier]; %></strong> points</li>
+	<%
+		}
+	%>
+</ul>
+<% 
+	} else if ( cap_type === 'mmr' ) {
+%>
+<h4>Cap Restrictions [MMR]</h4>
+<p>Total MMR Allowed: <strong><%= team_cap; %></strong>
+<%
+	} else if ( cap_type === 'tier' ) {
+%>
+<h4>Cap Restrictions [Tier]</h4>
+<p>Total MMR Allowed: <strong><%= team_cap; %></strong>
+<%
+	} else if ( cap_type === 'none' ) {
+%>
+<h4>Cap Restrictions [None]</h4>
+<p>Build your super-team and go nuts!</p>
+<%
+	}
+%>

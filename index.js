@@ -2,12 +2,13 @@
 // we also have to fix out "password" to strip out 
 // any escaping that we need for Bun .env reading
 if ( typeof Bun === 'undefined' ) {
-	console.log('Node runtime. :(');
+	console.log('*** Node runtime. :( ***');
 	require('dotenv').config();
 	process.env.DB_PASS = process.env.DB_PASS.replaceAll('\\','');
-	console.log(process.env.DB_USER);
+	console.log(`    ${process.env.NODE_ENV}`);
 } else {
-	console.log('Bun runtime. :)');
+	console.log('*** Bun runtime. :) ***');
+	console.log(`    ${process.env.NODE_ENV}`);
 }
 
 // Server app code below
@@ -112,6 +113,7 @@ app.use((req, res, next) => {
 
 	res.locals.menu = {
 		'dashboard': '',
+		'tournaments': '',
 		'tracker': '',
 		'championship': '',
 		'match': '',
@@ -182,32 +184,77 @@ app.use((req, res, next) => {
 
 // tournaments middleware
 app.use((req, res, next) => {
-	res.locals.my_tournaments = {};
-	if ( req.session.user_id ) {
-		const query = `
-			SELECT
-				p.t_id,p.player_id,p.team_id,
-				t.format,t.title,t.start_dtg
-			FROM tournament_players AS p
-			LEFT JOIN tournaments AS t
-			ON p.t_id = t.id
-			WHERE p.player_id = ? AND (t.start_dtg > now() OR t.active = 1)
-		`;
-		connection.query(query, [ req.session.user_id ], (err, results) => {
-			if ( err ) { throw err; }
+	res.locals.future_tournaments = {}; // active/upcoming tournaments
+	res.locals.my_tournaments     = {};
 
-			if ( results ) {
-				for ( let i = 0; i < results.length; ++i ) {
-					const tourney = results[i];
-					res.locals.my_tournaments[ tourney.t_id ] = tourney;
-				}
+	const t_query = `
+		SELECT
+			id,title,format,open,active,start_dtg,
+			signup_close_dtg,team_size,team_cap,allow_external,
+			description
+		FROM tournaments
+		WHERE start_dtg > now() OR active = 1
+	`;
+	req.db.query(t_query, (err, results) => {
+		if ( err ) { throw err; }
+
+		const tournaments = {
+			total: 0,
+			open: {},
+			active: {},
+			upcoming: {},
+		};	
+		for ( let i = 0; i < results.length; ++i ) {
+			const row = results[i];
+			tournaments.total++;
+			if ( row['active'] ) {
+				tournaments['active'][ row['id'] ] = row;
+			} else if ( row['open'] ) {
+				tournaments['open'][ row['id'] ] = row;
+			} else {
+				tournaments['upcoming'][ row['id'] ] = row;
 			}
+		}
+		res.locals.future_tournaments = tournaments;
 
+		if ( req.session.user_id ) {
+			const query = `
+				SELECT
+					p.t_id,p.player_id,p.team_id,
+					t.format,t.title,t.start_dtg,t.active,t.open,
+					tt.name AS team_name,tt.checked_in AS team_checked_in,
+					tt.assigned AS team_assigned
+				FROM tournament_players AS p
+				LEFT JOIN tournaments AS t ON p.t_id = t.id
+				LEFT JOIN tournament_teams AS tt
+					ON p.team_id = tt.id
+				WHERE p.player_id = ? AND (t.start_dtg > now() OR t.active = 1)
+			`;
+			connection.query(query, [ req.session.user_id ], (err, results) => {
+				if ( err ) { throw err; }
+
+				if ( results ) {
+					for ( let i = 0; i < results.length; ++i ) {
+						const tourney = results[i];
+						tourney.team = {
+							id: tourney.team_id,
+							name: tourney.team_name,
+							checked_in: tourney.team_checked_in,
+							assigned: tourney.team_assigned,
+						};
+						delete(tourney.team_name);
+						delete(tourney.team_assigned);
+						delete(tourney.team_checked_in);
+						res.locals.my_tournaments[ tourney.t_id ] = tourney;
+					}
+				}
+
+				next();
+			});
+		} else {
 			next();
-		});
-	} else {
-		next();
-	}
+		}
+	});
 });
 
 // checked in middleware.

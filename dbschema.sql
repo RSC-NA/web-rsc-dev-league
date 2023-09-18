@@ -7,6 +7,7 @@ CREATE TABLE tournaments (
 	`start_dtg` DATETIME NOT NULL DEFAULT now(),
 	`signup_close_dtg` DATETIME NOT NULL DEFAULT now(),
 	`team_size` int unsigned not null default 3,
+	`cap_type` varchar(15) not null default 'tier points', /* tier points, mmr, tier, none */
 	`team_cap` int unsigned not null default 14,
 	`allow_external` tinyint(1) unsigned not null default 0, /* external players */
 	`description` TEXT,

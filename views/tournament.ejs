@@ -1,7 +1,15 @@
 <%- include('partials/header.ejs'); %>
 
+<%
+	let my_tourney = my_tournaments[ tournament['id'] ];
+	let team = null;
+	if ( my_tourney && my_tourney.team_id ) {
+		team = tournament.teams.unsorted[ my_tourney['team_id'] ];
+	}
+%>
+
 <main class="container mt-2 p-2">
-	<div class="bg-light p-2 rounded">
+<div class="bg-light p-2 rounded">
 		<h1>
 			<%= tournament['title']; %>
 		</h1>
@@ -96,20 +104,16 @@
 					</li>
 				</ul>
 				<hr>
-				<h4>Cap Restrictions</h4>
-				
-				<ul>
-					<li class="mb-1 pb-1 border-bottom border-primary">Total Points Allowed: <strong><%= tournament['team_cap']; %></strong></li>
-					<li>Premier: <strong>9</strong> points</li>
-					<li>Master: <strong>8</strong> points</li>
-					<li>Elite: <strong>7</strong> points</li>
-					<li>Veteran: <strong>6</strong> points</li>
-					<li>Rival: <strong>5</strong> points</li>
-					<li>Challenger: <strong>4</strong> points</li>
-					<li>Prospect: <strong>3</strong> points</li>
-					<li>Contender: <strong>2</strong> points</li>
-					<li>Amateur: <strong>1</strong> points</li>
-				</ul>
+				<% console.log(team); %>
+				<%- 
+					include('partials/tournaments/cap', { 
+						cap_type: tournament.cap_type,
+						team_cap: tournament.team_cap,
+						salary: team && team.salary ? team.salary : tournament.team_cap,
+						POINTS: POINTS,
+						team_id: team ? team.id : null,
+					}); 
+				%>
 			</div>
 		</div>
 	</div>
@@ -117,10 +121,11 @@
 	<hr class="mb-4">
 
 	<div class="bg-light p-2 rounded">
-		<h2>Play</h2>
 		<%
 			if ( ! (tournament['id'] in my_tournaments) ) {
+					if ( tournament.times.start.time > (new Date()).getTime() ) {
 		%>
+		<h2>Play</h2>
 		<p class="lead">
 			Sign up to play in this tournament, either as a team or by yourself. If
 			you sign up alone, you <strong>might not be placed on a team</strong>, depending
@@ -134,6 +139,15 @@
 			these players.
 		</p>
 		<%
+				} else {
+				// TODO(erh): This needs to have a "view" of the tourney results
+		%>
+		<h2>Watch</h2>
+		<p class="lead">
+			This tournament has already started. 
+		</p>
+		<%
+				}
 			}
 
 			if ( ! user_id ) {
@@ -146,6 +160,12 @@
 		<%
 			} else {
 				if ( ! (tournament['id'] in my_tournaments) ) {
+					console.log(
+						tournament.times.start.dtg, 
+						new Date(), 
+						tournament.times.start.time > (new Date()).getTime()
+					);
+					if ( tournament.times.start.time > (new Date()).getTime() ) {
 		%>
 		<div class="row">
 			<div class="col-md-4">
@@ -165,11 +185,15 @@
 			</div>
 		</div>
 		<%
+					} else {
+		%>
+		<strong>This tournament has already started. You can't sign up.</strong>
+		<%
+					}
 				} else {
-					const my_tourney = my_tournaments[ tournament['id'] ];
 		%>
 		<div class="row">
-			<div class="col">
+			<div class="col p-4 border border-round" style="background-color:#bcffbc;">
 				<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
 				<p class="lead">
 					Make sure you're ready to go on the tournament start date.
@@ -195,7 +219,6 @@
 						Team: 
 						<%
 							if ( my_tourney['team_id'] !== null ) {
-								const team = tournament.teams.unsorted[ my_tourney['team_id'] ];
 						%>
 							<strong><%= team['name']; %></strong>
 						<%
@@ -207,11 +230,24 @@
 						%>
 					</li>
 				</ul>
+				
+				<%
+					// don't let anyone leave the tourney after check out time
+					if ( tournament.times.check_in.time > (new Date()).getTime() ) {
 
+				%>
 				<form action="/tournament/<%= tournament.id %>/leave" method="post">
 					<input type="hidden" name="discord_id" value="<%= discord_id %>">
 					<button type="submit" class="btn btn-lg btn-danger">Leave Tournament</button>
 				</form>
+				<%
+					} else {
+						// TODO(erh): is this needed here?
+				%>
+				<em>Tournament check-in time has passed. You can no longer leave this tournament.</em>
+				<%
+					}
+				%>
 			</div>
 		</div>
 		<%

@@ -1,11 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-// /tournaments
-// /tournament/:t_id
-// /tournament/:t_id/signup
-// /tournament/:t_id/signup_solo
-
 const POINTS = {
 	'Premier': 9,
 	'Master': 8,
@@ -31,6 +26,7 @@ function getTimes(signup_close_dtg, start_dtg) {
 		signup: {
 			active: timeNow > signup_close_dtg.getTime() ? false : true,
 			dtg: signup_close_dtg,
+			time: signup_close_dtg.getTime(),
 			color: 'inherit',
 		},
 		check_in: {
@@ -38,10 +34,12 @@ function getTimes(signup_close_dtg, start_dtg) {
 			hint: check_in_hint,
 			start: check_in_start,
 			dtg: check_in_dtg,
+			time: check_in_dtg.getTime(),
 			color: 'inherit',
 		},
 		start: {
 			dtg: start_dtg,
+			time: start_dtg.getTime(),
 		},
 	};
 
@@ -77,7 +75,7 @@ router.get('/tournaments', (req, res) => {
 	const query = `
 		SELECT
 			id,title,format,open,active,start_dtg,
-			signup_close_dtg,team_size,team_cap,allow_external,
+			signup_close_dtg,team_size,cap_type,team_cap,allow_external,
 			description
 		FROM tournaments
 		WHERE start_dtg > now() OR active = 1
@@ -128,7 +126,7 @@ router.get('/tournament/:t_id/team/:team_id', (req, res) => {
 	const query = `
 		SELECT
 			id,title,format,open,active,start_dtg,
-			signup_close_dtg,team_size,team_cap,allow_external,
+			signup_close_dtg,team_size,cap_type,team_cap,allow_external,
 			description
 		FROM tournaments
 		WHERE id = ?
@@ -255,7 +253,7 @@ router.post(['/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req,
 				req.db.query(p_query, p_params, (err, _results) => {
 					if ( err ) { throw err; }
 
-					return res.redirect(`/tournament/${req.params.t_id}/signup_solo`);
+					return res.redirect(`/tournament/${req.params.t_id}`);
 				});
 			}
 		});
@@ -336,7 +334,7 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 	const query = `
 		SELECT
 			id,title,format,open,active,start_dtg,
-			signup_close_dtg,team_size,team_cap,allow_external,
+			signup_close_dtg,team_size,cap_type,team_cap,allow_external,
 			description
 		FROM tournaments
 		WHERE id = ?

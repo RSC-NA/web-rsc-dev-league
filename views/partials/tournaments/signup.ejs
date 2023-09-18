@@ -1,0 +1,72 @@
+<%
+/*
+{
+	tournament:
+	POINTS:
+}
+*/
+%>
+
+<h2>Signup <%= tournament.SOLO ? 'Solo' : ' a Team'; %></h2>
+<form action="/tournament/<%= tournament['id']; %>/<%= path %>" method="post">
+	<input type="hidden" name="discord_id" value="<%= discord_id %>">
+
+	<% 
+		if ( ! tournament.SOLO ) {
+	%>
+
+	<div class="mb-3">
+		<label for="name">Team Name</label>
+		<div class="input-group">
+			<input type="text" class="form-control" name="name" id="team_name" placeholder="" value="" required>
+		</div>
+	</div>
+
+	<%
+		} // end of team name for non-solo signups
+
+		if ( user && user.rsc_id && user.tier && user.mmr ) {
+	%>
+	<h4>Your Info</h4>
+	<div class="mb-3">
+		<ul>
+			<li>Name: <strong><%= user.name; %></strong></li>
+			<li>Tier: <strong><%= user.tier; %></strong></li>
+			<li>MMR: <strong><%= user.mmr; %></strong></li>
+			<li>RSCID: <strong><%= user.rsc_id; %></strong></li>
+			<li>Salary Points: <strong><%= POINTS[user.tier]; %></strong></li>
+		</ul>
+	</div>
+
+	<%
+		} else {
+	%>
+
+	<h4>Your Info</h4>
+	<p>
+		In order for us to place you correctly, you need to provide your <strong>PRIMARY</strong>
+		tracker link.
+	</p>
+
+	<div class="mb-3">
+		<label for="tracker_link">Tracker Link</label>
+		<div class="input-group">
+			<input
+				type="text"
+				class="form-control"
+				name="tracker_link"
+				id="tracker_link"
+				placeholder="https://rocketleague.tracker.network/profile/steam/76561197996673327/overview"
+				value=""
+				required
+			>
+		</div>
+	</div>
+
+	<%
+		}
+	%>
+	
+	<input type="submit" class="btn btn-lg btn-primary" value="Signup for Tournament">
+
+</form>
