@@ -1,0 +1,87 @@
+
+<%- include('partials/header.ejs'); %>
+
+	<main class="container">
+		<div class="bg-light p-3 rounded">
+			<div class="row">
+				<div class="col-md-12">
+
+					<h1>Search <%= needle ? needle : ''; %></h1>
+				
+					<form method="get" action="/search">
+						<div class="input-group">
+							<div class="form-outline">
+								<input type="search" id="find" class="form-control" value="<%= needle ? needle : ''; %>" />
+							</div>
+							<button type="button" class="btn btn-primary">
+								<i class="fas fa-search"></i>
+							</button>
+						</div>
+					</form>	
+					
+					<%
+						if ( needle ) {
+					%>
+					<hr>
+					<h2><%- results.length; %> results for <%= needle; %></h2>
+
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">RSC ID</th>
+								<th scope="col">Discord</th>
+								<th scope="col">Name</th>
+								<th scope="col">MMR</th>
+								<th scope="col">Tier</th>
+								<th scope="col">Status</th>
+								<th scope="col">Active 3s</th>
+								<th scope="col">Active 2s</th>
+							</tr>
+						</thead>
+						<tbody>
+						<%
+							if ( ! results.length ) {
+						%>
+							<tr>
+								<td colspan="9"><em>No results found for "<%= needle; %>"</em></td>
+							</tr>
+						<%
+							} else {
+								for ( let i = 0; i < results.length; ++i ) {
+									const result = results[i];
+						%>
+							<tr>
+								<th scope="row">
+									<a href="/player/<%= result.rsc_id; %>">
+										<%= result.rsc_id; %>
+									</a>
+								</th>
+								<td><%= result.discord_id; %></td>
+								<td>
+									<a href="/player/<%= result.rsc_id; %>">
+										<%= result.name; %>
+									</a>
+								</td>
+								<td><%= result.mmr; %></td>
+								<td><%= result.tier; %></td>
+								<td><%= result.status; %></td>
+								<td><%= result.active_3s ? '✅' : '❌'; %></td>
+								<td><%= result.active_2s ? '✅' : '❌'; %></td>
+							</tr>
+						<%
+								}
+							}
+						%>
+						</tbody>
+					</table>
+					<%
+						}
+					%>
+
+				</div>
+			</div>
+		</div>
+	
+	</main>
+
+<%- include('partials/footer.ejs'); %>

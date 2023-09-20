@@ -4,6 +4,40 @@ const { mmrRange, getTierFromMMR } = require('../mmrs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
+router.get(['/search','/search/:needle'], (req,res) => {
+	const needle = `%${req.params.needle ? req.params.needle : req.query.find}%`;
+		
+	if ( needle ) {
+		const query = `
+			SELECT 
+				p.id,p.nickname,p.discord_id,c.rsc_id,
+				c.name,c.mmr,c.tier,c.status,c.active_2s,c.active_3s
+			FROM players AS p
+			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
+			LEFT JOIN trackers AS t ON t.rsc_id = c.rsc_id
+			WHERE (
+				p.nickname like ? OR
+				p.discord_id like ? OR
+				c.name like ? OR
+				c.discord_id like ? OR
+				t.tracker_link like ?
+			)
+		`;
+
+		req.db.query(query, [needle,needle,needle,needle,needle], (err,results) => {
+			if ( err ) { throw err; }
+			console.log('search =',results);			
+			if ( results.length === 1 ) {
+				return res.redirect(`/player/${results[0].rsc_id}`);
+			} else {
+				return res.render('search', { needle: '', results: results });
+			}
+		});
+	} else {
+		return res.render('search', { needle: '', results: [] });
+	}
+});
+
 router.get('/player/:rsc_id', (req, res) => {
 	if ( ! req.session.discord_id ) {
 		//return res.redirect('/login');
