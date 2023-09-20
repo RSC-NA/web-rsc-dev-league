@@ -6,7 +6,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 router.get(['/search','/search/:needle'], (req,res) => {
 	const needle = `%${req.params.needle ? req.params.needle : req.query.find}%`;
-		
+	console.log(`Search for "${needle}"`);
 	if ( needle ) {
 		const query = `
 			SELECT 
