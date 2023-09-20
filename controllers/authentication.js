@@ -49,7 +49,7 @@ router.get('/process_login', (req, res) => {
 	let discord_id = token[2];
 
 	req.db.query(
-		'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
+		'SELECT p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
 		[ discord_id ],
 		function(err, results) {
 			if ( err ) {
@@ -64,7 +64,7 @@ router.get('/process_login', (req, res) => {
 				req.session.discord_id = discord_id;
 				req.session.user_id = results[0].id;
 
-				let user = {
+				const user = {
 					user_id: results[0].id,
 					nickname: nickname,
 					name: results[0].name,
@@ -76,12 +76,18 @@ router.get('/process_login', (req, res) => {
 					active_3s: results[0].active_3s,
 					active_2s: results[0].active_2s,
 					is_admin: results[0].admin ? true: false,
+					is_tourney_admin: results[0].tourney_admin ? true: false,
+					is_devleague_admin: results[0].devleague_admin ? true: false,
+					is_stats_admin: results[0].stats_admin ? true: false,
 				};
 
 				req.session.user = user;
 				console.log(user);
 
 				req.session.is_admin = results[0].admin ? true : false;
+				req.session.is_tourney_admin = results[0].tourney_admin ? true: false;
+				req.session.is_devleague_admin = results[0].devleague_admin ? true: false;
+				req.session.is_stats_admin = results[0].stats_admin ? true: false;
 				if ( req.session.login_return_url ) {
 					res.redirect(req.session.login_return_url);
 				} else {
@@ -98,7 +104,7 @@ router.get('/process_login', (req, res) => {
 						if (err) throw err;
 
 						req.db.query(
-							'SELECT p.id,p.admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
+							'SELECT p.id,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
 							[ discord_id ],
 							(err, results) => {
 								let user = {
@@ -112,10 +118,17 @@ router.get('/process_login', (req, res) => {
 									discord_id: discord_id,
 									active_3s: results[0].active_3s ? true : false,
 									active_2s: results[0].active_2s ? true : false,
-									is_admin: results[0].admin ? true: false,
+									is_admin: false,
+									is_tourney_admin: false,
+									is_devleague_admin: false,
+									is_stats_admin: false,
 								};
 				
 								req.session.user = user;
+								req.session.is_admin = false;
+								req.session.is_tourney_admin = false;
+								req.session.is_devleague_admin = false;
+								req.session.is_stats_admin = false;
 								if ( req.session.login_return_url ) {
 									res.redirect(req.session.login_return_url);
 								} else {

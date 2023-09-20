@@ -17,70 +17,45 @@
 			<%= tournament['description']; %>
 		</p>
 		<div class="row">
-			<div class="col-8">
-				<h2>Tournament Format and Rules</h2>
-				<ul>
-					<li><%= tournament['format']; %></li>
-					<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
-					<li><%= tournament['team_cap']; %> Point Team Cap</li>
-				</ul>
-				<%
-					if ( tournament.allow_external ) {
-				%>
-				<p class="lead">
-					<i class="fas fa-lock-open"></i>
-					This tournament <strong>DOES</strong> allow non-RSC players
-					to join, though they will be required to provide a tracker link 
-					for placement.
-				</p>
-				<%
-					} else {
-				%>
-				<p class="lead">
-					<i class="fas fa-lock"></i>
-					This tournament <strong>DOES NOT</strong> allow non-RSC players
-					to join. All participants must be an active member of RSC
-					and exist in the Contracts Sheet of 3s or 2s.
-				</p>
-				<%
-					}
-				%>
-				<h2>Tournament Dates</h2>
-				<ul>
-					<li>
-						Signup:
-						<strong
-							class="timeago"
-							datetime="<%= tournament['signup_close_dtg']; %>"
-							title="<%= tournament['signup_close_dtg']; %>"
-						><%= tournament['signup_close_dtg']; %></strong>
-					</li>
-					<%
-						const check_in = new Date(tournament['start_dtg']);
-						check_in.setHours( check_in.getHours() - 1 );
-					%>
-					<li>
-						Check In:
-						<strong
-							class="timeago"
-							datetime="<%= check_in; %>"
-							title="<%= check_in; %>"
-						><%= check_in; %></strong>
-					</li>
-					<li>
-						Start:
-						<strong
-							class="timeago"
-							datetime="<%= tournament['start_dtg']; %>"
-							title="<%= tournament['start_dtg']; %>"
-						><%= tournament['start_dtg']; %></strong>
-					</li>
-				</ul>
-			</div>
+			<%
+				if ( tournament.EDIT && ( is_admin || is_tourney_admin ) ) {
+			%>
+			<%- 
+				include('partials/tournaments/edit', {
+					tournament: tournament,
+					POINTS: POINTS,
+				});
+			%>
+			<%
+				} else { // end of admin-only "edit" template
+			%>
+			<%- 
+				include('partials/tournaments/view', {
+					tournament: tournament,
+					POINTS: POINTS,
+				});
+			%>
+			<%
+				} // end of default "view" template
+			%>
+
 			<div class="col-4 matchDates">
+			<% 
+				if ( team ) {
+			%>
+					
+				<%- 
+					include('partials/tournaments/team_info', {
+						tournament: tournament,
+						team: team,
+					});
+				%>
+			<%
+				}
+			%>
 				<h3>Signups</h3>
 				<h5>Team Signups</h5>
-				<ul>
+				<ul> 
 					<li>
 						Full Teams:
 						<strong id="full_teams">
@@ -104,7 +79,6 @@
 					</li>
 				</ul>
 				<hr>
-				<% console.log(team); %>
 				<%- 
 					include('partials/tournaments/cap', { 
 						cap_type: tournament.cap_type,
@@ -203,9 +177,9 @@
 						Check In: 
 							<strong
 							class="timeago"
-							datetime="<%= check_in; %>"
-							title="<%= check_in; %>"
-							><%= check_in; %></strong>
+							datetime="<%= tournament.times.check_in; %>"
+							title="<%= tournament.times.check_in; %>"
+							><%= tournament.times.check_in; %></strong>
 					</li>
 					<li>
 						Start Time: 

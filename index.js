@@ -135,6 +135,9 @@ app.use((req, res, next) => {
 	res.locals.nickname = req.session.nickname;
 	res.locals.discord_id = req.session.discord_id;
 	res.locals.is_admin = req.session.is_admin;
+	res.locals.is_tourney_admin = req.session.is_tourney_admin;
+	res.locals.is_devleague_admin = req.session.is_devleague_admin;
+	res.locals.is_stats_admin = req.session.is_stats_admin;
 	res.locals.user = req.session.user || {};
 	res.locals.rostered = req.session.rostered;
 
@@ -294,7 +297,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
 	res.locals.pending_trackers = 0;
 	res.locals.bad_pending_trackers = 0;
-	if ( req.session.is_admin ) {
+	if ( req.session.is_admin || req.session.is_stats_admin ) {
 		connection.query('SELECT count(id) AS pending_trackers FROM tracker_data WHERE sent_to_api = 0', (err, results) => {
 			if ( err ) { console.error('Error fetching tracker count:', err); throw err; }
 

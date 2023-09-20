@@ -1,0 +1,26 @@
+<h3>Team Info</h3>
+<h5><%= team.name; %></h5>
+<h5>Roster</h5>
+<h6>Current Salary: <%= team.salary; %> (<%= tournament.team_cap - team.salary; %> remaining)</h6>
+<ul>
+	<%
+		console.log(team.players,'PLAYAS');
+		for ( const p_id in team.players ) {
+			const player = team.players[ p_id ];
+	%>
+	<li>
+		<strong><%= player.name ? player.name : player.nickname; %></strong>
+		[<%= player.tier ?? 'none'; %> (<%= player.mmr ?? '0'; %>)]
+		<% 
+			if ( new Date().getTime() > tournament.times.check_in.start.getTime() ) {
+		%>
+		<%- player.check_in_dtg ? '✅' : '❌'; %>
+		<%
+			}
+		%>
+	</li>
+	<%
+		}
+	%>
+</ul>
+<hr>

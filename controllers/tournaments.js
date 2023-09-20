@@ -325,11 +325,14 @@ router.all('/tournament/:t_id/leave', (req, res) => {
 	});
 });
 
-router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req, res) => {
+router.get(['/tournament/:t_id', '/tournament/:t_id/edit', '/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req, res) => {
 	res.locals.title = `RSC Tournaments`;
+	const action    = req.url.split('/').pop(); 
+	const SIGNUP = action.includes('signup');
+	const SOLO   = action.includes('solo');
+	const EDIT   = action === 'edit' ? true : false; // admin only path
 
-	const SIGNUP = req.url.split('/').pop().includes('signup');
-	const SOLO   = req.url.split('/').pop().includes('solo');
+	let my_player = null;
 
 	const query = `
 		SELECT
@@ -350,6 +353,7 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 		tournament.times = getTimes(tournament.signup_close_dtg, tournament.start_dtg);
 		tournament.SIGNUP = SIGNUP;
 		tournament.SOLO   = SOLO;
+		tournament.EDIT   = EDIT;
 
 		const teamsQuery = `
 			SELECT 
@@ -371,11 +375,14 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 
 			const playersQuery = `
 				SELECT
-					id,team_id,tier,
-					cap_value,mmr,tracker_link,
-					check_in_dtg,signup_dtg
-				FROM tournament_players
-				WHERE t_id = ?
+					tp.id,tp.team_id,tp.tier,tp.discord_id,tp.player_id,
+					tp.cap_value,tp.mmr,tp.tracker_link,
+					tp.check_in_dtg,tp.signup_dtg,
+					p.nickname,c.name
+				FROM tournament_players AS tp
+				LEFT JOIN players AS p ON tp.discord_id = p.discord_id
+				LEFT JOIN contracts AS c ON tp.discord_id = c.discord_id
+				WHERE tp.t_id = ?
 			`;
 			req.db.query(playersQuery, [ req.params.t_id ], (err, results) => {
 				if ( err ) { throw err; }
@@ -383,6 +390,9 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 				if ( results && results.length ) {
 					for ( let i = 0; i < results.length; ++i ) {
 						const player = results[i];
+						if ( player.discord_id === res.locals.discord_id ) {
+							my_player = player;
+						}
 						if ( player.team_id && player.team_id in tournament.teams.unsorted ) {
 							tournament.teams.unsorted[ player.team_id ].salary += player.cap_value;
 							tournament.teams.unsorted[ player.team_id ].players[ player.id ] = player;
@@ -403,13 +413,22 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/signup', '/tournament/:t_id/
 						tournament.teams.open[ team_id ] = team;
 					}
 				}
-
-				console.log(tournament);
-				if ( SIGNUP ) {
-					res.render('tournament_signup', { tournament: tournament, POINTS: POINTS });
+		
+				let team = {};
+				if ( my_player && my_player.team_id ) {
+					team = tournament.teams.unsorted[ my_player.team_id ];
+					res.locals.title = `${team.name} - ${tournament.name}`;
 				} else {
-					res.render('tournament', { tournament: tournament, POINTS: POINTS });
+					res.locals.title = `${tournament.name}`;
 				}
+
+				console.log(tournament.teams.unsorted[req.params.team_id],tournament);
+				res.render('tournament_team', {
+					tournament: tournament,
+					team: team,
+					me: my_player,
+					POINTS: POINTS,
+				});
 			});
 		});
 	});

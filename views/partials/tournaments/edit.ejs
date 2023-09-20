@@ -1,0 +1,221 @@
+<%
+	const formats = {
+		'single elimination': 'Single Elimination',
+		'double elimination': 'Double Elimination',
+		'swiss': 'Swiss',
+		'round robin': 'Round Robin',
+	};
+
+	const cap_types = {
+		'tier points': 'Tier Points',
+		'mmr': 'Pure MMR',
+		'tier': 'By RSC Tier Cap',
+		'none': 'No Cap Restrictions',
+	};
+
+	const defaultStart = new Date(Date.now() + (1000 * 60 * 60 * 24 * 7));
+	defaultStart.setHours(20);
+	defaultStart.setMinutes(0);
+	defaultStart.setSeconds(0);
+	
+	const form = {
+		title: tournament.title ?? '',
+		format: tournament.format ?? null,
+		start_dtg: tournament.start_dtg ?? defaultStart,
+		signup_close_dtg: tournament.signup_close_dtg ?? new Date(defaultStart.getTime() - (1000 * 60 * 60)),
+		team_size: tournament.team_size ?? null,
+		cap_type: tournament.cap_type ?? 'tier points',
+		team_cap: tournament.team_cap ?? 14,
+		allow_external: tournament.allow_external ?? 0,
+		description: tournament.description ?? '',
+	};
+%>
+
+<div class="col-8">
+	<h2>Tournament Editing</h2>
+	<p class="lead">
+		Edit this tournament and make it awesome!
+	</p>
+	
+	<form class="needs-validation" novalidate action="/tournament/<%= tournament.id; %>/edit" method="post">
+	
+		<div class="mb-3 me-3">
+			<label for="title">Tournament Title</label>
+			<div class="input-group">
+				<input type="text" class="form-control" name="title" id="title" placeholder="Tournament Title" value="<%= form.title %>" required>
+			</div>
+		</div>
+
+		<div class="mb-3 me-3">
+			<label for="format">Tournament Format</label>
+			<div class="input-group">
+				<select class="form-control" name="format" id="format" placeholder="Tournament Format" required>
+				<%
+					if ( form.format ) {
+				%>
+					<optgroup label="Selected">
+						<option value="<%= form.format; %>" selected><%= form.format; %></option>
+					</optgroup>
+				<%
+					}
+				%>
+					<optgroup label="Choices">
+				<%
+					for ( let format in formats ) {
+				%>
+						<option value="<%= format; %>"><%= formats[format]; %></option>	
+				<%
+					}
+				%>
+					</optgroup>
+				</select>
+			</div>
+		</div>
+		
+		<div class="mb-3 me-3">
+			<div class="row">
+				<div class="col-4">
+					<label for="team_size">Team Size</label>
+					<div class="input-group">
+						<select
+							class="form-control"
+							name="team_size"
+							id="team_size"
+							placeholder="Team Size"
+							required
+						>
+						<%
+							if ( form.team_size ) {
+						%>
+							<optgroup label="Selected">
+								<option value="<%= form.team_size; %>" selected><%= form.team_size == 3 ? '3v3' : '2v2'; %></option>
+							</optgroup>
+						<%
+							}
+						%>
+							<optgroup label="Team Sizes">
+								<option value="3">3v3</option>
+								<option value="2">2v2</option>
+							</optgroup>
+
+						</select>
+					</div>
+				</div>
+				<div class="col-4">
+					<label for="cap_type">Team Cap Calculation</label>
+					<div class="input-group">
+						<select
+							class="form-control"
+							name="cap_type"
+							id="cap_type"
+							placeholder="Select Cap Calculation"
+							required
+						>
+						<%
+							if ( form.cap_type ) {
+						%>
+							<optgroup label="Selected">
+								<option value="<%= form.cap_type; %>" selected><%= form.cap_type; %></option>
+							</optgroup>
+						<%
+							}
+						%>
+							<optgroup label="Choices">
+						<%
+							for ( let cap_type in cap_types ) {
+						%>
+								<option value="<%= cap_type; %>"><%= cap_types[cap_type]; %></option>	
+						<%
+							}
+						%>
+							</optgroup>
+						</select>
+					</div>
+				</div>
+				<div class="col-4">
+					<label for="team_cap">Team Cap Limit</label>
+					<div class="input-group">
+						<input
+							class="form-control"
+							name="team_cap"
+							id="team_cap"
+							placeholder=""
+							required
+							value="<%= form.team_cap; %>"
+						>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="mb-3 me-3">
+			<label for="start_dtg">
+				Start Date/Time
+				<span class="text-muted">(Eastern)</span>
+			</label>
+			<div class="input-group">
+				<input
+					type="datetime-local"
+					class="form-control"
+					name="start_dtg"
+					id="start_dtg"
+					value="<%= form.start_dtg.toISOString().replace(/\:00\.000Z/,''); %>"
+					min="<%- new Date().toISOString(); %>"
+					min="<%- new Date(Date.now() + (1000 * 60 * 60 * 24 * 180)).toISOString(); %>"
+					required
+				>
+			</div>
+		</div>
+		
+		<div class="mb-3 me-3">
+			<label for="signup_close_dtg">
+				Signup Close Date/Time
+				<span class="text-muted">(Eastern)</span>
+			</label>
+			<div class="input-group">
+				<input
+					type="datetime-local"
+					class="form-control"
+					name="signup_close_dtg"
+					id="signup_close_dtg"
+					value="<%= form.signup_close_dtg.toISOString().replace(/\:00\.000Z/,''); %>"
+					min="<%- new Date().toISOString(); %>"
+					min="<%- new Date(Date.now() + (1000 * 60 * 60 * 24 * 180) - 60).toISOString(); %>"
+					required
+				>
+			</div>
+		</div>
+
+		<div class="mb-3 me-3">
+			<div class="custom-control custom-checkbox">
+				<input
+					type="checkbox"
+					class="custom-control-input"
+					name="allow_external"
+					id="allow_external"
+					value="allow_external"
+					<%- form.allow_external ? 'checked' : ''; %>
+				>
+				<label for="allow_external">Allow External Players?</label>
+			</div>
+		</div>
+
+		<hr class="mb-3 me-3">
+
+		<div class="mb-3 me-3">
+			<label for="description">Tournament Description</label>
+			<div class="input-group">
+				<textarea
+					class="form-control"
+					name="description"
+					id="description"
+					required
+				><%= form.description; %></textarea>
+			</div>
+		</div>
+		<div class="mb-3 me-3">
+			<input type="submit" class="btn btn-large btn-primary" value="Save">
+		</div>
+	</form>
+
+</div>

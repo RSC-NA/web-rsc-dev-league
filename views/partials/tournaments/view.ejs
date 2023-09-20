@@ -1,0 +1,72 @@
+<div class="col-8">
+	<h2>Tournament Format and Rules</h2>
+	<ul>
+		<li><%= tournament['format']; %></li>
+		<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
+		<li><%= tournament['team_cap']; %> Point Team Cap</li>
+	</ul>
+	<%
+		if ( tournament.allow_external ) {
+	%>
+	<p class="lead">
+		<i class="fas fa-lock-open"></i>
+		This tournament <strong>DOES</strong> allow non-RSC players
+		to join, though they will be required to provide a tracker link 
+		for placement.
+	</p>
+	<%
+		} else {
+	%>
+	<p class="lead">
+		<i class="fas fa-lock"></i>
+		This tournament <strong>DOES NOT</strong> allow non-RSC players
+		to join. All participants must be an active member of RSC
+		and exist in the Contracts Sheet of 3s or 2s.
+	</p>
+	<%
+		}
+	%>
+	<h2>Tournament Dates</h2>
+	<ul>
+		<li>
+			Signup:
+			<strong
+				class="timeago"
+				datetime="<%= tournament['signup_close_dtg']; %>"
+				title="<%= tournament['signup_close_dtg']; %>"
+			><%= tournament['signup_close_dtg']; %></strong>
+		</li>
+		<%
+			const check_in = new Date(tournament['start_dtg']);
+			check_in.setHours( check_in.getHours() - 1 );
+		%>
+		<li>
+			Check In:
+			<strong
+				class="timeago"
+				datetime="<%= check_in; %>"
+				title="<%= check_in; %>"
+			><%= check_in; %></strong>
+		</li>
+		<li>
+			Start:
+			<strong
+				class="timeago"
+				datetime="<%= tournament['start_dtg']; %>"
+				title="<%= tournament['start_dtg']; %>"
+			><%= tournament['start_dtg']; %></strong>
+		</li>
+	</ul>
+	<%
+		if ( tournament.SIGNUP ) {
+	%>
+	<%- 
+		include('signup', {
+			tournament: tournament,
+			POINTS: POINTS,
+		});
+	%>
+	<%
+		}
+	%>
+</div>

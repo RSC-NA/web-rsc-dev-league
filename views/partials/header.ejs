@@ -103,7 +103,7 @@
 								}
 							}
 
-							if ( is_admin ) {  /* admin-only functionality */ 
+							if ( is_admin || is_stats_admin || is_devleague_admin) {  /* admin-only functionality */ 
 								let badge_class = 'bg-secondary';
 								let pending_count = 0;
 								if ( pending_trackers ) {
@@ -117,8 +117,13 @@
 									bad_badge_class = 'bg-danger';
 								}
 						%>
-
 							<div class="sb-sidenav-menu-heading">Admin</div>
+
+						<%
+
+								if ( is_admin || is_devleague_admin ) {
+						%>
+
 							<a class="nav-link <%- menu['process_gameday'] %>" href="/process_gameday">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
 								Process Gameday
@@ -131,6 +136,11 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Manage League
 							</a>
+						<% 
+								}
+
+								if ( is_admin || is_stats_admin ) {
+						%>
 							<div class="sb-sidenav-menu-heading">Trackers</div>
 							<a class="nav-link" href="/bump_api">
 								<div class="sb-nav-link-icon"><i class="fas fa-power-off"></i></div>
@@ -140,13 +150,13 @@
 								<% } %>
 							</a>
 							<%
-								if ( pending_count || bad_pending_count ) {
+									if ( pending_count || bad_pending_count ) {
 							%>
 							<hr>
 							<%
-								}
+									}
 						
-								if ( pending_count ) {
+									if ( pending_count ) {
 							%>
 							<a class="nav-link" href="/send_tracker_data">
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
@@ -154,9 +164,9 @@
 								<span class="badge ms-2 <%- badge_class %>"><%- pending_count %></span>
 							</a>
 							<%
-								}
+									}
 							
-								if ( pending_count ) {
+									if ( pending_count ) {
 							%>
 							<a class="nav-link" href="/send_bad_trackers">
 								<div class="sb-nav-link-icon"><i class="fas fa-triangle-exclamation"></i></div>
@@ -164,7 +174,7 @@
 								<span class="badge ms-2 <%- bad_badge_class %>"><%- bad_pending_count %></span>
 							</a>
 							<%
-								}
+									}
 							%>
 							<div class="sb-sidenav-menu-heading">Slow Actions</div>
 							<a class="nav-link" href="#" id="run3sStats">
@@ -199,7 +209,10 @@
 									document.getElementById('run2sModal').showModal();
 								});
 							</script>
-							<% } %>
+						<% 
+								}
+							}
+						%>
 
 						</div>
 					</div>
