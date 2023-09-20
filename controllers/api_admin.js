@@ -13,8 +13,8 @@ function forceInt(val) {
 }
 
 async function pull_stats(req, res) {
-	if ( ! req.session.is_admin ) {
-		//return res.redirect('/');
+	if ( ! req.session.is_admin && ! req.session.is_stats_admin ) {
+		return res.redirect('/');
 	} 
 
 	let sheetId          = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
@@ -197,7 +197,6 @@ async function pull_stats(req, res) {
 	res.send('<pre>' + JSON.stringify(output) + '</pre>');
 }
 
-router.get('/pull_stats', pull_stats);
-router.get('/pull_stats_2', pull_stats);
+router.get(['/pull_stats', '/pull_stats_2'], pull_stats);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const { mmrRange, getTierFromMMR } = require('../mmrs');
+const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -13,7 +13,7 @@ function writeError(error) {
  ******************** Admin Views *********************
  ******************************************************/
 router.get('/change_tier/:rsc_id/:new_tier', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
 
@@ -26,17 +26,17 @@ router.get('/change_tier/:rsc_id/:new_tier', (req, res) => {
 });
 
 router.post('/generate_team/:tier', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
 	// TODO (err trapping with invalid values)
-	let numPlayers = req.body.player_count;
-	let numTeams = numPlayers / 3;
-	let tier = req.params.tier;
+	const numPlayers = req.body.player_count;
+	const numTeams = numPlayers / 3;
+	const tier = req.params.tier;
 
-	let players = [];
-	let teams = {};
+	const players = [];
+	const teams = {};
 
 	for ( let i = 0; i < numPlayers; i++ ) {
 		players.push(parseInt(req.body['player_id_' + i]));
@@ -58,7 +58,7 @@ router.post('/generate_team/:tier', (req, res) => {
 	req.db.query(playersQuery, [ players ], (err, results) => {
 		if ( err ) { throw err; }
 
-		let playerList = [];
+		const playerList = [];
 		for ( let i = 0; i < results.length; i++ ) {
 			playerList.push(results[i]);
 		}
@@ -67,8 +67,8 @@ router.post('/generate_team/:tier', (req, res) => {
 		let direction = 'up';
 
 		while ( playerList.length ) {
-			let player = playerList.pop();
-			let mmr = player['mmr'];
+			const player = playerList.pop();
+			const mmr = player['mmr'];
 
 			teams[tier + '_' + curTeam]['players'].push(player);
 			teams[tier + '_' + curTeam]['mmr']+= mmr;
@@ -79,8 +79,8 @@ router.post('/generate_team/:tier', (req, res) => {
 					direction = 'down';
 
 					if ( playerList.length ) {
-						let playerTwo = playerList.pop();
-						let playerTwoMmr = playerTwo['mmr'];
+						const playerTwo = playerList.pop();
+						const playerTwoMmr = playerTwo['mmr'];
 
 						teams[tier + '_' + curTeam]['players'].push(playerTwo);
 						teams[tier + '_' + curTeam]['mmr'] += playerTwoMmr;
@@ -93,8 +93,8 @@ router.post('/generate_team/:tier', (req, res) => {
 					direction = 'up';
 
 					if ( playerList.length ) {
-						let playerTwo = playerList.pop();
-						let playerTwoMmr = playerTwo['mmr'];
+						const playerTwo = playerList.pop();
+						const playerTwoMmr = playerTwo['mmr'];
 
 						teams[tier + '_' + curTeam]['players'].push(playerTwo);
 						teams[tier + '_' + curTeam]['mmr'] += playerTwoMmr;
@@ -105,23 +105,23 @@ router.post('/generate_team/:tier', (req, res) => {
 
 		// id, team_number, tier
 		// ['Elite_1', 'Elite_2' ] => [ [1, 'Elite' ], [2, 'Elite'] ]
-		let teamParams = Object.keys(teams).map(tierString => [ tierString.split('_')[1], tierString.split('_')[0] ] );
-		let teamsQuery = 'INSERT INTO teams (team_number, tier) VALUES ?';
+		const teamParams = Object.keys(teams).map(tierString => [ tierString.split('_')[1], tierString.split('_')[0] ] );
+		const teamsQuery = 'INSERT INTO teams (team_number, tier) VALUES ?';
 		req.db.query(teamsQuery, [ teamParams ], (err, results) => {
 			if ( err ) { throw err; }
 			console.log(results);
 			let insertId = results.insertId;
 
-			let playerParams = [];
+			const playerParams = [];
 
-			let matchParams = [];
+			const matchParams = [];
 			let matchInfo = [];
 
-			for ( let team in teams ) {
+			for ( const team in teams ) {
 				teams[ team ]['team_id'] = insertId;
 
 				// set up match params for home team, finish it for away
-				let matchDate = new Date();
+				const matchDate = new Date();
 				if ( teams[ team ].home ) {
 					matchInfo = [
 						matchDate,
@@ -146,17 +146,25 @@ router.post('/generate_team/:tier', (req, res) => {
 				insertId++;
 			}
 
-			let playersQuery = 'INSERT INTO team_players (team_id, player_id) VALUES ?';
-			req.db.query(playersQuery, [ playerParams ], (err, results) => {
+			const playersQuery = 'INSERT INTO team_players (team_id, player_id) VALUES ?';
+			req.db.query(playersQuery, [ playerParams ], (err, _results) => {
 				if ( err ) { throw err; }
 
 				// season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass
-				let matchQuery = 'INSERT INTO matches (match_dtg, season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass) VALUES ?';
-				req.db.query(matchQuery, [ matchParams ], (err, results) => {
+				const matchQuery = 'INSERT INTO matches (match_dtg, season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass) VALUES ?';
+				req.db.query(matchQuery, [ matchParams ], (err, _results) => {
 					if ( err ) { throw err; }
 
 					// finally, mark all selected players as "rostered"
-					req.db.query('UPDATE signups SET rostered = 1 WHERE ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() ) AND player_id IN (?)', [players], (err, results) => {
+					const updateQuery = `
+						UPDATE signups 
+						SET rostered = 1 
+						WHERE ( 
+							DATE(signup_dtg) = CURDATE() OR 
+							DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+						) 
+						AND player_id IN (?)`;
+					req.db.query(updateQuery , [players], (err, _results) => {
 						if ( err ) { throw err; }
 
 						res.redirect('/process_gameday');
@@ -173,8 +181,8 @@ router.get('/make_active/:signup_id', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	let query = 'UPDATE signups SET active = 1 WHERE id = ?';
-	req.db.query(query, [ req.params.signup_id ], (err, results) => {
+	const query = 'UPDATE signups SET active = 1 WHERE id = ?';
+	req.db.query(query, [ req.params.signup_id ], () => {
 		res.redirect('/process_gameday');
 	});
 });
@@ -184,8 +192,8 @@ router.get('/make_inactive/:signup_id', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	let query = 'UPDATE signups SET active = 0 WHERE id = ?';
-	req.db.query(query, [ req.params.signup_id ], (err, results) => {
+	const query = 'UPDATE signups SET active = 0 WHERE id = ?';
+	req.db.query(query, [ req.params.signup_id ], () => {
 		res.redirect('/process_gameday');
 	});
 });
@@ -199,8 +207,8 @@ router.get('/activate_everyone/:match_day', (req, res) => {
 		return res.redirect('/');
 	}
 
-	let query = 'UPDATE signups SET active = 1 WHERE match_day = ? AND season = ?';
-	req.db.query(query, [ req.params.match_day, res.locals.settings.season ], (err, results) => {
+	const query = 'UPDATE signups SET active = 1 WHERE match_day = ? AND season = ?';
+	req.db.query(query, [ req.params.match_day, res.locals.settings.season ], () => {
 		return res.redirect('/process_gameday');
 	});
 
@@ -214,16 +222,20 @@ router.get('/process_gameday', (req, res) => {
 	res.locals.title = `Process Gameday - ${res.locals.title}`;
 
 	// TODO(erh): think about resorting this by signup date, or perhaps just in the front-end?
-	let signups_query = `
+	const signups_query = `
 	SELECT 
-		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
+		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
+		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
 	FROM 
 		signups AS s
 	LEFT JOIN players AS p 
 		ON s.player_id = p.id
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
-	WHERE ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )
+	WHERE ( 
+		DATE(signup_dtg) = CURDATE() OR 
+		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+	)
 	ORDER BY s.id ASC
 	`; 
 
@@ -261,11 +273,10 @@ router.get('/process_gameday', (req, res) => {
 		console.log(signups);
 		res.render('process', { signups: signups, match_day: match_day });
 	});
-
 });
 
 router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
@@ -280,7 +291,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	const sheet = doc.sheetsByTitle["Players"];
 	const rows = await sheet.getRows();
 
-	let players = {};
+	const players = {};
 
 	console.log('Importing contracts...');
 
@@ -350,31 +361,19 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'status': 'Free Agent',
 		};
 	}
-	let domino_id = 'RSC000945';
-	let domino_discord_id = '500092285120282635';
-	if ( ! ( domino_id in players ) ) {
-		players[domino_id] = {
-			'rsc_id': domino_id,
-			'name': 'Domino',
-			'discord_id': domino_discord_id,
-			'mmr': 1415,
-			'tier': 'Veteran',
-			'status': 'Free Agent',
-		};
-	}
 	*/
 	players['RSC000967'].mmr       = 1310;
 	players['RSC000967'].tier      = 'Rival';
 	players['RSC000967'].status    = 'Free Agent';
 	players['RSC000967'].active_3s = true;
 
-	req.db.query('TRUNCATE TABLE contracts', (err,results) => {
+	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }
 		console.log('truncate table');
 		
-		let playersArray = [];
-		for ( let rsc_id in players ) {
-			let player = players[rsc_id];
+		const playersArray = [];
+		for ( const rsc_id in players ) {
+			const player = players[rsc_id];
 
 			if ( ! player['tier'] ) {
 				player['tier'] = 'NONE';
@@ -396,8 +395,13 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'], player['active_3s'], player['active_2s'] ]);
 		}
 
+		const insertQuery = `
+			INSERT INTO contracts 
+				(discord_id, rsc_id, name, mmr, tier, status, active_3s, active_2s) 
+			VALUES ?
+		`;
 		req.db.query(
-			'INSERT INTO contracts (discord_id, rsc_id, name, mmr, tier, status, active_3s, active_2s) VALUES ?',
+			insertQuery,
 			[ playersArray ],
 			(err, results) => {
 				if (err) { /*throw err;*/ writeError(err.toString()); console.log('error!', err); }
@@ -413,12 +417,20 @@ router.get('/manage_league', (req, res) => { if ( ! req.session.is_admin ) {
 
 	res.locals.title = `Manage League - ${res.locals.title}`;
 
-	let counts_query = 'select count(*) AS count,tier,status from contracts where tier != "" AND tier != "NONE" group by tier,status order by tier,status';
+	const counts_query = `
+		SELECT 
+			count(*) AS count,tier,status 
+		FROM contracts 
+		WHERE 
+			tier != "" AND 
+			tier != "NONE" 
+		GROUP BY tier,status 
+		ORDER BY tier,status`;
 	req.db.query(counts_query, (err, results) => {
 		if ( err ) { throw err; }
 
 		// hardcoded tier names so we can get correct sort order.
-		let tiers = {
+		const tiers = {
 			'all': { 'total': 0, 'fa': 0 },
 			'Premier': { 'total': 0, 'fa': 0 },
 			'Master': { 'total': 0, 'fa': 0 },
@@ -440,7 +452,7 @@ router.get('/manage_league', (req, res) => { if ( ! req.session.is_admin ) {
 			}
 		}
 
-		let settings_query = `
+		const settings_query = `
 		SELECT 
 			id,season,contract_url,
 			amateur,contender,prospect,challenger,rival,
@@ -452,7 +464,7 @@ router.get('/manage_league', (req, res) => { if ( ! req.session.is_admin ) {
 		`;
 		req.db.query(settings_query, (err, results) => { 
 			if (err) { throw err; }
-			let contract_sheet_id = results[0].contract_url.split('/')[5];
+			const contract_sheet_id = results[0].contract_url.split('/')[5];
 			res.render('manage', { tiers: tiers, settings: results[0], contract_sheet_id: contract_sheet_id });
 		});
 
@@ -465,17 +477,17 @@ router.post('/manage_league', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	let amateur    = "amateur"    in req.body ? 1 : 0;
-	let contender  = "contender"  in req.body ? 1 : 0;
-	let prospect   = "prospect"   in req.body ? 1 : 0;
-	let challenger = "challenger" in req.body ? 1 : 0;
-	let rival      = "rival"      in req.body ? 1 : 0;
-	let veteran    = "veteran"    in req.body ? 1 : 0;
-	let elite      = "elite"      in req.body ? 1 : 0;
-	let master     = "master"     in req.body ? 1 : 0;
-	let premier    = "premier"    in req.body ? 1 : 0;
+	const amateur    = "amateur"    in req.body ? 1 : 0;
+	const contender  = "contender"  in req.body ? 1 : 0;
+	const prospect   = "prospect"   in req.body ? 1 : 0;
+	const challenger = "challenger" in req.body ? 1 : 0;
+	const rival      = "rival"      in req.body ? 1 : 0;
+	const veteran    = "veteran"    in req.body ? 1 : 0;
+	const elite      = "elite"      in req.body ? 1 : 0;
+	const master     = "master"     in req.body ? 1 : 0;
+	const premier    = "premier"    in req.body ? 1 : 0;
 
-	let settings_query = `
+	const settings_query = `
 	INSERT INTO league_settings
 		(
 			season,contract_url,amateur,contender,prospect,challenger,
@@ -489,7 +501,7 @@ router.post('/manage_league', (req, res) => {
 			req.body.season, req.body.contract_url, amateur, contender, prospect,
 			challenger, rival, veteran, elite, master, premier
 		],
-		(err, results) => {
+		(err) => {
 			if ( err ) { throw err; }
 			res.redirect('/manage_league');
 		}

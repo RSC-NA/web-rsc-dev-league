@@ -11,7 +11,7 @@ router.get('/login_with_discord', (req, res) => {
 	res.redirect(discord_url);
 });
 
-router.get('/login', (req, res) => {
+router.get('/login', (_req, res) => {
 	res.render('login');
 });
 
@@ -29,7 +29,7 @@ router.get('/logout', (req, res) => {
 	}
 });
 
-router.get('/oauth2', async (req, res) => {
+router.get('/oauth2', (_req, res) => {
 	res.render('login');
 });
 
@@ -42,11 +42,11 @@ router.get('/process_login', (req, res) => {
 		res.redirect('/');
 	}
 
-	let token = atob(req.query.rsc).split(':');
+	const token = atob(req.query.rsc).split(':');
 
 	// 1. check DB for existing user, if it exists, create session and redirect
-	let nickname = token[0] + '#' + token[1];
-	let discord_id = token[2];
+	const nickname = token[0] + '#' + token[1];
+	const discord_id = token[2];
 
 	req.db.query(
 		'SELECT p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
@@ -100,14 +100,14 @@ router.get('/process_login', (req, res) => {
 				req.db.query(
 					'INSERT INTO players (nickname,discord_id) VALUES (?, ?)',
 					[ nickname, discord_id ],
-					function (err, results) {
+					function (err, _results) {
 						if (err) throw err;
-
+						
 						req.db.query(
 							'SELECT p.id,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
 							[ discord_id ],
-							(err, results) => {
-								let user = {
+							(_err, results) => {
+								const user = {
 									user_id: results[0].id,
 									nickname: nickname,
 									name: results[0].name,

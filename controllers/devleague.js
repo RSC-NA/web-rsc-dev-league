@@ -81,7 +81,7 @@ router.get('/championship', (req, res) => {
 				players[ player.player_id ].points += win_points;
 			}
 			
-			let sorted_players = Object.keys(players);
+			const sorted_players = Object.keys(players);
 			sorted_players.sort((a, b) => {
 				return players[a].points - players[b].points;
 			});
