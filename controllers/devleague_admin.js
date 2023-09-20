@@ -215,7 +215,7 @@ router.get('/activate_everyone/:match_day', (req, res) => {
 });
 
 router.get('/process_gameday', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
@@ -411,7 +411,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	});
 });
 
-router.get('/manage_league', (req, res) => { if ( ! req.session.is_admin ) {
+router.get('/manage_league', (req, res) => { 
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
