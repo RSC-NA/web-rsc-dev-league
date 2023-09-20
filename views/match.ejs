@@ -38,7 +38,9 @@
 		<form action="/score/<%- match_id %>" method="post">
 		<div class="row">
 			<div class="col-md-4">
-				<h3 class="bg-primary text-white rounded p-2"><%= is_admin ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %></h3>
+				<h3 class="bg-primary text-white rounded p-2">
+					<%= (is_admin||is_devleague_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %>
+				</h3>
 				<div class="mb-3">
 					<label for="name">Home Team Series Score</label>
 					<div class="input-group">
@@ -48,24 +50,24 @@
 					
 				<ul>
 					<li>
-						<%= is_admin ? '[' + players[0].mmr + '] ' : '' %>
+						<%= (is_admin || is_devleague_admin) ? '[' + players[0].mmr + '] ' : '' %>
 						<strong>
 						<a href="/player/<%= players[0].rsc_id; %>"><%= players[0].name %></a>
 						</strong> 
 						[Makes lobby]
 					</li>
 					<li>
-						<%= is_admin ? '[' + players[1].mmr + '] ' : '' %>
+						<%= (is_admin || is_devleague_admin) ? '[' + players[1].mmr + '] ' : '' %>
 						<a href="/player/<%= players[1].rsc_id; %>"><%= players[1].name %></a>
 					</li>
 					<li>
-						<%= is_admin ? '[' + players[2].mmr + '] ' : '' %>
+						<% (is_admin||is_devleague_admin) ? '[' + players[2].mmr + '] ' : '' %>
 						<a href="/player/<%= players[2].rsc_id; %>"><%= players[2].name %></a>
 					</li>
 				</ul>
 			</div>
 			<div class="col-md-4">
-				<h3 class="bg-warning rounded p-2"><%= is_admin ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
+				<h3 class="bg-warning rounded p-2"><% (is_admin||is_devleague_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
 				<div class="mb-3">
 					<label for="name">Away Team Series Score</label>
 					<div class="input-group">
@@ -75,18 +77,18 @@
 				</div>
 				<ul>
 					<li>
-						<%= is_admin ? '[' + players[3].mmr + '] ' : '' %>
+						<% (is_admin||is_devleague_admin) ? '[' + players[3].mmr + '] ' : '' %>
 						<strong>
 						<a href="/player/<%= players[3].rsc_id; %>"><%= players[3].name %></a>
 						</strong> 
 						[Uploads replays/screenshots]
 					</li>
 					<li>
-						<%= is_admin ? '[' + players[4].mmr + '] ' : '' %>
+						<% (is_admin||is_devleague_admin) ? '[' + players[4].mmr + '] ' : '' %>
 						<a href="/player/<%= players[4].rsc_id; %>"><%= players[4].name %></a>
 					</li>
 					<li>
-						<%= is_admin ? '[' + players[5].mmr + '] ' : '' %>
+						<% (is_admin||is_devleague_admin) ? '[' + players[5].mmr + '] ' : '' %>
 						<a href="/player/<%= players[5].rsc_id; %>"><%= players[5].name %></a>
 					</li>
 				</ul>

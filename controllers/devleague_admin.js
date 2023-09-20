@@ -177,7 +177,7 @@ router.post('/generate_team/:tier', (req, res) => {
 });
 
 router.get('/make_active/:signup_id', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
@@ -188,7 +188,7 @@ router.get('/make_active/:signup_id', (req, res) => {
 });
 
 router.get('/make_inactive/:signup_id', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
@@ -199,7 +199,7 @@ router.get('/make_inactive/:signup_id', (req, res) => {
 });
 
 router.get('/activate_everyone/:match_day', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
@@ -474,7 +474,7 @@ router.get('/manage_league', (req, res) => {
 });
 
 router.post('/manage_league', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	} 
 
