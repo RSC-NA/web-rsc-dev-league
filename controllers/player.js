@@ -30,7 +30,7 @@ router.get(['/search','/search/:needle'], (req,res) => {
 			if ( results.length === 1 ) {
 				return res.redirect(`/player/${results[0].rsc_id}`);
 			} else {
-				return res.render('search', { needle: '', results: results });
+				return res.render('search', { needle: needle, results: results });
 			}
 		});
 	} else {
