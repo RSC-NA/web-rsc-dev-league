@@ -6,7 +6,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 router.get(['/search','/search/:needle'], (req,res) => {
 	const needle = req.params.needle ? req.params.needle : req.query.find;
-	const needle_f = `%{$needle}%`;
+	const needle_f = `%${needle}%`;
 	console.log(`Search for "${needle}"`);
 	if ( needle ) {
 		const query = `
@@ -23,7 +23,12 @@ router.get(['/search','/search/:needle'], (req,res) => {
 				c.discord_id like ? OR
 				t.tracker_link like ?
 			)
+			GROUP BY 
+				p.id, c.rsc_id, c.name, c.mmr, c.tier, 
+				c.status, c.active_2s, c.active_3s
 		`;
+
+		//res.send(query.replaceAll('?', `'${needle_f}'`));
 
 		req.db.query(query, [needle_f,needle_f,needle_f,needle_f,needle_f], (err,results) => {
 			if ( err ) { throw err; }

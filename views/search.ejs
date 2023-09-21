@@ -10,7 +10,7 @@
 				
 					<form method="get" action="/search">
 						<div class="input-group">
-							<div class="form-outline">
+							<div class="form-outline w-75 ms-4">
 								<input type="search" id="find" name="find" class="form-control" value="<%= needle ? needle : ''; %>" />
 							</div>
 							<button type="button" class="btn btn-primary">
@@ -22,8 +22,8 @@
 					<%
 						if ( needle ) {
 					%>
-					<hr>
-					<h2><%- results.length; %> results for <%= needle; %></h2>
+					<hr class="mb-4">
+					<h2 class="mt-4"><%- results.length; %> results for <%= needle; %></h2>
 
 					<table class="table table-striped">
 						<thead>
