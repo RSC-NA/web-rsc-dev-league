@@ -32,12 +32,11 @@ router.get(['/search','/search/:needle'], (req,res) => {
 
 		req.db.query(query, [needle_f,needle_f,needle_f,needle_f,needle_f], (err,results) => {
 			if ( err ) { throw err; }
-			console.log('search =',results);			
-			if ( results.length === 1 ) {
-				return res.redirect(`/player/${results[0].rsc_id}`);
-			} else {
+			//if ( results.length === 1 ) {
+				//return res.redirect(`/player/${results[0].rsc_id}`);
+			//} else {
 				return res.render('search', { needle: needle, results: results });
-			}
+			//}
 		});
 	} else {
 		return res.render('search', { needle: '', results: [] });
