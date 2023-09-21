@@ -6,11 +6,11 @@
 			<div class="row">
 				<div class="col-md-12">
 
-					<h1>Search <%= needle ? needle : ''; %></h1>
+					<h1 class="mb-4">Search <%= needle ? `"${needle}"` : ''; %></h1>
 				
-					<form method="get" action="/search">
+					<form method="get" action="/search" class="mb-4">
 						<div class="input-group">
-							<div class="form-outline w-75 ms-4">
+							<div class="form-outline w-50">
 								<input type="search" id="find" name="find" class="form-control" value="<%= needle ? needle : ''; %>" />
 							</div>
 							<button type="button" class="btn btn-primary">
@@ -23,7 +23,7 @@
 						if ( needle ) {
 					%>
 					<hr class="mb-4">
-					<h2 class="mt-4"><%- results.length; %> results for <%= needle; %></h2>
+					<h2 class="mt-4"><%- results.length; %> results for "<%= needle; %>"</h2>
 
 					<table class="table table-striped">
 						<thead>
