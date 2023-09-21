@@ -5,7 +5,8 @@ const { mmrRange, getTierFromMMR } = require('../mmrs');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 router.get(['/search','/search/:needle'], (req,res) => {
-	const needle = `%${req.params.needle ? req.params.needle : req.query.find}%`;
+	const needle = req.params.needle ? req.params.needle : req.query.find;
+	const needle_f = `%{$needle}%`;
 	console.log(`Search for "${needle}"`);
 	if ( needle ) {
 		const query = `
@@ -24,7 +25,7 @@ router.get(['/search','/search/:needle'], (req,res) => {
 			)
 		`;
 
-		req.db.query(query, [needle,needle,needle,needle,needle], (err,results) => {
+		req.db.query(query, [needle_f,needle_f,needle_f,needle_f,needle_f], (err,results) => {
 			if ( err ) { throw err; }
 			console.log('search =',results);			
 			if ( results.length === 1 ) {
