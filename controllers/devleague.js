@@ -268,7 +268,7 @@ router.get('/match/:match_id', (req, res) => {
 router.get('/matches', (req, res) => {
 	res.locals.title = `Season ${res.locals.settings.season} Matches - ${res.locals.title}`;
 
-	const matchesQuery = 'SELECT m.id,m.match_day,m.lobby_user,m.lobby_pass,t.tier FROM matches AS m LEFT JOIN teams AS t ON m.home_team_id = t.id WHERE m.season = ? ORDER BY m.match_day DESC';
+	const matchesQuery = 'SELECT m.id,m.match_day,m.lobby_user,m.lobby_pass,t.tier,m.home_wins,m.away_wins FROM matches AS m LEFT JOIN teams AS t ON m.home_team_id = t.id WHERE m.season = ? ORDER BY m.match_day DESC';
 	req.db.query(matchesQuery, [ res.locals.settings.season ], (err, results) => {
 		if ( err ) { throw err; }
 

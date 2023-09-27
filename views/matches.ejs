@@ -37,10 +37,14 @@
 
 						let homeTeam = matches[i].lobby_user;
 						let awayTeam = matches[i].lobby_pass;
+						const scored_class = matches[i].home_wins || matches[i].away_wins ? 'bg-success bg-opacity-50 border rounded fw-bold' : 'bg-secondary bg-opacity-25 border rounded text-muted';
 			%>
 				<li class="list-group-item d-flex justify-content-between 1h-condensed">
-					<div>
-					<h6 class="my-0"><%= awayTeam %> @ <%= homeTeam %></h6>
+					<div class="<%- scored_class; %> px-2 pb-1 me-2 align-middle">
+						<h5 class="my-0">[<%- matches[i].home_wins %> - <%- matches[i].away_wins %>]</h5>
+					</div>
+					<div class="my-0 flex-grow-1 align-middle">
+					<h5 class="my-0"><%= awayTeam %> @ <%= homeTeam %></h5>
 					</div>
 					<a href="/match/<%= matches[i].id %>">view teams</a>
 				</li>
