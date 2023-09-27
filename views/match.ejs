@@ -41,13 +41,24 @@
 				<h3 class="bg-primary text-white rounded p-2">
 					<%= (is_admin||is_devleague_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %>
 				</h3>
+				<%
+					if ( scored ) {
+				%>
+				<h4 class="text-center"><%- home_wins; %></h4>
+				<% 
+					}
+
+					if ( ! scored || (is_admin || is_devleague_admin) ) {
+				%>
 				<div class="mb-3">
 					<label for="name">Home Team Series Score</label>
 					<div class="input-group">
 						<input type="number" class="form-control" name="home_wins" id="home_wins" placeholder="2" value="<%- home_wins %>" required max="4">
 					</div>
 				</div>
-					
+				<% 
+					}
+				%>
 				<ul>
 					<li>
 						<%= (is_admin || is_devleague_admin) ? '[' + players[0].mmr + '] ' : '' %>
@@ -68,6 +79,15 @@
 			</div>
 			<div class="col-md-4">
 				<h3 class="bg-warning rounded p-2"><% (is_admin||is_devleague_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
+				<%
+					if ( scored ) {
+				%>
+				<h4 class="text-center"><%- away_wins; %></h4>
+				<% 
+					}
+
+					if ( ! scored || (is_admin || is_devleague_admin) ) {
+				%>
 				<div class="mb-3">
 					<label for="name">Away Team Series Score</label>
 					<div class="input-group">
@@ -75,6 +95,9 @@
 						<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
 					</div>
 				</div>
+				<%
+					}
+				%>
 				<ul>
 					<li>
 						<% (is_admin||is_devleague_admin) ? '[' + players[3].mmr + '] ' : '' %>

@@ -243,6 +243,7 @@ router.get('/match/:match_id', (req, res) => {
 	req.db.query(matchQuery, [ req.params.match_id ], (err, results) => {
 		if ( err ) { throw err; }
 
+		const scored = results[0].home_wins || results[0].away_wins ?  true : false;
 		res.render('match', { 
 			season: results[0].season, 
 			match_id: match_id,
@@ -251,6 +252,7 @@ router.get('/match/:match_id', (req, res) => {
 			lobby_pass: results[0].lobby_pass, 
 			home_wins: results[0].home_wins,
 			away_wins: results[0].away_wins,
+			scored: scored,
 			players: results 
 		});
 	});
