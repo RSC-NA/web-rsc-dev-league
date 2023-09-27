@@ -12,114 +12,132 @@
 			Games must start promptly at <strong>8:15</strong>. The home team is responsible for creating the lobby. The Away Team is responsible 
 			for <a href="https://www.rocketsoccarconfederation.com/replay-and-screenshot-uploads/">uploading replays and screenshots</a> to the RSC Website.
 		</p>
-		<h2>Match Rules</h2>
-		<ul>
-			<li>4-game series</li>
-			<li>In-game name must match Discord name <strong>exactly</strong></li>
-			<li>Follow all normal RSC <a href="https://tinyurl.com/MatchDayRules">Match Day Rules</a>. (Team names are provided below)</li>
-		</ul>
+		<div class="row">
+			<div class="col-9">
+				<div class="bg-light p-2 rounded">
+					<h2>Lobby Info</h2>
+					<p class="lead">This is a 4-game series.</p>
+
+					<ul>
+						<li>Lobby Username: <strong><%= lobby_user %></strong></li>
+						<li>Lobby Password: <strong><%= lobby_pass %></strong></li>
+					</ul>
+
+					<% 
+						let teamOneMmr = players[0].mmr + players[1].mmr + players[2].mmr;
+						let teamTwoMmr = players[3].mmr + players[4].mmr + players[5].mmr;
+					%> 
+					<form action="/score/<%- match_id %>" method="post">
+					<div class="row">
+						<div class="col-md-6">
+							<h3 class="bg-primary text-white rounded p-2">
+								<%= (is_admin||is_devleague_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %>
+							</h3>
+							<%
+								let homeClass = 'bg-info';
+								let awayClass = 'bg-info';
+								if ( scored ) {
+									if ( home_wins > 2 ) {
+										homeClass = 'bg-success';
+									} else if ( home_wins < 2 ) {
+										homeClass = 'bg-danger';
+									}
+							%>
+							<h3 class="text-center m-4">
+								<span class="<%- homeClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%- home_wins; %>
+								</span>
+							</h3>
+							<% 
+								}
+
+								if ( ! scored || (is_admin || is_devleague_admin) ) {
+							%>
+							<div class="mb-3">
+								<label for="name">Home Team Series Score</label>
+								<div class="input-group">
+									<input type="number" class="form-control" name="home_wins" id="home_wins" placeholder="2" value="<%- home_wins %>" required max="4">
+								</div>
+							</div>
+							<% 
+								}
+							%>
+							<ul>
+								<li>
+									<%= (is_admin || is_devleague_admin) ? '[' + players[0].mmr + '] ' : '' %>
+									<strong>
+									<a href="/player/<%= players[0].rsc_id; %>"><%= players[0].name %></a>
+									</strong> 
+									[Makes lobby]
+								</li>
+								<li>
+									<%= (is_admin || is_devleague_admin) ? '[' + players[1].mmr + '] ' : '' %>
+									<a href="/player/<%= players[1].rsc_id; %>"><%= players[1].name %></a>
+								</li>
+								<li>
+									<% (is_admin||is_devleague_admin) ? '[' + players[2].mmr + '] ' : '' %>
+									<a href="/player/<%= players[2].rsc_id; %>"><%= players[2].name %></a>
+								</li>
+							</ul>
+						</div>
+						<div class="col-md-6">
+							<h3 class="bg-warning rounded p-2"><% (is_admin||is_devleague_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
+							<%
+								if ( scored ) {
+									if ( away_wins > 2 ) {
+										awayClass = 'bg-success';
+									} else if ( away_wins < 2 ) {
+										awayClass = 'bg-danger';
+									}
+							%>
+							<h3 class="text-center m-4">
+								<span class="<%- awayClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%- away_wins; %>
+								</span>
+							</h3>
+							<% 
+								}
+
+								if ( ! scored || (is_admin || is_devleague_admin) ) {
+							%>
+							<div class="mb-3">
+								<label for="name">Away Team Series Score</label>
+								<div class="input-group">
+									<input type="number" class="form-control" name="away_wins" id="away_wins" placeholder="2" value="<%- away_wins %>" required max="4">
+									<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
+								</div>
+							</div>
+							<%
+								}
+							%>
+							<ul>
+								<li>
+									<% (is_admin||is_devleague_admin) ? '[' + players[3].mmr + '] ' : '' %>
+									<strong>
+									<a href="/player/<%= players[3].rsc_id; %>"><%= players[3].name %></a>
+									</strong> 
+									[Uploads replays/screenshots]
+								</li>
+								<li>
+									<% (is_admin||is_devleague_admin) ? '[' + players[4].mmr + '] ' : '' %>
+									<a href="/player/<%= players[4].rsc_id; %>"><%= players[4].name %></a>
+								</li>
+								<li>
+									<% (is_admin||is_devleague_admin) ? '[' + players[5].mmr + '] ' : '' %>
+									<a href="/player/<%= players[5].rsc_id; %>"><%= players[5].name %></a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					</form>
+				
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<hr class="mb-4">
 
-	<div class="bg-light p-2 rounded">
-		<h2>Lobby Info</h2>
-		<p class="lead">This is a 4-game series.</p>
-
-		<ul>
-			<li>Lobby Username: <strong><%= lobby_user %></strong></li>
-			<li>Lobby Password: <strong><%= lobby_pass %></strong></li>
-		</ul>
-
-		<% 
-			let teamOneMmr = players[0].mmr + players[1].mmr + players[2].mmr;
-			let teamTwoMmr = players[3].mmr + players[4].mmr + players[5].mmr;
-		%> 
-		<form action="/score/<%- match_id %>" method="post">
-		<div class="row">
-			<div class="col-md-4">
-				<h3 class="bg-primary text-white rounded p-2">
-					<%= (is_admin||is_devleague_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %>
-				</h3>
-				<%
-					if ( scored ) {
-				%>
-				<h4 class="text-center"><%- home_wins; %></h4>
-				<% 
-					}
-
-					if ( ! scored || (is_admin || is_devleague_admin) ) {
-				%>
-				<div class="mb-3">
-					<label for="name">Home Team Series Score</label>
-					<div class="input-group">
-						<input type="number" class="form-control" name="home_wins" id="home_wins" placeholder="2" value="<%- home_wins %>" required max="4">
-					</div>
-				</div>
-				<% 
-					}
-				%>
-				<ul>
-					<li>
-						<%= (is_admin || is_devleague_admin) ? '[' + players[0].mmr + '] ' : '' %>
-						<strong>
-						<a href="/player/<%= players[0].rsc_id; %>"><%= players[0].name %></a>
-						</strong> 
-						[Makes lobby]
-					</li>
-					<li>
-						<%= (is_admin || is_devleague_admin) ? '[' + players[1].mmr + '] ' : '' %>
-						<a href="/player/<%= players[1].rsc_id; %>"><%= players[1].name %></a>
-					</li>
-					<li>
-						<% (is_admin||is_devleague_admin) ? '[' + players[2].mmr + '] ' : '' %>
-						<a href="/player/<%= players[2].rsc_id; %>"><%= players[2].name %></a>
-					</li>
-				</ul>
-			</div>
-			<div class="col-md-4">
-				<h3 class="bg-warning rounded p-2"><% (is_admin||is_devleague_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
-				<%
-					if ( scored ) {
-				%>
-				<h4 class="text-center"><%- away_wins; %></h4>
-				<% 
-					}
-
-					if ( ! scored || (is_admin || is_devleague_admin) ) {
-				%>
-				<div class="mb-3">
-					<label for="name">Away Team Series Score</label>
-					<div class="input-group">
-						<input type="number" class="form-control" name="away_wins" id="away_wins" placeholder="2" value="<%- away_wins %>" required max="4">
-						<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
-					</div>
-				</div>
-				<%
-					}
-				%>
-				<ul>
-					<li>
-						<% (is_admin||is_devleague_admin) ? '[' + players[3].mmr + '] ' : '' %>
-						<strong>
-						<a href="/player/<%= players[3].rsc_id; %>"><%= players[3].name %></a>
-						</strong> 
-						[Uploads replays/screenshots]
-					</li>
-					<li>
-						<% (is_admin||is_devleague_admin) ? '[' + players[4].mmr + '] ' : '' %>
-						<a href="/player/<%= players[4].rsc_id; %>"><%= players[4].name %></a>
-					</li>
-					<li>
-						<% (is_admin||is_devleague_admin) ? '[' + players[5].mmr + '] ' : '' %>
-						<a href="/player/<%= players[5].rsc_id; %>"><%= players[5].name %></a>
-					</li>
-				</ul>
-			</div>
-		</div>
-		</form>
-	
-	</div>
 </main>
 
 <%- include('partials/footer.ejs'); %>

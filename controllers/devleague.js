@@ -217,8 +217,6 @@ router.post('/score/:match_id', (req, res) => {
 });
 
 router.get('/match/:match_id', (req, res) => {
-	res.locals.title = `Match ${req.params.match_id} Info - ${res.locals.title}`;
-
 	const matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
@@ -244,6 +242,14 @@ router.get('/match/:match_id', (req, res) => {
 		if ( err ) { throw err; }
 
 		const scored = results[0].home_wins || results[0].away_wins ?  true : false;
+		const tier = results[0].lobby_user.split('_')[0];	
+		const home_team = results[0].lobby_user.split('_')[1];
+		const away_team = results[0].lobby_pass.split('_')[1];
+		let score_title = '';
+		if ( scored ) {
+			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
+		}
+		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
 		res.render('match', { 
 			season: results[0].season, 
 			match_id: match_id,
@@ -253,7 +259,7 @@ router.get('/match/:match_id', (req, res) => {
 			home_wins: results[0].home_wins,
 			away_wins: results[0].away_wins,
 			scored: scored,
-			players: results 
+			players: results,
 		});
 	});
 
