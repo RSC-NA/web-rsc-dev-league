@@ -75,11 +75,11 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-trophy"></i></div>
 								S<%= settings.season; %> Championship
 							</a>
-							<a class="nav-link <%- menu['tracker'] %>" href="/tracker">
-								<div class="sb-nav-link-icon"><i class="fas fa-award"></i></div>
-								Tracker Leaderboard
-							</a>
 
+							<a class="nav-link <%- menu['matches'] %>" href="/matches">
+								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
+								S<%- settings.season %> Matches
+							</a>
 						<% if ( rostered ) { %>
 							<a class="nav-link <%- menu['match'] %>" href="/match">
 								<div class="sb-nav-link-icon"><i class="fas fa-gamepad"></i></div>
@@ -112,7 +112,14 @@
 									}
 								}
 							}
+						%>
 
+							<a class="nav-link <%- menu['tracker'] %>" href="/tracker">
+								<div class="sb-nav-link-icon"><i class="fas fa-award"></i></div>
+								Tracker Leaderboard
+							</a>
+
+						<%
 							if ( is_admin || is_stats_admin || is_devleague_admin) {  /* admin-only functionality */ 
 								let badge_class = 'bg-secondary';
 								let pending_count = 0;
@@ -137,10 +144,6 @@
 							<a class="nav-link <%- menu['process_gameday'] %>" href="/process_gameday">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
 								Process Gameday
-							</a>
-							<a class="nav-link <%- menu['matches'] %>" href="/matches">
-								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
-								View Matches
 							</a>
 							<a class="nav-link <%- menu['manage_league'] %>" href="/manage_league">
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
