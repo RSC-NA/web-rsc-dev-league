@@ -36,7 +36,7 @@
 							<%
 								let homeClass = 'bg-info';
 								let awayClass = 'bg-info';
-								if ( scored ) {
+								if ( has_scored ) {
 									if ( home_wins > 2 ) {
 										homeClass = 'bg-success';
 									} else if ( home_wins < 2 ) {
@@ -51,7 +51,7 @@
 							<% 
 								}
 
-								if ( ! scored || (is_admin || is_devleague_admin) ) {
+								if ( ! has_scored || (is_admin || is_devleague_admin) ) {
 							%>
 							<div class="mb-3">
 								<label for="name">Home Team Series Score</label>
@@ -83,7 +83,7 @@
 						<div class="col-md-6">
 							<h3 class="bg-warning rounded p-2"><% (is_admin||is_devleague_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
 							<%
-								if ( scored ) {
+								if ( has_scored ) {
 									if ( away_wins > 2 ) {
 										awayClass = 'bg-success';
 									} else if ( away_wins < 2 ) {
@@ -98,7 +98,7 @@
 							<% 
 								}
 
-								if ( ! scored || (is_admin || is_devleague_admin) ) {
+								if ( ! has_scored || (is_admin || is_devleague_admin) ) {
 							%>
 							<div class="mb-3">
 								<label for="name">Away Team Series Score</label>
