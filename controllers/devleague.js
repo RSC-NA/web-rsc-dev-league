@@ -241,7 +241,7 @@ router.get('/match/:match_id', (req, res) => {
 	req.db.query(matchQuery, [ req.params.match_id ], (err, results) => {
 		if ( err ) { throw err; }
 
-		const scored = results[0].home_wins || results[0].away_wins ?  true : false;
+		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
 		const tier = results[0].lobby_user.split('_')[0];	
 		const home_team = results[0].lobby_user.split('_')[1];
 		const away_team = results[0].lobby_pass.split('_')[1];
