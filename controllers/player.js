@@ -12,9 +12,9 @@ router.get(['/search','/search/:needle'], (req,res) => {
 		const query = `
 			SELECT 
 				c.rsc_id,
-				any_value(p.nickname), any_value(c.discord_id),
-				any_value(c.name), any_value(c.mmr), any_value(c.tier), 
-				any_value(c.status), any_value(c.active_2s), any_value(c.active_3s)
+				any_value(p.nickname) AS nickname, any_value(c.discord_id) AS discord_id,
+				any_value(c.name) AS name, any_value(c.mmr) AS mmr, any_value(c.tier) AS tier, 
+				any_value(c.status) AS status, any_value(c.active_2s) AS active_2s, any_value(c.active_3s) AS active_3s
 			FROM contracts AS c
 			LEFT JOIN players AS p ON p.discord_id = c.discord_id
 			LEFT JOIN trackers AS t ON t.rsc_id = c.rsc_id
