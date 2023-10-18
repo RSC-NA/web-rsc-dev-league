@@ -17,11 +17,11 @@
 							notification.id = 'notification_' + (new Date.getTime());
 							notification.className = 'p-2 border border-success bg-success';
 							notification.style.position = 'absolute';
-							notification.style.top = ev.clientX + 'px';
-							notification.style.left = ev.clientY + 'px';
+							notification.style.top = (ev.target.getBoundingClientRect().y - 10) + 'px';
+							notification.style.left = (ev.target.getBoundingClientRect().x - 5) + 'px';
 							notification.innerText = 'Copied!';
 							document.body.appendChild(notification);
-							setTimeout(() => notification.remove(); }, 1500);
+							setTimeout(() => { notification.remove(); }, 1500);
 						});
 				});
 			});
