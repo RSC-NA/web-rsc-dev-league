@@ -11,8 +11,10 @@ router.get(['/search','/search/:needle'], (req,res) => {
 	if ( needle ) {
 		const query = `
 			SELECT 
-				p.id,p.nickname,c.discord_id,c.rsc_id,
-				c.name,c.mmr,c.tier,c.status,c.active_2s,c.active_3s
+				any_value(p.id),any_value(p.nickname),any_value(c.discord_id),
+				c.rsc_id,
+				any_value(c.name), any_value(c.mmr), any_value(c.tier), 
+				any_value(c.status), any_value(c.active_2s), any_value(c.active_3s)
 			FROM contracts AS c
 			LEFT JOIN players AS p ON p.discord_id = c.discord_id
 			LEFT JOIN trackers AS t ON t.rsc_id = c.rsc_id
@@ -23,9 +25,7 @@ router.get(['/search','/search/:needle'], (req,res) => {
 				c.discord_id like ? OR
 				t.tracker_link like ?
 			)
-			GROUP BY 
-				p.id, c.rsc_id, c.name, c.mmr, c.tier, 
-				c.status, c.active_2s, c.active_3s
+			GROUP BY c.rsc_id
 		`;
 
 		//res.send(query.replaceAll('?', `'${needle_f}'`));
