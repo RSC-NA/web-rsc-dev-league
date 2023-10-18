@@ -13,8 +13,8 @@ router.get(['/search','/search/:needle'], (req,res) => {
 			SELECT 
 				p.id,p.nickname,p.discord_id,c.rsc_id,
 				c.name,c.mmr,c.tier,c.status,c.active_2s,c.active_3s
-			FROM players AS p
-			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
+			FROM contracts AS c
+			LEFT JOIN players AS p ON p.discord_id = c.discord_id
 			LEFT JOIN trackers AS t ON t.rsc_id = c.rsc_id
 			WHERE (
 				p.nickname like ? OR
