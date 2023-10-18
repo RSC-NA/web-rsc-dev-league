@@ -1,6 +1,33 @@
 
 <%- include('partials/header.ejs'); %>
 
+	<style type="text/css">
+		.discord_id {
+			cursor: pointer;
+		}
+	</style>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', () => {
+			document.querySelectorAll('.discord_id').forEach((el) => {
+				el.addEventListener('click', (ev) => {
+					const discord_id_mention = ev.target.dataset.discordMention;
+					navigator.clipboard.writeText(discord_id_mention)
+						.then(() => {
+							const notification = document.createElement('span');
+							notification.id = 'notification_' + (new Date.getTime());
+							notification.className = 'p-2 border border-success bg-success';
+							notification.style.position = 'absolute';
+							notification.style.top = ev.clientX + 'px';
+							notification.style.left = ev.clientY + 'px';
+							notification.innerText = 'Copied!';
+							document.body.appendChild(notification);
+							setTimeout(() => notification.remove(); }, 1500);
+						});
+				});
+			});
+		});
+	</script>
+
 	<main class="container">
 		<div class="bg-light p-3 rounded">
 			<div class="row">
@@ -56,7 +83,13 @@
 										<%= result.rsc_id; %>
 									</a>
 								</th>
-								<td><%= result.discord_id; %></td>
+								<td
+									class="discord_id"
+									data-discord-mention="&lt;@<%= result.discord_id; %>&gt;"
+									title="Click to copy to clipboard"
+								>
+									<%= result.discord_id; %>
+								</td>
 								<td>
 									<a href="/player/<%= result.rsc_id; %>">
 										<%= result.name; %>

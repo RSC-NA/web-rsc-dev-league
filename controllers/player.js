@@ -11,7 +11,7 @@ router.get(['/search','/search/:needle'], (req,res) => {
 	if ( needle ) {
 		const query = `
 			SELECT 
-				p.id,p.nickname,p.discord_id,c.rsc_id,
+				p.id,p.nickname,c.discord_id,c.rsc_id,
 				c.name,c.mmr,c.tier,c.status,c.active_2s,c.active_3s
 			FROM contracts AS c
 			LEFT JOIN players AS p ON p.discord_id = c.discord_id
