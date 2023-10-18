@@ -11,8 +11,8 @@ router.get(['/search','/search/:needle'], (req,res) => {
 	if ( needle ) {
 		const query = `
 			SELECT 
-				any_value(p.id),any_value(p.nickname),any_value(c.discord_id),
 				c.rsc_id,
+				any_value(p.nickname), any_value(c.discord_id),
 				any_value(c.name), any_value(c.mmr), any_value(c.tier), 
 				any_value(c.status), any_value(c.active_2s), any_value(c.active_3s)
 			FROM contracts AS c
@@ -20,9 +20,9 @@ router.get(['/search','/search/:needle'], (req,res) => {
 			LEFT JOIN trackers AS t ON t.rsc_id = c.rsc_id
 			WHERE (
 				p.nickname like ? OR
-				p.discord_id like ? OR
 				c.name like ? OR
 				c.discord_id like ? OR
+				c.rsc_id like ? OR
 				t.tracker_link like ?
 			)
 			GROUP BY c.rsc_id
