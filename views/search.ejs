@@ -15,10 +15,10 @@
 						.then(() => {
 							const notification = document.createElement('span');
 							notification.id = 'notification_' + (new Date).getTime();
-							notification.className = 'p-2 border border-success bg-success';
+							notification.className = 'p-2 border border-warning bg-success fw-bold text-warning';
 							notification.style.position = 'absolute';
-							notification.style.top = (ev.target.getBoundingClientRect().y - 10) + 'px';
-							notification.style.left = (ev.target.getBoundingClientRect().x - 5) + 'px';
+							notification.style.top = (window.scrollY + ev.clientY - 45) + 'px';
+							notification.style.left = (window.scrollX + ev.clientX) + 'px';
 							notification.innerText = 'Copied!';
 							document.body.appendChild(notification);
 							setTimeout(() => { notification.remove(); }, 1500);
