@@ -496,7 +496,7 @@ router.get([
 				let team = {};
 				console.log('----- my_player ------ ');
 				console.log(my_player);
-				if ( JOINTEAM ) {
+				if ( JOINTEAM && ! EDIT ) {
 					team = tournament.teams.unsorted[ param_team_id ];
 					res.locals.title = `${team.name} - ${tournament.title}`;
 					console.log(team);
@@ -506,7 +506,7 @@ router.get([
 						me: my_player,
 						POINTS: POINTS,
 					});
-				} else if ( my_player && my_player.team_id ) {
+				} else if ( my_player && my_player.team_id && ! EDIT ) {
 					team = tournament.teams.unsorted[ my_player.team_id ];
 					res.locals.title = `${team.name} - ${tournament.title}`;
 					res.render('tournament_team', {
