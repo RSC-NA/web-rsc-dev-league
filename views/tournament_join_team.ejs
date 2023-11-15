@@ -199,9 +199,21 @@
 						%>
 					
 						<%
-							if ( user && user.rsc_id && user.tier && user.mmr && ((tournament['team_cap'] - POINTS[user.tier] - 1) > POINTS[user.tier]) ) {
+							if ( 
+								user && user.rsc_id && user.tier && user.mmr &&
+								tournament.team_cap >= (team.salary + POINTS[user.tier])
+							) {
 						%>
 
+						<input type="submit" class="btn btn-lg btn-primary" value="Join Team '<%= team.name; %>'">
+						<%
+							} else if (user && tournament.team_cap >= team.salary ) {
+						%>
+						<h4>Warning!</h4>
+						<p>
+							Because you are not an active RSC player, it's possible that your calculated
+							MMR value might exceed the team cap for this tournament.
+						</p>
 						<input type="submit" class="btn btn-lg btn-primary" value="Join Team '<%= team.name; %>'">
 						<%
 							} else {
