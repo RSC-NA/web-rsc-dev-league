@@ -119,7 +119,7 @@
 					<li style="list-style-type:none;" class="mt-2"><strong>Remaining Choices:</strong></li>
 					<%
 						for ( const tier in POINTS ) {
-							if ( POINTS[tier] >= team.salary ) {
+							if ( POINTS[tier] > (tournament['team_cap'] - team.salary) ) {
 								continue;
 							}
 					%>

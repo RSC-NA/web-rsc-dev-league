@@ -3,6 +3,8 @@
 <%
 	let my_tourney = my_tournaments[ tournament['id'] ];
 	let team = null;
+	console.log('--MY TOURNAMENT--');
+	console.log(my_tournaments);
 	if ( my_tourney && my_tourney.team_id ) {
 		team = tournament.teams.unsorted[ my_tourney['team_id'] ];
 	}

@@ -120,7 +120,13 @@ router.get('/tournament/:t_id/team/:team_id/check_in', (req, res) => {
 	});
 });
 
+
 router.get('/tournament/:t_id/team/:team_id', (req, res) => {
+	let param_team_id = req.params.team_id;
+	if ( req.params.invite_code ) {
+		param_team_id = atob(req.params.invite_code);
+	}
+
 	let my_player = null;
 
 	const query = `
@@ -199,11 +205,12 @@ router.get('/tournament/:t_id/team/:team_id', (req, res) => {
 						tournament.teams.open[ team_id ] = team;
 					}
 				}
-			
-				const team = tournament.teams.unsorted[ req.params.team_id ];
+				console.log('TEAM_ID', param_team_id);	
+				const team = tournament.teams.unsorted[ param_team_id ];
+				console.log('TEam', team);	
 				res.locals.title = `${team.name} - ${tournament.name}`;
 
-				console.log(tournament.teams.unsorted[req.params.team_id],tournament);
+				console.log(tournament.teams.unsorted[param_team_id],tournament);
 				res.render('tournament_team', {
 					tournament: tournament,
 					team: team,
@@ -212,6 +219,52 @@ router.get('/tournament/:t_id/team/:team_id', (req, res) => {
 				});
 			});
 		});
+	});
+});
+
+router.post('/tournament/:t_id/signup_solo/:invite_code', (req, res) => {
+	const team_id = atob(req.params.invite_code);
+	const d_id = req.body.discord_id;
+	const tracker_link = 'tracker_link' in req.body ? req.body.tracker_link : '';
+	
+	const query = `
+		SELECT 
+			c.rsc_id,c.name,c.mmr,c.tier,c.status,c.active_2s,c.active_3s,
+			p.id
+		FROM players AS p
+		LEFT JOIN contracts AS c
+		ON p.discord_id = c.discord_id
+		WHERE p.discord_id = ?
+	`;
+	req.db.query(query, [ d_id ], (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results ) {
+			
+			const player = results[0];
+			let cap_value = 0;
+			if ( player.tier && player.tier in POINTS ) {
+				cap_value = POINTS[player.tier];
+			}
+
+			const p_query = `
+				INSERT INTO tournament_players 
+					(t_id, player_id, team_id, discord_id, 
+					tier, cap_value, mmr,
+					tracker_link)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+			`;
+			const p_params = [
+				req.params.t_id, player.id, team_id, d_id,
+				player.tier, cap_value, player.mmr,
+				tracker_link
+			];
+			req.db.query(p_query, p_params, (err, _results) => {
+				if ( err ) { throw err; }
+
+				return res.redirect(`/tournament/${req.params.t_id}`);
+			});
+		}
 	});
 });
 
@@ -236,7 +289,12 @@ router.post(['/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req,
 			if ( err ) { throw err; }
 
 			if ( results ) {
+				
 				const player = results[0];
+				let cap_value = 0;
+				if ( player.tier && player.tier in POINTS ) {
+					cap_value = POINTS[player.tier];
+				}
 
 				const p_query = `
 					INSERT INTO tournament_players 
@@ -247,7 +305,7 @@ router.post(['/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req,
 				`;
 				const p_params = [
 					req.params.t_id, player.id, d_id,
-					player.tier, POINTS[ player.tier ], player.mmr,
+					player.tier, cap_value, player.mmr,
 					tracker_link
 				];
 				req.db.query(p_query, p_params, (err, _results) => {
@@ -275,28 +333,34 @@ router.post(['/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req,
 				const player = results[0];
 				
 				const t_query = `INSERT INTO tournament_teams (t_id,name) VALUES (?, ?)`;
-				req.db.query(t_query, [ req.params.t_id, name ], (err, results) => {
+				req.db.query(t_query, [ req.params.t_id, name ], (err, tresults) => {
 					if ( err ) { throw err; }
 
-					const team_id = results.insertId;
+					if ( tresults ) {
+						const team_id = tresults.insertId;
+					
+						let cap_value = 0;
+						if ( player.tier && player.tier in POINTS ) {
+							cap_value = POINTS[player.tier];
+						}
+						const p_query = `
+							INSERT INTO tournament_players 
+								(t_id, player_id, team_id, discord_id, 
+								tier, cap_value, mmr,
+								tracker_link)
+							VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+						`;
+						const p_params = [
+							req.params.t_id, player.id, team_id, d_id,
+							player.tier, cap_value, player.mmr,
+							tracker_link
+						];
+						req.db.query(p_query, p_params, (err, _results) => {
+							if ( err ) { throw err; }
 
-					const p_query = `
-						INSERT INTO tournament_players 
-							(t_id, player_id, team_id, discord_id, 
-							tier, cap_value, mmr,
-							tracker_link)
-						VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-					`;
-					const p_params = [
-						req.params.t_id, player.id, team_id, d_id,
-						player.tier, POINTS[ player.tier ], player.mmr,
-						tracker_link
-					];
-					req.db.query(p_query, p_params, (err, _results) => {
-						if ( err ) { throw err; }
-
-						return res.redirect(`/tournament/${req.params.t_id}/team/${team_id}`);
-					});
+							return res.redirect(`/tournament/${req.params.t_id}/team/${team_id}`);
+						});
+					}
 				});
 			}
 		});
@@ -325,12 +389,27 @@ router.all('/tournament/:t_id/leave', (req, res) => {
 	});
 });
 
-router.get(['/tournament/:t_id', '/tournament/:t_id/edit', '/tournament/:t_id/signup', '/tournament/:t_id/signup_solo'], (req, res) => {
+router.get([
+		'/tournament/:t_id',
+		'/tournament/:t_id/edit',
+		'/tournament/:t_id/signup',
+		'/tournament/:t_id/signup_solo',
+		'/tournament/:t_id/signup/:invite_code',
+	], (req, res) => {
+
 	res.locals.title = `RSC Tournaments`;
 	const action    = req.url.split('/').pop(); 
 	const SIGNUP = action.includes('signup');
-	const SOLO   = action.includes('solo');
+	let SOLO     = action.includes('solo');
 	const EDIT   = action === 'edit' ? true : false; // admin only path
+	let JOINTEAM = false;
+
+	let param_team_id = null;
+	if ( req.params.invite_code ) {
+		JOINTEAM = true;
+		SOLO = true;
+		param_team_id = atob(req.params.invite_code);
+	}
 
 	let my_player = null;
 
@@ -415,20 +494,37 @@ router.get(['/tournament/:t_id', '/tournament/:t_id/edit', '/tournament/:t_id/si
 				}
 		
 				let team = {};
-				if ( my_player && my_player.team_id ) {
+				console.log('----- my_player ------ ');
+				console.log(my_player);
+				if ( JOINTEAM ) {
+					team = tournament.teams.unsorted[ param_team_id ];
+					res.locals.title = `${team.name} - ${tournament.title}`;
+					console.log(team);
+					res.render('tournament_join_team', {
+						tournament: tournament,
+						team: team,
+						me: my_player,
+						POINTS: POINTS,
+					});
+				} else if ( my_player && my_player.team_id ) {
 					team = tournament.teams.unsorted[ my_player.team_id ];
-					res.locals.title = `${team.name} - ${tournament.name}`;
+					res.locals.title = `${team.name} - ${tournament.title}`;
+					res.render('tournament_team', {
+						tournament: tournament,
+						team: team,
+						me: my_player,
+						POINTS: POINTS,
+					});
 				} else {
-					res.locals.title = `${tournament.name}`;
+					res.locals.title = `${tournament.title}`;
+					res.render('tournament', {
+						tournament: tournament,
+						team: team,
+						me: my_player,
+						POINTS: POINTS,
+					});
 				}
 
-				console.log(tournament.teams.unsorted[req.params.team_id],tournament);
-				res.render('tournament_team', {
-					tournament: tournament,
-					team: team,
-					me: my_player,
-					POINTS: POINTS,
-				});
 			});
 		});
 	});

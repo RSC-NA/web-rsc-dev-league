@@ -1,0 +1,308 @@
+<%- include('partials/header.ejs'); %>
+
+<main class="container mt-2 p-2">
+	<div class="bg-light p-2 rounded">
+		<h1>
+			<%= tournament['title']; %>
+		</h1>
+		<p class="lead">
+			<%= tournament['description']; %>
+		</p>
+		<div class="row">
+			<div class="col-8">
+				<h2>Tournament Format and Rules</h2>
+				<ul>
+					<li><%= tournament['format']; %></li>
+					<li><%= tournament['team_size']; %>v<%= tournament['team_size']; %></li>
+					<li><%= tournament['team_cap']; %> Point Team Cap</li>
+				</ul>
+				<%
+					if ( tournament.allow_external ) {
+				%>
+				<p class="lead">
+					<i class="fas fa-lock-open"></i>
+					This tournament <strong>DOES</strong> allow non-RSC players
+					to join, though they will be required to provide a tracker link 
+					for placement.
+				</p>
+				<%
+					} else {
+				%>
+				<p class="lead">
+					<i class="fas fa-lock"></i>
+					This tournament <strong>DOES NOT</strong> allow non-RSC players
+					to join. All participants must be an active member of RSC
+					and exist in the Contracts Sheet of 3s or 2s.
+				</p>
+				<%
+					}
+				%>
+				<h2>Tournament Dates</h2>
+				<ul>
+					<li>
+						Signup:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['signup_close_dtg']; %>"
+							title="<%= tournament['signup_close_dtg']; %>"
+						><%= tournament['signup_close_dtg']; %></strong>
+					</li>
+					<%
+						const check_in = new Date(tournament['start_dtg']);
+						check_in.setHours( check_in.getHours() - 1 );
+					%>
+					<li>
+						Check In:
+						<strong
+							class="timeago"
+							datetime="<%= check_in; %>"
+							title="<%= check_in; %>"
+						><%= check_in; %></strong>
+					</li>
+					<li>
+						Start:
+						<strong
+							class="timeago"
+							datetime="<%= tournament['start_dtg']; %>"
+							title="<%= tournament['start_dtg']; %>"
+						><%= tournament['start_dtg']; %></strong>
+					</li>
+				</ul>
+
+				<hr class="mb-4">
+
+				<div class="p-4 rounded" style="background-color:#bcffbc;">
+					<%
+						if ( ! user_id ) {
+					%>
+
+					<h3>Sign in with Discord</h3>
+					<p class="lead">
+						Please sign in with Discord to interact with this tournament.
+					</p>
+					<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+
+					<%
+						} else { // user is logged in
+							if ( tournament['id'] in my_tournaments ) {
+								const my_tourney = my_tournaments[ tournament['id'] ];
+					%>
+					<div class="row">
+						<div class="col">
+							<h3 class="bg-warning rounded p-2">You Are Signed Up!</h3>
+							<p class="lead">
+								Make sure you're ready to go on the tournament start date.
+							</p>
+							<ul>
+								<li>
+									Check In: 
+										<strong
+										class="timeago"
+										datetime="<%= check_in; %>"
+										title="<%= check_in; %>"
+										><%= check_in; %></strong>
+								</li>
+								<li>
+									Start Time: 
+										<strong
+										class="timeago"
+										datetime="<%= tournament['start_dtg']; %>"
+										title="<%= tournament['start_dtg']; %>"
+										><%= tournament['start_dtg'];  %></strong>
+								</li>
+								<li>
+									Team: 
+									<%
+										if ( my_tourney['team_id'] !== null ) {
+											const team = tournament.teams.unsorted[ my_tourney['team_id'] ];
+									%>
+										<strong><%= team['name']; %></strong>
+									<%
+										} else {
+									%>
+										<em>No team assigned</em>
+									<%
+										}
+									%>
+								</li>
+							</ul>
+							<form action="/tournament/<%= tournament.id; %>/leave" method="post">
+								<input type="hidden" name="discord_id" value="<%= discord_id; %>">
+								<button type="submit" class="btn btn-lg btn-danger">Leave Tournament</button>
+							</form>
+						</div>
+					</div>
+					<%
+							} else {
+								const path = tournament.SOLO ? 'signup_solo' : 'signup';
+
+					%>
+
+					<h2>Signup <%= tournament.SOLO ? 'Solo' : ' a Team'; %></h2>
+					<form action="/tournament/<%= tournament['id']; %>/<%= path %>/<%- btoa(team.id); %>" method="post">
+						<input type="hidden" name="discord_id" value="<%= discord_id %>">
+
+						<% 
+							if ( ! tournament.SOLO ) {
+						%>
+
+						<div class="mb-3">
+							<label for="name">Team Name</label>
+							<div class="input-group">
+								<input type="text" class="form-control" name="name" id="team_name" placeholder="" value="" required>
+							</div>
+						</div>
+
+						<%
+							} // end of team name for non-solo signups
+
+							if ( user && user.rsc_id && user.tier && user.mmr ) {
+						%>
+						<h4>Your Info</h4>
+						<div class="mb-3">
+							<ul>
+								<li>Name: <strong><%= user.name; %></strong></li>
+								<li>Tier: <strong><%= user.tier; %></strong></li>
+								<li>MMR: <strong><%= user.mmr; %></strong></li>
+								<li>RSCID: <strong><%= user.rsc_id; %></strong></li>
+								<li>Salary Points: <strong><%= POINTS[user.tier]; %></strong></li>
+							</ul>
+						</div>
+
+						<%
+							} else {
+						%>
+
+						<h4>Your Info</h4>
+						<p>
+							In order for us to place you correctly, you need to provide your <strong>PRIMARY</strong>
+							tracker link.
+						</p>
+
+						<div class="mb-3">
+							<label for="tracker_link">Tracker Link</label>
+							<div class="input-group">
+								<input
+									type="text"
+									class="form-control"
+									name="tracker_link"
+									id="tracker_link"
+									placeholder="https://rocketleague.tracker.network/profile/steam/76561197996673327/overview"
+									value=""
+									required
+								>
+							</div>
+						</div>
+
+						<%
+							}
+						%>
+					
+						<%
+							if ( user && user.rsc_id && user.tier && user.mmr && ((tournament['team_cap'] - POINTS[user.tier] - 1) > POINTS[user.tier]) ) {
+						%>
+
+						<input type="submit" class="btn btn-lg btn-primary" value="Join Team '<%= team.name; %>'">
+						<%
+							} else {
+						%>
+						<h4>Ineligible</h4>
+						<p>
+							You are ineligible to join this team because your current MMR would
+							exceed the tournament salary cap.
+						</p>
+						<%
+							}
+						%>
+
+					</form>
+				<%
+
+						}
+					}
+				%>
+				
+				</div>
+
+			</div>
+			<div class="col-4 matchDates">
+				<h3>Roster</h3>
+				<ul>
+					<%
+						for ( const p_id in team.players ) {
+							const player = team.players[ p_id ];
+					%>
+					<li>
+						<strong><%= player.name ? player.name : player.nickname; %></strong>
+						[<%= player.tier ?? 'none'; %> (<%= player.mmr ?? '0'; %>)]
+						<% 
+							if ( new Date().getTime() > tournament.times.check_in.start.getTime() ) {
+						%>
+						<%- player.check_in_dtg ? '✅' : '❌'; %>
+						<%
+							}
+						%>
+					</li>
+					<%
+						}
+					%>
+				</ul>
+				<h5>Team Signups</h5>
+				<ul>
+					<li>
+						Full Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.full).length; %>
+						</strong>
+					</li>
+					<li>
+						Open Teams:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.teams.open).length; %>
+						</strong>
+					</li>
+				</ul>
+				<h5>Solo Signups</h5>
+				<ul>
+					<li>
+						Solo Signups:
+						<strong id="full_teams">
+							<%= Object.keys(tournament.players).length; %>
+						</strong>
+					</li>
+				</ul>
+				<hr>
+
+				<h4>Cap Restrictions</h4>
+				<ul>
+					<li>
+						Total Points Allowed: <strong><%= tournament['team_cap']; %></strong>
+					</li>
+					<li>
+						Total Points Used: <strong><%= team.salary; %></strong>
+					</li>
+					<li class="mb-1 pb-1 border-bottom border-primary">
+						Total Points Remaining: <strong><%= tournament['team_cap'] - team.salary; %></strong>
+					</li>
+					<li style="list-style-type:none;" class="mt-2"><strong>Remaining Choices:</strong></li>
+					<%
+						for ( const tier in POINTS ) {
+							if ( POINTS[tier] >= team.salary ) {
+								continue;
+							}
+					%>
+					<li><%- tier %>: <strong><%- POINTS[tier]; %></strong> points</li>
+					<%
+						}
+					%>
+				</ul>
+
+
+			</div>
+		</div>
+	</div>
+
+
+</main>
+
+<%- include('partials/footer.ejs'); %>
