@@ -135,11 +135,11 @@
 								}
 								let display_name = leaderboard[ player ]['name'];
 						%>
-						- &lt;@<%- leaderboard[ player ]['discord_id']; %><br>
+						<%- count; %>. &lt;@<%- leaderboard[ player ]['discord_id']; %>&gt; [**<%- leaderboard[ player ]['points']; %>** pts.]<br>
 						<%
 							if ( count === 6 ) {
 						%>
-						**ALTERNATES**<br>
+						### <%- tier; %> Alternates<br>
 						<%
 							}
 						%>
