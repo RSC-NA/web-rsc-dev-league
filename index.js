@@ -45,7 +45,7 @@ const atob = require('atob');
 const e = require('express');
 */
 
-const API_HOST = '24.151.184.156';
+const API_HOST = 'staging-api.rscna.com';
 
 // pull in our two manually defined configuration objects
 // TODO(erh): this can probably be moved into a database table
@@ -434,7 +434,7 @@ const tracker_queue = {};
 async function grabMoreTrackers() {
 	let error = false;
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
-	const url = `http://${API_HOST}:4443/api/v1/tracker-links/next/?format=json&limit=25`;
+	const url = `https://${API_HOST}:4443/api/v1/tracker-links/next/?format=json&limit=25`;
 	const response = await fetch(url).catch(e => {console.log(`Error: ${e}`); error = true; });
 	if ( error ) {
 		console.log("Error fetching more trackers. Aborting...");
@@ -481,7 +481,7 @@ async function grabMoreTrackers() {
 // /send_tracker_data pushes all new trackers to the official RSC
 // API for storage
 function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
-	fetch(`http://${API_HOST}:4443/api/v1/numbers/mmr/bulk_submit/`, {
+	fetch(`https://${API_HOST}:4443/api/v1/numbers/mmr/bulk_submit/`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -527,7 +527,7 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 }
 
 function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
-	fetch(`http://${API_HOST}:4443/api/v1/tracker-links/invalidate_links/`, {
+	fetch(`https://${API_HOST}:4443/api/v1/tracker-links/invalidate_links/`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -751,7 +751,7 @@ app.get('/send_tracker_data', (req, res) => {
 		if ( tracker_data.length ) {
 // send them to api
 			console.log(tracker_data);
-			fetch(`http://${API_HOST}:4443/api/v1/numbers/mmr/bulk_submit/`, {
+			fetch(`https://${API_HOST}:4443/api/v1/numbers/mmr/bulk_submit/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -815,7 +815,7 @@ app.get('/send_bad_trackers', (req, res) => {
 
 // send them to api
 		// fetch()
-		fetch(`http://${API_HOST}:4443/api/v1/tracker-links/invalidate_links/`, {
+		fetch(`https://${API_HOST}:4443/api/v1/tracker-links/invalidate_links/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
