@@ -1,6 +1,108 @@
 const express = require('express');
 const router = express.Router();
 
+router.get(['/devstats', '/devstats/:season'], (req, res) => {
+	const season = req.params.season ? req.params.season : res.locals.settings.season;
+	const query = `
+		SELECT
+			m.id AS m_id, m.home_team_id, m.home_wins,
+			m.away_team_id, m.away_wins
+		FROM matches AS m
+		WHERE season = ?
+	`;
+	const leaderboards = {
+		'PreMaster': null,
+		'Elite': null,
+		'Veteran': null,
+		'Rival': null,
+		'Challenger': null,
+		'Prospect': null,
+		'ContAmmy': null,
+	};
+	const team_wins = {};
+	const team_match_map = {};
+	const team_ids = [0];
+	const players = {};
+	req.db.query(query, [season], (err, results) => {
+		if ( err ) { throw err; }
+
+		for ( let i = 0; i < results.length; ++i ) {
+			team_ids.push(results[i].home_team_id);
+			team_ids.push(results[i].away_team_id);
+			team_match_map[ results[i].home_team_id ] = results[i].id;
+			team_match_map[ results[i].away_team_id ] = results[i].id;
+			team_wins[ results[i].home_team_id ] = results[i].home_wins;
+			team_wins[ results[i].away_team_id ] = results[i].away_wins;
+		}
+
+		const playerQuery = `
+			SELECT
+				c.name,c.rsc_id,c.discord_id,c.tier,c.status,c.mmr,
+				tp.player_id,tp.team_id, p.nickname
+			FROM team_players AS tp
+			LEFT JOIN players AS p ON tp.player_id = p.id
+			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
+			WHERE tp.team_id IN (?)
+		`;
+		req.db.query(playerQuery, [ team_ids ], (err, results) => {
+			if ( err ) { throw err; }
+
+			for ( let i = 0; i < results.length; ++i ) {
+				const player = results[i];
+
+				switch ( player.tier ) {
+					case 'Premier':
+					case 'Master':
+						player.tier = 'PreMaster';
+						break;
+					case 'Contender':
+					case 'Amateur':
+						player.tier = 'ContAmmy';
+						break;
+				}
+
+				if ( ! (player.player_id in players) ) {
+					players[ player.player_id ] = {
+						name: player.name,
+						rsc_id: player.rsc_id,
+						discord_id: player.discord_id,
+						tier: player.tier,
+						status: player.status,
+						points: 0,
+						series: 0,
+						wins: 0,
+					};
+				}
+
+				players[ player.player_id ].points++;
+				players[ player.player_id ].series++;
+				players[ player.player_id ].wins += team_wins[ player.team_id ];
+				const win_points = team_wins[ player.team_id ] * .5;
+				players[ player.player_id ].points += win_points;
+			}
+			
+			const sorted_players = Object.keys(players);
+			sorted_players.sort((a, b) => {
+				return players[a].points - players[b].points;
+			});
+
+			while ( sorted_players.length ) {
+				const p_id = sorted_players.pop();
+				const player = players[ p_id ];
+				if ( leaderboards[player.tier] === null ) {
+					leaderboards[player.tier] = [];
+				}
+				if ( player.tier in leaderboards ) {
+					leaderboards[player.tier].push(player);
+				} else {
+					console.log('wtf?', player.tier);
+				}
+			}
+			res.render('championship', { leaderboards: leaderboards });
+		});
+	});
+});
+
 router.get('/championship', (req, res) => {
 	const season = res.locals.settings.season;
 	const query = `

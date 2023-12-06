@@ -4,42 +4,10 @@
 	<main class="container">
 		<div class="bg-light p-3 rounded">
 			<div class="row">
-				<div class="col-md-7">
+				<div class="col-12">
 
-					<h1>RSC Development League Season <%= settings.season; %> Championship</h1>
+					<h1>RSC DevLeague Season <%= settings.season; %> Stats</h1>
 
-					<p class="lead">
-						Development League has Champions now! Competing in <strong>any</strong> 
-						Dev League matches during the season gives you an entry into the end-of-season
-						Invitational Championship match. This match will take the best 6 people from
-						each tier and put them head to head in a final BO3 showdown to claim the 
-						trophy <i class="fas fa-trophy"></i> and earn permanent bragging rights
-						as the "Best Free Agent in RSC". 
-					</p>
-
-					<h3>Eligibility and Invitations</h3>
-					<p class="lead">
-						This Championship match is open to <strong>ALL</strong> active RSC players in
-						a given season. If you've played in any Dev League matches, you've already
-						earned a chance for glory!
-					</p>
-					<ul>
-						<li><strong>1 Point</strong> is earned for each Dev League match you play in.</li>
-						<li><strong>0.5 Points</strong> for every <strong>game win</strong>.</li>
-					</ul>
-					<p class="lead">
-						For example, if <code>tehblister</code> plays in Dev League Match Day 1 in Elite, he
-						automatically earns <strong>1 Point</strong> for getting placed on a roster. If he
-						wins all four matches of the night, he'll earn an additional <strong>2 Points (0.5 * 4)</strong>.
-					</p>
-					<p>
-						At the end of the season, we'll invite players to a (hopefully) streamed Championship Invitational
-						Match in the order of the total number of points they've won.
-					</p>
-
-				</div>
-				<div class="col-md-4 matchDates">
-					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {
 							const leaderboard = leaderboards[ tier ];
