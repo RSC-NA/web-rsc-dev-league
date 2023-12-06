@@ -64,64 +64,12 @@
 					<%
 						}
 					%>
-
-
-				</div>
-			</div>
-
-			<%
-				if ( is_admin ) {
-			%>
-
-			<div class="row">
-				<div class="col-12">
-					<h4>Invites</h4>
-					<%
-						for ( const tier in leaderboards ) {
-							const leaderboard = leaderboards[ tier ];
-							if ( leaderboard === null ) {
-								continue;
-							}
-					%>
-					<h4>## <%= tier; %></h4>
-						<%
-							let count = 0;
-							let myPosition = null;
-							if ( leaderboard && user.name && user.name in leaderboard ) {
-								myPosition = Object.keys(leaderboard).indexOf(user.name);
-							}
-							for ( let player in leaderboard ) {
-								count++;
-
-								if ( count > 15 ) {
-									break;
-								}
-
-								let player_class = '';
-								if ( player === user.name ) {
-									player_class = 'today';
-								}
-								let display_name = leaderboard[ player ]['name'];
-						%>
-						<%- count; %>. &lt;@<%- leaderboard[ player ]['discord_id']; %>&gt; [**<%- leaderboard[ player ]['points']; %>** pts.]<br>
-						<%
-							if ( count === 6 ) {
-						%>
-						### <%- tier; %> Alternates<br>
-						<%
-							}
-						%>
-					<%
-							}
-						}
-					%>
+					
+					<pre><%- JSON.stringify(leaderboards, undefined, 4); %>
 
 				</div>
-			</div>
 
-			<%
-				}
-			%>
+			</div>
 
 		</div>
 	

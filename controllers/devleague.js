@@ -98,7 +98,7 @@ router.get(['/devstats', '/devstats/:season'], (req, res) => {
 					console.log('wtf?', player.tier);
 				}
 			}
-			res.render('championship', { leaderboards: leaderboards });
+			res.render('devstats', { leaderboards: leaderboards });
 		});
 	});
 });
