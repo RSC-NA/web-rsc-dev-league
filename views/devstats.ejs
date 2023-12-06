@@ -64,7 +64,7 @@
 								<td><%= leaderboard[player]['series']; %></td>
 								<td><%= leaderboard[player]['wins']; %></td>
 								<td><%= (leaderboard[player]['series'] * 4) - leaderboard[player]['wins']; %></td>
-								<td><%= leaderboard[player]['wins'] / (leaderboard[player]['series'] * 4); %></td>
+								<td><%= (leaderboard[player]['wins'] / (leaderboard[player]['series'] * 4) * 100).toFixed(1); %></td>
 							</tr>
 
 						<%
