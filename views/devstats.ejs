@@ -21,6 +21,7 @@
 							<tr>
 								<th scope="col">Name</th>
 								<th scope="col">Status</th>
+								<th scope="col">Points</th>
 								<th scope="col">Series</th>
 								<th scope="col">Wins</th>
 								<th scope="col">Losses</th>
@@ -61,6 +62,7 @@
 									</a>
 								</th>
 								<td><%= leaderboard[player]['status']; %></td>
+								<td><strong><%= leaderboard[player]['points']; %></strong></td>
 								<td><%= leaderboard[player]['series']; %></td>
 								<td><%= leaderboard[player]['wins']; %></td>
 								<td><%= (leaderboard[player]['series'] * 4) - leaderboard[player]['wins']; %></td>
