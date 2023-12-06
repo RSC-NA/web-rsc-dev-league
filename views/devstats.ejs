@@ -16,6 +16,18 @@
 							}
 					%>
 					<h4><%= tier; %></h4>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">Name</th>
+								<th scope="col">Status</th>
+								<th scope="col">Series</th>
+								<th scope="col">Wins</th>
+								<th scope="col">Losses</th>
+								<th scope="col">Win %</th>
+							</tr>
+						</thead>
+						<tbody>
 					<ol class="dates">
 						<%
 							let count = 0;
@@ -42,37 +54,32 @@
 								let display_name = leaderboard[ player ]['name'];
 						%>
 
-						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - <code><%- leaderboard[ player ]['points']; %></code>
-						</li>
+							<tr>
+								<th scope="row">
+									<a href="/player/<%= result.rsc_id; %>">
+										<%= result.name; %>
+									</a>
+								</th>
+								<td><%= leaderboard[player]['status']; %></td>
+								<td><%= leaderboard[player]['series']; %></td>
+								<td><%= leaderboard[player]['wins']; %></td>
+								<td><%= (leaderboard[player]['series'] * 4) - leaderboard[player]['wins']; %></td>
+								<td><%= leaderboard[player]['wins'] / (leaderboard[player]['series'] * 4); %></td>
+							</tr>
 
 						<%
 							}
-
-							if ( myPosition && myPosition > 10 ) {
 						%>
 
-						<li class="today" value="<%- myPosition %>">
-							<%- user.name %> - <code><%- leaderboard[ user.name ]['points']; %></code>
-						</li>
-
-						<%
-							}
-						%>
-
-					</ol>
+						</tbody>
+					</table>
 					<%
 						}
 					%>
 					
-					<pre><%- JSON.stringify(leaderboards, undefined, 4); %>
-
 				</div>
-
 			</div>
-
 		</div>
-	
 	</main>
 
 <%- include('partials/footer.ejs'); %>
