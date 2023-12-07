@@ -301,6 +301,7 @@ router.get('/match', (req, res) => {
 			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
 		}
 		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
+		console.log(results);
 		res.render('match', { 
 			season: results[0].season, 
 			match_day: results[0].match_day, 
