@@ -137,7 +137,9 @@
 	</div>
 
 	<hr class="mb-4">
+	<% if ( is_admin ) { %>
 	<pre><%- JSON.stringify(players, undefined, 4); %></pre>
+	<% } %>
 
 </main>
 
