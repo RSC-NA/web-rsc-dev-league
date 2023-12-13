@@ -531,7 +531,7 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			//'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+			'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 		},
 		body: JSON.stringify({ links: [tracker_link] })
 	})
