@@ -84,7 +84,7 @@
 								if ( player === user.name ) {
 									player_class = 'today';
 								}
-								let display_name = leaderboard[ player ]['name'];
+								const display_name = `<em title="${player}">${player}</em>`;
 								/*
 								if ( display_name !== player ) {
 									if ( user.is_admin ) {
