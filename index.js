@@ -96,8 +96,8 @@ app.use((req, res, next) => {
 	// as the host
 	const host = req.headers.host;
 	console.log(host);
-	if ( ! (host == 'devleague.rscstream.com' || host == 'api.rscstream.com' || host === 'localhost:3030' ) ) {
-		return res.redirect('https://devleague.rscstream.com');
+	if ( ! (host == 'devleague.rscna.com' || host == 'api.rscna.com' || host === 'localhost:3030' ) ) {
+		return res.redirect('http://devleague.rscna.com');
 	}
 
 	next();
@@ -428,7 +428,7 @@ ORDER BY td.rsc_id, td.psyonix_season
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
 let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.8.0';
+const EXTENSION_VERSION = '2.9.0';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
