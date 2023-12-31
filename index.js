@@ -400,12 +400,12 @@ WHERE t.rsc_id = ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
 GROUP BY td.id, t.rsc_id, t.name
 ORDER BY td.rsc_id, td.psyonix_season
 	`;
-	connection.query(query, [ date ], (err, results) => {
+	connection.query(query, [ rsc_id ], (err, results) => {
 		if ( err ) {
 			res.send(err);
 		}
 		res.header('Content-type', 'text/csv');
-		res.attachment(`MMR Pull from ${date}.csv`);
+		res.attachment(`MMR Pull for ${rsc_id}.csv`);
 		const columns = [
 			'RSC ID', 'Player Name', 'Tracker Link', 
 			'1s MMR', '1s Season Peak', '1s GP',
