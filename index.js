@@ -463,6 +463,8 @@ ORDER BY td.rsc_id, td.psyonix_season
 		];
 		const stringifier = stringify({ header: true, columns: columns });
 		stringifier.pipe(res);
+
+		console.log(`Numbers Records: ${results.length}`);
 		for ( let i = 0; i < results.length; ++i ) {
 			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
 			if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
