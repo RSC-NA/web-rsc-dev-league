@@ -433,48 +433,62 @@ ORDER BY td.rsc_id, td.psyonix_season
  */ 
 app.get('/numbers/:date', (req, res) => {
 	const date = req.params?.date ?? '2023-01-01';
-	const query = `
-SELECT 
-	td.id, t.rsc_id as "RSC ID",t.name AS "Player Name",td.tracker_link AS "Tracker Link",
-	ones_rating AS "1s MMR",ones_season_peak AS "1s Season Peak",ones_games_played AS "1s GP",
-	twos_rating AS "2s MMR",twos_season_peak AS "2s Season Peak",twos_games_played AS "2s GP",
-	threes_rating AS "3s MMR",threes_season_peak AS "3s Season Peak",threes_games_played AS "3s GP",
-	td.date_pulled AS "Date Pulled", td.psyonix_season AS "Psyonix Season"
-FROM 
-	tracker_data AS td
-LEFT JOIN
-	trackers AS t ON td.tracker_link = t.tracker_link OR td.rsc_id = t.rsc_id
-WHERE td.date_pulled > ? AND t.name IS NOT NULL AND t.rsc_id IS NOT NULL
-GROUP BY td.id, t.rsc_id, t.name
-ORDER BY td.rsc_id, td.psyonix_season
-	`;
-	connection.query(query, [ date ], (err, results) => {
+
+	const name_map = {};
+	const name_map_query = 'SELECT distinct(rsc_id),name FROM trackers';
+	connection.query(name_map_query, (err, results) => {
 		if ( err ) {
 			res.send(err);
 		}
-		res.header('Content-type', 'text/csv');
-		res.attachment(`MMR Pull from ${date}.csv`);
-		const columns = [
-			'RSC ID', 'Player Name', 'Tracker Link', 
-			'1s MMR', '1s Season Peak', '1s GP',
-			'2s MMR', '2s Season Peak', '2s GP',
-			'3s MMR', '3s Season Peak', '3s GP',
-			'Date Pulled', 'Psyonix Season'
-		];
-		const stringifier = stringify({ header: true, columns: columns });
-		stringifier.pipe(res);
 
-		console.log(`Numbers Records: ${results.length}`);
 		for ( let i = 0; i < results.length; ++i ) {
-			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
-			if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
-				results[i]['1s GP'] = 0;
-				results[i]['2s GP'] = 0;
-				results[i]['3s GP'] = 0;
-			}
-			stringifier.write(results[i]);
+			name_map[results[i].rsc_id] = results[i].name;
 		}
-		stringifier.end();
+
+		const query = `
+	SELECT 
+		td.id, td.rsc_id as "RSC ID","Player Name",td.tracker_link AS "Tracker Link",
+		ones_rating AS "1s MMR",ones_season_peak AS "1s Season Peak",ones_games_played AS "1s GP",
+		twos_rating AS "2s MMR",twos_season_peak AS "2s Season Peak",twos_games_played AS "2s GP",
+		threes_rating AS "3s MMR",threes_season_peak AS "3s Season Peak",threes_games_played AS "3s GP",
+		td.date_pulled AS "Date Pulled", td.psyonix_season AS "Psyonix Season"
+	FROM 
+		tracker_data AS td
+	WHERE td.date_pulled > ? AND td.rsc_id IS NOT NULL
+	GROUP BY td.id, td.rsc_id
+	ORDER BY td.rsc_id, td.psyonix_season
+		`;
+		connection.query(query, [ date ], (err, results) => {
+			if ( err ) {
+				res.send(err);
+			}
+			res.header('Content-type', 'text/csv');
+			res.attachment(`MMR Pull from ${date}.csv`);
+			const columns = [
+				'RSC ID', 'Player Name', 'Tracker Link', 
+				'1s MMR', '1s Season Peak', '1s GP',
+				'2s MMR', '2s Season Peak', '2s GP',
+				'3s MMR', '3s Season Peak', '3s GP',
+				'Date Pulled', 'Psyonix Season'
+			];
+			const stringifier = stringify({ header: true, columns: columns });
+			stringifier.pipe(res);
+
+			console.log(`Numbers Records: ${results.length}`);
+			for ( let i = 0; i < results.length; ++i ) {
+				// I just saved us 200 seconds
+				results[i]["Player Name"] = name_map[ results[i]['RSC_ID'] ];
+
+				results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
+				if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
+					results[i]['1s GP'] = 0;
+					results[i]['2s GP'] = 0;
+					results[i]['3s GP'] = 0;
+				}
+				stringifier.write(results[i]);
+			}
+			stringifier.end();
+		});
 	});
 });
 

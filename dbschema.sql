@@ -47,7 +47,9 @@ CREATE TABLE trackers (
 	`active` tinyint(1) NOT NULL DEFAULT 1,
 	`bad` tinyint(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`),
-	INDEX `tracker_link_idx` (`tracker_link`)
+	INDEX `tracker_link_idx` (`tracker_link`),
+	INDEX `player_idx` (`name`, `rsc_id`),
+	INDEX  `rsc_idx` (`rsc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE tracker_data (
@@ -67,7 +69,11 @@ CREATE TABLE tracker_data (
 	`date_pulled` DATETIME NOT NULL DEFAULT now(),
 	`pulled_by` VARCHAR(50) NOT NULL DEFAULT '',
 	`sent_to_api` tinyint(1) not null default 0,
-	PRIMARY KEY(`id`)
+	PRIMARY KEY(`id`),
+	INDEX `tracker_link_idx` (`tracker_link`),
+	INDEX `date_pulled_idx` (`date_pulled`),
+	INDEX `date_player_idx` (`date_pulled`, `rsc_id`),
+	INDEX  `rsc_idx` (`rsc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE bad_trackers (
