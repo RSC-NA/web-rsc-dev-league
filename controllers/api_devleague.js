@@ -91,7 +91,7 @@ router.all('/check_in', (req, res) => {
 	}
 	
 	if ( ! player_id ) {
-		return res.json({'error': `Player with discord_id ${discord_id} not found.`});
+		return res.json({'error': `Player with discord_id ${discord_id} not found.`, 'message': "If you are a player, go to https://devleague.rscna.com/login_with_discord to create your account.", url: 'https://devleague.rscna.com/login_with_discord' });
 	}
 
 	if ( ! res.locals.checked_in ) {
