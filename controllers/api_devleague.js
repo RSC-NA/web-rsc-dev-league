@@ -57,19 +57,19 @@ router.all('/check_in', (req, res) => {
 			if ( results && results[0] ) {
 				const active = results[0].status == 'Free Agent' ? 1 : 0;
 				const status = results[0].status;
+
+				req.db.query(
+					'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
+					[ req.session.user_id, new Date(), season, match_day, active, status],
+					function(err, _results) {
+						if ( err ) throw err;
+
+						req.session.checked_in = true;
+
+						return res.json({ 'success': 'You are checked in!' });
+					}
+				);
 			}
-
-			req.db.query(
-				'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
-				[ req.session.user_id, new Date(), season, match_day, active, status],
-				function(err, _results) {
-					if ( err ) throw err;
-
-					req.session.checked_in = true;
-
-					return res.json({ 'success': 'You are checked in!' });
-				}
-			);
 		});
 	} else {
 		return res.json({'error': 'You are already checked in.'});
