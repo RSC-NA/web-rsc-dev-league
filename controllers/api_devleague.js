@@ -90,7 +90,7 @@ router.all('/check_in', (req, res) => {
 	}
 
 	if ( ! res.locals.checked_in ) {
-		req.db.query('SELECT active_3s,status FROM contracts WHERE discord_id = ?', [discord_id], (err, results) => {
+		req.db.query('SELECT active_3s,status,name FROM contracts WHERE discord_id = ?', [discord_id], (err, results) => {
 			if ( err ) { throw err; }
 
 			if ( results && results[0] ) {
@@ -104,7 +104,7 @@ router.all('/check_in', (req, res) => {
 						if ( err ) throw err;
 
 						req.session.checked_in = true;
-
+						console.log('Check in complete -', discord_id, results[0].name);
 						return res.json({ 'success': 'You are checked in!' });
 					}
 				);
