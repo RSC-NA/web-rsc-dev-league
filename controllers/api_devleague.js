@@ -11,6 +11,7 @@ router.use((req, res, next) => {
 	console.log(req.method,req.query);
 	if ( req.method === 'GET') {
 		res.locals.discord_id = req.query.discord_id;
+		console.log('here?', res.locals.discord_id);
 	} else {
 		res.locals.discord_id = req.body.discord_id;
 	}
