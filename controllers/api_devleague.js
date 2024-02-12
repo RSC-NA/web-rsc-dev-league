@@ -33,6 +33,7 @@ router.use((req, res, next) => {
 						res.locals.checked_in = results[0].id ? true : false;
 					}
 
+					console.log('checked_in?', res.locals.checked_in);
 					next();
 				});
 			}
@@ -87,6 +88,7 @@ router.get('/check_out', (req, res) => {
 	console.log('check_out', player_id, discord_id, match_day);
 
 	if ( res.locals.checked_in ) {
+		console.log('deleting the record');
 		req.db.query(
 			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
 			[ player_id, match_day ],
