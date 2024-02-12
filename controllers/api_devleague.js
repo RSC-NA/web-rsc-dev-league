@@ -85,7 +85,7 @@ router.get('/check_out', (req, res) => {
 	const match_day = res.locals.match_day;
 	const player_id = res.locals.player_id;
 
-	console.log('	check_out', player_id, discord_id, match_day);
+	console.log('	check_out', res.locals.checked_in, player_id, discord_id, match_day);
 
 	if ( res.locals.checked_in ) {
 		console.log('	deleting the record');
