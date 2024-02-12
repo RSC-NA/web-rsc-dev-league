@@ -17,7 +17,7 @@ router.use((req, res, next) => {
 		req.db.query('SELECT id FROM players WHERE discord_id = ?', [res.locals.discord_id], (err,results) => {
 			if ( err ) { throw err; }
 			
-			console.log('player_info', results[0]));
+			console.log('player_info', results);
 			if ( results && results[0] ) {
 				res.locals.player_id = results[0].id;
 
