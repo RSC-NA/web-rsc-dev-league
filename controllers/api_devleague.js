@@ -40,10 +40,10 @@ router.use((req, res, next) => {
 			console.log('	no signup info');
 			next();
 		});
+	} else {
+		console.log('No discord_id provided');	
+		next();
 	}
-
-	console.log('No discord_id provided');	
-	next();
 });
 
 router.all('/check_in', (req, res) => {
