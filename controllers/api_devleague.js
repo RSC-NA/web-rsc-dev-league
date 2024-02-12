@@ -23,7 +23,7 @@ router.use((req, res, next) => {
 			//console.log('1. player_info', results);
 			if ( results && results[0] ) {
 				res.locals.player_id = results[0].id;
-				//console.log('2. Found Player Id', res.locals.player_id, res.locals.settings.season, res.locals.match_day);
+				console.log('2. Found Player Id', res.locals.player_id, res.locals.settings.season, res.locals.match_day);
 
 				req.db.query('SELECT id FROM signups WHERE player_id = ? AND season = ? AND match_day = ?', [
 					res.locals.player_id,
@@ -99,7 +99,7 @@ router.all('/check_in', (req, res) => {
 
 				req.db.query(
 					'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
-					[ req.session.user_id, new Date(), season, match_day, active, status],
+					[ req.locals.player_id, new Date(), season, match_day, active, status],
 					function(err, _results) {
 						if ( err ) throw err;
 
