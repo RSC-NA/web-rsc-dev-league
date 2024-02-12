@@ -1,16 +1,22 @@
 const express = require('express');
 const router = express.Router();
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 router.use((req, res, next) => {
 	res.locals.discord_id = null;
 	res.locals.player_id = null;
 	res.locals.checked_in = false;
-
-	const discord_id = req.body.discord_id ?? req.query.discord_id;
-	if ( discord_id ) {
-		res.locals.discord_id = discord_id;
+	
+	console.log(req.method);
+	if ( req.method === 'get') {
+		res.locals.discord_id = req.query.discord_id;
+	} else {
+		res.locals.discord_id = req.body.discord_id;
+	}
+	if ( res.locals.discord_id ) {
 		
-		req.db.query('SELECT id FROM players WHERE discord_id = ?', [discord_id], (err,results) => {
+		req.db.query('SELECT id FROM players WHERE discord_id = ?', [res.locals.discord_id], (err,results) => {
 			if ( err ) { throw err; }
 
 			if ( results && results[0] ) {
