@@ -51,6 +51,34 @@ router.use((req, res, next) => {
 	}
 });
 
+router.all('/status', (req, res) => {
+	// TODO(get season and match day from somewhere)
+	const season = res.locals.settings.season;
+	const discord_id = res.locals.discord_id;
+	const match_day = res.locals.match_day;
+
+	req.db.query('SELECT rsc_id,name,tier,active_3s,status FROM contracts WHERE discord_id = ?', [discord_id], (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results && results[0] ) {
+			const active = results[0].status == 'Free Agent' ? 1 : 0;
+			const status = results[0].status;
+			
+			return res.json({
+				'player': results[0].name,
+				'rsc_id': results[0].rsc_id,
+				'tier': results[0].tier,
+				'checked_in': res.locals.checked_in,
+			});
+		} else {
+			return res.json({
+				'error': 'Player not found',
+				'discord_id': discord_id,
+			});
+		}
+	});
+});
+
 router.all('/check_in', (req, res) => {
 	// TODO(get season and match day from somewhere)
 	const season = res.locals.settings.season;
