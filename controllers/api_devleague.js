@@ -57,6 +57,10 @@ router.all('/check_in', (req, res) => {
 	const discord_id = res.locals.discord_id;
 	const match_day = res.locals.match_day;
 
+	if ( ! discord_id ) {
+		return res.json({'error': 'You must provide a discord_id'});
+	}
+
 	if ( ! res.locals.checked_in ) {
 		req.db.query('SELECT active_3s,status FROM contracts WHERE discord_id = ?', [discord_id], (err, results) => {
 			if ( err ) { throw err; }
@@ -91,6 +95,9 @@ router.get('/check_out', (req, res) => {
 	const player_id = res.locals.player_id;
 
 	//console.log('7. check_out', res.locals.checked_in, player_id, discord_id, match_day);
+	if ( ! discord_id ) {
+		return res.json({'error': 'You must provide a discord_id'});
+	}
 
 	if ( res.locals.checked_in ) {
 		//console.log('8. deleting the record');
@@ -108,4 +115,4 @@ router.get('/check_out', (req, res) => {
 	}
 });
 
-module.exports = router;
+module.exorts = router;
