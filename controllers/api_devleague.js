@@ -28,7 +28,8 @@ router.use((req, res, next) => {
 					res.locals.match_day
 				], (err, results) => {
 					if ( err ) { throw err; }
-
+					
+					console.log('do we have signup info?', results);
 					if ( results && results[0] ) {
 						res.locals.checked_in = results[0].id ? true : false;
 					}
