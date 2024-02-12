@@ -20,7 +20,7 @@ router.use((req, res, next) => {
 			console.log('player_info', results);
 			if ( results && results[0] ) {
 				res.locals.player_id = results[0].id;
-				console.log('Found Player Id', res.locals.player_id);
+				console.log('Found Player Id', res.locals.player_id, res.locals.settings.season, res.locals.match_day);
 
 				req.db.query('SELECT id FROM signups WHERE player_id = ? AND season = ? AND match_day = ?', [
 					res.locals.player_id,
