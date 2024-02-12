@@ -13,6 +13,9 @@ router.use((req, res, next) => {
 	} else {
 		res.locals.discord_id = req.body.discord_id;
 	}
+
+	console.log("\n", '--- START OF API ROUTE ---');
+
 	if ( res.locals.discord_id ) {
 		req.db.query('SELECT id FROM players WHERE discord_id = ?', [res.locals.discord_id], (err,results) => {
 			if ( err ) { throw err; }
