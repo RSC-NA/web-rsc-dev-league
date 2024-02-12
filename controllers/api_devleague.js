@@ -8,14 +8,13 @@ router.use((req, res, next) => {
 	res.locals.player_id = null;
 	res.locals.checked_in = false;
 	
-	console.log(req.method);
+	console.log(req.method,req.query);
 	if ( req.method === 'GET') {
 		res.locals.discord_id = req.query.discord_id;
 	} else {
 		res.locals.discord_id = req.body.discord_id;
 	}
 	if ( res.locals.discord_id ) {
-		
 		req.db.query('SELECT id FROM players WHERE discord_id = ?', [res.locals.discord_id], (err,results) => {
 			if ( err ) { throw err; }
 
