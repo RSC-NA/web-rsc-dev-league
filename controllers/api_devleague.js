@@ -77,23 +77,24 @@ router.all('/check_in', (req, res) => {
 
 });
 
-router.get('/api/check_out/:match_day', (req, res) => {
-	if ( req.session.discord_id && req.session.checked_in ) {
-		// TODO(get season and match day from somewhere)
-		const match_day = req.params.match_day;
+router.get('/check_out', (req, res) => {
+	// TODO(get season and match day from somewhere)
+	const discord_id = res.locals.discord_id;
+	const match_day = res.locals.match_day;
+	const player_id = res.locals.player_id;
+
+	if ( res.locals.checked_in ) {
 		req.db.query(
 			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
-			[ req.session.user_id, match_day ],
+			[ player_id, match_day ],
 			function(err, _results) {
 				if ( err ) throw err;
 
-				req.session.checked_in = false;
-
-				res.redirect('/');
+				res.json({'success': 'You are checked out.'});
 			}
 		);
 	} else {
-		res.redirect('/');
+		res.json({'error': 'You were not checked in.' });
 	}
 });
 
