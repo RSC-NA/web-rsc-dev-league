@@ -83,6 +83,8 @@ router.get('/check_out', (req, res) => {
 	const match_day = res.locals.match_day;
 	const player_id = res.locals.player_id;
 
+	console.log('check_out', player_id, discord_id, match_day);
+
 	if ( res.locals.checked_in ) {
 		req.db.query(
 			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
@@ -90,11 +92,11 @@ router.get('/check_out', (req, res) => {
 			function(err, _results) {
 				if ( err ) throw err;
 
-				res.json({'success': 'You are checked out.'});
+				return res.json({'success': 'You are checked out.'});
 			}
 		);
 	} else {
-		res.json({'error': 'You were not checked in.' });
+		return res.json({'error': 'You were not checked in.' });
 	}
 });
 
