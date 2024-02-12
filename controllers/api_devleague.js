@@ -9,7 +9,7 @@ router.use((req, res, next) => {
 	res.locals.checked_in = false;
 	
 	console.log(req.method);
-	if ( req.method === 'get') {
+	if ( req.method === 'GET') {
 		res.locals.discord_id = req.query.discord_id;
 	} else {
 		res.locals.discord_id = req.body.discord_id;
