@@ -40,9 +40,10 @@ router.use((req, res, next) => {
 					console.log('4. checked_in?', res.locals.checked_in);
 					next();
 				});
+			} else {
+				console.log('5. no signup info');
+				next();
 			}
-			console.log('5. no signup info');
-			next();
 		});
 	} else {
 		console.log('6. No discord_id provided');	
