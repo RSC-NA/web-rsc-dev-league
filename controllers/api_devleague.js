@@ -84,12 +84,18 @@ router.all('/check_in', (req, res) => {
 	const season = res.locals.settings.season;
 	const discord_id = res.locals.discord_id;
 	const match_day = res.locals.match_day;
+	const player_id = res.locals.player_id;
 
 	if ( ! discord_id ) {
 		return res.json({'error': 'You must provide a discord_id'});
 	}
+	
+	if ( ! player_id ) {
+		return res.json({'error': `Player with discord_id ${discord_id} not found.`});
+	}
 
 	if ( ! res.locals.checked_in ) {
+
 		req.db.query('SELECT active_3s,status,name FROM contracts WHERE discord_id = ?', [discord_id], (err, results) => {
 			if ( err ) { throw err; }
 
@@ -99,7 +105,7 @@ router.all('/check_in', (req, res) => {
 
 				req.db.query(
 					'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
-					[ req.locals.player_id, new Date(), season, match_day, active, status],
+					[ player_id, new Date(), season, match_day, active, status],
 					function(err, _results) {
 						if ( err ) throw err;
 
