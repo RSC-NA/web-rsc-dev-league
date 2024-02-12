@@ -20,10 +20,10 @@ router.use((req, res, next) => {
 		req.db.query('SELECT id FROM players WHERE discord_id = ?', [res.locals.discord_id], (err,results) => {
 			if ( err ) { throw err; }
 			
-			console.log('	player_info', results);
+			console.log('1. player_info', results);
 			if ( results && results[0] ) {
 				res.locals.player_id = results[0].id;
-				console.log('	Found Player Id', res.locals.player_id, res.locals.settings.season, res.locals.match_day);
+				console.log('2. Found Player Id', res.locals.player_id, res.locals.settings.season, res.locals.match_day);
 
 				req.db.query('SELECT id FROM signups WHERE player_id = ? AND season = ? AND match_day = ?', [
 					res.locals.player_id,
@@ -32,20 +32,20 @@ router.use((req, res, next) => {
 				], (err, results) => {
 					if ( err ) { throw err; }
 					
-					console.log('do we have signup info?', results);
+					console.log('3. do we have signup info?', results);
 					if ( results && results[0] ) {
 						res.locals.checked_in = results[0].id ? true : false;
 					}
 
-					console.log('	checked_in?', res.locals.checked_in);
+					console.log('4. checked_in?', res.locals.checked_in);
 					next();
 				});
 			}
-			console.log('	no signup info');
+			console.log('5. no signup info');
 			next();
 		});
 	} else {
-		console.log('No discord_id provided');	
+		console.log('6. No discord_id provided');	
 		next();
 	}
 });
@@ -89,10 +89,10 @@ router.get('/check_out', (req, res) => {
 	const match_day = res.locals.match_day;
 	const player_id = res.locals.player_id;
 
-	console.log('	check_out', res.locals.checked_in, player_id, discord_id, match_day);
+	console.log('7. check_out', res.locals.checked_in, player_id, discord_id, match_day);
 
 	if ( res.locals.checked_in ) {
-		console.log('	deleting the record');
+		console.log('8. deleting the record');
 		req.db.query(
 			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
 			[ player_id, match_day ],
