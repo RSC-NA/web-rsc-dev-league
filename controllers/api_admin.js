@@ -17,7 +17,8 @@ async function pull_stats(req, res) {
 		return res.redirect('/');
 	} 
 
-	let sheetId          = '1qulf-2ehBrZ8A2-E6kQsezSQ4V_2fQ9IHCm7RWlRXwA';
+	let sheetId = '1aPQYsRc8KsepnoNTDK1UKKd7mrXPIr7EwVHsSlRud3k';
+
 	let teamStatsTable   = 'StreamTeamStats';
 	let playerStatsTable = 'StreamPlayerStats';
 	if ( req.route.path == '/pull_stats_2' ) {
