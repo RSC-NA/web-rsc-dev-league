@@ -1,4 +1,4 @@
-// if we're running in node, pull in our .env
+// if we're running in node, pull in our .envindex
 // we also have to fix out "password" to strip out 
 // any escaping that we need for Bun .env reading
 if ( typeof Bun === 'undefined' ) {
@@ -28,6 +28,9 @@ const auth_controller = require('./controllers/authentication');
 const devleague_controller = require('./controllers/devleague');
 const devleague_api_controller = require('./controllers/api_devleague');
 const devleague_admin_controller = require('./controllers/devleague_admin');
+//const combines_controller = require('./controllers/combines');
+//const combines_api_controller = require('./controllers/api_combines');
+const combines_admin_controller = require('./controllers/combines_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 const player_controller = require('./controllers/player');
@@ -139,6 +142,7 @@ app.use((req, res, next) => {
 	res.locals.is_tourney_admin = req.session.is_tourney_admin;
 	res.locals.is_devleague_admin = req.session.is_devleague_admin;
 	res.locals.is_stats_admin = req.session.is_stats_admin;
+	res.locals.is_combines_admin = req.session.is_combines_admin;
 	res.locals.user = req.session.user || {};
 	res.locals.rostered = req.session.rostered;
 
@@ -274,8 +278,18 @@ app.use((req, res, next) => {
 	}
 
 	if ( res.locals.match_day && req.session.user_id ) {
+		const query = `
+			SELECT id,active,rostered 
+			FROM signups 
+			WHERE 
+				player_id = ? AND 
+				( 
+					DATE(signup_dtg) = CURDATE() OR 
+					DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+				)
+		`;
 		connection.query(
-			'SELECT id,active,rostered FROM signups WHERE player_id = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
+			query,
 			[ req.session.user_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
@@ -334,6 +348,11 @@ app.use(auth_controller);
 app.use(devleague_controller);
 app.use(devleague_admin_controller);
 app.use('/api', devleague_api_controller);
+
+// dev league functions for players are handled by /controllers/devleague.js
+//app.use(combines_controller);
+app.use(combines_admin_controller);
+//app.use('/combines_api', combines_api_controller);
 
 // stats api routes handled by /controllers/api.js
 app.use(stats_api_controller);

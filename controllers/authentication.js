@@ -47,9 +47,18 @@ router.get('/process_login', (req, res) => {
 	// 1. check DB for existing user, if it exists, create session and redirect
 	const nickname = token[0] + '#' + token[1];
 	const discord_id = token[2];
-
+	
+	const query = `
+		SELECT 
+			p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
+			p.combines_admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,
+			c.active_3s,c.active_2s 
+		FROM players AS p 
+		LEFT JOIN contracts AS c 
+		ON p.discord_id = c.discord_id WHERE p.discord_id = ?
+	`;
 	req.db.query(
-		'SELECT p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
+		query, 
 		[ discord_id ],
 		function(err, results) {
 			if ( err ) {
@@ -79,6 +88,7 @@ router.get('/process_login', (req, res) => {
 					is_tourney_admin: results[0].tourney_admin ? true: false,
 					is_devleague_admin: results[0].devleague_admin ? true: false,
 					is_stats_admin: results[0].stats_admin ? true: false,
+					is_combines_admin: results[0].combines_admin ? true: false,
 				};
 
 				req.session.user = user;
@@ -88,6 +98,7 @@ router.get('/process_login', (req, res) => {
 				req.session.is_tourney_admin = results[0].tourney_admin ? true: false;
 				req.session.is_devleague_admin = results[0].devleague_admin ? true: false;
 				req.session.is_stats_admin = results[0].stats_admin ? true: false;
+				req.session.is_combines_admin = results[0].combines_admin ? true: false;
 				if ( req.session.login_return_url ) {
 					res.redirect(req.session.login_return_url);
 				} else {
@@ -122,6 +133,7 @@ router.get('/process_login', (req, res) => {
 									is_tourney_admin: false,
 									is_devleague_admin: false,
 									is_stats_admin: false,
+									is_combines_admin: false,
 								};
 				
 								req.session.user = user;
@@ -129,6 +141,7 @@ router.get('/process_login', (req, res) => {
 								req.session.is_tourney_admin = false;
 								req.session.is_devleague_admin = false;
 								req.session.is_stats_admin = false;
+								req.session.is_combines_admin = false;
 								if ( req.session.login_return_url ) {
 									res.redirect(req.session.login_return_url);
 								} else {

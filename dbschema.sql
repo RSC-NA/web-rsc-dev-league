@@ -94,6 +94,7 @@ CREATE TABLE players (
 	`tourney_admin` TINYINT NOT NULL DEFAULT 0,
 	`devleague_admin` TINYINT NOT NULL DEFAULT 0,
 	`stats_admin` TINYINT NOT NULL DEFAULT 0,
+	`combines_admin` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`),
 	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
