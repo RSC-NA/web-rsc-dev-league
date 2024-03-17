@@ -1,0 +1,52 @@
+# specify the version number.  If none provided, then version 1 is assumed.
+version: '3.9'
+
+volumes: 
+  devleague-datavolume:
+
+services: # containers, like docker run
+
+  devleague_db:
+    build: # as an object with the path specified under context:
+      context: .
+      dockerfile: ./docker/local/mysql/Dockerfile
+    container_name: devleague-mysql # specifying a nicer container name for Painfree to look for in PainfreeConfig
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+      # specifying image name as well as build, Compose names the built image
+      # and will look for an image tagged with this name in future runs to re-use this same image
+    image: mysql-devleague
+    ports: # Expose port 3306 in the running container and map to and expose port 8889 on the host
+      - 9889:3306
+    volumes: 
+      - devleague-datavolume:/var/lib/mysql
+    environment: # Add environment variables
+      MYSQL_DATABASE: devleague
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_USER: devleague
+      MYSQL_PASSWORD: devleague
+
+  devleague_phpmyadmin:
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    build:
+      context: .
+      dockerfile: ./docker/local/phpmyadmin/Dockerfile
+    container_name: devleague-phpmyadmin
+    depends_on:
+      - 'devleague_db'
+    links:
+      - 'devleague_db:db'
+    ports:
+      - 9876:80
+    environment:
+        MYSQL_ROOT_PASSWORD: dev
+        MYSQL_USER: devleague
+        MYSQL_PASSWORD: devleague
+        PMA_USER: devleague
+        PMA_PASSWORD: devleague
+
