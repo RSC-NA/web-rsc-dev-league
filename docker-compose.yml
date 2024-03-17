@@ -19,7 +19,7 @@ services: # containers, like docker run
       # and will look for an image tagged with this name in future runs to re-use this same image
     image: mysql-devleague
     ports: # Expose port 3306 in the running container and map to and expose port 8889 on the host
-      - 9889:3306
+      - 6789:3306
     volumes: 
       - devleague-datavolume:/var/lib/mysql
     environment: # Add environment variables
