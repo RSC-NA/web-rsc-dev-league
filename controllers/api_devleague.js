@@ -129,7 +129,7 @@ router.all('/check_in', (req, res) => {
 
 						req.session.checked_in = true;
 						console.log('Check in complete -', discord_id, results[0].name);
-						return res.json({ 'success': 'You are checked in!', name: results[0].name });
+						return res.json({ 'success': 'You are checked in!', name: results[0].name, timestamp: new Date().getTime() });
 					}
 				);
 			}
