@@ -1,0 +1,185 @@
+
+<%- include('partials/header.ejs'); %>
+
+<%
+	const has_scored = match.completed === 1 ? true : false;
+%>
+
+<main class="container mt-2 p-2">
+	<div class="bg-light p-2 rounded">
+		<h1>Combine Match Info</h1>
+		<p class="lead">
+			Please find the lobby information provided below. If you have any questions or problems, please ask for help
+			in <a href="https://discord.com/channels/395806681994493964/1220034175835312228">#combines-help</a>.
+		</p>
+		<div class="row">
+			<div class="col-9">
+				<div class="bg-light p-2 rounded border-rounded">
+					<h2>Lobby Info</h2>
+					<p class="lead">This is a 4-game series.</p>
+					
+					<ul>
+						<li>Match: <strong><%- match.cancelled ? 'cancelled' : match.completed ? 'completed' : 'active'; %></strong></li>
+						<li>Lobby Username: <strong><code><%= match.lobby_user %></code></strong></li>
+						<li>Lobby Password: <strong><code><%= match.lobby_pass %></code></strong></li>
+						<% 
+							if ( is_admin || is_combines_admin ) {
+						%>
+						<li>
+							<i class="fa fa-lock"></i>
+							MMR Delta: <strong><%- match.home_mmr - match.away_mmr; %></strong>
+						</li>
+						<li>
+							<i class="fa fa-lock"></i>
+							Reported: <strong><%- match.reported_rsc_id; %></strong>
+						</li>
+						<li>
+							<i class="fa fa-lock"></i>
+							Confirmed: <strong><%- match.confirmed_rsc_id; %></strong>
+						</li>
+						<%
+							}
+						%>
+					</ul>
+
+					<% 
+						let teamOneMmr = match.home_mmr;
+						let teamTwoMmr = match.away_mmr;
+					%> 
+					<form action="/combine/<%- match.id %>" method="post">
+					<div class="row">
+						<div class="col-md-6">
+							<h3 class="bg-primary text-white rounded p-2">
+								<%= (is_admin||is_combines_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team
+							</h3>
+							<%
+								let homeClass = 'bg-info';
+								let awayClass = 'bg-info';
+								if ( has_scored ) {
+									if ( match.home_wins > 2 ) {
+										homeClass = 'bg-success';
+									} else if ( match.home_wins < 2 ) {
+										homeClass = 'bg-danger';
+									}
+							%>
+							<h3 class="text-center m-4">
+								<span class="<%- homeClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%- match.home_wins; %>
+								</span>
+							</h3>
+							<% 
+								}
+
+								if ( ! has_scored || (is_admin || is_combines_admin) ) {
+							%>
+							<div class="mb-3">
+								<label for="name">Home Team Series Score</label>
+								<div class="input-group">
+									<input
+										type="number"
+										class="form-control"
+										name="home_wins"
+										id="home_wins"
+										placeholder="2"
+										value="<%- match.home_wins %>"
+										required
+										max="4"
+									>
+								</div>
+							</div>
+							<% 
+								}
+							%>
+							<ul>
+								<li>
+									<%= (is_admin || is_combines_admin) ? '[' + match.players.home[0].start_mmr + '] ' : '' %>
+									<strong>
+									<a href="/player/<%= match.players.home[0].rsc_id; %>"><%= match.players.home[0].name %></a>
+									</strong> 
+									[Makes lobby]
+								</li>
+								<li>
+									<%= (is_admin || is_combines_admin) ? '[' + match.players.home[1].start_mmr + '] ' : '' %>
+									<a href="/player/<%= match.players.home[1].rsc_id; %>"><%= match.players.home[1].name %></a>
+								</li>
+								<li>
+									<%= (is_admin || is_combines_admin) ? '[' + match.players.home[2].start_mmr + '] ' : '' %>
+									<a href="/player/<%= match.players.home[2].rsc_id; %>"><%= match.players.home[2].name %></a>
+								</li>
+							</ul>
+						</div>
+						<div class="col-md-6">
+							<h3 class="bg-warning rounded p-2">
+								<%= (is_admin||is_combines_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team
+							</h3>
+							<%
+								if ( has_scored ) {
+									if ( match.away_wins > 2 ) {
+										awayClass = 'bg-success';
+									} else if ( match.away_wins < 2 ) {
+										awayClass = 'bg-danger';
+									}
+							%>
+							<h3 class="text-center m-4">
+								<span class="<%- awayClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%- match.away_wins; %>
+								</span>
+							</h3>
+							<% 
+								}
+
+								if ( ! has_scored || (is_admin || is_combines_admin) ) {
+							%>
+							<div class="mb-3">
+								<label for="name">Away Team Series Score</label>
+								<div class="input-group">
+									<input
+										type="number"
+										class="form-control"
+										name="away_wins"
+										id="away_wins"
+										placeholder="2"
+										value="<%- match.away_wins %>"
+										required
+										max="4"
+									>
+									<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
+								</div>
+							</div>
+							<%
+								}
+							%>
+							<ul>
+								<li>
+									<%= (is_admin||is_combines_admin) ? '[' + match.players.away[0].start_mmr + '] ' : '' %>
+									<strong>
+									<a href="/player/<%= match.players.home[0].rsc_id; %>"><%= match.players.away[0].name %></a>
+									</strong> 
+									[Uploads replays/screenshots]
+								</li>
+								<li>
+									<%= (is_admin||is_combines_admin) ? '[' + match.players.away[1].start_mmr + '] ' : '' %>
+									<a href="/player/<%= match.players.home[1].rsc_id; %>"><%= match.players.away[1].name %></a>
+								</li>
+								<li>
+									<%= (is_admin||is_combines_admin) ? '[' + match.players.away[2].start_mmr + '] ' : '' %>
+									<a href="/player/<%= match.players.home[2].rsc_id; %>"><%= match.players.away[2].name %></a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					</form>
+						
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<% if ( is_admin ) { %>
+	<hr class="mb-4">
+	<pre><%- JSON.stringify(match, undefined, 4); %></pre>
+	<% } %>
+
+</main>
+
+<%- include('partials/footer.ejs'); %>

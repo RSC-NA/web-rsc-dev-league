@@ -1,0 +1,386 @@
+
+<%- include('partials/header.ejs'); %>
+
+<% 
+	const ready_room = signups.active;
+	const waiting_room = signups.waiting;
+
+	const ready = Object.keys(ready_room).length;
+	let lobbies = 0;
+	let missing = 0;
+	if ( ready % 6 === 0 ) {
+		lobbies = ready / 6;
+	} else {
+		missing = 6 - (ready % 6);
+		lobbies = (ready + missing) / 6;
+	}
+%> 
+
+<style type="text/css">
+	td a.move-arrow-back {
+		text-decoration:none;
+		font-size: xx-large;
+		color: #6c757d;
+	}
+	td a.move-arrow {
+		text-decoration:none;
+		font-size: xx-large;
+		color: #6c757d;
+	}
+	td:hover a.move-arrow {
+		color: var(--bs-cyan) !important;
+	}
+	td:hover a.move-arrow-back {
+		color: var(--bs-red) !important;
+	}
+</style>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+	<symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+		<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+	</symbol>
+	<symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+		<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+	</symbol>
+</svg>
+
+<main class="container">
+	<div class="py-3 py-md-5 pb-md-2">
+		<h2>Combines Lobby Manager</h2>
+		<p class="lead">
+			Every player that checks in for combines is placed in the "Waiting Room". Add them to the active queue to build a large 
+			enough pool of players to run the "Generate Lobbies" command.
+		</p>
+	</div>
+	<div class="card mb-4">
+		<div class="card-header">
+			<h4>Active Games: <%- games.length; %>
+				<a
+					class="btn btn-primary btn-sm float-end"
+					data-bs-toggle="collapse"
+					href="#collapse_games"
+					role="button"
+					aria-expanded="false"
+					aria-controls="collapse_games"
+				>show</a>
+			</h4>
+		</div>
+		<div id="collapse_games" class="card-body collapse">
+			<ul>
+			<%
+				if ( games.length ) {	
+					for ( let i = 0; i < games.length; ++i ) {
+			%>
+				<li>
+					<a href="/combine/<%- games[i].id; %>">
+						<%- games[i].lobby_user; %>-<%- games[i].lobby_pass %>
+					</a>
+				</li>
+			<%
+					} 
+				}
+			%>
+			</ul>
+		</div>
+	</div>
+
+	<% 
+		if ( ! missing && lobbies >= 1 ) {
+	%>
+	<div class="row mb-sm-4 mb-lg-0">
+		<div class="col-1 col-sm-2"></div>
+		<div class="col-10 col-sm-8">
+			<div class="alert alert-success d-flex align-items-center" role="alert">
+				<div class="bi flex-shrink-0 me-2">
+					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+						<use xlink:href="#check-circle-fill"/>
+					</svg>
+				</div>
+				<div class="flex-fill">
+					<div class="display-5 alert-heading">
+						Aww yeah! Game Time!
+					</div>
+					<hr>
+					<%
+						if ( lobbies < 6 ) {
+					%>
+					<p class="lead fw-bolder">
+						Be careful!
+					</p>
+					<p>
+						<small>
+							Clicking this button with just a few lobbies is <strong>PROBABLY</strong> a really 
+							bad idea. Ideally, we probably want 15-20 lobbies every time we click this button to ensure 
+							a balanced distribution of player skill. If you're about to click this with less than 6 lobbies,
+							you're either <code>tehblister</code> or we're testing it and not using it for real combines.
+						</small>
+					</p>
+					<%
+						}
+					%>
+					<p class="lead">
+						If you're happy and have a large <strong>Ready Room</strong>, it's probably safe to 
+						kick things off. Anybody that shows up late or didn't fit in this generation will stick around
+						in the waiting room for the next session (15-30 minutes).
+					</p>
+
+					<div class="text-center">
+						<a href="/combines/generate" class="btn btn-success btn-lg">
+							<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
+								<span class="visually-hidden">Ready!</span>
+							</div>
+							Generate <%- lobbies > 1 ? `${lobbies} Lobbies!` : `${lobbies} Lobby`; %>
+							<i class="fa fa-car-burst text-warning"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-1 col-sm-2"></div>
+	</div>
+	<%
+		}
+	%>
+
+	<div class="row">
+
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 mt-5 mt-lg-0">
+			<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
+				<span class="text-muted">Waiting Room</span>
+				<a href="/combines/activate/all" class="btn btn-info fw-bold">
+					<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
+					<span class="d-xl-none d-lg-inline">&uarr;</span>
+					<i class="fas fa-user-plus"></i>
+					Add All
+				</a>
+			</h4>
+
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th></th>
+						<th class="text-center">MMR</th>
+						<th class="text-center">&Delta;</th>
+						<th>Player</th>
+						<th class="text-center">Record</th>
+						<th class="text-center">W%</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				<% 
+					const stat_colors = {
+						'great': 'text-success',
+						'ok': 'text-info',
+						'neutral': 'text-warning',
+						'bad': 'text-danger',
+						'none': 'text-muted',
+					};
+					let analysis = 'none';
+					if ( Object.keys(waiting_room).length ) {
+						for ( const rsc_id in waiting_room ) {
+							const p = waiting_room[rsc_id];
+							if ( p.win_percentage > 60 ) {
+								analysis = 'great';
+							} else if ( p.win_percentage > 52 ) {
+								analysis = 'ok';
+							} else if ( p.win_percentage > 45 ) {
+								analysis = 'neutral';
+							} else if ( p.win_percentage > 20 ) {
+								analysis = 'bad';
+							} else {
+								analysis = 'none';
+							}
+
+				%>
+					<tr>
+						<td class="p-0 text-center">
+							<a href="/combines/activate/<%- rsc_id; %>" 
+								class="move-arrow h4 p-0 px-2 mb-0" style=""
+								title="Move player to ready room.">
+								<span class="d-none d-xl-inline">&#10094;</span>
+								<span class="d-inline d-xl-none">&#9786;</span>
+								<!-- &#9754; -->
+							</a>
+						</td>
+						<td class="text-center">
+							<span class="text-primary fw-bold">
+								<%= p.current_mmr; %>
+							</span>
+						</td>
+						<td class="text-center">
+							<span 
+								class="fw-bold <%- 
+									p.mmr_delta > 0 ? 
+										'text-success' : 
+										p.mmr_delta === 0 ? 
+											'text-muted' : 'text-danger'; 
+								%>"
+								title="<%= p.effective_mmr; %>"
+								>
+								<%= p.mmr_delta; %>
+							</span>
+						</td>
+						<td class="fw-bolder">
+							<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
+						</td>
+						<td class="text-center">
+							<span class="text-success fw-bold"><%= p.wins; %></span> /
+							<span class="text-red fw-bold"><%= p.losses; %></span>
+						</td>
+						<td class="text-center">
+							<span class="<%- stat_colors[analysis]; %> fw-bold">
+								<%= p.win_percentage; %>%
+							</span>
+						</td>
+					</tr>
+
+				<% 
+						} // end of loop
+					} else {
+				%>
+
+					<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
+
+				<%
+					}
+				%>
+
+				</tbody>
+			</table>
+		</div>
+
+		<!-- primary FA signup / team generation -->
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 order-first">
+			<div class="mb-3 row">
+				<div class="col-6 col-lg-4 h3 fw-bolder text-success">Ready Room</div>
+				<div class="col-8">
+				<%
+					if ( missing ) {
+				%>
+					<div class="alert alert-warning d-flex align-items-center" role="alert">
+						<div class="bi flex-shrink-0 me-2">
+							<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
+								<use xlink:href="#exclamation-triangle-fill"/>
+							</svg>
+						</div>
+						<div class="flex-fill">
+							<div class="h5 alert-heading">
+								<%- missing; %> more for <%- lobbies; %> lobbies
+							</div>
+							<hr>
+							<p class="text-xs">
+								Clicking the "Deactivate <%- missing; %>" button will remove the <%- missing; %> players that 
+								were the last to check in.
+							</p>
+							<div class="text-end">
+								<a href="/combines/deactivate-last/<%- missing; %>" class="btn btn-sm btn-danger">
+									<i class="fa fa-user-xmark me-1"></i>
+									Deactivate <strong><%- missing; %></strong>
+								</a>
+							</div>
+						</div>
+					</div>
+
+				<%
+					}
+				%>
+				</div>
+			</div>
+
+			<div class="mb-3">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th class="text-center">MMR</th>
+							<th class="text-center">&Delta;</th>
+							<th>Player</th>
+							<th class="text-center">Record</th>
+							<th class="text-center">W%</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+
+					<% 
+						if ( Object.keys(ready_room).length ) {
+							for ( const rsc_id in ready_room ) {
+								const p = ready_room[rsc_id];
+								if ( p.win_percentage > 60 ) {
+									analysis = 'great';
+								} else if ( p.win_percentage > 52 ) {
+									analysis = 'ok';
+								} else if ( p.win_percentage > 45 ) {
+									analysis = 'neutral';
+								} else if ( p.win_percentage > 20 ) {
+									analysis = 'bad';
+								} else {
+									analysis = 'none';
+								}
+
+					%>
+						<tr>
+							<td class="text-center">
+								<span class="text-primary fw-bold">
+									<%= p.current_mmr; %>
+								</span>
+							</td>
+							<td class="text-center">
+								<span 
+									class="fw-bold <%- 
+										p.mmr_delta > 0 ? 
+											'text-success' : 
+											p.mmr_delta === 0 ? 
+												'text-muted' : 'text-danger'; 
+									%>"
+									title="<%= p.effective_mmr; %>"
+									>
+									<%= p.mmr_delta; %>
+								</span>
+							</td>
+							<td class="fw-bolder">
+								<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
+							</td>
+							<td class="text-center">
+								<span class="text-success fw-bold"><%= p.wins; %></span> /
+								<span class="text-red fw-bold"><%= p.losses; %></span>
+							</td>
+							<td class="text-center">
+								<span class="<%- stat_colors[analysis]; %> fw-bold">
+									<%= p.win_percentage; %>%
+								</span>
+							</td>
+							<td class="p-0 text-center">
+								<a href="/combines/deactivate/<%- rsc_id; %>" 
+									class="move-arrow-back h4 p-0 px-2 mb-0" style=""
+									title="Move player to waiting room.">
+									<span class="d-none d-xl-inline">&#10095;</span>
+									<span class="d-inline d-xl-none">&#9850;</span>
+									<!-- &#9754; -->
+								</a>
+							</td>
+						</tr>
+
+					<% 
+							} // end of loop
+						} else {
+					%>
+
+						<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
+
+					<%
+						}
+					%>
+
+					</tbody>
+				</table>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</main>
+
+<%- include('partials/footer.ejs'); %>

@@ -1,4 +1,4 @@
-// if we're running in node, pull in our .envindex
+// if we're running in node, pull in our .env
 // we also have to fix out "password" to strip out 
 // any escaping that we need for Bun .env reading
 if ( typeof Bun === 'undefined' ) {
@@ -28,7 +28,7 @@ const auth_controller = require('./controllers/authentication');
 const devleague_controller = require('./controllers/devleague');
 const devleague_api_controller = require('./controllers/api_devleague');
 const devleague_admin_controller = require('./controllers/devleague_admin');
-//const combines_controller = require('./controllers/combines');
+const combines_controller = require('./controllers/combines');
 //const combines_api_controller = require('./controllers/api_combines');
 const combines_admin_controller = require('./controllers/combines_admin');
 const stats_api_controller = require('./controllers/api');
@@ -124,6 +124,7 @@ app.use((req, res, next) => {
 		'process_gameday': '',
 		'matches': '',
 		'manage_league': '',
+		'manage_combines': '',
 	};
 
 	console.log('url: ' + req.originalUrl);
@@ -185,6 +186,42 @@ app.use((req, res, next) => {
 				master: results[0].master,
 				premier: results[0].premier,
 			};
+		}
+		next();
+	});
+});
+
+// combines middleware
+app.use((req, res, next) => {
+	const combines = {
+		season: 20,
+		active: false,
+		combine_day: false,
+		tiermaker_url: '',
+		k_factor: 32,
+		min_series: 10,
+	};
+
+	res.locals.combines = combines;
+
+	const query = `
+		SELECT 
+			season, active, tiermaker_url, k_factor, min_series
+		FROM combine_settings ORDER BY id DESC LIMIT 1
+	`;
+	connection.query(query, (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			const new_combines_settings = results[0];
+			if ( new_combines_settings.active ) {
+				const day = (new Date()).getDay();
+				if ( day === 1 || day === 3 || day === 5 ) {
+					new_combines_settings.combine_day = true;
+				}
+			}
+
+			res.locals.combines = new_combines_settings;
 		}
 		next();
 	});
@@ -338,7 +375,11 @@ app.use((req, res, next) => {
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
-	res.render('dashboard', { match_days: matchDays });
+	if ( res.locals.combines.active ) {
+		res.render('combines_dashboard');
+	} else {
+		res.render('dashboard', { match_days: matchDays });
+	}
 });
 
 // Authentication handled by /controllers/authentication.js
@@ -350,8 +391,8 @@ app.use(devleague_admin_controller);
 app.use('/api', devleague_api_controller);
 
 // dev league functions for players are handled by /controllers/devleague.js
-//app.use(combines_controller);
-app.use(combines_admin_controller);
+app.use(combines_controller);
+app.use('/combines', combines_admin_controller);
 //app.use('/combines_api', combines_api_controller);
 
 // stats api routes handled by /controllers/api.js
@@ -531,6 +572,11 @@ async function grabMoreTrackers() {
 		return false;
 	}
 	const trackers = await response.json();
+
+	if ( ! trackers || ! trackers.length ) {
+		console.error('No trackers came back from the DB');
+		return false;
+	} 
 
 	const trackers_by_link = {};
 	console.log('grabbed some trackers = ' + trackers.length);

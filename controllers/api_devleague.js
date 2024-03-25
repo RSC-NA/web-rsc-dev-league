@@ -99,6 +99,8 @@ router.all('/status', (req, res) => {
 
 router.all('/check_in', (req, res) => {
 	// TODO(get season and match day from somewhere)
+	res.removeHeader('Date');
+
 	const season = res.locals.settings.season;
 	const discord_id = res.locals.discord_id;
 	const match_day = res.locals.match_day;

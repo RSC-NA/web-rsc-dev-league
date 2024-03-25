@@ -1,5 +1,6 @@
 const express = require('express');
 const router  = express.Router();
+const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
@@ -9,9 +10,612 @@ function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
 
+function get_rand_word() {
+	const words = [
+		'octane', 'gizmo', 'breakout', 'merc', 'hotshot', 'gizmo', 'backfire',
+		'x-devil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
+		'mario', 'samus', 'sweet', 'tooth', 'aftershock', 'grog', 'esper', 
+		'marauder', 'masamune', 'proteus', 'ripper', 'scarab', 'takumi',
+		'triton', 'vulcan', 'zippy', 'backfire', 'paladin', 'hotshot', 'gizmo',
+		'animus', 'centio', 'cyclone', 'endo', 'dominusgt', 'dingo', 'diestro',
+		'fennec', 'fox', 'imperator', 'jager', 'mantis', 'nimbus', 'zsr', 
+		'peregrine', 'twinzer', 'sentinal', 'samurai', 'tygris', 'werewolf',
+		'ecto', 'ford', 'mustang', 'nascar', 'toyota', 'chevy', 'camaro',
+		'subaru', 'wrx', 'sti', 'astonmartin', 'batmobile', 'tumbler',
+		'reaper', 'fiero', 'fiesta', 'jeep', 'wrangler', 'cake', 'tehblister',
+		'treefrog', 'monty', 'tr1ppn', 'snacktime', 'nickm', 'rscbot', 'tinsel',
+	];
+	return words[ Math.floor(Math.random() * words.length) ];
+}
+
+/**
+ * lobby {
+ *	username: string, password: string,
+ *	home: { players: [], mmr: number, delta: number }
+ *	away: { players: [], mmr: number, delta: number }
+ * }
+ */
+async function make_lobby(db, lobby) {
+	const match_query = `
+		INSERT INTO combine_matches
+			(season, lobby_user, lobby_pass, home_mmr, away_mmr)
+		VALUES 
+			(     ?,          ?,          ?,        ?,        ?)
+	`;
+	const params = [
+		lobby.season,
+		lobby.username,
+		lobby.password,
+		lobby.home.mmr,
+		lobby.away.mmr,
+	];
+	const [results] = await db.execute(match_query, params);
+	const match_id = results.insertId;
+
+	const home = [];
+	const away = [];
+	for ( let i = 0; i < 3; ++i ) {
+		home.push([match_id,lobby.home.players[i].rsc_id,'home',lobby.home.players[i].current_mmr]);
+		away.push([match_id,lobby.away.players[i].rsc_id,'away',lobby.away.players[i].current_mmr]);
+	}
+
+	const players_query = `
+		INSERT INTO combine_match_players 
+			(match_id,rsc_id,team,start_mmr) 
+		VALUES ?
+	`;	
+	const players = home.concat(away);
+	const [player_results] = await db.query(players_query, [players]);
+
+}
+
+function calculate_mmrs(team) {
+	if ( ! team ) { return 0; }
+	if ( ! team.length ) { return 0; }
+	let mmr = 0;
+	for ( let i = 0; i < team.length; ++i ) {
+		if ( "current_mmr" in team[i] ) {
+			mmr += team[i].current_mmr;
+		}
+	}
+
+	return mmr;
+}
+
+// games is an array of games with winner
+// [ 'home', 'home', 'away', 'home' ]
+function game_outcome(home_mmr, away_mmr, games) {
+	const outcome = {
+		home: { start: home_mmr, end: home_mmr, w: 0, l: 0, },
+		away: { start: away_mmr, end: away_mmr, w: 0, l: 0, },
+		delta: [],
+	};
+
+	for ( let i = 0; i < games.length; ++i ) {
+		if ( games[i] === 'home' ) {
+			outcome.home.w += 1;
+			outcome.away.l += 1;
+		} else {
+			outcome.home.l += 1;
+			outcome.away.w += 1;
+		}
+	}
+
+	const delta = rating_delta_series(home_mmr, away_mmr, { home: outcome.home.w, away: outcome.away.w });
+
+	outcome.delta = delta;
+	outcome.home.end = delta.home.end;
+	outcome.away.end = delta.away.end;
+
+	return outcome;
+}
+
+function rating_delta_series(home_mmr, away_mmr, scores, k_factor = 32) {
+	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
+	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
+
+	const home_result = scores.home / 4;
+	const away_result = scores.away / 4;
+
+	const home_delta = Math.round(k_factor * (home_result - home_win_chance));
+	const away_delta = Math.round(k_factor * (away_result - away_win_chance));
+
+	const results = { 
+		home: {
+			start: home_mmr,
+			delta: home_delta,
+			end: home_mmr + home_delta,
+		},
+		away: {
+			start: away_mmr,
+			delta: away_delta,
+			end: away_mmr + away_delta,
+		},
+	};
+
+	return results;
+}
+
+// winner can be "home" or "away"
+function rating_delta(home_mmr, away_mmr, winner, k_factor = 32) {
+	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
+	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
+
+	const home_result = winner === 'home' ? 1 : 0; 
+	const away_result = winner === 'home' ? 0 : 1;
+
+	const home_delta = Math.round(k_factor * (home_result - home_win_chance));
+	const away_delta = Math.round(k_factor * (away_result - away_win_chance));
+
+	const results = { 
+		home: {
+			start: home_mmr,
+			delta: home_delta,
+			final: home_mmr + home_delta,
+		},
+		away: {
+			start: away_mmr,
+			delta: away_delta,
+			final: away_mmr + away_delta,
+		},
+	};
+
+	return results;
+}
+
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
+router.all('/generate', async (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	}
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const players_query = `
+		SELECT 
+			s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
+			s.current_mmr, s.active, s.rostered, 
+			t.name
+		FROM combine_signups AS s 
+		LEFT JOIN tiermaker AS t 
+		ON s.rsc_id = t.rsc_id
+		WHERE 
+			s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			s.active = 1 AND 
+			s.rostered = 0
+		ORDER BY s.current_mmr ASC
+	`;
+
+	const [results] = await db.execute(players_query);
+
+	if ( results && results.length ) {
+		if ( results.length % 6 !== 0 ) {
+			return res.redirect('/combines/process?error=CountMisMatch');
+		}
+
+		const num_lobbies = results.length / 6;
+
+		const lobbies = [];
+		for ( let i = 0; i < num_lobbies; ++i ) {
+			const lobby = {
+				season: res.locals.combines.season,
+				username: get_rand_word(),
+				password: get_rand_word(),
+				home: { players: [], mmr: 0, },
+				away: { players: [], mmr: 0, },
+			};
+
+			// snake-draft by MMR for balanced teams
+			lobby.home.players.push(results.pop()); // 1st player
+			lobby.away.players.push(results.pop()); // 2nd player
+			lobby.away.players.push(results.pop()); // 3rd player
+			lobby.home.players.push(results.pop());	// 4th player
+			lobby.home.players.push(results.pop());	// 5th player
+			lobby.away.players.push(results.pop()); // 6th player
+	
+			lobby.home.mmr = calculate_mmrs(lobby.home.players);
+			lobby.away.mmr = calculate_mmrs(lobby.away.players);
+			lobby.home.delta = lobby.home.mmr - lobby.away.mmr;
+			lobby.away.delta = lobby.away.mmr - lobby.home.mmr;
+
+			await make_lobby(db, lobby);
+
+			lobbies.push(lobby);
+		}
+
+		// mark everyone as rostered 
+		const rostered_query = `
+			UPDATE combine_signups 
+			SET rostered = 1 
+			WHERE active = 1 AND rostered = 0
+		`;
+		await db.execute(rostered_query);
+
+		await db.end();
+
+		return res.redirect('/combines/process?success');
+	} else {
+		return res.redirect('/combines/process?error=CountMisMatch2');
+	}
+});
+
+router.all('/activate/:rsc_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+	
+	const single_where = req.params.rsc_id !== 'all' ? "rsc_id = ? AND" : '';
+	const query = `
+		UPDATE combine_signups SET 
+			active = 1
+		WHERE 
+			${single_where}
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			active = 0 AND
+			rostered = 0
+	`;
+	
+	if ( req.params.rsc_id !== 'all' ) {
+		req.db.query(query, [ req.params.rsc_id ], (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/combines/process');
+		});
+	} else {
+		req.db.query(query, (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/combines/process');
+		});
+	}
+});
+
+router.all('/deactivate/:rsc_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+	
+	const single_where = req.params.rsc_id !== 'all' ? "rsc_id = ? AND" : '';
+	const query = `
+		UPDATE combine_signups SET 
+			active = 0
+		WHERE 
+			${single_where}
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			active = 1 AND
+			rostered = 0
+	`;
+	
+	if ( req.params.rsc_id !== 'all' ) {
+		req.db.query(query, [ req.params.rsc_id ], (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/combines/process');
+		});
+	} else {
+		req.db.query(query, (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/combines/process');
+		});
+	}
+});
+
+router.get('/process', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+
+	res.locals.title = `Combine Maker - ${res.locals.title}`;
+
+	const players_query = `
+		SELECT 
+			t.id, t.rsc_id, t.name, t.tier, t.effective_mmr, t.current_mmr, 
+			t.count, t.keeper, t.wins, t.losses
+		FROM tiermaker AS t 
+		WHERE t.season = ?
+	`;
+	const players = {};
+	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				const p = results[i];
+
+				players[p.rsc_id] = {
+					'rsc_id': p.rsc_id,
+					'name': p.name, 
+					'tier': p.tier,
+					'effective_mmr': p.effective_mmr,
+					'current_mmr': p.current_mmr,
+					'count': p.count,
+					'keeper': p.keeper,
+					'wins': p.wins,
+					'losses': p.losses,
+					'games': p.wins + p.losses,
+				};
+			}
+		}
+	
+		const signups_query = `
+			SELECT 
+				s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
+				s.current_mmr, s.active, s.rostered
+			FROM combine_signups AS s 
+			WHERE 
+				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.rostered = 0
+		`;
+		const signups = {
+			'games': [],
+			'active': {},
+			'waiting': {},
+		};
+		req.db.query(signups_query, (err, results) => {
+			if ( err ) { throw err; }
+
+			if ( results.length ) {
+				for ( let i = 0; i < results.length; ++i ) {
+					const s = results[i];
+					const p = players[s.rsc_id];
+					//console.log(s,p);
+					p.signup_dtg = s.signup_dtg;
+					p.win_percentage = p.games ? 
+						parseFloat(((p.wins / p.games) * 100).toFixed(1)) : 
+						0;
+					p.mmr_delta = s.current_mmr - p.effective_mmr;
+
+					if ( s.active ) {
+						signups.active[s.rsc_id] = p;
+					} else {
+						signups.waiting[s.rsc_id] = p;
+					}
+				}
+			}
+
+			const active_query = 'SELECT id,lobby_user,lobby_pass FROM combine_matches WHERE completed = 0';
+			req.db.query(active_query, (err, results) => {
+				if ( err ) { throw err; }
+
+				let games = [];
+				if ( results.length ) {
+					games = results;
+				}
+
+				res.render('process_combine', {
+					signups: signups,
+					games: games,
+				});
+			});
+		});
+	});
+});
+
+router.get('/manage', (req, res) => { 
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+
+	res.locals.title = `Manage Combines - ${res.locals.title}`;
+
+	const counts_query = `
+		SELECT 
+			count(*) AS count,tier 
+		FROM tiermaker 
+		WHERE 
+			season = ?
+		GROUP BY tier 
+		ORDER BY tier`;
+	req.db.query(counts_query, [res.locals.combines.season], (err, results) => {
+		if ( err ) { throw err; }
+
+		// hardcoded tier names so we can get correct sort order.
+		const tiers = {
+			'all': 0,
+			'Premier': 0,
+			'Master': 0,
+			'Elite': 0,
+			'Veteran': 0,
+			'Rival': 0,
+			'Challenger': 0,
+			'Prospect': 0,
+			'Contender': 0,
+			'Amateur': 0,
+		};
+		for ( let i = 0; i < results.length; i++ ) {
+			tiers[ results[i]['tier'] ] += results[i]['count'];
+			tiers['all'] += results[i]['count'];
+		}
+
+		const settings_query = `
+		SELECT 
+			id,season,active,tiermaker_url,
+			k_factor,min_series
+		FROM 
+			combine_settings 
+		ORDER by id DESC 
+		LIMIT 1
+		`;
+		req.db.query(settings_query, (err, results) => { 
+			if (err) { throw err; }
+			if ( results && results.length ) {
+				const tiermaker_sheet_id = results[0].tiermaker_url.split('/')[5];
+				res.render('manage_combines', {
+					tiers: tiers,
+					combines: results[0],
+					tiermaker_sheet_id: tiermaker_sheet_id,
+				});
+			} else { 
+				res.render('manage_combines', {
+					tiers: tiers,
+					combines: res.locals.combines,
+					tiermaker_sheet_id: '',
+				});
+			}
+		});
+
+	});
+
+});
+
+router.post('/manage', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+
+	const active    = "active" in req.body ? 1 : 0;
+
+	const settings_query = `
+	INSERT INTO combine_settings
+		(season, active, tiermaker_url, k_factor, min_series)
+	VALUES (?, ?, ?, ?, ?)
+	`;
+	req.db.query(
+		settings_query,
+		[
+			req.body.season, active, req.body.tiermaker_url, 
+			req.body.k_factor, req.body.min_series
+		],
+		(err) => {
+			if ( err ) { throw err; }
+			res.redirect('/combines/manage');
+		}
+	);
+});
+
+router.get('/setup', async (req, res) => {
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = 'SELECT rsc_id,season,current_mmr FROM tiermaker ORDER BY current_mmr DESC LIMIT 36';
+	const [results] = await db.execute(query);
+
+	if ( results && results.length ) {
+		const ins_query = 'INSERT INTO combine_signups (rsc_id,season,current_mmr) values (?,?,?)';
+		const players = [];
+		for ( let i = 0; i < results.length; ++i ) {
+			const [result] = await db.query(ins_query, [results[i].rsc_id,results[i].season,results[i].current_mmr]);
+		}
+	}
+
+	db.end();
+
+	res.redirect('/combines/process');
+});
+
+router.all('/import/:tiermaker_sheet_id', async (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+
+	const season = res.locals.combines.season;
+
+	// 1. create google sheets object
+	const doc = new GoogleSpreadsheet(req.params.tiermaker_sheet_id);
+	// 2. authenticate
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+
+	// 3. pull all relevant fields
+	await doc.loadInfo();
+
+	const sheet = doc.sheetsByTitle["9 Tier"];
+	const rows = await sheet.getRows();
+
+	const players = {};
+
+	console.log('Importing tiermaker...');
+	for ( let i = 0; i < rows.length; i++ ) {
+		const row = rows[i];
+		if ( ! row['Player Name'] || ! row['RSC ID'] ) {
+			continue;
+		}
+		players[ row['RSC ID'] ] = {
+			'season': res.locals.combines.season,
+			'discord_id': null,
+			'rsc_id': row['RSC ID'],
+			'name': row['Player Name'],
+			'tier': row._rawData[4],
+			'count': row['Count'],
+			'keeper': row['Keeper'],
+			'base_mmr': row['Base MMR'],
+			'effective_mmr': row['Effective MMR'],
+			'current_mmr': row['Effective MMR'],
+		};
+	}
+
+	console.log(`    Found ${Object.keys(players).length} players in tier maker.`);
+
+	const tiermaker_query = `SELECT id,rsc_id FROM tiermaker WHERE season = ?`;
+	let skipped = 0;
+	req.db.query(tiermaker_query, [ season ], (err, results) => {
+
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				const row = results[i];
+
+				if ( row['rsc_id'] in players ) {
+					delete(players[row['rsc_id']]);
+					skipped++;
+				}
+			}
+		}
+			
+		const new_players = [];
+		for ( const rsc_id in players ) {
+			const p = players[rsc_id];
+			new_players.push([
+				season, rsc_id, p.name, p.tier, p.count, p.keeper, p.base_mmr,
+				p.effective_mmr, p.current_mmr
+			]);
+		}
+		
+		const re_url = `/combines/manage?added=${new_players.length}&skipped=${skipped}`;
+		if ( new_players.length ) {
+			
+			const tiermaker_insert_query = `
+				INSERT INTO tiermaker 
+					(season,rsc_id,name,tier,count,keeper,base_mmr,effective_mmr,current_mmr)
+				VALUES ?
+			`;
+			req.db.query(tiermaker_insert_query, [new_players], (err, results) => {
+				if ( err ) { throw err; }
+
+				console.log(" -------- Tiermaker Import Complete --------- ");
+				console.log(`	Imported: ${new_players.length}`);
+				console.log(`	Skipped: ${skipped}`);
+				console.log(" -------- Tiermaker Import Complete --------- ");
+		
+				res.redirect(re_url);
+			});
+		} else {
+			res.redirect(re_url);
+		}
+	});
+
+});
+/*
 router.get('/change_tier/:rsc_id/:new_tier', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
@@ -348,20 +952,18 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// always add "tehblister" to the list in case he isn't playing
 	// Added for development in S17 so that I could test things 
 	// while non-playing.
-	/*
 	let tehblister_id = 'RSC000302';
 	let tehblister_discord_id = '207266416355835904';
-	if ( ! (tehblister_id in players) ) {
-		players[tehblister_id] = {
-			'rsc_id': tehblister_id,
-			'name': 'tehblister',
-			'discord_id': tehblister_discord_id,
-			'mmr': 1550,
-			'tier': 'Elite',
-			'status': 'Free Agent',
-		};
-	}
-	*/
+	// if ( ! (tehblister_id in players) ) {
+	// 	players[tehblister_id] = {
+	// 		'rsc_id': tehblister_id,
+	// 		'name': 'tehblister',
+	// 		'discord_id': tehblister_discord_id,
+	// 		'mmr': 1550,
+	// 		'tier': 'Elite',
+	// 		'status': 'Free Agent',
+	// 	};
+	// }
 	players['RSC000967'].mmr       = 1310;
 	players['RSC000967'].tier      = 'Rival';
 	players['RSC000967'].status    = 'Free Agent';
@@ -404,7 +1006,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			insertQuery,
 			[ playersArray ],
 			(err, results) => {
-				if (err) { /*throw err;*/ writeError(err.toString()); console.log('error!', err); }
+				if (err) { writeError(err.toString()); console.log('error!', err); }
 				console.log(`Inserting records`, results);
 				res.redirect('/manage_league');
 		});
@@ -508,5 +1110,6 @@ router.post('/manage_league', (req, res) => {
 		}
 	);
 });
+*/ 
 
 module.exports = router;

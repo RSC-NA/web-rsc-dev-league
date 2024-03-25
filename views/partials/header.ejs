@@ -39,7 +39,7 @@
 					<div class="form-outline w-75 ms-4">
 						<input type="search" id="find_header" name="find" class="form-control" placeholder="Search for anything" value="" />
 					</div>
-					<button type="button" class="btn btn-primary">
+					<button type="button" class="btn btn-primary d-none d-md-block">
 						<i class="fas fa-search"></i>
 					</button>
 				</div>
@@ -68,11 +68,11 @@
 						<div class="nav">
 							<div class="sb-sidenav-menu-heading">Core</div>
 							<a class="nav-link <%- menu['dashboard'] %>" href="/">
-								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt text-info"></i></div>
 								Dashboard
 							</a>
 							<a class="nav-link <%- menu['championship'] %>" href="/championship">
-								<div class="sb-nav-link-icon"><i class="fas fa-trophy"></i></div>
+								<div class="sb-nav-link-icon"><i class="fas fa-trophy text-warning"></i></div>
 								S<%= settings.season; %> Championship
 							</a>
 
@@ -82,7 +82,7 @@
 							</a>
 						<% if ( rostered ) { %>
 							<a class="nav-link <%- menu['match'] %>" href="/match">
-								<div class="sb-nav-link-icon"><i class="fas fa-gamepad"></i></div>
+								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-primary"></i></div>
 								Match Info
 							</a>
 						<% } %>
@@ -114,10 +114,10 @@
 							}
 						%>
 
-							<a class="nav-link <%- menu['tracker'] %>" href="/tracker">
-								<div class="sb-nav-link-icon"><i class="fas fa-award"></i></div>
-								Tracker Leaderboard
-							</a>
+							<!-- <a class="nav-link <%- menu['tracker'] %>" href="/tracker"> -->
+							<!-- 	<div class="sb-nav-link-icon"><i class="fas fa-award"></i></div> -->
+							<!-- 	Tracker Leaderboard -->
+							<!-- </a> -->
 
 						<%
 							if ( is_admin || is_stats_admin || is_devleague_admin) {  /* admin-only functionality */ 
@@ -134,7 +134,10 @@
 									bad_badge_class = 'bg-danger';
 								}
 						%>
-							<div class="sb-sidenav-menu-heading">League Admin</div>
+							<div class="sb-sidenav-menu-heading">
+								<i class="fas fa-lock text-warning me-1"></i> 
+								DevLeague Admin
+							</div>
 
 						<%
 
@@ -150,6 +153,25 @@
 								Manage League
 							</a>
 						<% 
+								}
+
+								if ( is_admin || is_combines_admin ) {
+						%>
+							<div class="sb-sidenav-menu-heading">
+								<i class="fas fa-lock text-warning me-1"></i> 
+								Combines Admin
+							</div>
+							
+							<a class="nav-link <%- menu['manage_combines'] %>" href="/combines/process">
+								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-info"></i></div>
+								Build Lobbies!
+							</a>
+							<a class="nav-link <%- menu['manage_combines'] %>" href="/combines/manage">
+								<div class="sb-nav-link-icon"><i class="fas fa-lock"></i></div>
+								Manage Combines
+							</a>
+		
+						<%
 								}
 
 								if ( is_admin || is_stats_admin ) {

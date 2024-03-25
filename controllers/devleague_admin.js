@@ -465,8 +465,21 @@ router.get('/manage_league', (req, res) => {
 		`;
 		req.db.query(settings_query, (err, results) => { 
 			if (err) { throw err; }
-			const contract_sheet_id = results[0].contract_url.split('/')[5];
-			res.render('manage', { tiers: tiers, settings: results[0], contract_sheet_id: contract_sheet_id });
+			
+			if ( results && results.length ) {
+				const contract_sheet_id = results[0].contract_url.split('/')[5];
+				res.render('manage', { 
+					tiers: tiers, 
+					settings: results[0], 
+					contract_sheet_id: contract_sheet_id 
+				});
+			} else {
+				res.render('manage', { 
+					tiers: tiers, 
+					settings: [], 
+					contract_sheet_id: '',
+				});
+			}
 		});
 
 	});

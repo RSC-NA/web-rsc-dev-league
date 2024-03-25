@@ -28,7 +28,7 @@ async function pull_stats(req, res) {
 	}
 	const output = [];
 
-	const conn2 = await mysqlP.createPool({
+	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USER,
 		password: process.env.DB_PASS,
@@ -126,7 +126,7 @@ async function pull_stats(req, res) {
 	console.log('Team Stats loaded...');
 
 	// clear our tables
-	await conn2.execute(`TRUNCATE ${teamStatsTable}`);
+	await db.execute(`TRUNCATE ${teamStatsTable}`);
 	output.push({ 'process': `Truncating ${teamStatsTable}`});
 
 	// insert into ${teamStatsTable}
@@ -136,7 +136,7 @@ async function pull_stats(req, res) {
 	console.log(teamStatsQuery);
 	for ( let i = 0; i < teamStats.length; i++ ) {
 		//console.log(Object.values(teamStats[i]));
-		await conn2.execute(teamStatsQuery, Object.values(teamStats[i]));
+		await db.execute(teamStatsQuery, Object.values(teamStats[i]));
 	}
 
 	const PlayerStatsSheet = doc.sheetsByTitle['Player Stats'];
@@ -178,7 +178,7 @@ async function pull_stats(req, res) {
 		});
 	}
 
-	await conn2.execute(`TRUNCATE ${playerStatsTable}`);
+	await db.execute(`TRUNCATE ${playerStatsTable}`);
 	output.push({ 'process': `Truncating ${playerStatsTable}`});
 
 	// insert into ${playerStatsTable}
@@ -190,10 +190,12 @@ async function pull_stats(req, res) {
 	console.log(playerStats[4]);
 	for ( let i = 0; i < playerStats.length; i++ ) {
 		if ( i % 100 == 0 ) { console.log(`Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
-		await conn2.execute(playerStatsQuery, Object.values(playerStats[i]));
+		await db.execute(playerStatsQuery, Object.values(playerStats[i]));
 	}
 
 	output.push({ 'process': 'Done!' });
+
+	await db.end();
 
 	res.send('<pre>' + JSON.stringify(output) + '</pre>');
 }

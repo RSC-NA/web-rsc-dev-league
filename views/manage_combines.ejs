@@ -1,3 +1,10 @@
+<%
+
+	function ucfirst(str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+%>
 
 <%- include('partials/header.ejs'); %>
 
@@ -15,98 +22,51 @@
 				<span class="text-muted">Active Leagues</span>
 			</h4>
 
-			<form class="card p-2" action="/import_tiermaker/<%= contract_sheet_id %>">
-				<div class="input-group">
-					<button type="submit" class="btn btn-primary">Import Contracts</button>
-				</div>
-			</form>
+			<div class="text-end mb-3">
+				<a href="/combines/import/<%= tiermaker_sheet_id; %>" class="btn btn-success">
+					Load Tiermaker
+				</a>
+			</div>
 
 			<ul class="list-group mb-3">
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.premier ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Premier</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
+
+				<%
+					for ( const tier in tiers ) {
+						if ( tier === 'all' ) {
+							continue;
+						}
+				%>
+
+				<li class="list-group-item">
+					<div class="row">
+						<div class="col-8">
+							<div class="h5 text-end"><%- tier; %></div>
+						</div>
+						<div class="col-4 text-success">
+							<span class="fw-bold h5"><%= tiers[tier]; %></span>
+							<span class="text-muted">players</span>
+						</div>
 					</div>
-					<span class="text-muted"><%= tiers['Premier']['total'] - tiers['Premier']['fa'] %> Signed / <%= tiers['Premier']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.master ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Master</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Master']['total'] - tiers['Master']['fa'] %> Signed / <%= tiers['Master']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.elite ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Elite</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Elite']['total'] - tiers['Elite']['fa'] %> Signed / <%= tiers['Elite']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.veteran ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Veteran</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Veteran']['total'] - tiers['Veteran']['fa'] %> Signed / <%= tiers['Veteran']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.rival ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Rival</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Rival']['total'] - tiers['Rival']['fa'] %> Signed / <%= tiers['Rival']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.challenger ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Challenger</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Challenger']['total'] - tiers['Challenger']['fa'] %> Signed / <%= tiers['Challenger']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.prospect ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Prospect</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Prospect']['total'] - tiers['Prospect']['fa'] %> Signed / <%= tiers['Prospect']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.contender ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Contender</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Contender']['total'] - tiers['Contender']['fa'] %> Signed / <%= tiers['Contender']['fa'] %> FA</span>
-				</li>
-
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
-					<div <%- settings.amateur ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Amateur</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Amateur']['total'] - tiers['Amateur']['fa'] %> Signed / <%= tiers['Amateur']['fa'] %> FA</span>
-				</li>
+				<%
+					}
+				%>
 				
-				<li class="list-group-item d-flex justify-content-between">
-					<span>FA</span>
-					<strong><%= tiers['all']['fa'] %></strong>
-				</li>
-
 				<!-- <li class="list-group-item d-flex justify-content-between">
 					<span>PermFA</span>
 					<strong>86</strong>
 				</li> -->
 
-				<li class="list-group-item d-flex justify-content-between">
-					<span>Total Players</span>
-					<strong><%= tiers['all']['total'] %></strong>
+				<li class="list-group-item">
+					<div class="row">
+						<div class="col-8">
+							<div class="h5 text-end">Total Players</div>
+						</div>
+						<div class="col-4">
+							<span class="h5 text-primary"><%= tiers['all'] %></span>
+						</div>
+					</div>
 				</li>
 				
 			</ul>
@@ -115,14 +75,14 @@
 		</div>
 
 		<div class="col-md-8 order-md-1">
-			<h4 class="mb-3">League Settings</h4>
+			<h4 class="mb-3">League Combines Settings</h4>
 			
-			<form class="needs-validation" novalidate action="/manage_league" method="post">
+			<form class="needs-validation" novalidate action="/combines/manage" method="post">
 
 			<div class="mb-3">
 				<label for="season">Season</label>
 				<div class="input-group">
-					<input type="text" class="form-control" name="season" id="season" placeholder="season" value="<%= settings.season %>" required>
+					<input type="text" class="form-control" name="season" id="season" placeholder="season" value="<%= combines.season %>" required>
 					<div class="invalid-feedback" style="width: 100%;">
 						Season is required
 					</div>
@@ -130,57 +90,41 @@
 			</div>
 
 			<div class="mb-3">
-				<label for="contract_url">Contract Sheet</label>
+				<label for="tiermaker_url">Tiermaker Sheet URL</label>
 				<div class="input-group">
-					<input type="text" class="form-control" name="contract_url" id="contract_url" placeholder="contract_url" value="<%= settings.contract_url %>" required>
-					<div class="invalid-feedback" style="width: 100%;">
-						Contract sheet URL is required.
-					</div>
+					<input type="text" class="form-control" name="tiermaker_url" id="tiermaker_url" placeholder="tiermaker_url" value="<%= combines.tiermaker_url %>">
 				</div>
 			</div>
 			
+			<div class="mb-3">
+				<label for="k_factor">K-Factor</label>
+				<div class="input-group">
+					<input type="number" class="form-control" name="k_factor" id="k_factor" placeholder="K-Factor" value="<%= combines.k_factor; %>">
+				</div>
+			</div>
+
+			<div class="mb-3">
+				<label for="min_series">Min Series</label>
+				<div class="input-group">
+					<input type="number" class="form-control" name="min_series" id="min_series" placeholder="Number of required series" value="<%= combines.min_series; %>">
+				</div>
+			</div>
+
 			<hr class="mb-4">
-			
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="premier" id="premier" <%- settings.premier ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="master">Premier</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="master" id="master" <%- settings.master ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="master">Master</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="elite" id="elite" <%- settings.elite ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="elite">Elite</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="veteran" id="veteran" <%- settings.veteran ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="veteran">Veteran</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="rival" id="rival" <%- settings.rival ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="rival">Rival</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="challenger" id="challenger" <%- settings.challenger ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="challenger">Challenger</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="prospect" id="prospect" <%- settings.prospect ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="prospect">Prospect</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="contender" id="contender" <%- settings.contender ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="contender">Contender</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="amateur" id="amateur" <%- settings.amateur ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="amateur">Amateur</label>
-			</div>
 		
+			<h5>Combines Status</h5>
+			<div class="custom-control custom-checkbox">
+				<input 
+					type="checkbox" 
+					class="custom-control-input" 
+					name="active" id="active" 
+					<%- combines.active ? 'checked="checked"' : '' %>>
+				<label class="custom-control-label" for="active">Are Combines Active?</label>
+			</div>
+			
 			<hr class="mb-4">
 			
-			<button class="btn btn-primary btn-lg btn-block" type="submit">Update League Settings</button>
+			<button class="btn btn-primary btn-lg btn-block" type="submit">Update Combine Settings</button>
 			
 			</form>
 		</div>
