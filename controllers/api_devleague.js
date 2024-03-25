@@ -82,7 +82,7 @@ router.all('/status', (req, res) => {
 			const active = results[0].status == 'Free Agent' ? 1 : 0;
 			const status = results[0].status;
 			
-			return res.json({
+			return res.status(200).json({
 				'player': results[0].name,
 				'rsc_id': results[0].rsc_id,
 				'tier': results[0].tier,
@@ -129,7 +129,7 @@ router.all('/check_in', (req, res) => {
 
 						req.session.checked_in = true;
 						console.log('Check in complete -', discord_id, results[0].name);
-						return res.json({ 'success': 'You are checked in!' });
+						res.status(200).json({ 'success': 'You are checked in!' });
 					}
 				);
 			}
@@ -159,11 +159,11 @@ router.get('/check_out', (req, res) => {
 			function(err, _results) {
 				if ( err ) throw err;
 
-				return res.json({'success': 'You are checked out.'});
+				res.status(200).json({'success': 'You are checked out.'});
 			}
 		);
 	} else {
-		return res.json({'error': 'You were not checked in.' });
+		res.json({'error': 'You were not checked in.' });
 	}
 });
 
