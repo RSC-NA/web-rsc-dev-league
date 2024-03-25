@@ -41,8 +41,26 @@ router.use((req, res, next) => {
 					next();
 				});
 			} else {
-				//console.log('5. no signup info');
-				next();
+				const contract_query = 'SELECT id,rsc_id,name,tier,status FROM contracts WHERE discord_id = ?';
+				req.db.query(contract_query, [res.locals.discord_id], (err, results) => {
+					if ( err ) { throw err; }
+
+					if ( results && results.length ) {
+						const p = results[0];
+
+						const new_query = 'INSERT INTO players (nickname,discord_id) VALUES (?, ?)';
+						req.db.query(new_query, [p.name, res.locals.discord_id], (err, results) => {
+							if ( err ) { throw err; }
+
+							res.locals.player_id = results.insertId;
+							res.locals.checked_in = false;
+
+							next();
+						});
+					} else {
+						next();
+					}
+				});
 			}
 		});
 	} else {
