@@ -657,6 +657,101 @@ router.get('/process_gameday', (req, res) => {
 	});
 });
 
+router.get('/import_players/:contract_sheet_id', async(req,res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	}
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const existing_query = `SELECT id,nickname,discord_id FROM players`;
+	const [p_results] = await db.query(existing_query);
+	const existing = {};
+	if ( p_results && p_results.length ) {
+		for ( let i = 0; i < p_results.length; ++i ) {
+			const p = p_results[i];
+			existing[p.discord_id] = p;
+		}
+	}
+
+
+	// 1. create google sheets object
+	const doc = new GoogleSpreadsheet(req.params.contract_sheet_id);
+	// 2. authenticate
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+
+	// 3. pull all relevant fields
+	await doc.loadInfo();
+
+	const sheet = doc.sheetsByTitle["Players"];
+	const rows = await sheet.getRows();
+
+	const players = {};
+	console.log('Importing Players from Contract Sheet...');
+	if ( ! rows ) {
+		return res.json({'error': 'Google rows was empty. :(', });
+	}
+	for ( let i = 0; i < rows.length; i++ ) {
+		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC Unique ID'] || ! rows[i]['Discord ID'] ) {
+			continue;
+		}
+
+		players[ rows[i]['Discord ID'] ] = {
+			'rsc_id': rows[i]['RSC Unique ID'],
+			'name': rows[i]['Player Name'],
+			'discord_id': rows[i]['Discord ID'],
+			'active_2s': false,
+			'active_3s': rows[i]['3v3 Active/ Returning'] === 'TRUE' ? true : false,
+			'status': 'Non-playing',
+		};
+	}
+
+	console.log(`    Players populated...${Object.keys(players).length}`);
+
+	const new_query = `INSERT INTO players (rsc_id,nickname,discord_id) VALUES (?, ?, ?)`;
+	const update_query = `UPDATE players SET rsc_id = ?, nickname = ? WHERE discord_id = ?`;
+	let new_players = 0;
+	let updated_players = 0;
+	let skipped_players = 0;
+	for ( const discord_id in players ) {
+		const p = players[discord_id];
+
+		if ( ! (discord_id in existing) ) {
+			await db.query(new_query,[p.rsc_id,p.name,p.discord_id]);
+			new_players++;
+		} else {
+			const e = existing[discord_id];
+			if ( e.nickname != p.name || ! e.rsc_id ) {
+				await db.query(update_query, [p.rsc_id,p.name,p.discord_id]);
+				updated_players++;
+			} else {
+				skipped_players++;
+			}
+		}
+	}
+
+	db.end();
+
+	const output = {
+		'new': new_players,
+		'updated': updated_players,
+		'skipped': skipped_players,
+	};
+	
+	console.log(output);
+	res.json(output);
+
+});
+
 router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
