@@ -403,6 +403,64 @@ router.get('/process', (req, res) => {
 	});
 });
 
+router.get('/active', async (req, res) => {
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const active_query = `
+		SELECT 
+			id,lobby_user,lobby_pass,home_wins,away_wins,
+			reported_rsc_id,confirmed_rsc_id,
+			completed,cancelled 
+		FROM combine_matches 
+		WHERE completed = 0
+	`;
+	const [results] = await db.query(active_query);
+	const games = {};
+	const game_ids = [];
+	if ( results && results.length ) {
+		for ( let i = 0; i < results.length; ++i ) {
+			game_ids.push(results[i].id);
+			const game = results[i];
+			game.home = [];
+			game.away = [];
+			games[results[i].id] = game;
+		}
+	}
+
+	const players_query = `
+		SELECT 
+			p.rsc_id,p.match_id,p.team,t.name
+		FROM combine_match_players AS p 
+		LEFT JOIN tiermaker AS t 
+		ON p.rsc_id = t.rsc_id 
+		WHERE p.match_id in (?)
+	`;
+	const [p_results] = await db.query(players_query, [game_ids]);
+	if ( p_results && p_results.length ) {
+		for ( let i = 0; i < p_results.length; ++i ) {
+			const p = p_results[i];
+			if ( p.team === 'home' ) {
+				games[p.match_id].home.push(p);
+			} else {
+				games[p.match_id].away.push(p);
+			}
+		}
+	}
+
+	db.end();
+
+	res.json(games);
+});
+
 router.get('/manage', (req, res) => { 
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');

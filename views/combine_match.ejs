@@ -2,7 +2,7 @@
 <%- include('partials/header.ejs'); %>
 
 <%
-	const has_scored = match.completed === 1 ? true : false;
+	const has_scored = (match.reported_rsc_id || match.confirmed_rsc_id) ? true : false;
 %>
 
 <main class="container mt-2 p-2">
@@ -22,6 +22,7 @@
 						<li>Match: <strong><%- match.cancelled ? 'cancelled' : match.completed ? 'completed' : 'active'; %></strong></li>
 						<li>Lobby Username: <strong><code><%= match.lobby_user %></code></strong></li>
 						<li>Lobby Password: <strong><code><%= match.lobby_pass %></code></strong></li>
+						<hr>
 						<% 
 							if ( is_admin || is_combines_admin ) {
 						%>
@@ -31,11 +32,17 @@
 						</li>
 						<li>
 							<i class="fa fa-lock"></i>
-							Reported: <strong><%- match.reported_rsc_id; %></strong>
+							Reported: 
+							<strong>
+								<a href="/player/<%- match.reported_rsc_id; %>"><%- match.reported_rsc_id; %></a>
+							</strong>
 						</li>
 						<li>
 							<i class="fa fa-lock"></i>
-							Confirmed: <strong><%- match.confirmed_rsc_id; %></strong>
+							Confirmed: 
+							<strong>
+								<a href="/player/<%- match.confirmed_rsc_id; %>"><%- match.confirmed_rsc_id; %></a>
+							</strong>
 						</li>
 						<%
 							}
@@ -73,7 +80,23 @@
 								if ( ! has_scored || (is_admin || is_combines_admin) ) {
 							%>
 							<div class="mb-3">
-								<label for="name">Home Team Series Score</label>
+									<%
+										if ( match.confirmed_rsc_id || match.reported_rsc_id ) {
+									%>
+									<input
+										type="hidden"
+										class="form-control"
+										name="home_wins"
+										id="home_wins"
+										placeholder="2"
+										value="<%- match.home_wins %>"
+										max="4"
+										required
+									>
+									<%
+										} else {
+									%>
+								<label for="home_wins">Home Team Series Score</label>
 								<div class="input-group">
 									<input
 										type="number"
@@ -82,10 +105,14 @@
 										id="home_wins"
 										placeholder="2"
 										value="<%- match.home_wins %>"
-										required
 										max="4"
+										tabindex="1"
+										required
 									>
 								</div>
+									<%
+										}
+									%>
 							</div>
 							<% 
 								}
@@ -131,7 +158,32 @@
 								if ( ! has_scored || (is_admin || is_combines_admin) ) {
 							%>
 							<div class="mb-3">
-								<label for="name">Away Team Series Score</label>
+									<% 
+										if ( ! match.confirmed_rsc_id || ! match.reported_rsc_id ) {
+											if ( match.confirmed_rsc_id || match.reported_rsc_id ) {
+									%>
+									<input
+										type="hidden"
+										class="form-control"
+										name="away_wins"
+										id="away_wins"
+										placeholder="2"
+										value="<%- match.away_wins %>"
+										max="4"
+										required
+									>
+									<div class="text-center">
+										<input
+											tabindex="1"
+											type="submit"
+											class="w-50 form-control btn btn-large btn-success rounded"
+											value="Verify Scores"
+										>
+									</div>
+									<%
+											} else {
+									%>
+								<label for="away_wins">Away Team Series Score</label>
 								<div class="input-group">
 									<input
 										type="number"
@@ -140,12 +192,17 @@
 										id="away_wins"
 										placeholder="2"
 										value="<%- match.away_wins %>"
-										required
+										tabindex="2"
 										max="4"
+										required
 									>
-									<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
+									<input tabindex="3" type="submit" class="btn btn-large btn-primary" value="Submit Scores">
 								</div>
-							</div>
+									<%
+											}
+										}
+									%>
+								</div>
 							<%
 								}
 							%>
