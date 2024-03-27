@@ -438,7 +438,7 @@ router.get('/active', async (req, res) => {
 
 	const players_query = `
 		SELECT 
-			p.rsc_id,p.match_id,p.team,t.name
+			t.discord_id,p.rsc_id,p.match_id,p.team,t.name
 		FROM combine_match_players AS p 
 		LEFT JOIN tiermaker AS t 
 		ON p.rsc_id = t.rsc_id 
