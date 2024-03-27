@@ -210,7 +210,9 @@ router.get('/check_in/:match_day', (req, res) => {
 		// TODO(get season and match day from somewhere)
 		const season = res.locals.settings.season;
 		const match_day = req.params.match_day;
-		const active = req.session.user['status'] == 'Free Agent' ? 1 : 0;
+		//const active = req.session.user['status'] == 'Free Agent' ? 1 : 0;
+		// make everyone inactive to start. we'll add folks
+		const active = 0;
 		const status = req.session.user['status'];
 		req.db.query(
 			'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
@@ -262,10 +264,13 @@ router.get('/match', (req, res) => {
 	const matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
+			t.tier,
 			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id,
 			m.home_wins, m.away_wins
 		FROM
 			matches AS m
+		LEFT JOIN teams AS t 
+			ON m.home_team_id = t.id
 		LEFT JOIN
 			team_players AS tp
 			ON ( m.home_team_id = tp.team_id OR m.away_team_id = tp.team_id )
@@ -293,17 +298,21 @@ router.get('/match', (req, res) => {
 		if ( err ) { throw err; }
 
 		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
-		const tier = results[0].lobby_user.split('_')[0];	
+		const tier = results[0].tier;	
 		const home_team = results[0].lobby_user.split('_')[1];
 		const away_team = results[0].lobby_pass.split('_')[1];
 		let score_title = '';
+
 		if ( scored ) {
 			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
 		}
+
 		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
+
 		res.render('match', { 
 			season: results[0].season, 
 			match_day: results[0].match_day, 
+			tier: tier, 
 			match_id: results[0].id,
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
@@ -330,10 +339,13 @@ router.get('/match/:match_id', (req, res) => {
 	const matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
+			t.tier,
 			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id, c.discord_id,
 			m.home_wins, m.away_wins
 		FROM
 			matches AS m
+		LEFT JOIN teams AS t 
+			ON m.home_team_id = t.id
 		LEFT JOIN
 			team_players AS tp
 			ON ( m.home_team_id = tp.team_id OR m.away_team_id = tp.team_id )
@@ -352,7 +364,7 @@ router.get('/match/:match_id', (req, res) => {
 		if ( err ) { throw err; }
 
 		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
-		const tier = results[0].lobby_user.split('_')[0];	
+		const tier = results[0].tier;	
 		const home_team = results[0].lobby_user.split('_')[1];
 		const away_team = results[0].lobby_pass.split('_')[1];
 		let score_title = '';
@@ -363,6 +375,7 @@ router.get('/match/:match_id', (req, res) => {
 		res.render('match', { 
 			season: results[0].season, 
 			match_id: match_id,
+			tier: tier,
 			match_day: results[0].match_day, 
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
@@ -378,10 +391,17 @@ router.get('/match/:match_id', (req, res) => {
 router.get('/matches', (req, res) => {
 	res.locals.title = `Season ${res.locals.settings.season} Matches - ${res.locals.title}`;
 
-	const matchesQuery = 'SELECT m.id,m.match_day,m.lobby_user,m.lobby_pass,t.tier,m.home_wins,m.away_wins FROM matches AS m LEFT JOIN teams AS t ON m.home_team_id = t.id WHERE m.season = ? ORDER BY m.match_day DESC';
+	const matchesQuery = `
+		SELECT 
+			m.id,m.match_day,m.lobby_user,m.lobby_pass,
+			t.tier,m.home_wins,m.away_wins 
+		FROM matches AS m 
+		LEFT JOIN teams AS t 
+		ON m.home_team_id = t.id 
+		WHERE m.season = ? 
+		ORDER BY m.match_day DESC, id DESC`;
 	req.db.query(matchesQuery, [ res.locals.settings.season ], (err, results) => {
 		if ( err ) { throw err; }
-
 		res.render('matches', { matches: results });
 	});
 });

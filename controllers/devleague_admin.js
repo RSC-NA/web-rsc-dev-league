@@ -1,5 +1,6 @@
 const express = require('express');
 const router  = express.Router();
+const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
@@ -8,6 +9,112 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
+
+function get_rand_word_devleague() {
+	const words = [
+		'octane', 'gizmo', 'breakout', 'merc', 'hotshot', 'gizmo', 'backfire',
+		'x-devil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
+		'mario', 'samus', 'sweet', 'tooth', 'aftershock', 'grog', 'esper', 
+		'marauder', 'masamune', 'proteus', 'ripper', 'scarab', 'takumi',
+		'triton', 'vulcan', 'zippy', 'backfire', 'paladin', 'hotshot', 'gizmo',
+		'animus', 'centio', 'cyclone', 'endo', 'dominusgt', 'dingo', 'diestro',
+		'fennec', 'fox', 'imperator', 'jager', 'mantis', 'nimbus', 'zsr', 
+		'peregrine', 'twinzer', 'sentinal', 'samurai', 'tygris', 'werewolf',
+		'ecto', 'ford', 'mustang', 'nascar', 'toyota', 'chevy', 'camaro',
+		'subaru', 'wrx', 'sti', 'astonmartin', 'batmobile', 'tumbler',
+		'reaper', 'fiero', 'fiesta', 'jeep', 'wrangler', 'cake', 'tehblister',
+		'treefrog', 'monty', 'tr1ppn', 'snacktime', 'nickm', 'rscbot', 'tinsel',
+	];
+	return words[ Math.floor(Math.random() * words.length) ];
+}
+
+function calculate_mmrs_devleague(team) {
+	console.log('team mmr calc',team);
+	if ( ! team ) { return 0; }
+	if ( ! team.length ) { return 0; }
+	let mmr = 0;
+	for ( let i = 0; i < team.length; ++i ) {
+		if ( "mmr" in team[i] ) {
+			mmr += team[i].mmr;
+		}
+	}
+
+	return mmr;
+}
+
+async function make_lobby_devleague(db, lobby) {
+	console.log('LOBBY MMRS');
+	console.log('Home: ', lobby.home.mmr / 3);
+	console.log('Away: ', lobby.away.mmr / 3);
+	console.log(getTierFromMMR(lobby.home.mmr / 3));
+	const home_tier = getTierFromMMR(lobby.home.mmr / 3);
+
+	// create teams 
+	const team_query = 'INSERT INTO teams (team_number, tier) VALUES (?, ?)';
+	const [home_team_res] = await db.execute(team_query, [lobby.home_num, home_tier]);
+	const [away_team_res] = await db.execute(team_query, [lobby.away_num, home_tier]);
+
+	const home_team_id = home_team_res.insertId;
+	const away_team_id = away_team_res.insertId;
+
+	const match_query = `
+		INSERT INTO matches 
+			(season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass)
+		VALUES 
+			(     ?,         ?,            ?,            ?,          ?,          ?)
+	`;
+	const [match_res] = await db.execute(match_query, [
+		lobby.season, 
+		lobby.match_day,
+		home_team_id,
+		away_team_id,
+		lobby.username,
+		lobby.password
+	])
+
+	const match_id = match_res.insertId;
+
+	const tp_query = `INSERT INTO team_players (team_id, player_id) VALUES (?, ?)`;
+	const home_players = lobby.home.players;
+	const away_players = lobby.away.players;
+
+	const in_lobby = [];
+
+	for ( let i = 0; i < home_players.length; ++i ) {
+		await db.execute(tp_query, [home_team_id, home_players[i].id]);
+		in_lobby.push(home_players[i].id);
+	}
+	for ( let i = 0; i < away_players.length; ++i ) {
+		await db.execute(tp_query, [away_team_id, away_players[i].id]);
+		in_lobby.push(away_players[i].id);
+	}
+
+	console.log(in_lobby);
+	// set their signup status to "rostered"
+	const rostered_query = `
+		UPDATE signups 
+		SET rostered = 1 
+		WHERE 
+			season = ? AND 
+			match_day = ? AND 
+			player_id in (?)
+	`;
+	await db.query(rostered_query, [lobby.season, lobby.match_day, in_lobby]);
+
+	console.log('Everyone updated!');
+
+	return true;
+
+	// v2 player table, not yet implemented
+	// const mp_query = `
+	// 	INSERT INTO match_players 
+	// 		(match_id, rsc_id, team)
+	// 	VALUES 
+	// 		(       ?,      ?,    ?)
+	// `;
+
+}
+
 
 /*******************************************************
  ******************** Admin Views *********************
@@ -25,155 +132,160 @@ router.get('/change_tier/:rsc_id/:new_tier', (req, res) => {
 	});
 });
 
-router.post('/generate_team/:tier', (req, res) => {
+
+router.get('/setup/devleague', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
-	} 
-
-	// TODO (err trapping with invalid values)
-	const numPlayers = req.body.player_count;
-	const numTeams = numPlayers / 3;
-	const tier = req.params.tier;
-
-	const players = [];
-	const teams = {};
-
-	for ( let i = 0; i < numPlayers; i++ ) {
-		players.push(parseInt(req.body['player_id_' + i]));
 	}
 
-	for ( let i = 1; i <= numTeams; i++ ) {
-		teams[tier + '_' + i] = {
-			home: i % 2 ? true : false,
-			away: i % 2 ? false : true,
-			match_day: req.body.match_day,
-			season: req.body.season,
-			team_number: i,
-			players: [],
-			mmr: 0,
-		};
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+
+	const db_query = "SELECT p.id,c.status FROM players AS p LEFT JOIN contracts AS c ON p.discord_id = c.discord_id WHERE c.active_3s = 1 ORDER BY rand() LIMIT 100";
+
+	const [ results ] = await db.execute(db_query);
+	if ( results && results.length ) {
+		const ins_query = 'INSERT INTO signups (player_id,season,match_day,status) VALUES (?, ?, ?, ?)';
+		for ( let i = 0; i < results.length; ++i ) {
+			await db.execute(ins_query, [ results[i].id, 19, 18, results[i].status ]);
+		}
 	}
 
-	let playersQuery = 'select p.id,c.name,c.mmr,c.tier from players as p left join contracts as c on p.discord_id = c.discord_id where p.id in (?) ORDER BY c.mmr DESC';
-	req.db.query(playersQuery, [ players ], (err, results) => {
-		if ( err ) { throw err; }
+	await db.end();
+	
+	res.json({'success': 'added 30 players'});
+});
 
-		const playerList = [];
-		for ( let i = 0; i < results.length; i++ ) {
-			playerList.push(results[i]);
+router.all('/generate_team/:tier', async (req, res) => {
+
+	if ( ! req.session.is_admin && ! req.sessoin.is_devleague_admin ) {
+		return res.redirect('/');
+	}
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+ 	const tier = req.params.tier;
+
+	let playersQuery = `
+		SELECT 
+			p.id,c.name,c.mmr,c.tier,c.rsc_id
+		FROM signups AS s
+		LEFT JOIN players AS p 
+		ON p.id = s.player_id
+		LEFT JOIN contracts AS c 
+		ON p.discord_id = c.discord_id 
+		WHERE 
+			s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			s.active = 1 AND 
+			s.rostered = 0 AND
+			c.tier = ? 
+		ORDER BY c.mmr DESC
+	`;
+	let tier_params = [tier];
+	if ( tier === 'Premier' || tier === 'Contender' ) {
+		console.log("OVERRIDE TIER!", tier);
+		playersQuery = `
+			SELECT 
+				p.id,c.name,c.mmr,c.tier,c.rsc_id
+			FROM signups AS s
+			LEFT JOIN players AS p 
+			ON p.id = s.player_id
+			LEFT JOIN contracts AS c 
+			ON p.discord_id = c.discord_id 
+			WHERE 
+				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.active = 1 AND 
+				s.rostered = 0 AND
+				(c.tier = ? OR c.tier = ?)
+			ORDER BY c.mmr DESC
+		`;
+		if ( tier === 'Premier' ) {
+			tier_params = ['Premier', 'Master'];
+		} else if ( tier === 'Contender' ) {
+			tier_params = ['Contender', 'Amateur'];
+		}
+	} else if ( tier === 'all' ) {
+		playersQuery = `
+			SELECT 
+				p.id,c.name,c.mmr,c.tier,c.rsc_id
+			FROM signups AS s
+			LEFT JOIN players AS p 
+			ON p.id = s.player_id
+			LEFT JOIN contracts AS c 
+			ON p.discord_id = c.discord_id 
+			WHERE 
+				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.active = 1 AND 
+				s.rostered = 0
+			ORDER BY c.mmr DESC
+		`;
+		tier_params = null;
+	}
+
+	const [results] = await db.execute(playersQuery, tier_params);
+	if ( results && results.length ) {
+		if ( results.length % 6 !== 0 ) {
+			return res.json(results);
+			return res.redirect('/devleague?error=InvalidNumberOfPlayers');
 		}
 
-		let curTeam = 1;
-		let direction = 'up';
+		const num_lobbies = results.length / 6;
 
-		while ( playerList.length ) {
-			const player = playerList.pop();
-			const mmr = player['mmr'];
+		const lobbies = [];
+		for ( let i = 0; i < num_lobbies; ++i ) {
+			const lobby = {
+				season: res.locals.settings.season,
+				match_day: res.locals.match_day,
+				username: get_rand_word_devleague(),
+				password: get_rand_word_devleague(),
+				home_num: ((i * 2) + 1),
+				away_num: ((i * 2) + 2),
+				home: { players: [], mmr: 0, },
+				away: { players: [], mmr: 0, },
+			};
 
-			teams[tier + '_' + curTeam]['players'].push(player);
-			teams[tier + '_' + curTeam]['mmr']+= mmr;
+			// snake-draft by MMR for balanced teams
+			lobby.home.players.push(results.pop()); // 1st player
+			lobby.away.players.push(results.pop()); // 2nd player
+			lobby.away.players.push(results.pop()); // 3rd player
+			lobby.home.players.push(results.pop());	// 4th player
+			lobby.home.players.push(results.pop());	// 5th player
+			lobby.away.players.push(results.pop()); // 6th player
+	
+			lobby.home.mmr = calculate_mmrs_devleague(lobby.home.players);
+			lobby.away.mmr = calculate_mmrs_devleague(lobby.away.players);
+			lobby.home.delta = lobby.home.mmr - lobby.away.mmr;
+			lobby.away.delta = lobby.away.mmr - lobby.home.mmr;
 
-			if ( direction == 'up' ) {
-				curTeam += 1;
-				if ( curTeam == numTeams ) {
-					direction = 'down';
+			await make_lobby_devleague(db, lobby);
 
-					if ( playerList.length ) {
-						const playerTwo = playerList.pop();
-						const playerTwoMmr = playerTwo['mmr'];
-
-						teams[tier + '_' + curTeam]['players'].push(playerTwo);
-						teams[tier + '_' + curTeam]['mmr'] += playerTwoMmr;
-					}
-				}
-			} else {
-				curTeam -= 1;
-
-				if ( curTeam == 1 ) {
-					direction = 'up';
-
-					if ( playerList.length ) {
-						const playerTwo = playerList.pop();
-						const playerTwoMmr = playerTwo['mmr'];
-
-						teams[tier + '_' + curTeam]['players'].push(playerTwo);
-						teams[tier + '_' + curTeam]['mmr'] += playerTwoMmr;
-					}
-				}
-			}
+			lobbies.push(lobby);
 		}
 
-		// id, team_number, tier
-		// ['Elite_1', 'Elite_2' ] => [ [1, 'Elite' ], [2, 'Elite'] ]
-		const teamParams = Object.keys(teams).map(tierString => [ tierString.split('_')[1], tierString.split('_')[0] ] );
-		const teamsQuery = 'INSERT INTO teams (team_number, tier) VALUES ?';
-		req.db.query(teamsQuery, [ teamParams ], (err, results) => {
-			if ( err ) { throw err; }
-			console.log(results);
-			let insertId = results.insertId;
+	}
 
-			const playerParams = [];
+	await db.end();
 
-			const matchParams = [];
-			let matchInfo = [];
+	res.redirect('/devleague');
 
-			for ( const team in teams ) {
-				teams[ team ]['team_id'] = insertId;
-
-				// set up match params for home team, finish it for away
-				const matchDate = new Date();
-				if ( teams[ team ].home ) {
-					matchInfo = [
-						matchDate,
-						teams[ team ].season,
-						teams[ team ].match_day,
-						insertId,
-						null,
-						team,
-						null
-					];
-				} else if ( teams[ team ].away ) {
-					matchInfo[4] = insertId;
-					matchInfo[6] = team;
-					matchParams.push(matchInfo);
-				}
-				
-				for ( let i = 0; i < teams[team].players.length; i++ ) {
-					playerParams.push([insertId, teams[team].players[i].id ]);
-				}
-
-				// move to next team
-				insertId++;
-			}
-
-			const playersQuery = 'INSERT INTO team_players (team_id, player_id) VALUES ?';
-			req.db.query(playersQuery, [ playerParams ], (err, _results) => {
-				if ( err ) { throw err; }
-
-				// season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass
-				const matchQuery = 'INSERT INTO matches (match_dtg, season, match_day, home_team_id, away_team_id, lobby_user, lobby_pass) VALUES ?';
-				req.db.query(matchQuery, [ matchParams ], (err, _results) => {
-					if ( err ) { throw err; }
-
-					// finally, mark all selected players as "rostered"
-					const updateQuery = `
-						UPDATE signups 
-						SET rostered = 1 
-						WHERE ( 
-							DATE(signup_dtg) = CURDATE() OR 
-							DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
-						) 
-						AND player_id IN (?)`;
-					req.db.query(updateQuery , [players], (err, _results) => {
-						if ( err ) { throw err; }
-
-						res.redirect('/process_gameday');
-					}); // final query, update players as rostered
-				}); // end query to create match details
-			}); // end query to insert players onto team roster
-			//res.json(teams);
-		}); // end query to generate team	
-	}); // end query to select players from provided list.
 });
 
 router.get('/make_active/:signup_id', (req, res) => {
@@ -214,6 +326,276 @@ router.get('/activate_everyone/:match_day', (req, res) => {
 
 });
 
+async function get_stats(db, season) {
+	console.log('in get_stats');
+	const query = `
+		SELECT
+			m.id AS m_id, m.home_team_id, m.home_wins,
+			m.away_team_id, m.away_wins
+		FROM matches AS m
+		WHERE season = ?
+	`;
+	const team_wins = {};
+	const team_match_map = {};
+	const team_ids = [0];
+	const players = {};
+	const [results] = await db.execute(query, [season]);
+
+	for ( let i = 0; i < results.length; ++i ) {
+		team_ids.push(results[i].home_team_id);
+		team_ids.push(results[i].away_team_id);
+		team_match_map[ results[i].home_team_id ] = results[i].id;
+		team_match_map[ results[i].away_team_id ] = results[i].id;
+		team_wins[ results[i].home_team_id ] = results[i].home_wins;
+		team_wins[ results[i].away_team_id ] = results[i].away_wins;
+	}
+
+	const playerQuery = `
+		SELECT
+			c.name,c.rsc_id,c.discord_id,c.tier,c.status,c.mmr,
+			tp.player_id,tp.team_id, p.nickname
+		FROM team_players AS tp
+		LEFT JOIN players AS p ON tp.player_id = p.id
+		LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
+		WHERE tp.team_id IN (?)
+	`;
+	const [p_results] = await db.query(playerQuery, [team_ids]);
+	for ( let i = 0; i < p_results.length; ++i ) {
+		const player = p_results[i];
+
+		// switch ( player.tier ) {
+		// 	case 'Premier':
+		// 	case 'Master':
+		// 		player.tier = 'PreMaster';
+		// 		break;
+		// 	case 'Contender':
+		// 	case 'Amateur':
+		// 		player.tier = 'ContAmmy';
+		// 		break;
+		// }
+
+		if ( ! (player.rsc_id in players) ) {
+			players[ player.rsc_id ] = {
+				id: player.player_id,
+				name: player.name,
+				rsc_id: player.rsc_id,
+				discord_id: player.discord_id,
+				tier: player.tier,
+				status: player.status,
+				points: 0,
+				series: 0,
+				wins: 0,
+				losses: 0,
+			};
+		}
+
+		players[ player.rsc_id ].points++;
+		players[ player.rsc_id ].series++;
+		players[ player.rsc_id ].wins += team_wins[ player.team_id ];
+		const win_points = team_wins[ player.team_id ] * .5;
+		players[ player.rsc_id ].points += win_points;
+		players[ player.rsc_id ].losses += (4 - team_wins[ player.team_id ]);
+	}
+
+	return players;
+}
+
+
+router.all('/devleague/deactivate-last/:amount', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+	
+	const query = `
+		UPDATE signups SET 
+			active = 0
+		WHERE 
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			active = 1 AND
+			rostered = 0
+		ORDER BY signup_dtg DESC 
+		LIMIT ?
+	`;
+	if ( ! req.params.amount || ! parseInt(req.params.amount) ) {
+		console.log('WTF?', parseInt(req.params.amount) );
+		return res.redirect('/devleague');
+	}
+	//return res.json({query: query, amount: parseInt(req.params.amount)});	
+	req.db.query(query, [ parseInt(req.params.amount) ], (err,results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect('/devleague');
+	});
+});
+
+router.all('/devleague/deactivate/:player_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+	
+	const single_where = req.params.player_id !== 'all' ? "player_id = ? AND" : '';
+	const query = `
+		UPDATE signups SET 
+			active = 0
+		WHERE 
+			${single_where}
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			active = 1 AND
+			rostered = 0
+	`;
+	
+	if ( req.params.player_id !== 'all' ) {
+		req.db.query(query, [ req.params.player_id ], (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/devleague');
+		});
+	} else {
+		req.db.query(query, (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/devleague');
+		});
+	}
+});
+
+router.get('/devleague/activate/:player_id', async (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+
+	const single_where = req.params.player_id !== 'all' ? "player_id = ? AND" : '';
+	const query = `
+		UPDATE signups SET 
+			active = 1
+		WHERE 
+			${single_where}
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			active = 0 AND
+			rostered = 0
+	`;
+	
+	if ( req.params.player_id !== 'all' ) {
+		req.db.query(query, [ req.params.player_id ], (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/devleague');
+		});
+	} else {
+		req.db.query(query, (err,results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/devleague');
+		});
+	}
+});
+
+
+router.get('/devleague', async (req, res) => {
+
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+
+	res.locals.title = `DevLeague Maker - ${res.locals.title}`;
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const season = res.locals.settings.season;
+
+	const players = await get_stats(db, season);
+
+	const signups_query = `
+	SELECT 
+		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
+		s.signup_dtg,c.mmr,
+		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
+	FROM 
+		signups AS s
+	LEFT JOIN players AS p 
+		ON s.player_id = p.id
+	LEFT JOIN contracts AS c
+		ON p.discord_id = c.discord_id
+	WHERE 
+	( 
+		DATE(signup_dtg) = CURDATE() OR 
+		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+	) AND
+	rostered = 0
+	ORDER BY s.id ASC
+	`; 
+
+	const signups = {
+		'games': [],
+		'active': {},
+		'waiting': {},
+	};
+	const [signup_results] = await db.query(signups_query);
+
+	if ( signup_results.length ) {
+		for ( let i = 0; i < signup_results.length; ++i ) {
+			const s = signup_results[i];
+			//const p = players[s.rsc_id];
+			//console.log(s,p);
+			s.mmr_delta = 0;
+			s.win_percentage = 0;
+			s.wins = 0;
+			s.losses = 0;
+			if ( s.rsc_id in players ) {
+				const p = players[s.rsc_id];
+				//console.log(p);
+				s.win_percentage = p.series ? 
+					parseFloat(((p.wins / (p.wins + p.losses)) * 100).toFixed(1)) : 
+					0;
+				s.wins = p.wins;
+				s.losses = p.losses;
+			}
+
+			if ( s.active ) {
+				signups.active[s.rsc_id] = s;
+			} else {
+				signups.waiting[s.rsc_id] = s;
+			}
+		}
+	}
+
+	const active_query = `
+		SELECT 
+			m.id,m.lobby_user,m.lobby_pass,t.tier 
+		FROM matches AS m 
+		LEFT JOIN teams AS t 
+		ON m.home_team_id = t.id
+		WHERE
+			m.season = ? AND 
+			m.match_day = ? AND
+			(m.home_wins = 0 AND m.away_wins = 0)
+		ORDER BY id DESC
+	`;
+	const [active_results] = await db.query(active_query, [
+		res.locals.settings.season, res.locals.match_day
+	]);
+	let games = [];
+	if ( active_results.length ) {
+		games = active_results;
+	}
+
+	db.end();
+
+	res.render('process_devleague', {
+		signups: signups,
+		games: games,
+	});
+});
+
 router.get('/process_gameday', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
@@ -245,7 +627,6 @@ router.get('/process_gameday', (req, res) => {
 		const signups = {};
 		let match_day = null;
 		for ( let i = 0; i < results.length; i++ ) {
-			// combine master/prem, ammy/contender
 			if ( results[i]['tier'] === 'Master' ) {
 				results[i]['tier'] = 'Premier';
 			} else if ( results[i]['tier'] === 'Amateur' ) {

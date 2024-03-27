@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
@@ -82,14 +83,14 @@ router.all('/status', (req, res) => {
 			const active = results[0].status == 'Free Agent' ? 1 : 0;
 			const status = results[0].status;
 			
-			return res.status(200).json({
+			res.status(200).json({
 				'player': results[0].name,
 				'rsc_id': results[0].rsc_id,
 				'tier': results[0].tier,
 				'checked_in': res.locals.checked_in,
 			});
 		} else {
-			return res.json({
+			res.json({
 				'error': 'Player not found',
 				'discord_id': discord_id,
 			});
@@ -99,8 +100,6 @@ router.all('/status', (req, res) => {
 
 router.all('/check_in', (req, res) => {
 	// TODO(get season and match day from somewhere)
-	res.removeHeader('Date');
-
 	const season = res.locals.settings.season;
 	const discord_id = res.locals.discord_id;
 	const match_day = res.locals.match_day;
@@ -120,7 +119,9 @@ router.all('/check_in', (req, res) => {
 			if ( err ) { throw err; }
 
 			if ( results && results[0] ) {
-				const active = results[0].status == 'Free Agent' ? 1 : 0;
+				//const active = results[0].status == 'Free Agent' ? 1 : 0;
+				// make everyone "inactive" to start. we'll add them to lobbies
+				const active = 0;
 				const status = results[0].status;
 
 				req.db.query(
@@ -131,7 +132,7 @@ router.all('/check_in', (req, res) => {
 
 						req.session.checked_in = true;
 						console.log('Check in complete -', discord_id, results[0].name);
-						return res.json({ 'success': 'You are checked in!', name: results[0].name, timestamp: new Date().getTime() });
+						res.status(200).json({ 'success': 'You are checked in!', name: results[0].name, timestamp: new Date().getTime() });
 					}
 				);
 			}
@@ -139,7 +140,6 @@ router.all('/check_in', (req, res) => {
 	} else {
 		return res.json({'error': 'You are already checked in.'});
 	}
-
 });
 
 router.get('/check_out', (req, res) => {

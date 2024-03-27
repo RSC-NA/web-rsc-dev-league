@@ -8,7 +8,6 @@
 			Below is a list of all matches and outcomes for RSC Season <%= settings.season %>.
 		</p>
 	</div>
-
 	<div class="row">
 		<!-- <div class="col-md-4 order-md-2 mb-4">
 			<h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -44,7 +43,10 @@
 						<h5 class="my-0">[<%- matches[i].home_wins %> - <%- matches[i].away_wins %>]</h5>
 					</div>
 					<div class="my-0 flex-grow-1 align-middle">
-					<h5 class="my-0"><%= awayTeam %> @ <%= homeTeam %></h5>
+					<h5 class="my-0">
+						<span class="bg-<%- matches[i].tier; %> d-inline-block text-end pe-2" style="width:125px;"><%= matches[i].tier; %></span> 
+						<%= awayTeam %> @ <%= homeTeam %>
+					</h5>
 					</div>
 					<a href="/match/<%= matches[i].id %>">view teams</a>
 				</li>

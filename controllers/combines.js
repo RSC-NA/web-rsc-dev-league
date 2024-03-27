@@ -22,7 +22,7 @@ function get_rand_word() {
 		'peregrine', 'twinzer', 'sentinal', 'samurai', 'tygris', 'werewolf',
 		'ecto', 'ford', 'mustang', 'nascar', 'toyota', 'chevy', 'camaro',
 		'subaru', 'wrx', 'sti', 'astonmartin', 'batmobile', 'tumbler',
-		'reaper', 'fiero', 'fiesta', 'jeep', 'wrangler', 'cake', 'tehblister',
+		'reaper', 'fiero', 'iesta', 'jeep', 'wrangler', 'cake', 'tehblister',
 		'treefrog', 'monty', 'tr1ppn', 'snacktime', 'nickm', 'rscbot', 'tinsel',
 	];
 	return words[ Math.floor(Math.random() * words.length) ];

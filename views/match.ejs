@@ -15,10 +15,13 @@
 		<div class="row">
 			<div class="col-9">
 				<div class="bg-light p-2 rounded">
-					<h2>Lobby Info</h2>
-					<p class="lead">This is a 4-game series.</p>
+					<h2>
+						<span class="<%= tier; %>"><%= tier; %></span> Lobby Info
+					</h2>
+					<p class="lead">This is a <strong>4-game</strong> series.</p>
 
 					<ul>
+						<li>Tier: <strong class="<%= tier; %>"><%= tier %></strong></li>
 						<li>Lobby Username: <strong><%= lobby_user %></strong></li>
 						<li>Lobby Password: <strong><%= lobby_pass %></strong></li>
 					</ul>
@@ -56,7 +59,17 @@
 							<div class="mb-3">
 								<label for="name">Home Team Series Score</label>
 								<div class="input-group">
-									<input type="number" class="form-control" name="home_wins" id="home_wins" placeholder="2" value="<%- home_wins %>" required max="4">
+									<input
+										type="number"
+										class="form-control"
+										name="home_wins"
+										id="home_wins"
+										placeholder="2"
+										value="<%- home_wins %>"
+										max="4"
+										tabindex="1"
+										required
+									>
 								</div>
 							</div>
 							<% 
@@ -103,8 +116,23 @@
 							<div class="mb-3">
 								<label for="name">Away Team Series Score</label>
 								<div class="input-group">
-									<input type="number" class="form-control" name="away_wins" id="away_wins" placeholder="2" value="<%- away_wins %>" required max="4">
-									<input type="submit" class="btn btn-large btn-primary" value="Submit Scores">
+									<input
+										type="number"
+										class="form-control"
+										name="away_wins"
+										id="away_wins"
+										placeholder="2"
+										value="<%- away_wins %>"
+										tabindex="2"
+										max="4"
+										required
+									>
+									<input
+										type="submit"
+										class="btn btn-large btn-primary"
+										value="Submit Scores"
+										tabindex="3"
+									>
 								</div>
 							</div>
 							<%

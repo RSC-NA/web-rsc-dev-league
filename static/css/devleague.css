@@ -37,3 +37,23 @@ li.today.holiday {
 	list-style-type: '🏖️';
 	background-color: #fa7b7b;
 }
+
+.bg-Premier { background-color: #d600d6 !important; font-weight: bold; }
+.bg-Master { background-color: #9b59b6 !important; font-weight: bold; }
+.bg-Elite { background-color: #3498db !important; font-weight: bold; }
+.bg-Veteran { background-color: #33ffda !important; font-weight: bold; }
+.bg-Rival { background-color: #2ecc71 !important; font-weight: bold; }
+.bg-Challenger { background-color: #ceb337 !important; font-weight: bold; }
+.bg-Prospect { background-color: #e67e22 !important; font-weight: bold; }
+.bg-Contender { background-color: #d64694 !important; font-weight: bold; }
+.bg-Amateur { background-color: #f3a9a9 !important; font-weight: bold; }
+
+.Premier { color: #d600d6; }
+.Master { color: #9b59b6; }
+.Elite { color: #3498db; }
+.Veteran { color: #33ffda; }
+.Rival { color: #2ecc71; }
+.Challenger { color: #ceb337; }
+.Prospect { color: #e67e22; }
+.Contender { color: #d64694; }
+.Amateur { color: #f3a9a9; }

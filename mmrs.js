@@ -49,6 +49,7 @@ exports.mmrRange = mmrRange;
 
 // this function is used to return a tier
 exports.getTierFromMMR = (mmr) => {
+	mmr = Math.ceil((mmr + 1) / 5) * 5;
 	for ( let tier in mmrRange ) {
 		if ( mmr >= mmrRange[tier]['min'] && mmr <= mmrRange[tier]['max'] ) {
 			return tier;

@@ -117,6 +117,7 @@ app.use((req, res, next) => {
 
 	res.locals.menu = {
 		'dashboard': '',
+		'devleague': '',
 		'tournaments': '',
 		'tracker': '',
 		'championship': '',
