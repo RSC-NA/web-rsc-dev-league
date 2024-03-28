@@ -27,14 +27,49 @@
 					</ul>
 
 					<% 
-						let teamOneMmr = players[0].mmr + players[1].mmr + players[2].mmr;
-						let teamTwoMmr = players[3].mmr + players[4].mmr + players[5].mmr;
+						const teamOneMmr = Math.round((players[0].mmr + players[1].mmr + players[2].mmr) / 3);
+						const teamTwoMmr = Math.round((players[3].mmr + players[4].mmr + players[5].mmr) / 3);
+						const homeDelta  = teamOneMmr - teamTwoMmr;
+						const homeDeltaAbs = Math.abs(homeDelta);
+
+						const prediction = [];
+						const win_prediction = homeDelta > 0 ? 'Home' : 'Away';
+						let magnitude = '';
+						if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
+							magnitude = 'slight';
+						} else if ( homeDeltaAbs >= 10 && homeDeltaAbs < 20 ) {
+							magnitude = 'large';
+						} else if ( homeDeltaAbs >= 20 && homeDeltaAbs <= 40 ) {
+							magnitude = 'massive';
+						} else if ( homeDeltaAbs >= 40 ) {
+							magnitude = 'overwhelming';
+						}
+						
+						if ( is_admin || is_devleague_admin ) {
+							if ( magnitude ) {
 					%> 
+					<h3 class="p-2 text-center <%- win_prediction === 'Home' ? 'bg-primary text-white' : 'bg-warning text-black'; %>">
+						<%- win_prediction; %> has a <em><%- magnitude; %></em> predicted advantage.
+						<span class="text-muted">+<%- homeDeltaAbs; %></span>
+					</h3>
+					<%
+							} else {
+					%>
+
+					<h3 class="p-2 text-center bg-secondary">
+						No team has a statistical advantage.
+						<span class="text-muted">+<%- homeDeltaAbs; %></span>
+					</h3>
+					<%
+							}
+						}
+					%>
 					<form action="/score/<%- match_id %>" method="post">
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-primary text-white rounded p-2">
-								<%= (is_admin||is_devleague_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team - <%= lobby_user %>
+								<%= (is_admin||is_devleague_admin) ? `[${teamOneMmr}]` : '' %>
+								Home Team - <%= lobby_user %>
 							</h3>
 							<%
 								let homeClass = 'bg-info';
@@ -75,26 +110,59 @@
 							<% 
 								}
 							%>
-							<ul>
+							<ul style="list-style: none;">
 								<li>
-									<%= (is_admin || is_devleague_admin) ? '[' + players[0].mmr + '] ' : '' %>
+									<% 
+										if ( is_admin || is_devleague_admin ) {
+									%>
+									<a
+										href="/match/<%- match_id; %>/sub/<%- players[0].player_id; %>"
+										class="text-success"
+									><i class="fas fa-recycle"></i></a>
+									(<span class="text-muted"><%- players[0].mmr; %></span>)
+									<%
+										}
+									%>
 									<strong>
 									<a href="/player/<%= players[0].rsc_id; %>"><%= players[0].name %></a>
 									</strong> 
 									[Makes lobby]
 								</li>
 								<li>
-									<%= (is_admin || is_devleague_admin) ? '[' + players[1].mmr + '] ' : '' %>
+									<% 
+										if ( is_admin || is_devleague_admin ) {
+									%>
+									<a
+										href="/match/<%- match_id; %>/sub/<%- players[1].player_id; %>"
+										class="text-success"
+									><i class="fas fa-recycle"></i></a>
+									(<span class="text-muted"><%- players[1].mmr; %></span>)
+									<%
+										}
+									%>
 									<a href="/player/<%= players[1].rsc_id; %>"><%= players[1].name %></a>
 								</li>
 								<li>
-									<%= (is_admin || is_devleague_admin) ? '[' + players[2].mmr + '] ' : '' %>
+									<% 
+										if ( is_admin || is_devleague_admin ) {
+									%>
+									<a
+										href="/match/<%- match_id; %>/sub/<%- players[2].player_id; %>"
+										class="text-success"
+									><i class="fas fa-recycle"></i></a>
+									(<span class="text-muted"><%- players[2].mmr; %></span>)
+									<%
+										}
+									%>
 									<a href="/player/<%= players[2].rsc_id; %>"><%= players[2].name %></a>
 								</li>
 							</ul>
 						</div>
 						<div class="col-md-6">
-							<h3 class="bg-warning rounded p-2"><%= (is_admin||is_devleague_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team - <%= lobby_pass %></h3>
+							<h3 class="bg-warning rounded p-2">
+								<%= (is_admin||is_devleague_admin) ? `[${teamTwoMmr}]` : '' %>
+								Away Team - <%= lobby_pass %>
+							</h3>
 							<%
 								if ( has_scored ) {
 									if ( away_wins > 2 ) {
@@ -138,20 +206,50 @@
 							<%
 								}
 							%>
-							<ul>
+							<ul style="list-style:none;">
 								<li>
-									<%= (is_admin||is_devleague_admin) ? '[' + players[3].mmr + '] ' : '' %>
+									<% 
+										if ( is_admin || is_devleague_admin ) {
+									%>
+									<a
+										href="/match/<%- match_id; %>/sub/<%- players[3].player_id; %>"
+										class="text-success"
+									><i class="fas fa-recycle"></i></a>
+									(<span class="text-muted"><%- players[3].mmr; %></span>)
+									<%
+										}
+									%>
 									<strong>
 									<a href="/player/<%= players[3].rsc_id; %>"><%= players[3].name %></a>
 									</strong> 
 									[Uploads replays/screenshots]
 								</li>
 								<li>
-									<%= (is_admin||is_devleague_admin) ? '[' + players[4].mmr + '] ' : '' %>
+									<% 
+										if ( is_admin || is_devleague_admin ) {
+									%>
+									<a
+										href="/match/<%- match_id; %>/sub/<%- players[4].player_id; %>"
+										class="text-success"
+									><i class="fas fa-recycle"></i></a>
+									(<span class="text-muted"><%- players[4].mmr; %></span>)
+									<%
+										}
+									%>
 									<a href="/player/<%= players[4].rsc_id; %>"><%= players[4].name %></a>
 								</li>
 								<li>
-									<%= (is_admin||is_devleague_admin) ? '[' + players[5].mmr + '] ' : '' %>
+									<% 
+										if ( is_admin || is_devleague_admin ) {
+									%>
+									<a
+										href="/match/<%- match_id; %>/sub/<%- players[5].player_id; %>"
+										class="text-success"
+									><i class="fas fa-recycle"></i></a>
+									(<span class="text-muted"><%- players[5].mmr; %></span>)
+									<%
+										}
+									%>
 									<a href="/player/<%= players[5].rsc_id; %>"><%= players[5].name %></a>
 								</li>
 							</ul>

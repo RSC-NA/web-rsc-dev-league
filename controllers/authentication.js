@@ -51,7 +51,7 @@ router.get('/process_login', (req, res) => {
 	const query = `
 		SELECT 
 			p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
-			p.combines_admin,c.name,c.mmr,c.tier,c.status,c.rsc_id,
+			p.combines_admin,c.name,c.mmr,c.tier,c.status,p.rsc_id,
 			c.active_3s,c.active_2s 
 		FROM players AS p 
 		LEFT JOIN contracts AS c 

@@ -24,7 +24,7 @@ function get_rand_word_devleague() {
 		'subaru', 'wrx', 'sti', 'astonmartin', 'batmobile', 'tumbler',
 		'reaper', 'fiero', 'fiesta', 'jeep', 'wrangler', 'cake', 'tehblister',
 		'treefrog', 'monty', 'tr1ppn', 'snacktime', 'nickm', 'rscbot', 'tinsel',
-		'anthage', 'limon', 'feet',
+		'anthage', 'limon', 'feet', 'crimetime',
 	];
 	return words[ Math.floor(Math.random() * words.length) ];
 }
