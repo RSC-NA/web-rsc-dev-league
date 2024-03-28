@@ -1,0 +1,78 @@
+
+<%- include('partials/header.ejs'); %>
+
+	<style type="text/css">
+		.discord_id {
+			cursor: pointer;
+		}
+	</style>
+
+	<main class="container">
+		<div class="bg-light p-3 rounded">
+			<div class="row">
+				<div class="col-md-12">
+
+					<h1 class="mb-4">
+						Select Sub for "<%= player.nickname; %>" 
+						(<span class="text-muted"><%- player.mmr; %></span>)
+					</h1>
+				
+					<hr class="mb-4">
+					<h2 class="mt-4">Available Players</h2>
+
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th scope="col">RSC ID</th>
+								<th scope="col">MMR</th>
+								<th scope="col">Name</th>
+								<th scope="col">Tier</th>
+								<th scope="col" class="text-center"><i class="fas fa-recycle"></i> Sub Player</th>
+							</tr>
+						</thead>
+						<tbody>
+						<%
+							if ( ! Object.keys(available).length ) {
+						%>
+							<tr>
+								<td colspan="3"><em>No players found?</em></td>
+							</tr>
+						<%
+							} else {
+								for ( const p_id in available ) {
+									const p = available[ p_id ];
+						%>
+							<tr>
+								<th scope="row">
+									<a href="/player/<%= p.rsc_id; %>">
+										<%= p.rsc_id; %>
+									</a>
+								</th>
+								<td><%= p.mmr; %></td>
+								<td>
+									<a href="/player/<%= p.rsc_id; %>">
+										<%= p.nickname; %>
+									</a>
+								</td>
+								<td class="bg-<%- p.tier; %>"><%= p.tier; %></td>
+								<td class="text-center">
+									<a 
+										href="/match/<%- team_id; %>/confirm-sub/<%- player.id; %>/<%- p.id; %>"
+										class="btn btn-primary btn-sm">
+										<i class="fas fa-recycle"></i> Sub
+									</a>
+								</td>
+							</tr>
+						<%
+								}
+							}
+						%>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	
+	</main>
+
+<%- include('partials/footer.ejs'); %>

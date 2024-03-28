@@ -289,6 +289,86 @@ router.all('/generate_team/:tier', async (req, res) => {
 
 });
 
+router.get('/match/:team_id/confirm-sub/:player_id/:sub_player_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	}
+
+	const team_id = parseInt(req.params.team_id);
+	const player_id = parseInt(req.params.player_id);
+	const sub_player_id = parseInt(req.params.sub_player_id);
+	const output = {
+		team_id: team_id,
+		player_id: player_id,
+		sub_player_id: sub_player_id,
+	};
+	console.log(output);
+	//return res.json(output);
+
+	const query = `
+		UPDATE team_players SET player_id = ? 
+		WHERE team_id = ? AND player_id = ?
+	`;
+	req.db.query(query, [sub_player_id, team_id, player_id], (err, results) => {
+		if ( err ) { throw err; }
+
+		const match_id_query = `SELECT id FROM matches WHERE home_team_id = ? OR away_team_id = ?`;
+		req.db.query(match_id_query, [team_id, team_id], (err, results) => {
+			if ( err ) { throw err; }
+
+			if ( results && results.length ) {
+				const id = results[0].id;
+				res.redirect(`/match/${id}`);
+			} else {
+				res.redirect('/?error=WhatTheHeck');
+			}
+		});
+	});
+});
+
+router.get('/match/:team_id/sub/:player_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	}
+
+	const query = `
+		SELECT 
+			p.id,p.nickname,p.rsc_id,c.mmr,c.tier
+		FROM players AS p 
+		LEFT JOIN contracts AS c 
+			ON p.rsc_id = c.rsc_id 
+		WHERE c.active_3s = 1
+		ORDER BY p.nickname
+	`;
+
+	const player_id = parseInt(req.params.player_id);
+	req.db.query(query, (err, results) => {
+		if ( err ) { throw err; }
+
+		const template = {
+			match_id: req.params.match_id,
+			player: {},
+			available: {},
+		};
+		if ( results && results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				const p = results[i];
+				if ( p.id === player_id ) {
+					template.player = p;
+				} else {
+					template.available[p.id] = p;
+				}
+			}
+
+			res.render('sub', {
+				team_id: parseInt(req.params.team_id),
+				available: template.available,
+				player: template.player,
+			});
+		}
+	});
+});
+
 router.get('/make_active/:signup_id', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
