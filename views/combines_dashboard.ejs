@@ -64,8 +64,17 @@
 
 		<div class="bg-light p-3 rounded">
 		<% if ( combine_day && combine_day != 'holiday' ) { %>
+			<% if ( nickname && user && user.combines.match ) { %>
 
-			<% if ( nickname && ! checked_in && user && user.combines.active ) { %>
+				<h2>Your Lobby is Ready!</h2>
+				<p class="lead">
+					Time to show your metal. Your lobby is ready to go.
+				</p>
+				<a class="btn btn-lg btn-success" href="/combine/<%- user.combines.match['id']; %>" role="button">
+					View Match Details
+				</a>
+
+			<% } else if ( nickname && ! checked_in && user && user.combines.active ) { %>
 
 			<!-- check in features -->	
 			<style type="text/css">
@@ -111,12 +120,6 @@
 			</script>
 
 
-			<% } else if ( nickname && checked_in && rostered && "rsc_id" in user && user['rsc_id'] != null ) { %>
-				<h2>Your Team is Ready to Play!</h2>
-				<p class="lead">
-					You have been selected to play tonight. Click the "Match" link in the sidebar or click the button below. 
-				</p>
-				<a class="btn btn-lg btn-success" href="/match" role="button">View Match Details</a>
 			<% } else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) { %>
 			<h2>You are checked in!</h2>
 			<p class="lead">

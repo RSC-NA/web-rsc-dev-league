@@ -15,7 +15,10 @@ if ( typeof Bun === 'undefined' ) {
 const express = require('express');
 const app = express();
 const connection = require('./core/database').databaseConnection;
+
 const mysqlP = require('mysql2/promise');
+let a_db = null;
+
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const sessionStore = new MySQLStore({}, connection);
@@ -391,6 +394,7 @@ app.use((req, res, next) => {
 });
 */
 
+
 // checked in middleware.
 // only really needed if the user is logged in AND it's a game day
 app.use((req, res, next) => {
@@ -467,6 +471,61 @@ app.use((req, res, next) => {
 	} else {
 		next();
 	}
+});
+
+async function db_get(query, params=null) {
+	if ( ! a_db ) {
+		a_db = await mysqlP.createPool({
+			host: process.env.DB_HOST,
+			user: process.env.DB_USER,
+			password: process.env.DB_PASS,
+			port: process.env.DB_PORT,
+			database: process.env.DB_SCHEMA,
+			waitForConnections: true,
+			connectionLimit: 10,
+			queueLimit: 0
+		});
+	}
+
+	const output = {
+		results: null,
+		error: null,
+	};
+	if ( params ) {
+		const [results, fields] = await a_db.query(query, params);
+		output.results = results;
+	} else {
+		const [results, fields] = await a_db.query(query);
+		output.results = results;
+	}
+
+	return output.results;
+}
+
+// combine match middleware. used if the player logged in has an active combine match 
+app.use(async (req, res, next) => {
+	if ( res.locals.combine_day && res.locals.user.rsc_id ) {
+		const query = `
+			SELECT 
+				m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass,
+				m.home_wins, m.away_wins, m.reported_rsc_id, m.confirmed_rsc_id,
+				m.completed, m.cancelled,
+				mp.rsc_id,mp.team
+			FROM combine_matches AS m 
+			LEFT JOIN combine_match_players AS mp 
+				ON m.id = mp.match_id 
+			WHERE
+				(m.completed = 0 AND m.cancelled = 0) AND
+				mp.rsc_id = ?
+		`;
+
+		const match = await db_get(query, [res.locals.user.rsc_id]);
+		if ( match && match.length ) {
+			res.locals.user.combines.match = match[0];
+		}
+	}
+
+	next();
 });
 
 // fetch a count of pending trackers

@@ -2,7 +2,35 @@
 <%- include('partials/header.ejs'); %>
 
 <%
+
+	const submitted_scores = {
+		home: null,
+		away: null,
+	};
+
+	const lobby = {};
+	for ( let i = 0; i < match.players.home.length; ++i ) {
+		const p = match.players.home[i];
+		lobby[p.rsc_id] = p;
+	}
+	for ( let i = 0; i < match.players.away.length; ++i ) {
+		const p = match.players.away[i];
+		lobby[p.rsc_id] = p;
+	}
+
+	if ( match.reported_rsc_id ) {
+		if ( match.reported_rsc_id in lobby ) {
+			submitted_scores.home = match.reported_rsc_id;
+		}
+	}
+	if ( match.confirmed_rsc_id ) {
+		if ( match.confirmed_rsc_id in lobby ) {
+			submitted_scores.away = match.confirmed_rsc_id;
+		}
+	}
+
 	const has_scored = (match.reported_rsc_id || match.confirmed_rsc_id) ? true : false;
+	const can_report = is_admin || is_combines_admin || user.rsc_id in lobby ? true : false;
 %>
 
 <main class="container mt-2 p-2">
@@ -34,20 +62,30 @@
 							<i class="fa fa-lock"></i>
 							Reported: 
 							<strong>
-								<a href="/player/<%- match.reported_rsc_id; %>"><%- match.reported_rsc_id; %></a>
+								<a href="/player/<%- match.reported_rsc_id; %>">
+									<%- match.reported_rsc_id in lobby ? 
+										lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
+								</a>
 							</strong>
 						</li>
 						<li>
 							<i class="fa fa-lock"></i>
 							Confirmed: 
 							<strong>
-								<a href="/player/<%- match.confirmed_rsc_id; %>"><%- match.confirmed_rsc_id; %></a>
+								<a href="/player/<%- match.confirmed_rsc_id; %>">
+									<%- match.confirmed_rsc_id in lobby ? 
+										lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
+								</a>
 							</strong>
 						</li>
 						<%
 							}
 						%>
 					</ul>
+
+					<% if ( ! has_scored ) { %>
+					<h3>BOTH TEAMS MUST REPORT THE SCORE!</h3>
+					<% } %>
 
 					<% 
 						let teamOneMmr = match.home_mmr;
@@ -77,25 +115,9 @@
 							<% 
 								}
 
-								if ( ! has_scored || (is_admin || is_combines_admin) ) {
+								if ( ! has_scored && can_report ) {
 							%>
 							<div class="mb-3">
-									<%
-										if ( match.confirmed_rsc_id || match.reported_rsc_id ) {
-									%>
-									<input
-										type="hidden"
-										class="form-control"
-										name="home_wins"
-										id="home_wins"
-										placeholder="2"
-										value="<%- match.home_wins %>"
-										max="4"
-										required
-									>
-									<%
-										} else {
-									%>
 								<label for="home_wins">Home Team Series Score</label>
 								<div class="input-group">
 									<input
@@ -110,29 +132,33 @@
 										required
 									>
 								</div>
-									<%
-										}
-									%>
 							</div>
 							<% 
 								}
 							%>
 							<ul>
+								<%
+									for ( let i = 0; i < match.players.home.length; ++i ) {
+								%>
 								<li>
-									<%= (is_admin || is_combines_admin) ? '[' + match.players.home[0].start_mmr + '] ' : '' %>
+									<% if (is_admin || is_combines_admin) { %>
+									[<%- match.players.home[i].start_mmr %>]
+									<% } %>
 									<strong>
-									<a href="/player/<%= match.players.home[0].rsc_id; %>"><%= match.players.home[0].name %></a>
+										<a href="/player/<%= match.players.home[i].rsc_id; %>">
+											<%= match.players.home[i].name %></a>
 									</strong> 
+									<% if ( i === 0 ) { %>
 									[Makes lobby]
+									<% } %>
+
+									<% if ( submitted_scores.home === match.players.home[i].rsc_id ) { %>
+									<strong class="text-success ms-1">REPORTED</strong>
+									<% } %>
 								</li>
-								<li>
-									<%= (is_admin || is_combines_admin) ? '[' + match.players.home[1].start_mmr + '] ' : '' %>
-									<a href="/player/<%= match.players.home[1].rsc_id; %>"><%= match.players.home[1].name %></a>
-								</li>
-								<li>
-									<%= (is_admin || is_combines_admin) ? '[' + match.players.home[2].start_mmr + '] ' : '' %>
-									<a href="/player/<%= match.players.home[2].rsc_id; %>"><%= match.players.home[2].name %></a>
-								</li>
+								<%
+									}
+								%>
 							</ul>
 						</div>
 						<div class="col-md-6">
@@ -162,24 +188,26 @@
 										if ( ! match.confirmed_rsc_id || ! match.reported_rsc_id ) {
 											if ( match.confirmed_rsc_id || match.reported_rsc_id ) {
 									%>
+								<label for="away_wins">Away Team Series Score</label>
+								<div class="input-group">
 									<input
-										type="hidden"
+										type="number"
 										class="form-control"
 										name="away_wins"
 										id="away_wins"
 										placeholder="2"
 										value="<%- match.away_wins %>"
+										tabindex="2"
 										max="4"
 										required
 									>
-									<div class="text-center">
-										<input
-											tabindex="1"
-											type="submit"
-											class="w-50 form-control btn btn-large btn-success rounded"
-											value="Verify Scores"
-										>
-									</div>
+									<input
+										tabindex="1"
+										type="submit"
+										class=" btn btn-large btn-success rounded"
+										value="Verify Scores"
+									>
+								</div>
 									<%
 											} else {
 									%>
@@ -207,20 +235,26 @@
 								}
 							%>
 							<ul>
+								<%
+									for ( let i = 0; i < match.players.away.length; ++i ) {
+								%>
 								<li>
-									<%= (is_admin||is_combines_admin) ? '[' + match.players.away[0].start_mmr + '] ' : '' %>
+									<% if (is_admin || is_combines_admin) { %>
+									[<%- match.players.away[i].start_mmr %>]
+									<% } %>
 									<strong>
-									<a href="/player/<%= match.players.home[0].rsc_id; %>"><%= match.players.away[0].name %></a>
+										<a href="/player/<%= match.players.away[i].rsc_id; %>">
+											<%= match.players.away[i].name %></a>
 									</strong> 
+									<% if ( i === 0 ) { %>
 									[Uploads replays/screenshots]
-								</li>
-								<li>
-									<%= (is_admin||is_combines_admin) ? '[' + match.players.away[1].start_mmr + '] ' : '' %>
-									<a href="/player/<%= match.players.home[1].rsc_id; %>"><%= match.players.away[1].name %></a>
-								</li>
-								<li>
-									<%= (is_admin||is_combines_admin) ? '[' + match.players.away[2].start_mmr + '] ' : '' %>
-									<a href="/player/<%= match.players.home[2].rsc_id; %>"><%= match.players.away[2].name %></a>
+									<% } %>
+									<% if ( submitted_scores.away === match.players.away[i].rsc_id ) { %>
+									<strong class="text-success ms-1">REPORTED</strong>
+									<% } %>
+								<%
+									}
+								%>
 								</li>
 							</ul>
 						</div>
