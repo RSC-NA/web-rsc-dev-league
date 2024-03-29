@@ -64,7 +64,7 @@
 
 		<div class="bg-light p-3 rounded">
 		<% if ( combine_day && combine_day != 'holiday' ) { %>
-			<% if ( nickname && user && user.combines.match ) { %>
+			<% if ( nickname && user && user.combines.match && user.combines.match.id ) { %>
 
 				<h2>Your Lobby is Ready!</h2>
 				<p class="lead">
