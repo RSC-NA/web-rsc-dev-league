@@ -15,6 +15,7 @@ if ( typeof Bun === 'undefined' ) {
 const express = require('express');
 const app = express();
 const connection = require('./core/database').databaseConnection;
+const mysqlP = require('mysql2/promise');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 const sessionStore = new MySQLStore({}, connection);
@@ -54,6 +55,7 @@ const API_HOST = 'staging-api.rscna.com';
 // pull in our two manually defined configuration objects
 // TODO(erh): this can probably be moved into a database table
 const matchDays = require('./matchDays');
+const combineDays = require('./combineDays');
 const { mmrRange, getTierFromMMR } = require('./mmrs');
 
 function writeError(error) {
@@ -109,10 +111,85 @@ app.use((req, res, next) => {
 
 // primary middleware -- check user session, set up local vars
 // for templates, etc. 
+
+async function get_user(user_id) {
+	if ( ! user_id ) { 
+		return {}; 
+	}
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = `
+		SELECT 
+			p.id,p.nickname,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
+			p.combines_admin,c.name,c.mmr,c.tier,c.status,p.rsc_id,p.discord_id,
+			c.active_3s,c.active_2s,
+			t.season,t.tier AS assigned_tier, t.count, t.keeper,
+			t.base_mmr, t.effective_mmr,t.current_mmr, 
+			t.wins,t.losses
+		FROM players AS p 
+		LEFT JOIN contracts AS c 
+		ON p.discord_id = c.discord_id 
+		LEFT JOIN tiermaker AS t 
+		ON p.discord_id = t.discord_id
+		WHERE p.id = ?
+	`;
+	const [results] = await db.query(query, [ user_id ]);
+
+	if ( results && results.length ) {
+		const p = results[0];
+		const user = {
+			user_id: p.id,
+			nickname: p.nickname,
+			name: p.name,
+			mmr: p.mmr,
+			tier: p.tier,
+			status: p.status,
+			rsc_id: p.rsc_id,
+			discord_id: p.discord_id,
+			combines: {
+				active: p.current_mmr ? true : false,
+				season: p.season,
+				base_mmr: p.base_mmr,
+				effective_mmr: p.effective_mmr,
+				current_mmr: p.current_mmr,
+				losses: p.losses,
+				wins: p.wins,
+				tier: p.assigned_tier,
+				count: p.count,
+				keeper: p.keeper,
+				waiting: {},
+				match: {},
+			},
+			active_3s: p.active_3s,
+			active_2s: p.active_2s,
+			is_admin: p.admin ? true: false,
+			is_tourney_admin: p.tourney_admin ? true: false,
+			is_devleague_admin: p.devleague_admin ? true: false,
+			is_stats_admin: p.stats_admin ? true: false,
+			is_combines_admin: p.combines_admin ? true: false,
+		};
+		
+		db.end();
+		return user;
+	}
+
+	return {};
+}
+
 //
 // this middleware also fetches the "settings" from the database
 // configured in the /manage_league route
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
 	res.locals.requestUrl = req.originalUrl;
 
 	res.locals.menu = {
@@ -145,10 +222,19 @@ app.use((req, res, next) => {
 	res.locals.is_devleague_admin = req.session.is_devleague_admin;
 	res.locals.is_stats_admin = req.session.is_stats_admin;
 	res.locals.is_combines_admin = req.session.is_combines_admin;
-	res.locals.user = req.session.user || {};
 	res.locals.rostered = req.session.rostered;
 
+	//res.locals.user = req.session.user || {};
+	res.locals.user = await get_user(req.session.user_id);
+
 	res.locals.SEND_TO_API_SERVER = SEND_TO_API_SERVER;
+	
+	res.locals.future_tournaments = {
+		total: 0,
+		open: {},
+		active: {},
+		upcoming: {},
+	};	
 
 	res.locals.title = title;
 	res.locals.description = description;
@@ -229,6 +315,7 @@ app.use((req, res, next) => {
 });
 
 // tournaments middleware
+/*
 app.use((req, res, next) => {
 	res.locals.future_tournaments = {}; // active/upcoming tournaments
 	res.locals.my_tournaments     = {};
@@ -302,6 +389,7 @@ app.use((req, res, next) => {
 		}
 	});
 });
+*/
 
 // checked in middleware.
 // only really needed if the user is logged in AND it's a game day
@@ -311,8 +399,12 @@ app.use((req, res, next) => {
 	const date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
 	res.locals.today = date;
 	res.locals.match_day = false;
+	res.locals.combine_day = false;
 	if ( date in matchDays ) {
 		res.locals.match_day = matchDays[date];
+	}
+	if ( date in combineDays ) {
+		res.locals.combine_day = combineDays[date];
 	}
 
 	if ( res.locals.match_day && req.session.user_id ) {
@@ -341,6 +433,37 @@ app.use((req, res, next) => {
 				}
 			}
 		);
+	} else if ( res.locals.combine_day && res.locals.discord_id ) {
+		const query = `
+			SELECT 
+				id,season,rsc_id,signup_dtg,current_mmr,active,rostered
+			FROM combine_signups 
+			WHERE 
+				discord_id = ? AND 
+				rostered = 0 AND
+				( 
+					DATE(signup_dtg) = CURDATE() OR 
+					DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+				)
+		`;
+		connection.query(
+			query,
+			[ res.locals.discord_id ],
+			(_err, results) => {
+				if ( results && results.length > 0 ) {
+					console.log('Waiting in queue',results[0]);
+					res.locals.user.combines.waiting = results;
+					req.session.checked_in = true;
+					req.session.rostered = results[0].rostered;
+					res.locals.checked_in = req.session.checked_in;
+					res.locals.rostered = req.session.rostered;
+					next();
+				} else {
+					next();
+				}
+			}
+		);
+
 	} else {
 		next();
 	}
@@ -377,7 +500,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
 	// TODO(load template)
 	if ( res.locals.combines.active ) {
-		res.render('combines_dashboard');
+		res.render('combines_dashboard', { match_days: combineDays });
 	} else {
 		res.render('dashboard', { match_days: matchDays });
 	}

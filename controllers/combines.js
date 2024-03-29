@@ -158,6 +158,93 @@ async function update_mmrs(db, match) {
 	}
 }
 
+
+/*******************************************************
+ ********************* User Views **********************
+ ******************************************************/
+router.get('/combines/check_out/:discord_id', async (req, res) => {
+	if ( ! res.locals.checked_in ) {
+		return res.redirect('/?error=YouAreNotCheckedIn');
+	}
+	
+	const user = res.locals.user;
+	const ucombines = user.combines;
+	const combines = res.locals.combines;
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = `
+		DELETE FROM combine_signups 
+		WHERE 
+			season = ? AND 
+			rsc_id = ? AND 
+			discord_id = ? AND 
+			current_mmr = ? AND
+			rostered = 0
+	`;
+	const [inserted] = await db.query(query, [
+		res.locals.combines.season,
+		user.rsc_id,
+		user.discord_id,
+		ucombines.current_mmr
+	]);
+
+	await db.end();
+
+	return res.redirect('/?success=YouAreCheckedOut');
+});
+
+router.get('/combines/check_in/:discord_id', async (req, res) => {
+	if ( res.locals.checked_in ) {
+		return res.redirect('/?error=YouAreAlreadyCheckedIn');
+	}
+	
+	const user = res.locals.user;
+	const ucombines = user.combines;
+	const combines = res.locals.combines;
+
+	if ( ucombines.season !== combines.season ) {
+		return res.redirect('/?error=YouAreInTheWrongSeason');
+	}
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = `
+		INSERT INTO combine_signups 
+			(season,rsc_id,discord_id,current_mmr) 
+		VALUES 
+			(     ?,     ?,         ?,          ?)
+	`;
+	const [inserted] = await db.query(query, [
+		res.locals.combines.season,
+		user.rsc_id,
+		user.discord_id,
+		ucombines.current_mmr
+	]);
+
+	await db.end();
+
+	return res.redirect('/');
+});
+
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
@@ -167,8 +254,14 @@ router.post('/combine/:match_id', async (req, res) => {
 	const home_wins = parseInt(req.body.home_wins);
 	const away_wins = parseInt(req.body.away_wins);
 
+	if ( 
+		(home_wins < 0 || home_wins > 4) ||
+		(away_wins < 0 || away_wins > 4 ) ) {
+		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
+	}
+
 	if ( home_wins + away_wins != 4 ) {
-		res.redirect(`/combine/${match_id}?error=InvalidScore`);
+		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
 	const my_rsc_id = res.locals.user.rsc_id;

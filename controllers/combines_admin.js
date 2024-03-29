@@ -282,6 +282,34 @@ router.all('/activate/:rsc_id', (req, res) => {
 	}
 });
 
+router.all('/deactivate-last/:amount', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+	
+	const query = `
+		UPDATE combine_signups SET 
+			active = 0
+		WHERE 
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			active = 1 AND
+			rostered = 0
+		ORDER BY signup_dtg DESC 
+		LIMIT ?
+	`;
+	if ( ! req.params.amount || ! parseInt(req.params.amount) ) {
+		console.log('WTF?', parseInt(req.params.amount) );
+		return res.redirect('/combines/process');
+	}
+	//return res.json({query: query, amount: parseInt(req.params.amount)});	
+	req.db.query(query, [ parseInt(req.params.amount) ], (err,results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect('/combines/process');
+	});
+});
+
+
 router.all('/deactivate/:rsc_id', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');
@@ -566,14 +594,19 @@ router.get('/setup', async (req, res) => {
 		queueLimit: 0
 	});
 
-	const query = 'SELECT rsc_id,season,current_mmr FROM tiermaker ORDER BY current_mmr DESC LIMIT 36';
+	const query = 'SELECT rsc_id,discord_id,season,current_mmr FROM tiermaker ORDER BY rand() LIMIT 100';
 	const [results] = await db.execute(query);
 
 	if ( results && results.length ) {
-		const ins_query = 'INSERT INTO combine_signups (rsc_id,season,current_mmr) values (?,?,?)';
+		const ins_query = 'INSERT INTO combine_signups (rsc_id,discord_id,season,current_mmr) values (?,?,?,?)';
 		const players = [];
 		for ( let i = 0; i < results.length; ++i ) {
-			const [result] = await db.query(ins_query, [results[i].rsc_id,results[i].season,results[i].current_mmr]);
+			const [result] = await db.query(ins_query, [
+				results[i].rsc_id,
+				results[i].discord_id,
+				results[i].season,
+				results[i].current_mmr,
+			]);
 		}
 	}
 
@@ -581,6 +614,32 @@ router.get('/setup', async (req, res) => {
 
 	res.redirect('/combines/process');
 });
+
+async function get_rsc_discord_map() {
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = `SELECT rsc_id,discord_id FROM players`;
+	const [results] = await db.query(query);
+	db.end();
+
+	const players = {};
+	if ( results && results.length ) {
+		for ( let i = 0; i < results.length; ++i ) {
+			players[results[i].rsc_id] = results[i].discord_id;
+		}
+	}
+
+	return players;
+}
 
 router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
@@ -600,6 +659,8 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 	const sheet = doc.sheetsByTitle["9 Tier"];
 	const rows = await sheet.getRows();
 
+	const discord_ids = await get_rsc_discord_map();
+
 	const players = {};
 
 	console.log('Importing tiermaker...');
@@ -608,10 +669,11 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		if ( ! row['Player Name'] || ! row['RSC ID'] ) {
 			continue;
 		}
-		players[ row['RSC ID'] ] = {
+		const rsc_id = row['RSC ID'];
+		players[ rsc_id ] = {
 			'season': res.locals.combines.season,
-			'discord_id': null,
-			'rsc_id': row['RSC ID'],
+			'discord_id': (rsc_id in discord_ids) ? discord_ids[rsc_id] : null,
+			'rsc_id': rsc_id,
 			'name': row['Player Name'],
 			'tier': row._rawData[4],
 			'count': row['Count'],
@@ -619,6 +681,22 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 			'base_mmr': row['Base MMR'],
 			'effective_mmr': row['Effective MMR'],
 			'current_mmr': row['Effective MMR'],
+		};
+	}
+
+	if ( ! ( 'RSC000302' in players ) ) {
+		const me = 'RSC000302';
+		players[ me ] = {
+			'season': res.locals.combines.season,
+			'discord_id': (me in discord_ids) ? discord_ids[me] : null,
+			'rsc_id': me,
+			'name': 'tehblister',
+			'tier': 'Elite',
+			'count': 3,
+			'keeper': 4,
+			'base_mmr': 1500,
+			'effective_mmr': 1500,
+			'current_mmr': 1500,
 		};
 	}
 
@@ -645,7 +723,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		for ( const rsc_id in players ) {
 			const p = players[rsc_id];
 			new_players.push([
-				season, rsc_id, p.name, p.tier, p.count, p.keeper, p.base_mmr,
+				season, rsc_id, p.discord_id, p.name, p.tier, p.count, p.keeper, p.base_mmr,
 				p.effective_mmr, p.current_mmr
 			]);
 		}
@@ -655,7 +733,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 			
 			const tiermaker_insert_query = `
 				INSERT INTO tiermaker 
-					(season,rsc_id,name,tier,count,keeper,base_mmr,effective_mmr,current_mmr)
+					(season,rsc_id,discord_id,name,tier,count,keeper,base_mmr,effective_mmr,current_mmr)
 				VALUES ?
 			`;
 			req.db.query(tiermaker_insert_query, [new_players], (err, results) => {

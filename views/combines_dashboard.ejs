@@ -1,0 +1,170 @@
+
+<%- include('partials/header.ejs'); %>
+
+<%
+	console.log(user, combine_day);	
+%>
+
+	<main class="container">
+		<div class="bg-light p-3 rounded">
+			<div class="row">
+				<div class="col-md-8">
+
+			<% if ( user.name ) { %>
+					<h1>Welcome to the RSC Combines, <%= user.name %></h1>
+			<% } else { %>
+					<h1>Welcome to the RSC Combines!</h1>
+			<% } %>
+
+					<p class="lead">
+						The RSC Combines are a place to show your true skill and talent in RSC's offseason
+						prior to the RSC Draft. You'll play in sets of 4 sweaty matches with other players around your 
+						skill level to flex for GMs and Scouts.
+					</p>
+
+					<h3>Combines Info</h3>
+					<p>
+						Every Monday, Wednesday, and Friday, show up on this website to check in and play in 
+						as many series as you can with other RSC draft hopefuls. Every 15-20 minutes from 
+						<strong>8:00PM</strong> to <strong>11:00PM</strong>, new teams will be generated from 
+						anyone checked in and ready to play. 
+					</p>
+					<p>
+						You'll be assigned a lobby and will hop in a VC to play a series of 4 games with your 
+						assigned team and do your absolute best to prove you're the right person for a starting 
+						spot on one of our 32 franchises.
+					</p>
+					<p>
+						<strong>WARNING:</strong> Only check in if you are at your computer/console and ready to  
+						play. Checking in and then not being available for the full four games will make earning 
+						a roster spot difficult for the other five people in your lobby. Ditching queues will be 
+						treated as a serious behavior violation and will potentially make you ineligible to compete 
+						in RSC's upcoming season.
+					</p>
+				</div>
+				<div class="col-md-4 matchDates">
+					<h4>Season <%= settings.season %> Dates</h4>
+					<ul class="dates">
+						<%
+							for ( let match_date in match_days ) {
+						%>
+
+						<li class="<%- match_date == today ? 'today' : '' %> <%- match_date == today && combine_day == 'holiday' ? 'holiday' : '' %>">
+							<%- match_date %> - 
+							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : 'Combine Day: <strong>' + match_days[match_date] + '</strong>' %>
+						</li>
+
+						<%
+							}
+						%>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="bg-light p-3 rounded">
+		<% if ( combine_day && combine_day != 'holiday' ) { %>
+
+			<% if ( nickname && ! checked_in && user && user.combines.active ) { %>
+
+			<!-- check in features -->	
+			<style type="text/css">
+				dialog#confirmCheckIn {
+					background-color: #C2FFD7;
+					border-radius: 12px;
+					max-width: 50vw;
+				}
+
+				dialog#confirmCheckIn h4 {
+					text-decoration: underline;
+				}
+
+				dialog#confirmCheckIn::backdrop {
+					background-color:  #FF3400aa;
+				}
+			</style>
+
+			<dialog id="confirmCheckIn">
+				<h4>Confirm Check In</h4>
+				<p>
+					<strong>Warning!</strong> - Combines are your chance to show GMs that you're a 
+					player that they want to have on their team this season. Checking in for a match and 
+					not showing up is frustrating for the other 5 players in the lobby. To prevent this,
+					this software shows GMs a count of any matches you've missed. Continued abuse may result 
+					in your removal from RSC.
+				</p>
+				<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES.</h5>
+				<a class="btn btn-lg btn-primary" href="/combines/check_in/<%- user.rsc_id; %>" role="button">Confirm Check In!</a>
+				<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
+			</dialog>
+
+			<a class="btn btn-lg btn-primary" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
+
+			<script type="text/javascript">
+				document.getElementById('checkInModal').addEventListener('click', function() {
+					document.getElementById('confirmCheckIn').showModal();
+				});
+
+				document.getElementById('backOut').addEventListener('click', function() {
+					document.getElementById('confirmCheckIn').close();
+				});
+			</script>
+
+
+			<% } else if ( nickname && checked_in && rostered && "rsc_id" in user && user['rsc_id'] != null ) { %>
+				<h2>Your Team is Ready to Play!</h2>
+				<p class="lead">
+					You have been selected to play tonight. Click the "Match" link in the sidebar or click the button below. 
+				</p>
+				<a class="btn btn-lg btn-success" href="/match" role="button">View Match Details</a>
+			<% } else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) { %>
+			<h2>You are checked in!</h2>
+			<p class="lead">
+				Lobbies are generated every 15-20 minutes. Stay at your computer and ready, as the lobbies could be 
+				created at any time.
+			</p>
+			<%
+				if ( new Date().getHours() < 24 ) {
+			%>
+			<a class="btn btn-lg btn-danger" href="/combines/check_out/<%= user.rsc_id; %>" role="button">Check Out</a>
+			<%
+				}
+			%>
+			<% } else if ( nickname && user && ! user.combines.active ) { %>
+			<h2>You Aren't In the Rolling Tier List</h2>
+			<p>
+				You don't currently have an entry in the Rolling Tier List. Processing new applicants
+				is a manual process that takes several days. If you just <strong>recently</strong> signed up for RSC, 
+				it might be a few days before you've been correctly added to our systems.
+			</p>
+			<p>
+				If you think this is an error, please reach out to the RSC Team by sending a DM to 
+				the bot <code>.MainModmail</code> on the RSC Discord server.
+			</p>
+			<% } else { %>
+			<a class="btn btn-lg btn-primary" href="https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=<%- callbackUrl %>&response_type=token&scope=identify" role="button">Log In with Discord</a>
+			<% } %>
+
+		<% } else if ( combine_day && combine_day == 'holiday' ) { %>
+			
+			<h2>Happy Holidays 🎆 from RSC!</h2>
+			<p>
+				Today is a Holiday and RSC is taking a much-needed vacation. Please enjoy time with your loved ones. ❤️
+			</p>
+
+		<% } else { %>
+
+			<h2>It is not an RSC Combine Day</h2>
+			<p>
+				Combines games are played every <strong>Monday, Wednesday, and Friday</strong> 
+				from <strong>8PM ET - 11PM ET</strong> until the draft. You can check in 
+				to play at 7:45PM.
+			</p>
+
+		<% } %>
+			
+		
+		</div>
+	</main>
+
+<%- include('partials/footer.ejs'); %>

@@ -52,10 +52,16 @@ router.get('/process_login', (req, res) => {
 		SELECT 
 			p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
 			p.combines_admin,c.name,c.mmr,c.tier,c.status,p.rsc_id,
-			c.active_3s,c.active_2s 
+			c.active_3s,c.active_2s,
+			t.season,t.tier AS assigned_tier, t.count, t.keeper,
+			t.base_mmr, t.effective_mmr,t.current_mmr, 
+			t.wins,t.losses
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
-		ON p.discord_id = c.discord_id WHERE p.discord_id = ?
+		ON p.discord_id = c.discord_id 
+		LEFT JOIN tiermaker AS t 
+		ON p.discord_id = t.discord_id
+		WHERE p.discord_id = ?
 	`;
 	req.db.query(
 		query, 
@@ -82,6 +88,18 @@ router.get('/process_login', (req, res) => {
 					status: results[0].status,
 					rsc_id: results[0].rsc_id,
 					discord_id: discord_id,
+					combines: {
+						active: results[0].current_mmr ? true : false,
+						season: results[0].season,
+						base_mmr: results[0].base_mmr,
+						effective_mmr: results[0].effective_mmr,
+						current_mmr: results[0].current_mmr,
+						losses: results[0].losses,
+						wins: results[0].wins,
+						tier: results[0].assigned_tier,
+						count: results[0].count,
+						keeper: results[0].keeper,
+					},
 					active_3s: results[0].active_3s,
 					active_2s: results[0].active_2s,
 					is_admin: results[0].admin ? true: false,
@@ -114,10 +132,21 @@ router.get('/process_login', (req, res) => {
 					function (err, _results) {
 						if (err) throw err;
 						
-						req.db.query(
-							'SELECT p.id,c.name,c.mmr,c.tier,c.status,c.rsc_id,c.active_3s,c.active_2s FROM players AS p LEFT JOIN contracts AS c on p.discord_id = c.discord_id WHERE p.discord_id = ?',
-							[ discord_id ],
-							(_err, results) => {
+						const player_lookup_query =	`
+							SELECT 
+								p.id,c.name,c.mmr,c.tier,c.status,c.rsc_id,
+								c.active_3s,c.active_2s,
+								t.season,t.tier AS assigned_tier, t.count, t.keeper,
+								t.base_mmr, t.effective_mmr,t.current_mmr, 
+								t.wins,t.losses
+							FROM players AS p 
+							LEFT JOIN contracts AS c 
+							ON p.discord_id = c.discord_id 
+							LEFT JOIN tiermaker AS t 
+							ON p.discord_id = t.discord_id
+							WHERE p.discord_id = ?`;
+						req.db.query(player_lookup_query, [discord_id], (err, results) => {
+
 								const user = {
 									user_id: results[0].id,
 									nickname: nickname,
@@ -127,6 +156,18 @@ router.get('/process_login', (req, res) => {
 									status: results[0].status,
 									rsc_id: results[0].rsc_id,
 									discord_id: discord_id,
+									combines: {
+										active: results[0].current_mmr ? true : false,
+										season: results[0].season,
+										base_mmr: results[0].base_mmr,
+										effective_mmr: results[0].effective_mmr,
+										current_mmr: results[0].current_mmr,
+										losses: results[0].losses,
+										wins: results[0].wins,
+										tier: results[0].assigned_tier,
+										count: results[0].count,
+										keeper: results[0].keeper,
+									},
 									active_3s: results[0].active_3s ? true : false,
 									active_2s: results[0].active_2s ? true : false,
 									is_admin: false,
