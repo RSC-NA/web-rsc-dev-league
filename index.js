@@ -1073,6 +1073,8 @@ app.get('/send_tracker_data', (req, res) => {
 			if ( limit === 1 ) {
 				console.log('THIS RECORD IS BROKEN');
 				console.log(tracker_data);
+				writeError("--- BAD TRACKER DATA ---\n");
+				writeError(tracker_data);
 			}
 			fetch(`https://${API_HOST}/api/v1/numbers/mmr/bulk_submit/`, {
 				method: 'POST',
