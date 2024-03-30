@@ -134,7 +134,7 @@
 								</div>
 							</div>
 							<% 
-								}
+								} 
 							%>
 							<ul>
 								<%
@@ -181,12 +181,11 @@
 							<% 
 								}
 
-								if ( ! has_scored || can_report ) {
+								if ( ! has_scored && can_report ) {
 							%>
 							<div class="mb-3">
 									<% 
-										if ( ! match.confirmed_rsc_id || ! match.reported_rsc_id ) {
-											if ( match.confirmed_rsc_id || match.reported_rsc_id ) {
+										if ( match.confirmed_rsc_id || match.reported_rsc_id ) {
 									%>
 								<label for="away_wins">Away Team Series Score</label>
 								<div class="input-group">
@@ -209,10 +208,7 @@
 									>
 								</div>
 									<%
-											} else {
-												if ( match.complete ) {
-
-												} else {
+										} else {
 									%>
 								<label for="away_wins">Away Team Series Score</label>
 								<div class="input-group">
@@ -227,10 +223,14 @@
 										max="4"
 										required
 									>
+									<input
+										tabindex="1"
+										type="submit"
+										class=" btn btn-large btn-success rounded"
+										value="Submit Scores"
+									>
 								</div>
 									<%
-												}
-											}
 										}
 									%>
 								</div>
