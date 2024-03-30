@@ -1070,7 +1070,7 @@ app.get('/send_tracker_data', (req, res) => {
 		if ( tracker_data.length ) {
 			console.log("TRACKERS BEING SENT", tracker_data.length);
 // send them to api
-			console.log(tracker_data);
+			//console.log(tracker_data);
 			fetch(`https://${API_HOST}/api/v1/numbers/mmr/bulk_submit/`, {
 				method: 'POST',
 				headers: {
@@ -1105,6 +1105,7 @@ app.get('/send_tracker_data', (req, res) => {
 					res.send(data);
 				}
 			}).catch(error => {
+				console.log('error', error);
 				console.error(error);
 			});
 
