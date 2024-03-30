@@ -183,6 +183,15 @@ router.all('/generate', async (req, res) => {
 		queueLimit: 0
 	});
 
+	const used = {};
+	const lobby_query = `SELECT id,lobby_user FROM combine_matches WHERE completed != 1 and cancelled != 1`;
+	const [lobs] = await db.query(lobby_query);
+	if ( lobs && lobs.length ) {
+		for ( let i = 0; i < lobs.length; ++i ) {
+			used[lobs[i].lobby_user] = lobs[i].id;
+		}
+	}
+
 	const players_query = `
 		SELECT 
 			s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
@@ -209,6 +218,19 @@ router.all('/generate', async (req, res) => {
 
 		const lobbies = [];
 		for ( let i = 0; i < num_lobbies; ++i ) {
+			let safe_name = false;
+			while ( ! safe_name ) {
+				let word1 = get_rand_word();
+				let word2 = get_rand_word();
+				if ( ! (word1 in used) ) {
+
+				} e
+				if ( word1 in used ) {
+					console.log('Skipping',word1);
+				} else if ( word2 in used ) {
+					console.log('Skipping',word2);
+				}
+			}
 			const lobby = {
 				season: res.locals.combines.season,
 				username: get_rand_word(),
@@ -339,6 +361,124 @@ router.all('/deactivate/:rsc_id', (req, res) => {
 			return res.redirect('/combines/process');
 		});
 	}
+});
+
+router.get('/history', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+
+	const cols = {
+		'rsc_id': 't.rsc_id',
+		'name': 't.name',
+		'tier': 't.tier',
+		'base_mmr': 't.base_mmr',
+		'effective_mmr': 't.effective_mmr',
+		'current_mmr': 't.current_mmr',
+		'count': 't.count',
+		'keeper': 't.keeper',
+		'wins': 't.wins',
+		'losses': 't.losses',
+		'win_percentage': 't.wins / (t.wins + t.losses)',
+	};
+	let order = 't.current_mmr';
+	let dir = 'DESC';
+	if ( req.query.order && req.query.order in cols ) {
+		console.log('ORDER', req.query.order, cols[req.query.order]);
+		order = cols[req.query.order];
+	}
+	if ( req.query.dir ) {
+		console.log('DIR', req.query.dir);
+		if ( req.query.dir === 'up' ) {
+			dir = 'ASC';
+		} else {
+			if ( order === 't.wins' ) {
+				order = 't.losses';
+				dir = 'ASC';
+			} else {
+				dir = 'DESC';
+			}
+		}
+	}
+
+	let limit = 100;
+	if ( req.query.limit ) {
+		limit = parseInt(req.query.limit);
+	}
+
+	let page = 1;
+	if ( req.query.page ) {
+		page = parseInt(req.query.page);
+	}
+	let page_offset = (page - 1) * limit;
+
+
+	res.locals.title = `Combine History - ${res.locals.title}`;
+
+	const players_query = `
+		SELECT 
+			t.id, t.rsc_id, t.name, t.tier, t.base_mmr, t.effective_mmr, t.current_mmr, 
+			t.count, t.keeper, t.wins, t.losses
+		FROM tiermaker AS t 
+		WHERE t.season = ?
+		ORDER BY ${order} ${dir}
+		LIMIT ${limit}
+		OFFSET ${page_offset}
+	`;
+	const players = {};
+	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				const p = results[i];
+
+				players[p.rsc_id] = {
+					'num': i + 1,
+					'rsc_id': p.rsc_id,
+					'name': p.name, 
+					'tier': p.tier,
+					'base_mmr': p.base_mmr,
+					'effective_mmr': p.effective_mmr,
+					'current_mmr': p.current_mmr,
+					'combines_tier': getTierFromMMR(p.current_mmr),
+					'count': p.count,
+					'keeper': p.keeper,
+					'wins': p.wins,
+					'losses': p.losses,
+					'games': p.wins + p.losses,
+				};
+				players[p.rsc_id].win_percentage = p.games ? 
+					parseFloat(((p.wins / p.games) * 100).toFixed(1)) : 
+					0;
+				players[p.rsc_id].mmr_delta = p.current_mmr - p.effective_mmr;
+			}
+		}
+	
+		const count_query = `
+			SELECT 
+				count(*) AS total
+			FROM tiermaker AS t 
+			WHERE t.season = ?
+			ORDER BY ${order} ${dir}
+		`;
+		req.db.query(count_query, [ res.locals.combines.season ], (err, results) => {
+			if ( err ) { throw err; }
+
+			if ( results && results.length ) {
+				const total = results[0].total;
+				res.render('history_combine', {
+					order: order,
+					dir: dir,
+					players: players,
+					limit: limit,
+					page: page,
+					page_offset: page_offset,
+					total: total,
+				});
+			}
+		});
+	});
 });
 
 router.get('/process', (req, res) => {
