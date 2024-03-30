@@ -1041,7 +1041,7 @@ app.get('/send_tracker_data', (req, res) => {
 		if ( results && results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
 				record_ids.push(results[i].id);
-				let td = {
+				const td = {
 					psyonix_season: results[i].psyonix_season,
 					tracker_link: { link: results[i].tracker_link },
 					rsc_id: results[i].rsc_id ?? '',
@@ -1068,6 +1068,7 @@ app.get('/send_tracker_data', (req, res) => {
 		}
 
 		if ( tracker_data.length ) {
+			console.log("TRACKERS BEING SENT", tracker_data.length);
 // send them to api
 			console.log(tracker_data);
 			fetch(`https://${API_HOST}/api/v1/numbers/mmr/bulk_submit/`, {
