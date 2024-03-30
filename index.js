@@ -53,7 +53,7 @@ const atob = require('atob');
 const e = require('express');
 */
 
-const API_HOST = 'staging-api.rscna.com';
+const API_HOST = 'api.rscna.com';
 
 // pull in our two manually defined configuration objects
 // TODO(erh): this can probably be moved into a database table
