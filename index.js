@@ -1070,7 +1070,10 @@ app.get('/send_tracker_data', (req, res) => {
 		if ( tracker_data.length ) {
 			console.log("TRACKERS BEING SENT", tracker_data.length);
 // send them to api
-			//console.log(tracker_data);
+			if ( limit === 1 ) {
+				console.log('THIS RECORD IS BROKEN');
+				console.log(tracker_data);
+			}
 			fetch(`https://${API_HOST}/api/v1/numbers/mmr/bulk_submit/`, {
 				method: 'POST',
 				headers: {
