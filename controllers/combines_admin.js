@@ -420,7 +420,7 @@ router.get('/history', (req, res) => {
 			t.id, t.rsc_id, t.name, t.tier, t.base_mmr, t.effective_mmr, t.current_mmr, 
 			t.count, t.keeper, t.wins, t.losses
 		FROM tiermaker AS t 
-		WHERE t.season = ?
+		WHERE t.season = ? AND (t.wins > 0 OR t.losses > 0)
 		ORDER BY ${order} ${dir}
 		LIMIT ${limit}
 		OFFSET ${page_offset}
