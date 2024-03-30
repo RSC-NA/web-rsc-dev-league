@@ -86,11 +86,45 @@
 					<% if ( ! has_scored ) { %>
 					<h3>BOTH TEAMS MUST REPORT THE SCORE!</h3>
 					<% } %>
+					
+					<%
+						const teamOneMmr = match.home_mmr;
+						const teamTwoMmr = match.away_mmr;
+						const homeDelta  = teamOneMmr - teamTwoMmr;
+						const homeDeltaAbs = Math.abs(homeDelta);
 
-					<% 
-						let teamOneMmr = match.home_mmr;
-						let teamTwoMmr = match.away_mmr;
+						const prediction = [];
+						const win_prediction = homeDelta > 0 ? 'Home' : 'Away';
+						let magnitude = '';
+						if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
+							magnitude = 'slight';
+						} else if ( homeDeltaAbs >= 10 && homeDeltaAbs < 20 ) {
+							magnitude = 'large';
+						} else if ( homeDeltaAbs >= 20 && homeDeltaAbs <= 40 ) {
+							magnitude = 'massive';
+						} else if ( homeDeltaAbs >= 40 ) {
+							magnitude = 'overwhelming';
+						}
+						
+						if ( is_admin || is_combines_admin ) {
+							if ( magnitude ) {
 					%> 
+					<h3 class="p-2 text-center <%- win_prediction === 'Home' ? 'bg-primary text-white' : 'bg-warning text-black'; %>">
+						<%- win_prediction; %> has a <em><%- magnitude; %></em> predicted advantage.
+						<span class="text-muted">+<%- homeDeltaAbs; %></span>
+					</h3>
+					<%
+							} else {
+					%>
+
+					<h3 class="p-2 text-center bg-secondary">
+						No team has a statistical advantage.
+						<span class="text-muted">+<%- homeDeltaAbs; %></span>
+					</h3>
+					<%
+							}
+						}
+					%>
 					<form action="/combine/<%- match.id %>" method="post">
 					<div class="row">
 						<div class="col-md-6">
