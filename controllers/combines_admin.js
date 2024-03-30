@@ -432,7 +432,8 @@ router.get('/history', (req, res) => {
 		if ( results.length ) {
 			for ( let i = 0; i < results.length; ++i ) {
 				const p = results[i];
-
+				
+				const total_games = p.wins + p.losses;
 				players[p.rsc_id] = {
 					'num': i + 1,
 					'rsc_id': p.rsc_id,
@@ -446,11 +447,9 @@ router.get('/history', (req, res) => {
 					'keeper': p.keeper,
 					'wins': p.wins,
 					'losses': p.losses,
-					'games': p.wins + p.losses,
+					'win_percentage': total_games > 0 ? parseFloat((p.wins / total_games) * 100).toFixed(1) : 0,
+					'games': total_games,
 				};
-				players[p.rsc_id].win_percentage = p.games ? 
-					parseFloat(((p.wins / p.games) * 100).toFixed(1)) : 
-					0;
 				players[p.rsc_id].mmr_delta = p.current_mmr - p.effective_mmr;
 			}
 		}
