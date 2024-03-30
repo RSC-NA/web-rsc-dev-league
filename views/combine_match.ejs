@@ -29,7 +29,7 @@
 		}
 	}
 
-	const has_scored = (match.reported_rsc_id || match.confirmed_rsc_id) ? true : false;
+	const has_scored = (match.reported_rsc_id && match.confirmed_rsc_id) ? true : false;
 	const can_report = is_admin || is_combines_admin || user.rsc_id in lobby ? true : false;
 %>
 
