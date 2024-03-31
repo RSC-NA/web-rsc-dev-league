@@ -198,6 +198,7 @@ app.use(async (req, res, next) => {
 	res.locals.menu = {
 		'dashboard': '',
 		'devleague': '',
+		'/combines/process': '',
 		'tournaments': '',
 		'tracker': '',
 		'championship': '',
@@ -205,15 +206,20 @@ app.use(async (req, res, next) => {
 		'process_gameday': '',
 		'matches': '',
 		'manage_league': '',
-		'manage_combines': '',
+		'/combines/manage': '',
+		'/combines/history': '',
 	};
 
 	console.log('url: ' + req.originalUrl);
 	let current_view = req.originalUrl.split('/')[1];
 	if ( current_view == '' ) { current_view = 'dashboard'; }
+
 	if ( current_view in res.locals.menu ) {
 		res.locals.menu[ current_view ] = 'active';
+	} else if ( req.originalUrl in res.locals.menu ) {
+		res.locals.menu[req.originalUrl] = 'active';
 	}
+
 	const httpPre = req.headers.host.includes('localhost') ? 'http' : 'https';
 	res.locals.callbackUrl = encodeURIComponent(`${httpPre}://${req.headers.host}/oauth2`);
 

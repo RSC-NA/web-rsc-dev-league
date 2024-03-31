@@ -10,23 +10,93 @@
 	</symbol>
 </svg>
 
+<script type="text/javascript">
+	function set_page_size(el) {
+		if ( ! el ) { return; }
+
+		const search = new URLSearchParams(window.location.search);
+		if ( search.has('limit') ) {
+			search.set('limit', el.value);
+		} else {
+			search.append('limit', el.value);
+		}
+	
+		window.location.href = `${window.location.pathname}?${search}`;
+	}
+
+	function set_visibility(el) {
+		if ( ! el ) { return; }
+
+		const search = new URLSearchParams(window.location.search);
+		if ( search.has('visibility') ) {
+			search.set('visibility', el.value);
+		} else {
+			search.append('visibility', el.value);
+		}
+
+		window.location.href = `${window.location.pathname}?${search}`;
+	}
+	function set_sort_order(el) {
+		if ( ! el ) { return; }
+
+		const search = new URLSearchParams(window.location.search);
+		console.log(search.get('order'));
+		const same_val = search.get('order') === el.dataset.order ? true : false;
+		if ( search.has('order') ) {
+			search.set('order', el.dataset.order);
+		} else {
+			search.append('order', el.dataset.order);
+		}
+
+		if ( search.has('dir') ) {
+			console.log('HAS dir', same_val, same_val ? 'desc' : 'asc');
+			search.set(
+				'dir', same_val ? 
+					search.get('dir') === 'DESC' ? 
+						'ASC' : 'DESC' 
+					: 'DESC'
+			);
+		} else {
+			console.log('NO dir', same_val, same_val ? 'asc' : 'desc');
+			search.append('dir', same_val ? 'ASC' : 'DESC');
+			search.set(
+				'dir', same_val ? 
+					search.get('dir') === 'DESC' ? 
+						'ASC' : 'DESC' 
+					: 'ASC'
+			);
+		}
+		
+		console.log(search.toString());
+		console.log(search);
+
+		window.location.href = `${window.location.pathname}?${search}`;
+	}
+</script>
+
 <main class="container">
 	<div class="py-3 py-md-5 pb-md-2">
-		<h2><%- combines.season; %>Combines Overview</h2>
+		<h2>S<%- combines.season; %> Combines TierMaker</h2>
 		<p class="lead">
 			View all the players that have played in this combine and how well they
 			did during the combine.
 		</p>
 	</div>
 
-	<div class="row">
 
+	<div class="row">
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12">
 			<div class="mb-3 row">
 				<div class="col-6 col-lg-4 h3 fw-bolder text-success">Combine Tiermaker</div>
 			</div>
 
 			<%
+				const visibilities = {
+					'all': 'All Players',
+					'played': 'WITH Games',
+					'none': 'WITHOUT Games',
+				};
+
 				const limits = {
 					50: false,
 					100: false,
@@ -77,25 +147,110 @@
 					limit: limit,
 					dir: dir,
 					order: order,
+					visibility: visibility,
 				});
 			%>
 			<div class="row">
+				<div class="col-12">
+					<div class="text-center">
+						<nav aria-label="">
+							<ul class="pagination justify-content-end">
+								<% 
+									const pages = Math.floor(total / limit) + 1;
+									if ( page <= 1 ) {
+								%>
+								<li class="page-item disabled">
+									<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+								</li>
+								<%
+									} else {
+								%>
+								<li class="page-item">
+									<a class="page-link"
+										href="?<%- query.toString(); %>&page=<%- page-1; %>"
+									>Previous</a>
+								</li>
+								<%
+									}
+									for ( let i = 1; i <= pages; ++i ) {
+										if ( page === i ) {
+								%>
+								<li class="page-item active" aria-current="page">
+									<span class="page-link">
+									<%- i; %>
+									</span>
+								</li>
+								<%
+										} else { 
+								%>
+								<li class="page-item">
+									<a class="page-link" href="?<%- query.toString(); %>&page=<%- i; %>">
+									<%- i; %>
+									</a>
+								</li>
+								<%
+										}
+									}
+									if ( page >= pages ) {
+								%>
+								<li class="page-item disabled">
+									<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+								</li>
+								<%
+									} else {
+								%>
+								<li class="page-item">
+									<a class="page-link"
+										href="?<%- query.toString(); %>&page=<%- page+1; %>"
+									>Next</a>
+								</li>
+								<%
+									}
+								%>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
 				<div class="col-12 col-md-3">
+					<label for="limit">Limit</label>
 					<select name="limit" id="limit" onchange="set_page_size(this);">
 						<% 
 							for ( let lim in limits ) {
 						%>
-						<option value="<%- lim %>" <%- limits[lim] ? 'selected' : ''; %>><%- lim; %></option>
+						<option value="<%- lim %>" <%- limits[lim] ? 'selected' : ''; %>><%- lim; %> Players</option>
 						<%
 							}
 						%>
 					</select>
 				</div>
-				<div class="col-12 col-md-7">
+				<div class="col-12 col-md-3">
+					<label for="show">Show</label>
+					<select name="show" id="show" onchange="set_visibility(this);">
+						<% 
+							for ( let vis in visibilities ) {
+						%>
+						<option value="<%- vis %>" <%- vis === visibility ? 'selected' : ''; %>>
+							<%- visibilities[vis]; %>
+						</option>
+						<%
+							}
+						%>
+					</select>
 				</div>
-				<div class="col-12 col-md-2">
-					<a href="/combines/history">
-						<i class="fas fa-file-spreadsheet"></i>
+				<div class="col-12 col-md-4">
+					<h4><span class="text-success"><%- total; %></span> TierMaker Players</h4>
+				</div>
+				<div class="col-12 col-md-2 text-end h-2">
+					<a
+						href="/combines/history?<%- query.toString(); %>&csv=true"
+						class="btn btn-warning fw-bold"
+						title="Download Combine Tiermaker"
+					>
+						<i class="fas fa-file-arrow-down me-1"></i>
+						Download
 					</a>
 				</div>
 			</div>
@@ -104,61 +259,79 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th class="text-center">
-								<a href="<%- cols['t.rsc_id']; %>">
-									RSC ID
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="rsc_id"
+								data-dir="">
+								RSC ID
 								<%- arrows['t.rsc_id']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.name']; %>">
-									Player Name
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="name"
+								data-dir="">
+								Player Name
 								<%- arrows['t.name']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.tier']; %>">
-									Initial Tier
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="tier"
+								data-dir="">
+								Initial Tier
 								<%- arrows['t.tier']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.base_mmr']; %>">
-									Base MMR
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="base_mmr"
+								data-dir="">
+								Base MMR
 								<%- arrows['t.base_mmr']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.effective_mmr']; %>">
-									Effective MMR
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="effective_mmr"
+								data-dir="">
+								Effective MMR
 								<%- arrows['t.effective_mmr']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.mmr_delta']; %>">
-									&Delta;
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="mmr_delta"
+								data-dir="">
+								&Delta;
 								<%- arrows['t.mmr_delta']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.current_mmr']; %>">
-									Combines MMR
-								</a>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="current_mmr"
+								data-dir="">
+								Combines MMR
 								<%- arrows['t.current_mmr']; %>
 							</th>
 							<th class="text-center">
 								Combine Tier
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.wins']; %>">
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="wins"
+								data-dir="">
 									Record
-								</a>
 								<%- arrows['t.wins']; %>
 							</th>
-							<th class="text-center">
-								<a href="<%- cols['t.win_percentage']; %>">
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								data-order="win_percentage"
+								data-dir="">
 									W%
-								</a>
 								<%- arrows['t.win_percentage']; %>
 							</th>
 							<th></th>
@@ -265,22 +438,64 @@
 
 					</tbody>
 				</table>
-
-				<nav aria-label="...">
-					<ul class="pagination">
-						<li class="page-item <%- page === 1 ? 'disabled' : ''; %>">
-							<a class="page-link" href="#" tabindex="-1">Previous</a>
-						</li>
-						<li class="page-item"><a class="page-link" href="#">1</a></li>
-						<li class="page-item active">
-							<a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-						</li>
-						<li class="page-item"><a class="page-link" href="#">3</a></li>
-						<li class="page-item">
-							<a class="page-link" href="?">Next</a>
-						</li>
-					</ul>
-				</nav>
+			
+				<div class="text-center">
+					<nav aria-label="">
+						<ul class="pagination justify-content-center">
+							<% 
+								if ( page <= 1 ) {
+							%>
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+							</li>
+							<%
+								} else {
+							%>
+							<li class="page-item">
+								<a class="page-link"
+									href="?<%- query.toString(); %>&page=<%- page-1; %>"
+								>Previous</a>
+							</li>
+							<%
+								}
+								for ( let i = 1; i <= pages; ++i ) {
+									if ( page === i ) {
+							%>
+							<li class="page-item active" aria-current="page">
+								<span class="page-link">
+								<%- i; %>
+								</span>
+							</li>
+							<%
+									} else { 
+							%>
+							<li class="page-item">
+								<a class="page-link" href="?<%- query.toString(); %>&page=<%- i; %>">
+								<%- i; %>
+								</a>
+							</li>
+							<%
+									}
+								}
+								if ( page >= pages ) {
+							%>
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+							</li>
+							<%
+								} else {
+							%>
+							<li class="page-item">
+								<a class="page-link"
+									href="?<%- query.toString(); %>&page=<%- page+1; %>"
+								>Next</a>
+							</li>
+							<%
+								}
+							%>
+						</ul>
+					</nav>
+				</div>
 
 			</div>
 

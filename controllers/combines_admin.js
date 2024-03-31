@@ -5,6 +5,7 @@ const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { stringify } = require('csv-stringify');
 
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
@@ -368,6 +369,11 @@ router.get('/history', (req, res) => {
 		return res.redirect('/');
 	} 
 
+	let csv = false;
+	if ( req.query.csv ) {
+		csv = true;
+	}
+
 	const cols = {
 		'rsc_id': 't.rsc_id',
 		'name': 't.name',
@@ -380,6 +386,7 @@ router.get('/history', (req, res) => {
 		'wins': 't.wins',
 		'losses': 't.losses',
 		'win_percentage': 't.wins / (t.wins + t.losses)',
+		'mmr_delta': '(cast(t.current_mmr as signed) - cast(t.effective_mmr as signed))',
 	};
 	let order = 't.current_mmr';
 	let dir = 'DESC';
@@ -389,7 +396,7 @@ router.get('/history', (req, res) => {
 	}
 	if ( req.query.dir ) {
 		console.log('DIR', req.query.dir);
-		if ( req.query.dir === 'up' ) {
+		if ( req.query.dir === 'DESC' ) {
 			dir = 'ASC';
 		} else {
 			if ( order === 't.wins' ) {
@@ -412,15 +419,32 @@ router.get('/history', (req, res) => {
 	}
 	let page_offset = (page - 1) * limit;
 
+	if ( csv ) { 
+		limit = 2000;
+		page = 1;
+		page_offset = 0;
+	}
+
+	let visibility = 'all';
+	let and_where = ``;
+	if ( req.query.visibility ) {
+		visibility = req.query.visibility;
+		if ( visibility === 'none' ) {
+			and_where = ` AND (t.wins = 0 AND t.losses = 0)`;
+		} else if ( visibility === 'played' ) {
+			and_where = ` AND (t.wins > 0 OR t.losses > 0)`;
+		}
+	}
 
 	res.locals.title = `Combine History - ${res.locals.title}`;
+
 
 	const players_query = `
 		SELECT 
 			t.id, t.rsc_id, t.name, t.tier, t.base_mmr, t.effective_mmr, t.current_mmr, 
 			t.count, t.keeper, t.wins, t.losses
 		FROM tiermaker AS t 
-		WHERE t.season = ? AND (t.wins > 0 OR t.losses > 0)
+		WHERE t.season = ? ${and_where}
 		ORDER BY ${order} ${dir}
 		LIMIT ${limit}
 		OFFSET ${page_offset}
@@ -458,23 +482,50 @@ router.get('/history', (req, res) => {
 			SELECT 
 				count(*) AS total
 			FROM tiermaker AS t 
-			WHERE t.season = ?
+			WHERE t.season = ? ${and_where}
 			ORDER BY ${order} ${dir}
 		`;
+		console.log(and_where);
 		req.db.query(count_query, [ res.locals.combines.season ], (err, results) => {
 			if ( err ) { throw err; }
 
 			if ( results && results.length ) {
 				const total = results[0].total;
-				res.render('history_combine', {
-					order: order,
-					dir: dir,
-					players: players,
-					limit: limit,
-					page: page,
-					page_offset: page_offset,
-					total: total,
-				});
+
+					if ( csv ) {
+						/* CSV Output if ?csv=true is sent */
+						res.header('Content-type', 'text/csv');
+						res.attachment(`S${res.locals.combines.season} Combines.csv`);
+						const columns = [
+							'RSC ID', 'Player Name', 'Initial Tier', 
+							'Base MMR', 'Effective MMR', 'Δ', 'Combines MMR',
+							'Combine Tier', 'Wins', 'Losses', 'Games', 'Win %',
+						];
+						const stringifier = stringify({ header: true, columns: columns });
+						stringifier.pipe(res);
+						for ( const rsc_id in players ) {
+							const p = players[rsc_id];
+							stringifier.write([
+								rsc_id, p.name, p.tier, 
+								p.base_mmr, p.effective_mmr, p.mmr_delta, p.current_mmr,
+								p.combines_tier, p.wins, p.losses, p.games, p.win_percentage,
+							]);
+						}
+						stringifier.end();
+					} else {
+
+					res.render('history_combine', {
+						order: order,
+						dir: dir,
+						players: players,
+						limit: limit,
+						page: page,
+						page_offset: page_offset,
+						total: total,
+						visibility: visibility,
+						players_query: players_query,
+					});
+				}
 			}
 		});
 	});
