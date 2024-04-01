@@ -110,7 +110,7 @@ function game_outcome(home_mmr, away_mmr, games) {
 	return outcome;
 }
 
-function rating_delta_series(home_mmr, away_mmr, scores, k_factor = 32) {
+function rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
 	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
 	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
 
@@ -136,9 +136,9 @@ function rating_delta_series(home_mmr, away_mmr, scores, k_factor = 32) {
 	return results;
 }
 
-async function update_mmrs(db, match) {
+async function update_mmrs(db, match, k_factor=48) {
 	const scores = { home: match.home_wins, away: match.away_wins };
-	const delta = rating_delta_series(match.home_mmr, match.away_mmr, scores);
+	const delta = rating_delta_series(match.home_mmr, match.away_mmr, scores, k_factor);
 
 	const player_query = `
 		UPDATE combine_match_players SET end_mmr = ? WHERE match_id = ? AND rsc_id =?
@@ -156,6 +156,9 @@ async function update_mmrs(db, match) {
 		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
 		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id]);
 	}
+
+	match.delta = delta;
+	return match;
 }
 
 
@@ -312,52 +315,96 @@ router.post('/combine/:match_id', async (req, res) => {
 	}
 
 	let can_save = false;
+	let can_report = false;
+	let can_verify = false;
 
 	if ( req.session.is_admin || req.session.is_combines_admin ) {
 		can_save = true;
+		can_report = true;
+		can_confirm = true;
 	} else {
 		if ( my_rsc_id ) {
 			if ( my_rsc_id in match.players ) {
 				can_save = true;
+
+				if ( match.players[my_rsc_id].team === 'home' ) {
+					can_report = true;
+				} else if ( match.players[my_rsc_id].team === 'away' ) {
+					can_confirm = true;
+				}
 			}
 		}
 	}
 
 	if ( ! can_save ) {
+		db.end();
 		return res.redirect(`/combine/${match_id}?error=NotInLobby`);
 	}
 
-	if ( ! match.reported_rsc_id ) {
+
+	if ( can_report && ! match.reported_rsc_id ) {
+		if ( match.confirmed_rsc_id && (match.home_wins || match.away_wins)) {
+			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
+				db.end();
+				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
+			}
+		}
+
+		const completed = match.confirmed_rsc_id ? 1 : 0;
+		
 		const report_query = `
 			UPDATE combine_matches 
 			SET 
 				home_wins = ?, 
 				away_wins = ?, 
-				reported_rsc_id = ? 
+				reported_rsc_id = ?,
+				completed = ?
 			WHERE id = ?
 		`;
-		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, match_id]);
-		return res.redirect(`/combine/${match_id}?reported`);
-	} else if ( ! match.confirmed_rsc_id ) {
-		if ( home_wins !== match.home_wins ) {
-			return res.redirect(`/combine/${match_id}?error=DifferentScore`);
+		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
+
+		if ( completed ) {	
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
+			db.end();
+			return res.redirect(`/combine/${match_id}?finished`);
+		} else {
+			db.end();
+			return res.redirect(`/combine/${match_id}?reported`);
+		}
+	} 
+
+	if ( can_confirm && ! match.confirmed_rsc_id ) {
+		if ( match.reported_rsc_id && (match.home_wins || match.away_wins)) {
+			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
+				db.end();
+				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
+			}
 		}
 
+		const completed = match.reported_rsc_id ? 1 : 0;
+		
 		const report_query = `
 			UPDATE combine_matches 
 			SET 
 				home_wins = ?, 
 				away_wins = ?, 
 				confirmed_rsc_id = ?,
-				completed = 1
+				completed = ?
 			WHERE id = ?
 		`;
-		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, match_id]);
+		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
 
-		const delta = await update_mmrs(db, match);
-		return res.redirect(`/combine/${match_id}?finished`);
+		if ( completed) {	
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
+			db.end();
+			return res.redirect(`/combine/${match_id}?finished`);
+		} else {
+			db.end();
+			return res.redirect(`/combine/${match_id}?confirmed`);
+		}
 	}
 
+	db.end();
 	res.redirect(`/combine/${match_id}?error=AlreadyReported`);
 });
 
@@ -401,8 +448,18 @@ router.get('/combine/:match_id', (req, res) => {
 						match.players[p.team].push(p);
 					}
 				}
+
+				let success = false;
+				if ('reported' in req.query ) {
+					success = 'reported';
+				}
+
 				// res.json(match);
-				res.render('combine_match', {match: match});
+				res.render('combine_match', {
+					match: match,
+					error: req.query.error,
+					success: success,
+				});
 			});
 		}
 	});

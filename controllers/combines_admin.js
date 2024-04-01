@@ -11,7 +11,7 @@ function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
 
-function get_rand_word() {
+function get_rand_word(suffix='') {
 	const words = [
 		'octane', 'gizmo', 'breakout', 'merc', 'hotshot', 'gizmo', 'backfire',
 		'x-devil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
@@ -27,7 +27,7 @@ function get_rand_word() {
 		'treefrog', 'monty', 'tr1ppn', 'snacktime', 'nickm', 'rscbot', 'tinsel',
 		'anthage', 'limon', 'feet', 'crimetime',
 	];
-	return words[ Math.floor(Math.random() * words.length) ];
+	return `${words[ Math.floor(Math.random() * words.length) ]}${suffix}`;
 }
 
 /**
@@ -219,27 +219,6 @@ router.all('/generate', async (req, res) => {
 
 		const lobbies = [];
 		for ( let i = 0; i < num_lobbies; ++i ) {
-			let safe_name = false;
-			while ( ! safe_name ) {
-				let word1 = get_rand_word();
-				let word2 = get_rand_word();
-				if ( ! (word1 in used) ) {
-
-				} e
-				if ( word1 in used ) {
-					console.log('Skipping',word1);
-				} else if ( word2 in used ) {
-					console.log('Skipping',word2);
-				}
-			}
-			const lobby = {
-				season: res.locals.combines.season,
-				username: get_rand_word(),
-				password: get_rand_word(),
-				home: { players: [], mmr: 0, },
-				away: { players: [], mmr: 0, },
-			};
-
 			// snake-draft by MMR for balanced teams
 			lobby.home.players.push(results.pop()); // 1st player
 			lobby.away.players.push(results.pop()); // 2nd player
@@ -247,6 +226,15 @@ router.all('/generate', async (req, res) => {
 			lobby.home.players.push(results.pop());	// 4th player
 			lobby.home.players.push(results.pop());	// 5th player
 			lobby.away.players.push(results.pop()); // 6th player
+
+			const lobby = {
+				season: res.locals.combines.season,
+				username: get_rand_word(lobby.home.players[0].id),
+				password: get_rand_word(),
+				home: { players: [], mmr: 0, },
+				away: { players: [], mmr: 0, },
+			};
+
 	
 			lobby.home.mmr = calculate_mmrs(lobby.home.players);
 			lobby.away.mmr = calculate_mmrs(lobby.away.players);

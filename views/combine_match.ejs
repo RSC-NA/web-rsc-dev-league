@@ -31,7 +31,23 @@
 
 	const has_scored = (match.reported_rsc_id && match.confirmed_rsc_id) ? true : false;
 	const can_report = is_admin || is_combines_admin || user.rsc_id in lobby ? true : false;
+	const combine_player = user.rsc_id in lobby ? lobby[user.rsc_id] : {};
+
+	const teamOneMmr = match.home_mmr;
+	const teamTwoMmr = match.away_mmr;
+	const homeDelta  = teamOneMmr - teamTwoMmr;
+	const homeDeltaAbs = Math.abs(homeDelta);
 %>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+	<symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+		<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+	</symbol>
+	<symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+		<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+	</symbol>
+</svg>
+
 
 <main class="container mt-2 p-2">
 	<div class="bg-light p-2 rounded">
@@ -40,92 +56,222 @@
 			Please find the lobby information provided below. If you have any questions or problems, please ask for help
 			in <a href="https://discord.com/channels/395806681994493964/1220034175835312228">#combines-help</a>.
 		</p>
+
 		<div class="row">
-			<div class="col-9">
+			
+			<div class="col-12">
 				<div class="bg-light p-2 rounded border-rounded">
-					<h2>Lobby Info</h2>
-					<p class="lead">This is a 4-game series.</p>
-					
-					<ul>
-						<li>Match: <strong><%- match.cancelled ? 'cancelled' : match.completed ? 'completed' : 'active'; %></strong></li>
-						<li>Lobby Username: <strong><code><%= match.lobby_user %></code></strong></li>
-						<li>Lobby Password: <strong><code><%= match.lobby_pass %></code></strong></li>
-						<hr>
+					<p class="lead">This is a <strong>4-game</strong> series.</p>
+					<div class="row">
+						<div class="col-md-4 col-12">
+							<table class="table">
+								<thead>
+									<tr>
+										<th colspan="2">
+											Lobby Info
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-end">Match:</td>	
+										<td>
+											<strong>
+												<%- match.cancelled ? 'cancelled' : match.completed ? 'completed' : 'active'; %>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">Username:</td>	
+										<td>
+											<strong><code>
+												<%- match.lobby_user; %>
+											</code></strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">Password:</td>	
+										<td>
+											<strong><code>
+												<%- match.lobby_pass; %>
+											</code></strong>
+										</td>	
+									</tr>
+								</tbody>
+							</table>
+						</div>
 						<% 
 							if ( is_admin || is_combines_admin ) {
-						%>
-						<li>
-							<i class="fa fa-lock"></i>
-							MMR Delta: <strong><%- match.home_mmr - match.away_mmr; %></strong>
-						</li>
-						<li>
-							<i class="fa fa-lock"></i>
-							Reported: 
-							<strong>
-								<a href="/player/<%- match.reported_rsc_id; %>">
-									<%- match.reported_rsc_id in lobby ? 
-										lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
-								</a>
-							</strong>
-						</li>
-						<li>
-							<i class="fa fa-lock"></i>
-							Confirmed: 
-							<strong>
-								<a href="/player/<%- match.confirmed_rsc_id; %>">
-									<%- match.confirmed_rsc_id in lobby ? 
-										lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
-								</a>
-							</strong>
-						</li>
-						<%
-							}
-						%>
-					</ul>
 
+								const prediction = [];
+								const win_prediction = homeDelta > 0 ? 'Home' : 'Away';
+								const win_class = homeDelta > 0 ? 'bg-info bg-opacity-50' : 'bg-warning bg-opacity-50';
+
+								let magnitude = '';
+								if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
+									magnitude = 'slight';
+								} else if ( homeDeltaAbs >= 10 && homeDeltaAbs < 20 ) {
+									magnitude = 'large';
+								} else if ( homeDeltaAbs >= 20 && homeDeltaAbs <= 40 ) {
+									magnitude = 'massive';
+								} else if ( homeDeltaAbs >= 40 ) {
+									magnitude = 'overwhelming';
+								}
+
+								if ( ! magnitude ) {
+									win_class = 'bg-secondary';
+									win_prediction = 'even';
+									magnitude = 'even';
+								}
+						%>
+						<div class="col-md-4 col-12">
+							<table class="table">
+								<thead>
+									<tr>
+										<th colspan="3">
+											<i class="fas fa-lock"></i> 
+											Admin Details
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-end">MMR Delta:</td>	
+										<td colspan="2">
+											<strong>
+												Home 
+												<%- match.home_mmr - match.away_mmr; %>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">
+											Reported:
+										</td>	
+										<td colspan="2">
+											<strong>
+												<a href="/player/<%- match.reported_rsc_id; %>">
+													<%- match.reported_rsc_id in lobby ? 
+														lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
+												</a>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">Confirmed:</td>	
+										<td colspan="2">
+											<strong>
+												<a href="/player/<%- match.confirmed_rsc_id; %>">
+													<%- match.confirmed_rsc_id in lobby ? 
+														lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
+												</a>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">
+											Predicted:
+										</td>
+										<td class="<%- win_class; %> fw-bold">
+											<%- win_prediction; %> 
+										</td>
+										<td class="fw-bold">
+											<%- magnitude; %>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<%
+								}
+							%>
+						</div>
+					</div>
 					<% if ( ! has_scored ) { %>
-					<h3>BOTH TEAMS MUST REPORT THE SCORE!</h3>
+
+					<h3 class="text-center bg-danger bg-opacity-50">BOTH TEAMS MUST REPORT THE SCORE!</h3>
 					<% } %>
 					
-					<%
-						const teamOneMmr = match.home_mmr;
-						const teamTwoMmr = match.away_mmr;
-						const homeDelta  = teamOneMmr - teamTwoMmr;
-						const homeDeltaAbs = Math.abs(homeDelta);
+				</div>
+			</div>
+		</div>
 
-						const prediction = [];
-						const win_prediction = homeDelta > 0 ? 'Home' : 'Away';
-						let magnitude = '';
-						if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
-							magnitude = 'slight';
-						} else if ( homeDeltaAbs >= 10 && homeDeltaAbs < 20 ) {
-							magnitude = 'large';
-						} else if ( homeDeltaAbs >= 20 && homeDeltaAbs <= 40 ) {
-							magnitude = 'massive';
-						} else if ( homeDeltaAbs >= 40 ) {
-							magnitude = 'overwhelming';
-						}
-						
-						if ( is_admin || is_combines_admin ) {
-							if ( magnitude ) {
-					%> 
-					<h3 class="p-2 text-center <%- win_prediction === 'Home' ? 'bg-primary text-white' : 'bg-warning text-black'; %>">
-						<%- win_prediction; %> has a <em><%- magnitude; %></em> predicted advantage.
-						<span class="text-muted">+<%- homeDeltaAbs; %></span>
-					</h3>
-					<%
-							} else {
-					%>
+		<%
+			if ( error ) {		
+				const errors = {
+					'InvalidScore': 'You have entered a score that is impossible.',
+					'NotInLobby': 'You are not a participant of this lobby. You cannot report this score.',
+					'ScoreReportMismatch': 'You have reported a score that is different from what the other team has reported.',
+				};
+		%>
+		<div class="row">
+			<div class="col-8 mx-auto">
+				<div class="alert alert-danger d-flex align-items-center" role="alert">
+					<div class="bi flex-shrink-0 me-2">
+						<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
+							<use xlink:href="#exclamation-triangle-fill"/>
+						</svg>
+					</div>
+					<div class="flex-fill">
+						<div class="h4 alert-heading">
+							<%- error; %>
+						</div>
+						<hr>
+						<p class="lead">
+							<%- errors[error]; %>
+						</p>
+						<p class="text-sm">
+							If you are unable to correct this issue, please ask for help in 
+							<a href="https://discord.com/channels/395806681994493964/1222954461601988618"
+								>#combines-general</a>.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<%
+			}
+		%>
 
-					<h3 class="p-2 text-center bg-secondary">
-						No team has a statistical advantage.
-						<span class="text-muted">+<%- homeDeltaAbs; %></span>
-					</h3>
-					<%
-							}
-						}
-					%>
+		<%
+			if ( success || match.completed ) {
+				let alert_class = 'alert-success';
+				let alert_title = 'The Grind Continues!';
+				let message = 'Thank you for reporting the score. Please return to <a href="/">https://devleague.rscna.com</a> to check in for the next series.';
+				if ( success === 'reported' ) {
+					alert_class = 'alert-warning';
+					alert_title = 'Waiting For Verification';
+					message = 'Thank you for reporting the score. <strong>When the opposing team also reports the score, you will be able to check in for the next series.</strong><br><br>You will <strong>NOT</strong> be able to check in for another series until your opponent has verified.';
+				}
+		%>
+		<div class="row">
+			<div class="col-8 mx-auto">
+				<div class="alert <%- alert_class; %> d-flex align-items-center" role="alert">
+					<div class="bi flex-shrink-0 me-2">
+						<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+							<use xlink:href="#check-circle-fill"/>
+						</svg>
+					</div>
+					<div class="flex-fill">
+						<div class="display-5 alert-heading">
+							<%- alert_title; %>
+						</div>
+						<hr>
+						<p class="lead">
+							<%- message; %>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<%
+			}
+		%>
+
+		<div class="row">
+			<div class="col-12">
+				<div class="bg-light">
 					<form action="/combine/<%- match.id %>" method="post">
+						<input type="hidden" name="reporter_team" value="<%- combine_player.team; %>">
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-primary text-white rounded p-2">
@@ -170,31 +316,72 @@
 							<% 
 								} 
 							%>
-							<ul>
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Player</th>
+										<th>task</th>
+										<th class="text-end">Start MMR</th>
+										<th class="text-end">MMR &Delta;</th>
+										<th class="text-end">End MMR</th>
+									</tr>
+								</thead>
+								<tbody>
 								<%
 									for ( let i = 0; i < match.players.home.length; ++i ) {
+										const p = match.players.home[i];
+										const mmr_delta = p.end_mmr ? 
+											p.start_mmr - p.end_mmr : '<em>n/a</em>';
+										const mmr_class = p.end_mmr ? 
+											mmr_delta > 0 ? 'text-success fw-bold text-lg' : 'text-danger' :
+											'text-muted';
 								%>
-								<li>
-									<% if (is_admin || is_combines_admin) { %>
-									[<%- match.players.home[i].start_mmr %>]
-									<% } %>
-									<strong>
-										<a href="/player/<%= match.players.home[i].rsc_id; %>">
-											<%= match.players.home[i].name %></a>
-									</strong> 
-									<% if ( i === 0 ) { %>
-									[Makes lobby]
-									<% } %>
+									<tr class="fs-5">
+										<td>
+											<strong>
+												<a href="/player/<%= p.rsc_id; %>">
+													<%= p.name %></a>
+											</strong> 
+										</td>
+										<td>
+										<% 
+											if ( submitted_scores.home === p.rsc_id ) { 
+										%>
+											<strong class="text-success ms-1">reported</strong>
+										<%
+											} else { 
+												if ( i === 0 ) { 
+										%>
+											<span class="text-danger fw-bold">[Makes lobby]</span>
+										<% 
+												}
+											} 
+										%>
 
-									<% if ( submitted_scores.home === match.players.home[i].rsc_id ) { %>
-									<strong class="text-success ms-1">REPORTED</strong>
-									<% } %>
-								</li>
+										</td>
+										<% 
+											if ( (is_admin || is_combines_admin) || ! combines.active ) {
+										%>
+										<td class="text-end">
+											<%- p.start_mmr; %>
+										</td>
+										<td class="text-end <%- mmr_class; %>">
+											<%- mmr_delta > 0 ? `+${mmr_delta}` : mmr_delta; %>
+										</td>
+										<td class="text-end font-<%- mmr_class; %>">
+											<%- p.end_mmr; %>
+										</td>
+										<% } else if ( combines.active ){ %>
+										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
+										<% } %>
+									</tr>
 								<%
 									}
 								%>
-							</ul>
+								</tbody>
+							</table>
 						</div>
+
 						<div class="col-md-6">
 							<h3 class="bg-warning rounded p-2">
 								<%= (is_admin||is_combines_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team
@@ -235,7 +422,7 @@
 										required
 									>
 									<input
-										tabindex="1"
+										tabindex="3"
 										type="submit"
 										class=" btn btn-large btn-success rounded"
 										value="Verify Scores"
@@ -258,7 +445,7 @@
 										required
 									>
 									<input
-										tabindex="1"
+										tabindex="3"
 										type="submit"
 										class=" btn btn-large btn-success rounded"
 										value="Submit Scores"
@@ -271,29 +458,72 @@
 							<%
 								}
 							%>
-							<ul>
+
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Player</th>
+										<th>task</th>
+										<th class="text-end">Start MMR</th>
+										<th class="text-end">MMR &Delta;</th>
+										<th class="text-end">End MMR</th>
+									</tr>
+								</thead>
+								<tbody>
 								<%
 									for ( let i = 0; i < match.players.away.length; ++i ) {
+										const p = match.players.away[i];
+										const mmr_delta = p.end_mmr ? 
+											p.start_mmr - p.end_mmr : '<em>n/a</em>';
+										const mmr_class = p.end_mmr ? 
+											mmr_delta > 0 ? 'text-success fw-bold text-lg' : 'text-danger' :
+											'text-muted';
 								%>
-								<li>
-									<% if (is_admin || is_combines_admin) { %>
-									[<%- match.players.away[i].start_mmr %>]
-									<% } %>
-									<strong>
-										<a href="/player/<%= match.players.away[i].rsc_id; %>">
-											<%= match.players.away[i].name %></a>
-									</strong> 
-									<% if ( i === 0 ) { %>
-									[Uploads replays/screenshots]
-									<% } %>
-									<% if ( submitted_scores.away === match.players.away[i].rsc_id ) { %>
-									<strong class="text-success ms-1">REPORTED</strong>
-									<% } %>
+									<tr class="fs-5">
+										<td>
+											<strong>
+												<a href="/player/<%= p.rsc_id; %>"
+													><%= p.name %></a>
+											</strong> 
+										</td>
+										<td>
+										<% 
+											if ( submitted_scores.home === p.rsc_id ) { 
+										%>
+											<strong class="text-success ms-1">confirmed</strong>
+										<%
+											} else { 
+												if ( i === 0 ) { 
+										%>
+											<span class="text-danger fw-bold">[UPLOADS Replays!]</span>
+										<% 
+												}
+											} 
+										%>
+
+										</td>
+										<% 
+											if ( (is_admin || is_combines_admin) || ! combines.active ) {
+										%>
+										<td class="text-end">
+											<%- p.start_mmr; %>
+										</td>
+										<td class="text-end <%- mmr_class; %>">
+											<%- mmr_delta > 0 ? `+${mmr_delta}` : mmr_delta; %>
+										</td>
+										<td class="text-end font-<%- mmr_class; %>">
+											<%- p.end_mmr; %>
+										</td>
+										<% } else if ( combines.active ){ %>
+										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
+										<% } %>
+									</tr>
 								<%
 									}
 								%>
-								</li>
-							</ul>
+								</tbody>
+							</table>
+
 						</div>
 					</div>
 					</form>
