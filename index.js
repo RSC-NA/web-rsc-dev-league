@@ -210,7 +210,6 @@ app.use(async (req, res, next) => {
 		'/combines/history': '',
 	};
 
-	console.log('url: ' + req.originalUrl);
 	let current_view = req.originalUrl.split('/')[1];
 	if ( current_view == '' ) { current_view = 'dashboard'; }
 
@@ -232,6 +231,8 @@ app.use(async (req, res, next) => {
 	res.locals.is_stats_admin = req.session.is_stats_admin;
 	res.locals.is_combines_admin = req.session.is_combines_admin;
 	res.locals.rostered = req.session.rostered;
+
+	console.log(`url: ${req.originalUrl} - [${req.session.nickname}]`);
 
 	//res.locals.user = req.session.user || {};
 	res.locals.user = await get_user(req.session.user_id);
