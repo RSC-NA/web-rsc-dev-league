@@ -107,19 +107,6 @@
 				if ( limit in limits ) {
 					limits[limit] = true;
 				}
-				const cols = {
-					'rsc_id': '?order=rsc_id',
-					'name': '?order=name',
-					'tier': '?order=tier',
-					'base_mmr': '?order=base_mmr',
-					'effective_mmr': '?order=effective_mmr',
-					'current_mmr': '?order=current_mmr',
-					'count': '?order=count',
-					'keeper': '?order=keeper',
-					'wins': '?order=wins',
-					'losses': '?order=losses',
-					'win_percentage': '?order=win_percentage',
-				};
 				const arrows = {
 					'rsc_id': '',
 					'name': '',
@@ -134,12 +121,10 @@
 					'losses': '',
 					'win_percentage': '',
 				};
-				if ( order in cols && dir ) {
+				if ( order in arrows && dir ) {
 					if ( dir === 'ASC' ) {
-						cols[order] = cols[order] + '&dir=DESC';
 						arrows[order] = '<i class="fas fa-arrow-down"></i>';
 					} else if ( dir === 'DESC' ) {
-						cols[order] = cols[order] + '&dir=ASC';
 						arrows[order] = '<i class="fas fa-arrow-up"></i>';
 					}
 				}
