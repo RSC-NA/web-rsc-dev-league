@@ -113,16 +113,34 @@
 
 			<hr class="mb-4">
 		
-			<h5>Combines Status</h5>
+			<h5>Preseason?</h5>
+			<p>
+				If you mark this checkbox, it will put all of the software in "Combines Mode", hiding 
+				MMRs and using the <code>combineDays</code> data-set. Only turn this on at the start of the 
+				offseason and off when the normal season begins.
+			</p>
 			<div class="custom-control custom-checkbox">
 				<input 
 					type="checkbox" 
 					class="custom-control-input" 
 					name="active" id="active" 
 					<%- combines.active ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="active">Are Combines Active?</label>
+				<label class="custom-control-label" for="active">Combine Offseason?</label>
 			</div>
 			
+			<h5>Combines Currently Active?</h5>
+			<p>
+				This checkbox will prevent signups unless you are actively running games.
+				Turn this on at 7:50ish and off when you're done for the evening.
+			</p>
+			<div class="custom-control custom-checkbox">
+				<input 
+					type="checkbox" 
+					class="custom-control-input" 
+					name="live" id="live" 
+					<%- combines.live ? 'checked="checked"' : '' %>>
+				<label class="custom-control-label" for="live">Are Combines CURRENTLY (8pm - 11pm) Active?</label>
+			</div>
 			<hr class="mb-4">
 			
 			<button class="btn btn-primary btn-lg btn-block" type="submit">Update Combine Settings</button>

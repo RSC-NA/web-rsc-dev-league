@@ -219,6 +219,10 @@ router.get('/combines/check_in/:discord_id', async (req, res) => {
 		return res.redirect('/?error=YouAreInTheWrongSeason');
 	}
 
+	if ( ! combines.live ) {
+		return res.redirect('?error=CombinesArentRunning');
+	}
+
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USER,

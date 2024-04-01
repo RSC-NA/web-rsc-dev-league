@@ -706,7 +706,7 @@ router.get('/manage', (req, res) => {
 
 		const settings_query = `
 		SELECT 
-			id,season,active,tiermaker_url,
+			id,season,active,live,tiermaker_url,
 			k_factor,min_series
 		FROM 
 			combine_settings 
@@ -740,17 +740,18 @@ router.post('/manage', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	const active    = "active" in req.body ? 1 : 0;
+	const active = "active" in req.body ? 1 : 0;
+	const live   = "live" in req.body ? 1 : 0;
 
 	const settings_query = `
 	INSERT INTO combine_settings
-		(season, active, tiermaker_url, k_factor, min_series)
-	VALUES (?, ?, ?, ?, ?)
+		(season, active, live, tiermaker_url, k_factor, min_series)
+	VALUES (?, ?, ?, ?, ?, ?)
 	`;
 	req.db.query(
 		settings_query,
 		[
-			req.body.season, active, req.body.tiermaker_url, 
+			req.body.season, active, live, req.body.tiermaker_url, 
 			req.body.k_factor, req.body.min_series
 		],
 		(err) => {

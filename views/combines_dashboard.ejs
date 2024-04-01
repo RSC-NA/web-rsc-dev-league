@@ -107,8 +107,10 @@
 				<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 			</dialog>
 
+			<% 
+				if ( combine_live ) {
+			%>
 			<a class="btn btn-lg btn-primary" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
-
 			<script type="text/javascript">
 				document.getElementById('checkInModal').addEventListener('click', function() {
 					document.getElementById('confirmCheckIn').showModal();
@@ -119,6 +121,18 @@
 				});
 			</script>
 
+			<%
+				} else {
+			%>
+			<h2>Soon!</h2>
+			<p>
+				Today is a day for combines, but we don't allow people to check in until 7:50PM ET. Come back later this 
+				evening for some awesome pre-season games.
+			</p>
+			<a class="btn btn-lg btn-primary disabled" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
+			<%
+				}
+			%>
 
 			<% } else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) { %>
 			<h2>You are checked in!</h2>

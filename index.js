@@ -33,7 +33,7 @@ const devleague_controller = require('./controllers/devleague');
 const devleague_api_controller = require('./controllers/api_devleague');
 const devleague_admin_controller = require('./controllers/devleague_admin');
 const combines_controller = require('./controllers/combines');
-//const combines_api_controller = require('./controllers/api_combines');
+const combines_api_controller = require('./controllers/api_combines');
 const combines_admin_controller = require('./controllers/combines_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
@@ -293,7 +293,9 @@ app.use((req, res, next) => {
 	const combines = {
 		season: 20,
 		active: false,
+		live: false,
 		combine_day: false,
+		combine_live: false,
 		tiermaker_url: '',
 		k_factor: 32,
 		min_series: 10,
@@ -303,7 +305,7 @@ app.use((req, res, next) => {
 
 	const query = `
 		SELECT 
-			season, active, tiermaker_url, k_factor, min_series
+			season, active, live, tiermaker_url, k_factor, min_series
 		FROM combine_settings ORDER BY id DESC LIMIT 1
 	`;
 	connection.query(query, (err, results) => {
@@ -311,10 +313,14 @@ app.use((req, res, next) => {
 
 		if ( results.length ) {
 			const new_combines_settings = results[0];
-			if ( new_combines_settings.active ) {
+			if ( new_combines_settings.active && new_combines_settings.live ) {
+				new_combines_settings.combine_day = true;
+				new_combines_settings.combine_live = true;
+			} else if ( new_combines_settings.active && ! new_combines_settings.live ) {
 				const day = (new Date()).getDay();
 				if ( day === 1 || day === 3 || day === 5 ) {
 					new_combines_settings.combine_day = true;
+					new_combines_settings.combine_live = false;
 				}
 			}
 
@@ -411,10 +417,13 @@ app.use((req, res, next) => {
 	res.locals.today = date;
 	res.locals.match_day = false;
 	res.locals.combine_day = false;
+	res.locals.combine_active = false;
+	res.locals.combine_live = res.locals.combines.live;
+
 	if ( date in matchDays ) {
 		res.locals.match_day = matchDays[date];
 	}
-	if ( date in combineDays ) {
+	if ( date in combineDays || res.locals.combine_live ) {
 		res.locals.combine_day = combineDays[date];
 	}
 
@@ -583,7 +592,7 @@ app.use('/api', devleague_api_controller);
 // dev league functions for players are handled by /controllers/devleague.js
 app.use(combines_controller);
 app.use('/combines', combines_admin_controller);
-//app.use('/combines_api', combines_api_controller);
+app.use('/c-api', combines_api_controller);
 
 // stats api routes handled by /controllers/api.js
 app.use(stats_api_controller);
