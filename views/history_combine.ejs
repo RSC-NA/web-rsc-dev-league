@@ -108,38 +108,38 @@
 					limits[limit] = true;
 				}
 				const cols = {
-					't.rsc_id': '?order=rsc_id',
-					't.name': '?order=name',
-					't.tier': '?order=tier',
-					't.base_mmr': '?order=base_mmr',
-					't.effective_mmr': '?order=effective_mmr',
-					't.current_mmr': '?order=current_mmr',
-					't.count': '?order=count',
-					't.keeper': '?order=keeper',
-					't.wins': '?order=wins',
-					't.losses': '?order=losses',
-					't.win_percentage': '?order=win_percentage',
+					'rsc_id': '?order=rsc_id',
+					'name': '?order=name',
+					'tier': '?order=tier',
+					'base_mmr': '?order=base_mmr',
+					'effective_mmr': '?order=effective_mmr',
+					'current_mmr': '?order=current_mmr',
+					'count': '?order=count',
+					'keeper': '?order=keeper',
+					'wins': '?order=wins',
+					'losses': '?order=losses',
+					'win_percentage': '?order=win_percentage',
 				};
 				const arrows = {
-					't.rsc_id': '',
-					't.name': '',
-					't.tier': '',
-					't.base_mmr': '',
-					't.effective_mmr': '',
-					't.current_mmr': '',
-					't.mmr_delta': '',
-					't.count': '',
-					't.keeper': '',
-					't.wins': '',
-					't.losses': '',
-					't.win_percentage': '',
+					'rsc_id': '',
+					'name': '',
+					'tier': '',
+					'base_mmr': '',
+					'effective_mmr': '',
+					'current_mmr': '',
+					'mmr_delta': '',
+					'count': '',
+					'keeper': '',
+					'wins': '',
+					'losses': '',
+					'win_percentage': '',
 				};
 				if ( order in cols && dir ) {
 					if ( dir === 'ASC' ) {
-						cols[order] = cols[order] + '&dir=down';
+						cols[order] = cols[order] + '&dir=DESC';
 						arrows[order] = '<i class="fas fa-arrow-down"></i>';
 					} else if ( dir === 'DESC' ) {
-						cols[order] = cols[order] + '&dir=up';
+						cols[order] = cols[order] + '&dir=ASC';
 						arrows[order] = '<i class="fas fa-arrow-up"></i>';
 					}
 				}
@@ -266,7 +266,7 @@
 								data-order="rsc_id"
 								data-dir="">
 								RSC ID
-								<%- arrows['t.rsc_id']; %>
+								<%- arrows['rsc_id']; %>
 							</th>
 							<th
 								class="text-center"
@@ -274,7 +274,7 @@
 								data-order="name"
 								data-dir="">
 								Player Name
-								<%- arrows['t.name']; %>
+								<%- arrows['name']; %>
 							</th>
 							<th
 								class="text-center"
@@ -282,7 +282,7 @@
 								data-order="tier"
 								data-dir="">
 								Initial Tier
-								<%- arrows['t.tier']; %>
+								<%- arrows['tier']; %>
 							</th>
 							<th
 								class="text-center"
@@ -290,7 +290,7 @@
 								data-order="base_mmr"
 								data-dir="">
 								Base MMR
-								<%- arrows['t.base_mmr']; %>
+								<%- arrows['base_mmr']; %>
 							</th>
 							<th
 								class="text-center"
@@ -298,7 +298,7 @@
 								data-order="effective_mmr"
 								data-dir="">
 								Effective MMR
-								<%- arrows['t.effective_mmr']; %>
+								<%- arrows['effective_mmr']; %>
 							</th>
 							<th
 								class="text-center"
@@ -306,7 +306,7 @@
 								data-order="mmr_delta"
 								data-dir="">
 								&Delta;
-								<%- arrows['t.mmr_delta']; %>
+								<%- arrows['mmr_delta']; %>
 							</th>
 							<th
 								class="text-center"
@@ -314,7 +314,7 @@
 								data-order="current_mmr"
 								data-dir="">
 								Combines MMR
-								<%- arrows['t.current_mmr']; %>
+								<%- arrows['current_mmr']; %>
 							</th>
 							<th class="text-center">
 								Combine Tier
@@ -325,7 +325,7 @@
 								data-order="wins"
 								data-dir="">
 									Record
-								<%- arrows['t.wins']; %>
+								<%- arrows['wins']; %>
 							</th>
 							<th
 								class="text-center"
@@ -333,7 +333,7 @@
 								data-order="win_percentage"
 								data-dir="">
 									W%
-								<%- arrows['t.win_percentage']; %>
+								<%- arrows['win_percentage']; %>
 							</th>
 							<th></th>
 						</tr>
