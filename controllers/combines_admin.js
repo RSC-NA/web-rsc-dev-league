@@ -515,7 +515,7 @@ router.get('/history', (req, res) => {
 					} else {
 
 					res.render('history_combine', {
-						order: order,
+						order: req.query.order ? req.query.order : 'current_mmr',
 						dir: dir,
 						players: players,
 						limit: limit,
