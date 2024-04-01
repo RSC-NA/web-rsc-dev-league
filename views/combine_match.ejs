@@ -104,8 +104,8 @@
 							if ( is_admin || is_combines_admin ) {
 
 								const prediction = [];
-								const win_prediction = homeDelta > 0 ? 'Home' : 'Away';
-								const win_class = homeDelta > 0 ? 'bg-info bg-opacity-50' : 'bg-warning bg-opacity-50';
+								let win_prediction = homeDelta > 0 ? 'Home' : 'Away';
+								let win_class = homeDelta > 0 ? 'bg-info bg-opacity-50' : 'bg-warning bg-opacity-50';
 
 								let magnitude = '';
 								if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {

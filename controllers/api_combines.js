@@ -29,7 +29,7 @@ router.use(async (req, res, next) => {
 
 	if ( res.locals.discord_id ) {
 		const [tm_results] = await res.locals.adb.query(
-			'SELECT rsc_id,name FROM tiermaker WHERE discord_id = ? AND season = ?',
+			'SELECT rsc_id,name,current_mmr FROM tiermaker WHERE discord_id = ? AND season = ?',
 			[res.locals.discord_id, res.locals.combines.season]
 		);
 
@@ -42,6 +42,7 @@ router.use(async (req, res, next) => {
 
 		res.locals.rsc_id = tm_results[0].rsc_id;
 		res.locals.name = tm_results[0].name;
+		res.locals.current_mmr = tm_results[0].current_mmr;
 		
 		const query = `
 		SELECT id,active,rostered FROM combine_signups 
@@ -120,22 +121,24 @@ router.get('/active', async(req,res) => {
 		}
 	}
 
-	const players_query = `
-		SELECT 
-			t.discord_id,p.rsc_id,p.match_id,p.team,t.name
-		FROM combine_match_players AS p 
-		LEFT JOIN tiermaker AS t 
-		ON p.rsc_id = t.rsc_id 
-		WHERE p.match_id in (?)
-	`;
-	const [p_results] = await res.locals.db.query(players_query, [game_ids]);
-	if ( p_results && p_results.length ) {
-		for ( let i = 0; i < p_results.length; ++i ) {
-			const p = p_results[i];
-			if ( p.team === 'home' ) {
-				games[p.match_id].home.push(p);
-			} else {
-				games[p.match_id].away.push(p);
+	if ( game_ids && game_ids.length ) {
+		const players_query = `
+			SELECT 
+				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
+			FROM combine_match_players AS p 
+			LEFT JOIN tiermaker AS t 
+			ON p.rsc_id = t.rsc_id 
+			WHERE p.match_id in (?)
+		`;
+		const [p_results] = await res.locals.adb.query(players_query, [game_ids]);
+		if ( p_results && p_results.length ) {
+			for ( let i = 0; i < p_results.length; ++i ) {
+				const p = p_results[i];
+				if ( p.team === 'home' ) {
+					games[p.match_id].home.push(p);
+				} else {
+					games[p.match_id].away.push(p);
+				}
 			}
 		}
 	}
@@ -166,17 +169,8 @@ router.get('/check_in', async (req, res) => {
 			'message': 'You are already checked in.',
 		});
 	}
-	
-	const user = res.locals.user;
-	const ucombines = user.combines;
-	const combines = res.locals.combines;
 
-	if ( ucombines.season !== combines.season ) {
-		return res.json({
-			'status': 'error',
-			'message': 'You are not a player in the tiermaker.',
-		});
-	}
+	const combines = res.locals.combines;
 
 	if ( ! combines.live ) {
 		return res.json({
@@ -193,9 +187,9 @@ router.get('/check_in', async (req, res) => {
 	`;
 	const [inserted] = await res.locals.adb.query(query, [
 		res.locals.combines.season,
-		user.rsc_id,
-		user.discord_id,
-		ucombines.current_mmr
+		res.locals.rsc_id,
+		res.locals.discord_id,
+		res.locals.current_mmr,
 	]);
 
 	await res.locals.adb.end();
@@ -234,11 +228,11 @@ router.get('/check_out', async (req, res) => {
 			rostered = 0 AND 
 			signup_dtg > DATE_SUB(now(), INTERVAL 2 HOUR)
 	`;
+
 	const [deletedId] = await res.locals.adb.query(query, [
 		res.locals.combines.season,
 		res.locals.rsc_id,
-		res.locals.discord_id,
-		ucombines.current_mmr
+		res.locals.discord_id
 	]);
 
 	await res.locals.adb.end();

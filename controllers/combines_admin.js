@@ -220,19 +220,23 @@ router.all('/generate', async (req, res) => {
 		const lobbies = [];
 		for ( let i = 0; i < num_lobbies; ++i ) {
 			// snake-draft by MMR for balanced teams
-			lobby.home.players.push(results.pop()); // 1st player
-			lobby.away.players.push(results.pop()); // 2nd player
-			lobby.away.players.push(results.pop()); // 3rd player
-			lobby.home.players.push(results.pop());	// 4th player
-			lobby.home.players.push(results.pop());	// 5th player
-			lobby.away.players.push(results.pop()); // 6th player
+			const home_players = [];
+			const away_players = [];
+
+			//
+			home_players.push(results.pop()); // 1st player
+			away_players.push(results.pop()); // 2nd player
+			away_players.push(results.pop()); // 3rd player
+			home_players.push(results.pop());	// 4th player
+			home_players.push(results.pop());	// 5th player
+			away_players.push(results.pop()); // 6th player
 
 			const lobby = {
 				season: res.locals.combines.season,
-				username: get_rand_word(lobby.home.players[0].id),
+				username: get_rand_word(home_players[0].id),
 				password: get_rand_word(),
-				home: { players: [], mmr: 0, },
-				away: { players: [], mmr: 0, },
+				home: { players: home_players, mmr: 0, },
+				away: { players: home_players, mmr: 0, },
 			};
 
 	
