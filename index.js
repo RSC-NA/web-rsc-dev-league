@@ -104,7 +104,6 @@ app.use((req, res, next) => {
 	// either comment this section out, or add a check for 'localhost'
 	// as the host
 	const host = req.headers.host;
-	console.log(host);
 	if ( ! (host == 'devleague.rscna.com' || host == 'api.rscna.com' || host === 'localhost:3030' ) ) {
 		return res.redirect('http://devleague.rscna.com');
 	}
@@ -232,7 +231,7 @@ app.use(async (req, res, next) => {
 	res.locals.is_combines_admin = req.session.is_combines_admin;
 	res.locals.rostered = req.session.rostered;
 
-	console.log(`url: ${req.originalUrl} - [${req.session.nickname}]`);
+	console.log(`url: ${req.headers.host}${req.originalUrl} - [${req.session.nickname}]`);
 
 	//res.locals.user = req.session.user || {};
 	res.locals.user = await get_user(req.session.user_id);
@@ -471,7 +470,7 @@ app.use((req, res, next) => {
 			[ res.locals.discord_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
-					console.log('Waiting in queue',results[0]);
+					//console.log('Waiting in queue',results[0]);
 					res.locals.user.combines.waiting = results;
 					req.session.checked_in = true;
 					req.session.rostered = results[0].rostered;

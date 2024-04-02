@@ -110,7 +110,7 @@ router.get('/process_login', (req, res) => {
 				};
 
 				req.session.user = user;
-				console.log(user);
+				//console.log(user);
 
 				req.session.is_admin = results[0].admin ? true : false;
 				req.session.is_tourney_admin = results[0].tourney_admin ? true: false;
