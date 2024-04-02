@@ -33,7 +33,7 @@ router.use(async (req, res, next) => {
 			[res.locals.discord_id, res.locals.combines.season]
 		);
 
-		if ( ! tm_results ) {
+		if ( ! tm_results || ! tm_results.length ) {
 				return res.json({
 					'status': 'error',
 					'message': 'You are not a player in the tiermaker. ',
