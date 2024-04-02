@@ -328,8 +328,8 @@
 								</thead>
 								<tbody>
 								<%
-									for ( let i = 0; i < match.players.away.length; ++i ) {
-										const p = match.players.away[i];
+									for ( let i = 0; i < match.players.home.length; ++i ) {
+										const p = match.players.home[i];
 										const mmr_delta = p.end_mmr ? 
 											p.start_mmr - p.end_mmr : '<em>n/a</em>';
 										const mmr_class = p.end_mmr ? 

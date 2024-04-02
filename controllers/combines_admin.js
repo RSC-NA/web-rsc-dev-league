@@ -239,6 +239,7 @@ router.all('/generate', async (req, res) => {
 				away: { players: away_players, mmr: 0, },
 			};
 
+			console.log(lobby.home.players, lobby.away.players);
 	
 			lobby.home.mmr = calculate_mmrs(lobby.home.players);
 			lobby.away.mmr = calculate_mmrs(lobby.away.players);
