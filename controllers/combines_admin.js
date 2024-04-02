@@ -236,7 +236,7 @@ router.all('/generate', async (req, res) => {
 				username: get_rand_word(home_players[0].id),
 				password: get_rand_word(),
 				home: { players: home_players, mmr: 0, },
-				away: { players: home_players, mmr: 0, },
+				away: { players: away_players, mmr: 0, },
 			};
 
 	
