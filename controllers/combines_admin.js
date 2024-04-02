@@ -165,6 +165,74 @@ function rating_delta(home_mmr, away_mmr, winner, k_factor = 32) {
 	return results;
 }
 
+async function notify_bot(db) {
+	console.log('SENDING THE STUFF TO THE BOT');
+	const games = await get_active(db);
+	if ( games && Object.keys(games).length ) {
+		try {
+			await fetch('http://localhost:8008/combines_match', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+				},
+				body: JSON.stringify(games)
+			});
+		} catch(e) { 
+			console.error('ERROR SENDING TO THE BOT', e);
+		}
+	}
+
+	console.log('SENDING STUFF TO THE BOT CMPLETE');
+}
+
+async function get_active(db) {
+	const active_query = `
+		SELECT 
+			id,lobby_user,lobby_pass,home_wins,away_wins,
+			reported_rsc_id,confirmed_rsc_id,
+			completed,cancelled 
+		FROM combine_matches 
+		WHERE completed = 0
+	`;
+	const [results] = await db.query(active_query);
+	const games = {};
+	const game_ids = [];
+	if ( results && results.length ) {
+		for ( let i = 0; i < results.length; ++i ) {
+			game_ids.push(results[i].id);
+			const game = results[i];
+			game.home = [];
+			game.away = [];
+			games[results[i].id] = game;
+		}
+	}
+
+	if ( game_ids && game_ids.length ) {
+		const players_query = `
+			SELECT 
+				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
+			FROM combine_match_players AS p 
+			LEFT JOIN tiermaker AS t 
+			ON p.rsc_id = t.rsc_id 
+			WHERE p.match_id in (?)
+		`;
+		const [p_results] = await db.query(players_query, [game_ids]);
+		if ( p_results && p_results.length ) {
+			for ( let i = 0; i < p_results.length; ++i ) {
+				const p = p_results[i];
+				if ( p.team === 'home' ) {
+					games[p.match_id].home.push(p);
+				} else {
+					games[p.match_id].away.push(p);
+				}
+			}
+		}
+	}
+
+	return games;
+}
+
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
@@ -239,7 +307,7 @@ router.all('/generate', async (req, res) => {
 				away: { players: away_players, mmr: 0, },
 			};
 
-			console.log(lobby.home.players, lobby.away.players);
+			//console.log(lobby.home.players, lobby.away.players);
 	
 			lobby.home.mmr = calculate_mmrs(lobby.home.players);
 			lobby.away.mmr = calculate_mmrs(lobby.away.players);
@@ -258,6 +326,8 @@ router.all('/generate', async (req, res) => {
 			WHERE active = 1 AND rostered = 0
 		`;
 		await db.execute(rostered_query);
+
+		await notify_bot(db);
 
 		await db.end();
 
