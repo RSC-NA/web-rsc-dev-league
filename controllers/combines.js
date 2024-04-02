@@ -215,6 +215,11 @@ router.get('/combines/check_in/:discord_id', async (req, res) => {
 	const ucombines = user.combines;
 	const combines = res.locals.combines;
 
+	if ( ! user || ! ucombines ) {
+		console.error('Missing ucombines?');
+		return res.redirect('/?error=LogIn');
+	}
+
 	if ( ucombines.season !== combines.season ) {
 		return res.redirect('/?error=YouAreInTheWrongSeason');
 	}
