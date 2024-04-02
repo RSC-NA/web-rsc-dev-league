@@ -53,18 +53,19 @@
 		</p>
 	</div>
 	<div class="card mb-4">
-		<div class="card-header">
-			<h4>Active Games: <%- games.length; %>
-				<a
-					class="btn btn-primary btn-sm float-end"
-					data-bs-toggle="collapse"
-					href="#collapse_games"
-					role="button"
-					aria-expanded="false"
-					aria-controls="collapse_games"
-				>show</a>
-			</h4>
-		</div>
+		<a
+			data-bs-toggle="collapse"
+			href="#collapse_games"
+			role="button"
+			aria-expanded="false"
+			aria-controls="collapse_games"
+		>
+			<div class="card-header">
+				<h4>Active Games: <%- games.length; %>
+				<button class="btn btn-primary btn-sm float-end">Show Active Games</button>
+				</h4>
+			</div>
+		</a>
 		<div id="collapse_games" class="card-body collapse">
 			<ul>
 			<%
