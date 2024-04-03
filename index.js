@@ -580,6 +580,10 @@ app.get('/', (req, res) => {
 	}
 });
 
+app.get('/dev_dashboard', (req, res) => {
+	res.render('dashboard', { match_days: matchDays });
+});
+
 // Authentication handled by /controllers/authentication.js
 app.use(auth_controller);
 
