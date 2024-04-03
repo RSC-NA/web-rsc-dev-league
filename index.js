@@ -761,7 +761,7 @@ app.get('/numbers/:date', (req, res) => {
 // THIS WILL BE SET TO true AT RUNTIME, AND IF 
 // THE SERVER EVER CRASHES, IT WILL BE FLIPPED TO FALSE
 let SEND_TO_API_SERVER = true;
-const EXTENSION_VERSION = '2.9.0';
+const EXTENSION_VERSION = '3.0.0';
 const tracker_queue = {};
 
 async function grabMoreTrackers() {
