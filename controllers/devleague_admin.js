@@ -244,6 +244,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 	const [results] = await db.execute(playersQuery, tier_params);
 	if ( results && results.length ) {
 		if ( results.length % 6 !== 0 ) {
+			results.blister = 'blister';
 			return res.json(results);
 			return res.redirect('/devleague?error=InvalidNumberOfPlayers');
 		}
