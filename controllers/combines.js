@@ -172,7 +172,7 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 	};
 	if ( Object.keys(games).length ) {
 		try {
-			await fetch('http://localhost:8008/combines_match', {
+			await fetch('http://localhost:8008/combines_event', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
