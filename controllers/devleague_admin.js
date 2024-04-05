@@ -225,18 +225,18 @@ router.all('/generate_team/:tier', async (req, res) => {
 		}
 	} else if ( tier === 'all' ) {
 		playersQuery = `
-			SELECT 
-				p.id,c.name,c.mmr,c.tier,c.rsc_id
-			FROM signups AS s
-			LEFT JOIN players AS p 
-			ON p.id = s.player_id
-			LEFT JOIN contracts AS c 
-			ON p.discord_id = c.discord_id 
-			WHERE 
-				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
-				s.active = 1 AND 
-				s.rostered = 0
-			ORDER BY c.mmr DESC
+SELECT
+p.id,c.name,c.mmr,c.tier,c.rsc_id
+FROM signups AS s
+LEFT JOIN players AS p 
+ON p.id = s.player_id
+LEFT JOIN contracts AS c 
+ON p.discord_id = c.discord_id 
+WHERE 
+s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+s.active = 1 AND 
+s.rostered = 0
+ORDER BY c.mmr DESC
 		`;
 		tier_params = null;
 	}
