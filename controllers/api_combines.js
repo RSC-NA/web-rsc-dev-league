@@ -170,9 +170,12 @@ router.get('/lobby', async (req, res) => {
 	let lobby = {};
 	if ( results && results.length ) {
 		lobby = results[0];
+	} else {
+		lobby = {
+			status: 'error',
+			message: 'You are not in any lobbies.',
+		};
 	}
-
-	res.locals.adb.end();
 
 	await res.locals.adb.end();
 	res.json(lobby);
