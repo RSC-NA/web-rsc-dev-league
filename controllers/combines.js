@@ -161,11 +161,12 @@ async function update_mmrs(db, match, k_factor=48) {
 	return match;
 }
 
-async function send_bot_message(actor, status, message, match={}) {
+async function send_bot_message(actor, status, message_type, message, match={}) {
 	console.log(`[BOT-${status}:${match_id}] ${actor.name} did "${message}"`);
 	const outbound = {
 		actor: actor,
 		status: status,
+		message_type: message_type,
 		message: message,
 		match: match,
 	};
@@ -225,6 +226,17 @@ router.get('/combines/check_out/:discord_id', async (req, res) => {
 	]);
 
 	await db.end();
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+	await send_bot_message(
+		actor,
+		'success',
+		'Checked In',
+		`You are checked in. Please stay at your computer and wait for the next game to start.`,
+		{}
+	);
 
 	return res.redirect('/?success=YouAreCheckedOut');
 });
@@ -275,6 +287,17 @@ router.get('/combines/check_in/:discord_id', async (req, res) => {
 		ucombines.current_mmr
 	]);
 
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+	await send_bot_message(
+		actor,
+		'success',
+		'Checked In',
+		`You are checked in. Please stay at your computer and wait for the next game to start.`,
+		{}
+	);
 	await db.end();
 
 	return res.redirect('/');
@@ -288,6 +311,11 @@ router.post('/combine/:match_id', async (req, res) => {
 
 	const home_wins = parseInt(req.body.home_wins);
 	const away_wins = parseInt(req.body.away_wins);
+	
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
 
 	if ( 
 		(home_wins < 0 || home_wins > 4) ||
@@ -295,6 +323,7 @@ router.post('/combine/:match_id', async (req, res) => {
 		await send_bot_message(
 			actor,
 			'error',
+			'Invalid Score',
 			`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
 			match
 		);
@@ -305,6 +334,7 @@ router.post('/combine/:match_id', async (req, res) => {
 		await send_bot_message(
 			actor,
 			'error',
+			'Invalid Score',
 			`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
 			match
 		);
@@ -385,10 +415,6 @@ router.post('/combine/:match_id', async (req, res) => {
 		return res.redirect(`/combine/${match_id}?error=NotInLobby`);
 	}
 
-	const actor = {
-		nickname: res.locals.user.nickname,
-		discord_id: res.locals.user.discord_id,
-	};
 
 	if ( can_report && ! match.reported_rsc_id ) {
 		if ( match.confirmed_rsc_id && (match.home_wins || match.away_wins)) {
@@ -397,7 +423,8 @@ router.post('/combine/:match_id', async (req, res) => {
 				await send_bot_message(
 					actor,
 					'error',
-					`Score report mismatch. Score was ${match.home_wins}-${match.away_wins} and got ${home_wins}-${away_wins}.`,
+					'Score Report Mismatch',
+					`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
 					match
 				);
 				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
@@ -423,13 +450,20 @@ router.post('/combine/:match_id', async (req, res) => {
 			await send_bot_message(
 				actor,
 				'success',
-				'Finished the game.',
+				'Finished Game',
+				`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
 				match
 			);
 			return res.redirect(`/combine/${match_id}?finished`);
 		} else {
 			await db.end();
-			await send_bot_message(actor, 'success', 'Reported score', match);
+			await send_bot_message(
+				actor,
+				'success',
+				'Reported Score',
+				`${home_wins}-${away_wins}`,
+				match
+			);
 			return res.redirect(`/combine/${match_id}?reported`);
 		}
 	} 
@@ -441,7 +475,8 @@ router.post('/combine/:match_id', async (req, res) => {
 				await send_bot_message(
 					actor,
 					'error',
-					`Score report mismatch. Score was ${match.home_wins}-${match.away_wins} and got ${home_wins}-${away_wins}.`,
+					'Score Report Mismatch',
+					`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
 					match
 				);
 				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
@@ -467,13 +502,20 @@ router.post('/combine/:match_id', async (req, res) => {
 			await send_bot_message(
 				actor,
 				'success',
-				'Finished the game.',
+				'Finished Game',
+				`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
 				match
 			);
 			return res.redirect(`/combine/${match_id}?finished`);
 		} else {
 			await db.end();
-			await send_bot_message(actor, 'success', 'Reported score', match);
+			await send_bot_message(
+				actor,
+				'success',
+				'Reported Score',
+				`${home_wins}-${away_wins}`,
+				match
+			);
 			return res.redirect(`/combine/${match_id}?confirmed`);
 		}
 	}
@@ -482,7 +524,8 @@ router.post('/combine/:match_id', async (req, res) => {
 	await send_bot_message(
 		actor,
 		'error',
-		'Tried to report a game that is already over.',
+		'Game Complete',
+		'This game has already ended. The score cannot be reported again.',
 		match
 	);
 	res.redirect(`/combine/${match_id}?error=AlreadyReported`);
