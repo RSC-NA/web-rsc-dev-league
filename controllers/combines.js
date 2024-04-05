@@ -161,7 +161,7 @@ async function update_mmrs(db, match, k_factor=48) {
 	return match;
 }
 
-async function send_bot_message(actor, status, message_type, message, match={}) {
+async function send_bot_message(actor, status, message_type, message, match_id) {
 	console.log(`[BOT-${status}:${match_id}] ${actor.name} did "${message}"`);
 	const outbound = {
 		actor: actor,
