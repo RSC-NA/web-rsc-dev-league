@@ -168,7 +168,7 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 		status: status,
 		message_type: message_type,
 		message: message,
-		match: match,
+		match_id: match?.id || null,
 	};
 	if ( Object.keys(games).length ) {
 		try {
