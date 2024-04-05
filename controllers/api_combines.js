@@ -156,10 +156,26 @@ router.get('/lobby', async (req, res) => {
 		});
 	}
 
-	await res.locals.adb.end();
+	const active_query = `
+		SELECT 
+			m.id,m.lobby_user,m.lobby_pass,m.home_wins,m.away_wins,
+			m.reported_rsc_id,m.confirmed_rsc_id,
+			m.completed,m.cancelled,p.team,p.rsc_id,
+		FROM combine_matches AS m  
+		LEFT JOIN combine_match_players AS p 
+		ON m.id = p.match_id 
+		WHERE m.completed = 0 AND m.canceled != 0 AND p.discord_id = ?
+	`;
+	const [results] = await res.locals.adb.query(active_query);
+	let lobby = {};
+	if ( results && results.length ) {
+		lobby = results[0];
+	}
 
-	return res.json(res.locals.match);
-	
+	res.locals.adb.end();
+
+	await res.locals.adb.end();
+	res.json(lobby);
 });
 
 router.get('/check_in', async (req, res) => {
