@@ -120,21 +120,6 @@
 			<%
 				} else {
 			%>
-			<script type="text/javascript">
-				document.addEventListener('DOMContentLoaded', () => {
-					const chips = document.getElementById('button_friend');	
-					let begin_fuckery = false;
-					chips.addEventListener('mouseover', (ev) => {
-						begin_fuckery = true;
-						function r(m,mx) { return Math.random() * (mx - m) + m; }
-						const cute = ev.target;
-						cute.style.position = 'absolute';
-						console.log('mouseover', ev.clientX, ev.clientY);
-						cute.style.top = (ev.clientX + r(-100,50)) + 'px';
-						cute.style.left = (ev.clientY + r(-100,50)) + 'px';
-					});
-				});	
-			</script>
 			<h2>Soon!</h2>
 			<p>
 				Today is a day for combines, but we don't allow people to check in until 7:50PM ET. Come back later this 
