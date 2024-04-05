@@ -161,6 +161,29 @@ async function update_mmrs(db, match, k_factor=48) {
 	return match;
 }
 
+async function send_bot_message(actor, status, message, match={}) {
+	console.log(`[BOT-${status}:${match_id}] ${actor.name} did "${message}"`);
+	const outbound = {
+		actor: actor,
+		status: status,
+		message: message,
+		match: match,
+	};
+	if ( Object.keys(games).length ) {
+		try {
+			await fetch('http://localhost:8008/combines_match', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+				},
+				body: JSON.stringify(outbound)
+			});
+		} catch(e) { 
+			console.error('ERROR SENDING TO THE BOT', e);
+		}
+	}
+}
 
 /*******************************************************
  ********************* User Views **********************
@@ -269,10 +292,22 @@ router.post('/combine/:match_id', async (req, res) => {
 	if ( 
 		(home_wins < 0 || home_wins > 4) ||
 		(away_wins < 0 || away_wins > 4 ) ) {
+		await send_bot_message(
+			actor,
+			'error',
+			`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
+			match
+		);
 		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
 	if ( home_wins + away_wins != 4 ) {
+		await send_bot_message(
+			actor,
+			'error',
+			`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
+			match
+		);
 		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
@@ -346,15 +381,25 @@ router.post('/combine/:match_id', async (req, res) => {
 	}
 
 	if ( ! can_save ) {
-		db.end();
+		await db.end();
 		return res.redirect(`/combine/${match_id}?error=NotInLobby`);
 	}
 
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
 
 	if ( can_report && ! match.reported_rsc_id ) {
 		if ( match.confirmed_rsc_id && (match.home_wins || match.away_wins)) {
 			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
-				db.end();
+				await db.end();
+				await send_bot_message(
+					actor,
+					'error',
+					`Score report mismatch. Score was ${match.home_wins}-${match.away_wins} and got ${home_wins}-${away_wins}.`,
+					match
+				);
 				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
 			}
 		}
@@ -374,10 +419,17 @@ router.post('/combine/:match_id', async (req, res) => {
 
 		if ( completed ) {	
 			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
-			db.end();
+			await db.end();
+			await send_bot_message(
+				actor,
+				'success',
+				'Finished the game.',
+				match
+			);
 			return res.redirect(`/combine/${match_id}?finished`);
 		} else {
-			db.end();
+			await db.end();
+			await send_bot_message(actor, 'success', 'Reported score', match);
 			return res.redirect(`/combine/${match_id}?reported`);
 		}
 	} 
@@ -385,7 +437,13 @@ router.post('/combine/:match_id', async (req, res) => {
 	if ( can_confirm && ! match.confirmed_rsc_id ) {
 		if ( match.reported_rsc_id && (match.home_wins || match.away_wins)) {
 			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
-				db.end();
+				await db.end();
+				await send_bot_message(
+					actor,
+					'error',
+					`Score report mismatch. Score was ${match.home_wins}-${match.away_wins} and got ${home_wins}-${away_wins}.`,
+					match
+				);
 				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
 			}
 		}
@@ -405,15 +463,28 @@ router.post('/combine/:match_id', async (req, res) => {
 
 		if ( completed) {	
 			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
-			db.end();
+			await db.end();
+			await send_bot_message(
+				actor,
+				'success',
+				'Finished the game.',
+				match
+			);
 			return res.redirect(`/combine/${match_id}?finished`);
 		} else {
-			db.end();
+			await db.end();
+			await send_bot_message(actor, 'success', 'Reported score', match);
 			return res.redirect(`/combine/${match_id}?confirmed`);
 		}
 	}
 
-	db.end();
+	await db.end();
+	await send_bot_message(
+		actor,
+		'error',
+		'Tried to report a game that is already over.',
+		match
+	);
 	res.redirect(`/combine/${match_id}?error=AlreadyReported`);
 });
 
