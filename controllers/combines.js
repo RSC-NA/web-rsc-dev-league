@@ -170,19 +170,17 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 		message: message,
 		match_id: match?.id || null,
 	};
-	if ( Object.keys(games).length ) {
-		try {
-			await fetch('http://localhost:8008/combines_event', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
-				},
-				body: JSON.stringify(outbound)
-			});
-		} catch(e) { 
-			console.error('ERROR SENDING TO THE BOT', e);
-		}
+	try {
+		await fetch('http://localhost:8008/combines_event', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+			},
+			body: JSON.stringify(outbound)
+		});
+	} catch(e) { 
+		console.error('ERROR SENDING TO THE BOT', e);
 	}
 }
 
