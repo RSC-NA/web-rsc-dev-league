@@ -388,7 +388,7 @@ router.post('/combine/:match_id', async (req, res) => {
 
 	let can_save = false;
 	let can_report = false;
-	let can_verify = false;
+	let can_confirm = false;
 
 	if ( req.session.is_admin || req.session.is_combines_admin ) {
 		can_save = true;
