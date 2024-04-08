@@ -1225,7 +1225,8 @@ app.get('/import_trackers', async (req, res) => {
 	console.log('grabbing trackers from sheet');
 
 	// 1. create google sheets object
-	const trackerDoc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
+	//const trackerDoc = new GoogleSpreadsheet('1HLd_2yMGh_lX3adMLxQglWPIfRuiSiv587ABYnQX-0s');
+	const trackerDoc = new GoogleSpreadsheet('1WVQEfU1DuFMm4s4XUXKI6mdU7k54c8OmdHvjLlDTWX0');
 	// 2. authenticate
 	trackerDoc.useApiKey(process.env.GOOGLE_API_KEY);
 
