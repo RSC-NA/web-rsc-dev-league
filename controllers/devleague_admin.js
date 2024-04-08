@@ -865,7 +865,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'active_3s': false,
 			'status': 'Non-playing',
 		};
-		if ( rows[i]['3v3 Active/ Returning'] == "TRUE" ) { 
+		if ( rows[i]['3v3 Active/Returning'] == "TRUE" ) { 
 			players[ rows[i]['RSC Unique ID'] ].active_3s = true;
 		}
 	}
