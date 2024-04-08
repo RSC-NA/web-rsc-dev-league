@@ -854,8 +854,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	console.log('Importing contracts...');
 
 	for ( let i = 0; i < rows.length; i++ ) {
-		console.log(rows[i]['Player Name']);
-		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC Unique ID'] || ! rows[i]['Discord ID'] ) {
+		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC ID'] || ! rows[i]['Discord ID'] ) {
 			continue;
 		}
 		players[ rows[i]['RSC Unique ID'] ] = {
