@@ -351,6 +351,16 @@ CREATE TABLE combine_matches (
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE combine_matches (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`match_id` INT UNSIGNED NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`replay` VARCHAR(100) NOT NULL,
+	PRIMARY KEY(`id`),
+	INDEX `match_idx` (`match_id`),
+	INDEX `player_idx` (`rsc_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE combine_match_players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`match_id` INT UNSIGNED NOT NULL,

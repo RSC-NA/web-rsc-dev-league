@@ -48,7 +48,8 @@
 	</symbol>
 </svg>
 
-
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
 <main class="container mt-2 p-2">
 	<div class="bg-light p-2 rounded">
 		<h1>Combine Match Info</h1>
@@ -203,6 +204,7 @@
 					'ScoreReportMismatch': 'You have reported a score that is different from what the other team has reported.',
 				};
 		%>
+
 		<div class="row">
 			<div class="col-8 mx-auto">
 				<div class="alert alert-danger d-flex align-items-center" role="alert">
@@ -266,6 +268,57 @@
 		<%
 			}
 		%>
+
+		<div class="row mb-2">
+			<div class="col-md-6">
+				<h4>Upload Replays</h4>
+				<script type="text/javascript">
+					Dropzone.options.replayDropzone = {
+						paramName: 'replay',
+						withCredentials: true,
+						accept: (file, done) => {
+							console.log('FILE IS BEING UPLOADED', file);
+							const fileSplit = file.name.split('.');
+							if ( fileSplit.length === 2 && fileSplit[1] === 'replay' ) {
+								done();
+							}
+														
+						},
+						renameFile: (file) => {
+							const fileSplit = file.name.split('.');
+							const new_file_name = `<%- match.id; %>_<%- user.rsc_id %>-${fileSplit[0]}.${fileSplit[1]}`;
+							file.name = new_file_name;
+							return new_file_name;
+						}
+					};
+				</script>
+				<form action="/combine/<%- match.id; %>/upload" method="post" class="dropzone" id="replay-dropzone"> </form>
+
+			</div>
+			<div class="col-md-6">
+				<%
+					console.log(match.replays);
+					if ( match.replays && match.replays.length ) {
+				%>
+				<ul>
+				<%
+						for ( let i = 0; i < match.replays.length; ++i ) { 
+				%>
+					<li>
+						<%- match.replays[i].rsc_id; %>: 
+						<a href="/replays/<%- match.replays[i].replay; %>">
+							<%- match.replays[i].replay; %>
+						</a>
+					</li>
+				<%
+						}
+				%>
+				</ul>
+				<%
+					}
+				%>
+			</div>
+		</div>
 
 		<div class="row">
 			<div class="col-12">

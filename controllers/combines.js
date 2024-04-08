@@ -2,6 +2,8 @@ const express = require('express');
 const router  = express.Router();
 const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
+const upload = require('./upload');
+
 const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -187,6 +189,22 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 /*******************************************************
  ********************* User Views **********************
  ******************************************************/
+
+router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, res) => {
+	const user = res.locals.user;
+	const combine_id = req.params.combine_id;
+
+	console.log(req.file.originalname);
+	const file_name = req.file.originalname;
+
+	const query = `INSERT INTO combine_replays (match_id,rsc_id,replay) VALUES (?, ?, ?)`;
+	req.db.query(query, [combine_id, user.rsc_id, file_name], (err, results) => {
+		if ( err ) { throw err; }
+
+		res.json({'success': true });
+	});
+});
+
 router.get('/combines/check_out/:discord_id', async (req, res) => {
 	if ( ! res.locals.checked_in ) {
 		return res.redirect('/?error=YouAreNotCheckedIn');
@@ -366,6 +384,7 @@ router.post('/combine/:match_id', async (req, res) => {
 	let match = {};
 	if ( match_results && match_results.length ) {
 		match = match_results[0];
+		match.replays = [];
 		match.players = {};
 	}
 			
@@ -389,6 +408,7 @@ router.post('/combine/:match_id', async (req, res) => {
 	let can_save = false;
 	let can_report = false;
 	let can_confirm = false;
+
 
 	if ( req.session.is_admin || req.session.is_combines_admin ) {
 		can_save = true;
@@ -575,11 +595,20 @@ router.get('/combine/:match_id', (req, res) => {
 					success = 'reported';
 				}
 
-				// res.json(match);
-				res.render('combine_match', {
-					match: match,
-					error: req.query.error,
-					success: success,
+				const replay_query = `
+					SELECT match_id,rsc_id,replay
+					FROM combine_replays 
+					WHERE match_id = ?
+				`;
+				req.db.query(replay_query, [ match_id ], (err, results) => {
+					if ( err ) { throw err; }
+
+					match.replays = results;
+					res.render('combine_match', {
+						match: match,
+						error: req.query.error,
+						success: success,
+					});
 				});
 			});
 		}
