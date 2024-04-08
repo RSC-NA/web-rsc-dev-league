@@ -920,10 +920,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		};
 	}
 	*/
-	players['RSC000967'].mmr       = 1310;
-	players['RSC000967'].tier      = 'Rival';
-	players['RSC000967'].status    = 'Free Agent';
-	players['RSC000967'].active_3s = true;
 
 	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }
