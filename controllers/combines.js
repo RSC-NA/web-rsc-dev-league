@@ -578,7 +578,7 @@ router.get('/combine/:match_id', (req, res) => {
 				FROM combine_match_players AS p
 				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id 
 				WHERE p.match_id = ?
-				GROUP BY p.id, p.rsc_id
+				GROUP BY p.id, p.rsc_id,t.name
 			`;
 
 			req.db.query(players_query, [ match_id ], (err, results) => {
