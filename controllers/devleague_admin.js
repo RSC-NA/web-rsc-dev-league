@@ -926,6 +926,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		console.log('truncate table');
 		
 		const playersArray = [];
+		let n = 0;
 		for ( const rsc_id in players ) {
 			const player = players[rsc_id];
 
@@ -933,12 +934,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 				player['tier'] = 'NONE';
 			}
 
-			// discord_id, rsc_id, mmr, tier, status
-			if ( player['tier'] == 'Master' ) {
-				//player['tier'] = 'Premier';
-			} else if ( player['tier'] == 'Amateur' ) {
-				//player['tier'] = 'Contender';
-			}
 			if ( ! player['mmr'] ) {
 				player['mmr'] = 0;
 			}
@@ -947,7 +942,14 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			}
 
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'], player['active_3s'], player['active_2s'] ]);
+			n++;
+
+			if ( n > 5 ) {
+				break;
+			}
 		}
+
+		console.log(playersArray);
 
 		const insertQuery = `
 			INSERT INTO contracts 
