@@ -926,7 +926,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		console.log('truncate table');
 		
 		const playersArray = [];
-		let n = 0;
 		for ( const rsc_id in players ) {
 			const player = players[rsc_id];
 			console.log(rsc_id, player['name']);
@@ -943,14 +942,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			}
 
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'], player['active_3s'], player['active_2s'] ]);
-			n++;
-
-			if ( n > 5 ) {
-				break;
-			}
 		}
-
-		console.log(playersArray);
 
 		const insertQuery = `
 			INSERT INTO contracts 
