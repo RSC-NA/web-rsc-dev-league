@@ -576,11 +576,12 @@ router.get('/combine/:match_id', (req, res) => {
 					p.id, p.rsc_id, p.team, p.start_mmr, p.end_mmr,
 					t.name,t.effective_mmr,t.wins,t.losses
 				FROM combine_match_players AS p
-				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ?
+				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id 
 				WHERE p.match_id = ?
+				GROUP BY p.rsc_id
 			`;
 
-			req.db.query(players_query, [ res.locals.combines.season, match_id ], (err, results) => {
+			req.db.query(players_query, [ match_id ], (err, results) => {
 				if ( err ) { throw err; }
 
 				if ( results && results.length ) {
