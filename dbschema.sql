@@ -351,7 +351,7 @@ CREATE TABLE combine_matches (
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE combine_matches (
+CREATE TABLE combine_replays (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`match_id` INT UNSIGNED NOT NULL,
 	`rsc_id` VARCHAR(10) NOT NULL,
