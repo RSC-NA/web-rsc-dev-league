@@ -857,8 +857,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC ID'] || ! rows[i]['Discord ID'] ) {
 			continue;
 		}
-		players[ rows[i]['RSC Unique ID'] ] = {
-			'rsc_id': rows[i]['RSC Unique ID'],
+		players[ rows[i]['RSC ID'] ] = {
+			'rsc_id': rows[i]['RSC ID'],
 			'name': rows[i]['Player Name'],
 			'discord_id': rows[i]['Discord ID'],
 			'active_2s': false,
@@ -866,7 +866,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'status': 'Non-playing',
 		};
 		if ( rows[i]['3v3 Active/Returning'] == "TRUE" ) { 
-			players[ rows[i]['RSC Unique ID'] ].active_3s = true;
+			players[ rows[i]['RSC ID'] ].active_3s = true;
 		}
 	}
 
