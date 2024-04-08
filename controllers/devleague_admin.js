@@ -929,6 +929,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		let n = 0;
 		for ( const rsc_id in players ) {
 			const player = players[rsc_id];
+			console.log(rsc_id, player['name']);
 
 			if ( ! player['tier'] ) {
 				player['tier'] = 'NONE';
