@@ -67,6 +67,7 @@ router.use(async (req, res, next) => {
 		}
 
 		if ( res.locals.active_match ) { 
+			console.log('This RSC ID', res.locals.rsc_id);
 			const matchQuery = `
 				SELECT 
 					m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass,
