@@ -938,21 +938,21 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		};
 	}
 
-	if ( ! ( 'RSC000302' in players ) ) {
-		const me = 'RSC000302';
-		players[ me ] = {
-			'season': res.locals.combines.season,
-			'discord_id': (me in discord_ids) ? discord_ids[me] : null,
-			'rsc_id': me,
-			'name': 'tehblister',
-			'tier': 'Elite',
-			'count': 3,
-			'keeper': 4,
-			'base_mmr': 1500,
-			'effective_mmr': 1500,
-			'current_mmr': 1500,
-		};
-	}
+	// if ( ! ( 'RSC000302' in players ) ) {
+	// 	const me = 'RSC000302';
+	// 	players[ me ] = {
+	// 		'season': res.locals.combines.season,
+	// 		'discord_id': (me in discord_ids) ? discord_ids[me] : null,
+	// 		'rsc_id': me,
+	// 		'name': 'tehblister',
+	// 		'tier': 'Elite',
+	// 		'count': 3,
+	// 		'keeper': 4,
+	// 		'base_mmr': 1500,
+	// 		'effective_mmr': 1500,
+	// 		'current_mmr': 1500,
+	// 	};
+	// }
 
 	console.log(`    Found ${Object.keys(players).length} players in tier maker.`);
 

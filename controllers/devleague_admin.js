@@ -782,16 +782,16 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 		return res.json({'error': 'Google rows was empty. :(', });
 	}
 	for ( let i = 0; i < rows.length; i++ ) {
-		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC Unique ID'] || ! rows[i]['Discord ID'] ) {
+		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC ID'] || ! rows[i]['Discord ID'] ) {
 			continue;
 		}
 
 		players[ rows[i]['Discord ID'] ] = {
-			'rsc_id': rows[i]['RSC Unique ID'],
+			'rsc_id': rows[i]['RSC ID'],
 			'name': rows[i]['Player Name'],
 			'discord_id': rows[i]['Discord ID'],
 			'active_2s': false,
-			'active_3s': rows[i]['3v3 Active/ Returning'] === 'TRUE' ? true : false,
+			'active_3s': rows[i]['3v3 Active/Returning'] === 'TRUE' ? true : false,
 			'status': 'Non-playing',
 		};
 	}
