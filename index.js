@@ -68,7 +68,6 @@ function writeError(error) {
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 app.use( express.urlencoded({ extended: true }) );
-app.use(express.limit('4MB'));
 
 const title = 'RSC Development League';
 const description = 'Welcome to the RSC Development League! Matches are open to all active players in RSC and run at 8:15 on match nights.';
