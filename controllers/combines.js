@@ -347,13 +347,13 @@ router.post('/combine/:match_id', async (req, res) => {
 	}
 
 	if ( home_wins + away_wins != 4 ) {
-		await send_bot_message(
-			actor,
-			'error',
-			'Invalid Score',
-			`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
-			match
-		);
+		// await send_bot_message(
+		// 	actor,
+		// 	'error',
+		// 	'Invalid Score',
+		// 	`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
+		// 	match
+		// );
 		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
