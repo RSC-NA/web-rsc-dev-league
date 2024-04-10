@@ -213,12 +213,13 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 		SELECT 
 			m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass, m.home_mmr, m.away_mmr,
 			m.home_wins, m.away_wins, m.reported_rsc_id, m.confirmed_rsc_id, 
-			m.completed, m.cancelled
-		FROM 
-			combine_matches AS m 
-		LEFT JOIN 
-			combine_match_players AS mp 
+			m.completed, m.cancelled,
+			t.name
+		FROM combine_matches AS m 
+		LEFT JOIN combine_match_players AS mp 
 		ON m.id = mp.match_id
+		LEFT JOIN tiermaker AS t 
+		ON mp.rsc_id = t.rsc_id AND mp.season = t.season 
 		WHERE m.season = ? AND mp.rsc_id = ?
 		ORDER BY id DESC
 	`;
@@ -227,7 +228,9 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 	await db.end();
 
 	if ( matches && matches.length ) {
+		const name = matches[0].name;
 		return res.render('combine_matches', { 
+			name: name,
 			rsc_id: req.params.rsc_id,
 			matches: matches,
 		}); 
