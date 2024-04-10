@@ -151,7 +151,7 @@
 										</td>	
 										<td colspan="2">
 											<strong>
-												<a href="/player/<%- match.reported_rsc_id; %>">
+												<a href="/combines/matches/<%- match.reported_rsc_id; %>">
 													<%- match.reported_rsc_id in lobby ? 
 														lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
 												</a>
@@ -162,7 +162,7 @@
 										<td class="text-end">Confirmed:</td>	
 										<td colspan="2">
 											<strong>
-												<a href="/player/<%- match.confirmed_rsc_id; %>">
+												<a href="/combines/matches/<%- match.confirmed_rsc_id; %>">
 													<%- match.confirmed_rsc_id in lobby ? 
 														lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
 												</a>
@@ -392,7 +392,7 @@
 									<tr class="fs-5">
 										<td>
 											<strong>
-												<a href="/player/<%= p.rsc_id; %>">
+												<a href="/combines/matches/<%= p.rsc_id; %>">
 													<%= p.name %></a>
 											</strong> 
 										</td>
@@ -535,7 +535,7 @@
 									<tr class="fs-5">
 										<td>
 											<strong>
-												<a href="/player/<%= p.rsc_id; %>"
+												<a href="/combines/matches/<%= p.rsc_id; %>"
 													><%= p.name %></a>
 											</strong> 
 										</td>
