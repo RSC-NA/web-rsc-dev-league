@@ -384,8 +384,8 @@ router.post('/combine/:match_id', async (req, res) => {
 	};
 
 	if ( 
-		(home_wins < 0 || home_wins > 3) ||
-		(away_wins < 0 || away_wins > 3 ) ) {
+		(home_wins < 0 || home_wins > 4) ||
+		(away_wins < 0 || away_wins > 4 ) ) {
 		await send_bot_message(
 			actor,
 			'error',
@@ -396,7 +396,7 @@ router.post('/combine/:match_id', async (req, res) => {
 		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
-	if ( home_wins + away_wins != 3 ) {
+	if ( home_wins + away_wins != 4 ) {
 		// await send_bot_message(
 		// 	actor,
 		// 	'error',
