@@ -190,8 +190,10 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
  ********************* User Views **********************
  ******************************************************/
 router.get('/combines/matches/:rsc_id', async(req,res) => {
-	if ( ! res.locals?.user?.combines?.active ) {
-		return res.redirect('/');
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		if ( ! res.locals?.user?.combines?.active ) {
+			return res.redirect('/');
+		}
 	}
 	const user = res.locals.user;
 	const combine_season = res.locals.combines.season;
