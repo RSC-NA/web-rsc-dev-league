@@ -219,7 +219,7 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 		LEFT JOIN combine_match_players AS mp 
 		ON m.id = mp.match_id
 		LEFT JOIN tiermaker AS t 
-		ON mp.rsc_id = t.rsc_id AND mp.season = t.season 
+		ON mp.rsc_id = t.rsc_id AND m.season = t.season 
 		WHERE m.season = ? AND mp.rsc_id = ?
 		ORDER BY id DESC
 	`;
