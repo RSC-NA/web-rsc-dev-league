@@ -1015,7 +1015,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 				(season,rsc_id,discord_id,name,tier,count,keeper,base_mmr,effective_mmr,current_mmr)
 			VALUES ?
 		`;
-		await db.execute(tiermaker_insert_query, [new_players]);
+		await db.query(tiermaker_insert_query, [new_players]);
 
 		console.log(" -------- Tiermaker Import Complete --------- ");
 		console.log(`	Imported: ${new_players.length}`);
