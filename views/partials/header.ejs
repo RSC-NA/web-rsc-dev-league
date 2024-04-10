@@ -71,16 +71,30 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt text-info"></i></div>
 								Dashboard
 							</a>
+
+						<% 
+							if ( ! combines.active ) { 
+						%>
 							<a class="nav-link <%- menu['championship'] %>" href="/championship">
 								<div class="sb-nav-link-icon"><i class="fas fa-trophy text-warning"></i></div>
 								S<%= settings.season; %> Championship
 							</a>
-
 							<a class="nav-link <%- menu['matches'] %>" href="/matches">
 								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
 								S<%- settings.season %> Matches
 							</a>
-						<% if ( rostered ) { %>
+						<%
+							} else if ( combines.active && discord_id ) {
+						%>
+							<a class="nav-link <%- menu['combines_matches'] %>" href="/combines/matches">
+								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
+								S<%- combines.season %> Combines Matches
+							</a>
+						<%
+							}
+
+							if ( rostered ) { 
+						%>
 							<a class="nav-link <%- menu['match'] %>" href="/match">
 								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-primary"></i></div>
 								Match Info

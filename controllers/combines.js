@@ -189,6 +189,56 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 /*******************************************************
  ********************* User Views **********************
  ******************************************************/
+router.get('/combines/matches/:rsc_id', async(req,res) => {
+	if ( ! res.locals?.user?.combines?.active ) {
+		return res.redirect('/');
+	}
+	const user = res.locals.user;
+	const combine_season = res.locals.combines.season;
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const matches_query = `
+		SELECT 
+			m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass, m.home_mmr, m.away_mmr,
+			m.home_wins, m.away_wins, m.reported_rsc_id, m.confirmed_rsc_id, 
+			m.completed, m.cancelled
+		FROM 
+			combine_matches AS m 
+		LEFT JOIN 
+			combine_match_players AS mp 
+		ON m.id = mp.match_id
+		WHERE m.season = ? AND mp.rsc_id = ?
+		ORDER BY id DESC
+	`;
+	const [matches] = await db.query(matches_query, [combine_season, req.params.rsc_id ]);
+
+	await db.end();
+
+	if ( matches && matches.length ) {
+		return res.render('combine_matches', { 
+			rsc_id: req.params.rsc_id,
+			matches: matches,
+		}); 
+	}
+});
+
+router.get('/combines/matches', (req, res) => {
+	if ( ! res.locals?.user?.rsc_id ) {
+		return res.redirect('/');
+	}
+
+	return res.redirect('/combines/matches/' + res.locals.user.rsc_id);
+});
 
 router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, res) => {
 	const user = res.locals.user;

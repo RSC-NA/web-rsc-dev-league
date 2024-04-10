@@ -1,0 +1,79 @@
+
+<%- include('partials/header.ejs'); %>
+
+<main class="container">
+	<div class="py-0 mt-2">
+		<h2>RSC Development League, Season <%- combines.season %></h2>
+		<p class="lead">
+			Below is a list of all matches and outcomes for RSC Season <%= combines.season %>
+			for <%= rsc_id; %>.
+		</p>
+	</div>
+	<div class="row">
+		<!-- <div class="col-md-4 order-md-2 mb-4">
+			<h4 class="d-flex justify-content-between align-items-center mb-3">
+				<span class="text-muted">Available Subs</span>
+				<span class="badge badge-secondary badge-pill">3</span>
+			</h4>
+		</div> -->
+
+		<!-- primary FA signup / team generation -->
+		<div class="col-md-8 order-md-1">
+
+			<%
+				if ( matches && matches.length ) {
+
+					let matchDay = '';
+
+					for ( let i = 0; i < matches.length; i++ ) {
+						const match = matches[i];
+						const match_dtg = match.match_dtg.toISOString();
+						if ( match_dtg.split('T')[0] != matchDay ) {
+							matchDay = match_dtg.split('T')[0];
+			%>
+			<h4 class="mb-3">MD <%= matchDay %></h4>
+			<ul class="list-group mb-3">
+
+			<%	
+						} // end of MD check and list prep
+
+						let homeTeam = matches[i].lobby_user;
+						let awayTeam = matches[i].lobby_pass;
+						const scored_class = (matches[i].home_wins || matches[i].away_wins) ? 'bg-success bg-opacity-25 border-success border rounded fw-bold' : 'bg-secondary bg-opacity-25 border rounded text-muted';
+			%>
+				<li class="list-group-item d-flex justify-content-between 1h-condensed">
+					<div class="<%- scored_class; %> px-2 pb-1 me-2 align-middle">
+						<h5 class="my-0">[<%- matches[i].home_wins %> - <%- matches[i].away_wins %>]</h5>
+					</div>
+					<div class="my-0 flex-grow-1 align-middle">
+					<h5 class="my-0">
+						<span class="bg-<%- matches[i].tier; %> d-inline-block text-end pe-2" style="width:125px;"><%= matches[i].tier; %></span> 
+						<%= awayTeam %> @ <%= homeTeam %>
+					</h5>
+					</div>
+					<a href="/combine/<%= matches[i].id %>">view teams</a>
+				</li>
+			<%
+						if ( i == matches.length - 1 || matches[i+1].match_day != matchDay ) {
+							// close out the list if we're done, or if the next result is a different MD.
+			%>
+			</ul>
+			<%				
+						}
+
+					} // end of total loop
+			%>
+
+				
+
+			<%		
+				}
+			%>
+
+		</div>
+
+	</div>
+
+</main>
+
+<%- include('partials/footer.ejs'); %>
