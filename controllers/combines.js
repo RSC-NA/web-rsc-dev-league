@@ -234,6 +234,8 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 			rsc_id: req.params.rsc_id,
 			matches: matches,
 		}); 
+	} else {
+		return res.redirect('/');
 	}
 });
 
