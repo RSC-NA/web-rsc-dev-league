@@ -154,7 +154,7 @@ async function update_mmrs(db, match, k_factor=48) {
 		const p = match.players[rsc_id];
 		const new_mmr = p.start_mmr + delta[p.team].delta;
 		const new_wins = p.wins + scores[p.team];
-		const new_losses = p.losses + (4 - scores[p.team]);
+		const new_losses = p.losses + (3 - scores[p.team]);
 		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
 		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id]);
 	}
@@ -384,8 +384,8 @@ router.post('/combine/:match_id', async (req, res) => {
 	};
 
 	if ( 
-		(home_wins < 0 || home_wins > 4) ||
-		(away_wins < 0 || away_wins > 4 ) ) {
+		(home_wins < 0 || home_wins > 3) ||
+		(away_wins < 0 || away_wins > 3 ) ) {
 		await send_bot_message(
 			actor,
 			'error',
@@ -396,7 +396,7 @@ router.post('/combine/:match_id', async (req, res) => {
 		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
-	if ( home_wins + away_wins != 4 ) {
+	if ( home_wins + away_wins != 3 ) {
 		// await send_bot_message(
 		// 	actor,
 		// 	'error',
