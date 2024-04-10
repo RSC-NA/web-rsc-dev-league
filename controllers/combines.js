@@ -154,7 +154,7 @@ async function update_mmrs(db, match, k_factor=48) {
 		const p = match.players[rsc_id];
 		const new_mmr = p.start_mmr + delta[p.team].delta;
 		const new_wins = p.wins + scores[p.team];
-		const new_losses = p.losses + (3 - scores[p.team]);
+		const new_losses = p.losses + (4 - scores[p.team]);
 		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
 		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id]);
 	}
