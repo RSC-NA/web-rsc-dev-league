@@ -264,18 +264,18 @@ router.all('/generate', async (req, res) => {
 	}
 
 	const players_query = `
-		SELECT 
+		select 
 			s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
 			s.current_mmr, s.active, s.rostered, 
 			t.name
-		FROM combine_signups AS s 
-		LEFT JOIN tiermaker AS t 
-		ON s.rsc_id = t.rsc_id
-		WHERE 
-			s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
-			s.active = 1 AND 
+		from combine_signups as s 
+		left join tiermaker as t 
+		on s.rsc_id = t.rsc_id
+		where 
+			s.signup_dtg > date_sub(now(), interval 1 day) and 
+			s.active = 1 and 
 			s.rostered = 0
-		ORDER BY s.current_mmr ASC
+		order by s.current_mmr asc
 	`;
 
 	const [results] = await db.execute(players_query);
@@ -903,6 +903,17 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		return res.redirect('/');
 	} 
 
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
 	const season = res.locals.combines.season;
 
 	// 1. create google sheets object
@@ -959,54 +970,66 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 
 	console.log(`    Found ${Object.keys(players).length} players in tier maker.`);
 
-	const tiermaker_query = `SELECT id,rsc_id FROM tiermaker WHERE season = ?`;
+	const tiermaker_query = `SELECT id,rsc_id,name FROM tiermaker WHERE season = ?`;
 	let skipped = 0;
-	req.db.query(tiermaker_query, [ season ], (err, results) => {
+	const updates = {};
+	const [results] = await db.query(tiermaker_query, [ season ]);
+	if ( results.length ) {
+		for ( let i = 0; i < results.length; ++i ) {
+			const row = results[i];
 
-		if ( err ) { throw err; }
-
-		if ( results.length ) {
-			for ( let i = 0; i < results.length; ++i ) {
-				const row = results[i];
-
-				if ( row['rsc_id'] in players ) {
-					delete(players[row['rsc_id']]);
-					skipped++;
+			if ( row['rsc_id'] in players ) {
+				if ( players[row['rsc_id']].name !== row['name'] ) {
+					updates[row['rsc_id']] = players[row['rsc_id']].name;
 				}
+				delete(players[row['rsc_id']]);
+				skipped++;
 			}
 		}
-			
-		const new_players = [];
-		for ( const rsc_id in players ) {
-			const p = players[rsc_id];
-			new_players.push([
-				season, rsc_id, p.discord_id, p.name, p.tier, p.count, p.keeper, p.base_mmr,
-				p.effective_mmr, p.current_mmr
-			]);
-		}
+	}
 		
-		const re_url = `/combines/manage?added=${new_players.length}&skipped=${skipped}`;
-		if ( new_players.length ) {
-			
-			const tiermaker_insert_query = `
-				INSERT INTO tiermaker 
-					(season,rsc_id,discord_id,name,tier,count,keeper,base_mmr,effective_mmr,current_mmr)
-				VALUES ?
-			`;
-			req.db.query(tiermaker_insert_query, [new_players], (err, results) => {
-				if ( err ) { throw err; }
+	const new_players = [];
+	for ( const rsc_id in players ) {
+		const p = players[rsc_id];
+		new_players.push([
+			season, rsc_id, p.discord_id, p.name, p.tier, p.count, p.keeper, p.base_mmr,
+			p.effective_mmr, p.current_mmr
+		]);
+	}
+	
+	const re_url = `/combines/manage?added=${new_players.length}&skipped=${skipped}&updated=${Object.keys(updates).length}`;
+	if ( Object.keys(updates).length ) {
+		const update_query = `
+			UPDATE tiermaker 
+			SET name = ? WHERE rsc_id = ?
+		`;
+		for ( const rsc_id in updates ) {
+			await db.query(update_query, [updates[rsc_id], rsc_id]);
+		}
+	}
 
-				console.log(" -------- Tiermaker Import Complete --------- ");
-				console.log(`	Imported: ${new_players.length}`);
-				console.log(`	Skipped: ${skipped}`);
-				console.log(" -------- Tiermaker Import Complete --------- ");
+	if ( new_players.length ) {
 		
-				res.redirect(re_url);
-			});
-		} else {
-			res.redirect(re_url);
-		}
-	});
+		const tiermaker_insert_query = `
+			INSERT INTO tiermaker 
+				(season,rsc_id,discord_id,name,tier,count,keeper,base_mmr,effective_mmr,current_mmr)
+			VALUES ?
+		`;
+		await db.execute(tiermaker_insert_query, [new_players]);
+
+		console.log(" -------- Tiermaker Import Complete --------- ");
+		console.log(`	Imported: ${new_players.length}`);
+		console.log(`	Updated: ${Object.keys(updates).length}`);
+		console.log(`	Skipped: ${skipped}`);
+		console.log(updates);
+		console.log(" -------- Tiermaker Import Complete --------- ");
+
+		await db.end();
+
+		res.redirect(re_url);
+	} else {
+		res.redirect(re_url);
+	}
 
 });
 
