@@ -7,7 +7,7 @@
 // the contracts sheet
 const mmrRange = {
 	'Premier': { 
-		'max': 2010,
+		'max': 3010,
 		'min': 1750,
 	},
 	'Master': { 
@@ -40,7 +40,7 @@ const mmrRange = {
 	},
 	'Amateur': { 
 		'max': 915,
-		'min': 500,
+		'min': 0,
 	},
 };
 

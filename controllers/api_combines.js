@@ -114,6 +114,7 @@ router.get('/active', async(req,res) => {
 	const game_ids = [];
 	if ( results && results.length ) {
 		for ( let i = 0; i < results.length; ++i ) {
+			// TODO(erh): Add "getTierFromMMR()" for Nick
 			game_ids.push(results[i].id);
 			const game = results[i];
 			game.home = [];
