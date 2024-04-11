@@ -269,6 +269,9 @@
 			}
 		%>
 
+		<%
+			if ( ! match.cancelled ) {
+		%>
 		<div class="row mb-2">
 			<div class="col-md-6">
 				<h4>Upload Replays</h4>
@@ -319,7 +322,7 @@
 				%>
 			</div>
 		</div>
-
+		
 		<div class="row">
 			<div class="col-12">
 				<div class="bg-light">
@@ -584,6 +587,9 @@
 				</div>
 			</div>
 		</div>
+		<% 
+			}
+		%>
 	</div>
 
 	<% if ( is_admin ) { %>
