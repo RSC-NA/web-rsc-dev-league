@@ -254,12 +254,20 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 	console.log(req.file.originalname);
 	const file_name = req.file.originalname;
 
+	try { 
+
 	const query = `INSERT INTO combine_replays (match_id,rsc_id,replay) VALUES (?, ?, ?)`;
 	req.db.query(query, [combine_id, user.rsc_id, file_name], (err, results) => {
 		if ( err ) { throw err; }
 
 		res.json({'success': true });
 	});
+	} catch(e) { 
+		console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
+		console.log(` Combine ID: ${combine_id}`);
+
+		res.json({'success': false });
+	}
 });
 
 router.get('/combines/check_out/:discord_id', async (req, res) => {
