@@ -286,6 +286,13 @@ router.get('/check_in', async (req, res) => {
 		});
 	}
 
+	if ( res.locals.active_match ) {
+		return res.json({
+			'status': 'error',
+			'message': 'You are currently in a match. You cannot check in until it is finished.',
+		});
+	}
+
 	const combines = res.locals.combines;
 
 	if ( ! combines.live ) {
