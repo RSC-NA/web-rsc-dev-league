@@ -149,9 +149,6 @@ async function get_user(user_id) {
 
 	if ( results && results.length ) {
 		const p = results[0];
-		if ( p.discord_id === '966311613474938950' ) {
-			return res.json({banned: true});
-		}
 		const user = {
 			user_id: p.id,
 			nickname: p.nickname,
