@@ -14,7 +14,7 @@ function writeError(error) {
 function get_rand_word(suffix='') {
 	const words = [
 		'octane', 'gizmo', 'breakout', 'merc', 'hotshot', 'gizmo', 'backfire',
-		'x-devil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
+		'xdevil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
 		'mario', 'samus', 'sweet', 'tooth', 'aftershock', 'grog', 'esper', 
 		'marauder', 'masamune', 'proteus', 'ripper', 'scarab', 'takumi',
 		'triton', 'vulcan', 'zippy', 'backfire', 'paladin', 'hotshot', 'gizmo',
@@ -53,6 +53,9 @@ async function make_lobby(db, lobby) {
 	];
 	const [results] = await db.execute(match_query, params);
 	const match_id = results.insertId;
+
+	const username_query = 'UPDATE combine_matches SET lobby_user = ? WHERE id = ?';
+	await db.execute(username_query, [ `RSC${match_id}`, match_id ]);
 
 	const home = [];
 	const away = [];

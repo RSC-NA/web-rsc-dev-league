@@ -126,6 +126,9 @@ router.get('/process_login', (req, res) => {
 
 			// user doesn't exist, create the account.
 			if ( ! exists ) {
+				if ( ! discord_id ) {
+					console.log('DISCORD_ID IS NULL', nickname);
+				}
 				req.db.query(
 					'INSERT INTO players (nickname,discord_id) VALUES (?, ?)',
 					[ nickname, discord_id ],
