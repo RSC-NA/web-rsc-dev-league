@@ -34,13 +34,18 @@ router.get('/logout', (req, res) => {
 
 router.get('/oauth2', async (req, res) => {
 	const code = req.query.code;
+	
+	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	console.log('THE IP IS', ip);
+
 	try {
+		const http_pre = req.headers.host.includes('localhost') ? 'http://' : 'https://';
 		const params = new URLSearchParams({
 			client_id: process.env.DISCORD_CLIENT_ID,
 			client_secret: process.env.DISCORD_CLIENT_SECRET,
 			grant_type: 'authorization_code',
 			code: code,
-			redirect_uri: `${req.headers.host}/oauth2`,
+			redirect_uri: `${http_pre}${req.headers.host}/oauth2`,
 			scope: 'identify'
 		});
 		const response = await fetch('https://discord.com/api/oauth2/token', {
@@ -56,7 +61,6 @@ router.get('/oauth2', async (req, res) => {
 
 		const token_type = data.token_type;
 		const token = data.access_token;
-
 
 		const user = await fetch('https://discord.com/api/users/@me', {
 			headers: {
@@ -140,11 +144,19 @@ router.get('/oauth2', async (req, res) => {
 						req.session.is_devleague_admin = results[0].devleague_admin ? true: false;
 						req.session.is_stats_admin = results[0].stats_admin ? true: false;
 						req.session.is_combines_admin = results[0].combines_admin ? true: false;
-						if ( req.session.login_return_url ) {
-							res.redirect(req.session.login_return_url);
-						} else {
-							res.redirect('/');
-						}
+
+						const ip_query = `
+						insert into player_ips (rsc_id, nickname, discord_id, ip) 
+						values (?, ?, ?, ?)`;
+						req.db.query(ip_query, [user.rsc_id, user.nickname, discord_id, req.ip], (err, _results) => {
+							if ( err ) { throw err; }
+
+							if ( req.session.login_return_url ) {
+								res.redirect(req.session.login_return_url);
+							} else {
+								res.redirect('/');
+							}
+						});
 					}
 
 					// user doesn't exist, create the account.
@@ -173,47 +185,59 @@ router.get('/oauth2', async (req, res) => {
 									WHERE p.discord_id = ?`;
 								req.db.query(player_lookup_query, [discord_id], (err, results) => {
 
-										const user = {
-											user_id: results[0].id,
-											nickname: nickname,
-											name: results[0].name,
-											mmr: results[0].mmr,
-											tier: results[0].tier,
-											status: results[0].status,
-											rsc_id: results[0].rsc_id,
-											discord_id: discord_id,
-											combines: {
-												active: results[0].current_mmr ? true : false,
-												season: results[0].season,
-												base_mmr: results[0].base_mmr,
-												effective_mmr: results[0].effective_mmr,
-												current_mmr: results[0].current_mmr,
-												losses: results[0].losses,
-												wins: results[0].wins,
-												tier: results[0].assigned_tier,
-												count: results[0].count,
-												keeper: results[0].keeper,
-											},
-											active_3s: results[0].active_3s ? true : false,
-											active_2s: results[0].active_2s ? true : false,
-											is_admin: false,
-											is_tourney_admin: false,
-											is_devleague_admin: false,
-											is_stats_admin: false,
-											is_combines_admin: false,
-										};
-						
-										req.session.user = user;
-										req.session.is_admin = false;
-										req.session.is_tourney_admin = false;
-										req.session.is_devleague_admin = false;
-										req.session.is_stats_admin = false;
-										req.session.is_combines_admin = false;
+									const user = {
+										user_id: results[0].id,
+										nickname: nickname,
+										name: results[0].name,
+										mmr: results[0].mmr,
+										tier: results[0].tier,
+										status: results[0].status,
+										rsc_id: results[0].rsc_id,
+										discord_id: discord_id,
+										combines: {
+											active: results[0].current_mmr ? true : false,
+											season: results[0].season,
+											base_mmr: results[0].base_mmr,
+											effective_mmr: results[0].effective_mmr,
+											current_mmr: results[0].current_mmr,
+											losses: results[0].losses,
+											wins: results[0].wins,
+											tier: results[0].assigned_tier,
+											count: results[0].count,
+											keeper: results[0].keeper,
+										},
+										active_3s: results[0].active_3s ? true : false,
+										active_2s: results[0].active_2s ? true : false,
+										is_admin: false,
+										is_tourney_admin: false,
+										is_devleague_admin: false,
+										is_stats_admin: false,
+										is_combines_admin: false,
+									};
+					
+									req.session.user = user;
+									req.session.is_admin = false;
+									req.session.is_tourney_admin = false;
+									req.session.is_devleague_admin = false;
+									req.session.is_stats_admin = false;
+									req.session.is_combines_admin = false;
+									const ip_query = `
+									insert into player_ips (rsc_id, nickname, discord_id, ip) 
+									values (?, ?, ?, ?)`;
+									req.db.query(ip_query, [
+										user.rsc_id,
+										user.nickname,
+										discord_id,
+										req.ip,
+									], (err, _results) => {
+										if ( err ) { throw err; }
+
 										if ( req.session.login_return_url ) {
-											return res.redirect(req.session.login_return_url);
+											res.redirect(req.session.login_return_url);
 										} else {
-											return res.redirect('/');
+											res.redirect('/');
 										}
+									});
 								});
 							}
 						);
@@ -236,6 +260,8 @@ router.get('/callback', (req, res) => {
 });
 
 router.get('/process_login', (req, res) => {
+	console.error('------ A HACKER IS TRYING TO HACK -------');
+	console.log(req.ip);
 });
 
 module.exports = router;

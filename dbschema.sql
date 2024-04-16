@@ -99,6 +99,16 @@ CREATE TABLE players (
 	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE player_ips (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`rsc_id` VARCHAR(10),
+	`nickname` VARCHAR(255) NOT NULL,
+	`discord_id` VARCHAR(20) NOT NULL,
+	`ip` VARCHAR(18),
+	`date_logged_in` DATETIME NOT NULL DEFAULT now(),
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE signups (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`player_id` INT UNSIGNED NOT NULL,
