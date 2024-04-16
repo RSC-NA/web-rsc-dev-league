@@ -259,9 +259,4 @@ router.get('/callback', (req, res) => {
 	res.json(req.body);
 });
 
-router.get('/process_login', (req, res) => {
-	console.error('------ A HACKER IS TRYING TO HACK -------');
-	console.log(req.ip);
-});
-
 module.exports = router;
