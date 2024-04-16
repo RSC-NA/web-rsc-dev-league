@@ -673,7 +673,7 @@ router.get('/process', (req, res) => {
 				}
 			}
 
-			const active_query = 'SELECT id,lobby_user,lobby_pass FROM combine_matches WHERE completed = 0 AND cancelled = 0';
+			const active_query = 'SELECT id,lobby_user,lobby_pass,home_mmr FROM combine_matches WHERE completed = 0 AND cancelled = 0';
 			req.db.query(active_query, (err, results) => {
 				if ( err ) { throw err; }
 
@@ -685,6 +685,7 @@ router.get('/process', (req, res) => {
 				res.render('process_combine', {
 					signups: signups,
 					games: games,
+					getTierFromMMR: getTierFromMMR,
 				});
 			});
 		});

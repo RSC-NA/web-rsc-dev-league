@@ -67,12 +67,16 @@
 			</div>
 		</a>
 		<div id="collapse_games" class="card-body collapse">
-			<ul>
+			<ul style="list-style: none;" class="fw-bolder">
 			<%
 				if ( games.length ) {	
 					for ( let i = 0; i < games.length; ++i ) {
+						const tier = getTierFromMMR(games[i].home_mmr / 3);
 			%>
 				<li>
+					<span class="<%- tier; %> text-end d-inline-block px-1" style="width:100px;">
+						<%- tier; %>
+					</span>
 					<a href="/combine/<%- games[i].id; %>">
 						<%- games[i].lobby_user; %>-<%- games[i].lobby_pass %>
 					</a>

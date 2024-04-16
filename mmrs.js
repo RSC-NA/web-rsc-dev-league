@@ -8,38 +8,38 @@
 const mmrRange = {
 	'Premier': { 
 		'max': 3010,
-		'min': 1750,
+		'min': 1780,
 	},
 	'Master': { 
-		'max': 1745,
-		'min': 1650,
+		'max': 1775,
+		'min': 1680,
 	},
 	'Elite': { 
-		'max': 1645,
-		'min': 1505,
+		'max': 1675,
+		'min': 1530,
 	},
 	'Veteran': { 
-		'max': 1500,
-		'min': 1415,
+		'max': 1525,
+		'min': 1420,
 	},
 	'Rival': { 
-		'max': 1410,
-		'min': 1300,
+		'max': 1415,
+		'min': 1270,
 	},
 	'Challenger': { 
-		'max': 1295,
-		'min': 1170,
+		'max': 1265,
+		'min': 1130,
 	},
 	'Prospect': { 
-		'max': 1165,
-		'min': 1050,
+		'max': 1125,
+		'min': 1040,
 	},
 	'Contender': { 
-		'max': 1045,
-		'min': 920,
+		'max': 1035,
+		'min': 930,
 	},
 	'Amateur': { 
-		'max': 915,
+		'max': 925,
 		'min': 0,
 	},
 };
