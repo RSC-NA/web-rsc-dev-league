@@ -4,6 +4,54 @@ const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
+async function get_lobby(db,match_id) {
+	const active_query = `
+		SELECT 
+			id,lobby_user,lobby_pass,home_wins,away_wins,
+			reported_rsc_id,confirmed_rsc_id,home_mmr as tier,
+			completed,cancelled 
+		FROM combine_matches 
+		WHERE id = ?
+	`;
+	const [results] = await db.query(active_query, [match_id]);
+	const games = {};
+	const game_ids = [];
+	if ( results && results.length ) {
+		for ( let i = 0; i < results.length; ++i ) {
+			game_ids.push(results[i].id);
+			const game = results[i];
+			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
+			console.log('Generated Tier', game.tier);
+			game.home = [];
+			game.away = [];
+			games[results[i].id] = game;
+		}
+	}
+
+	if ( game_ids && game_ids.length ) {
+		const players_query = `
+			SELECT 
+				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
+			FROM combine_match_players AS p 
+			LEFT JOIN tiermaker AS t 
+			ON p.rsc_id = t.rsc_id 
+			WHERE p.match_id in (?)
+		`;
+		const [p_results] = await db.query(players_query, [game_ids]);
+		if ( p_results && p_results.length ) {
+			for ( let i = 0; i < p_results.length; ++i ) {
+				const p = p_results[i];
+				if ( p.team === 'home' ) {
+					games[p.match_id].home.push(p);
+				} else {
+					games[p.match_id].away.push(p);
+				}
+			}
+		}
+	}
+
+	return games;
+}
 async function get_active(db,match_id) {
 	const active_query = `
 		SELECT 
@@ -239,7 +287,8 @@ router.get('/lobby/:lobby_id', async (req, res) => {
 
 	try { 
 
-		lobby = await get_active(res.locals.adb, req.params.lobby_id);
+		lobby = await get_lobby(res.locals.adb, req.params.lobby_id);
+		console.log(res.locals.adb,lobby,req.params.lobby_id);
 
 		await res.locals.adb.end();
 
