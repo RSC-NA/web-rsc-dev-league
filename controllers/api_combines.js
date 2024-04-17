@@ -96,6 +96,8 @@ router.use(async (req, res, next) => {
 							'status': 'error',
 							'message': 'You are not a player in the tiermaker. ',
 						});
+					} else {
+						next();
 					}
 			}
 
