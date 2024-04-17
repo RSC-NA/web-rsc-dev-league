@@ -164,6 +164,11 @@ router.get('/oauth2', async (req, res) => {
 					if ( ! exists ) {
 						if ( ! discord_id ) {
 							console.log('DISCORD_ID IS NULL', nickname);
+
+							if ( ! nickname ) {
+								console.log('user does not exist. reloading', user_obj);
+								return res.redirect('/');
+							}
 						}
 						req.db.query(
 							'INSERT INTO players (nickname,discord_id) VALUES (?, ?)',
