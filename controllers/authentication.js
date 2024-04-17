@@ -148,7 +148,7 @@ router.get('/oauth2', async (req, res) => {
 						const ip_query = `
 						insert into player_ips (rsc_id, nickname, discord_id, ip) 
 						values (?, ?, ?, ?)`;
-						req.db.query(ip_query, [user.rsc_id, user.nickname, discord_id, req.ip], (err, _results) => {
+						req.db.query(ip_query, [user.rsc_id, user.nickname, discord_id, ip], (err, _results) => {
 							if ( err ) { throw err; }
 
 							if ( req.session.login_return_url ) {
@@ -228,7 +228,7 @@ router.get('/oauth2', async (req, res) => {
 										user.rsc_id,
 										user.nickname,
 										discord_id,
-										req.ip,
+										ip,
 									], (err, _results) => {
 										if ( err ) { throw err; }
 
@@ -259,4 +259,3 @@ router.get('/callback', (req, res) => {
 	res.json(req.body);
 });
 
-module.exports = router;
