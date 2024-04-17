@@ -91,10 +91,12 @@ router.use(async (req, res, next) => {
 			);
 
 			if ( ! tm_results || ! tm_results.length ) {
-					return res.json({
-						'status': 'error',
-						'message': 'You are not a player in the tiermaker. ',
-					});
+					if ( ! req.originalUrl.includes('lobby') ) {
+						return res.json({
+							'status': 'error',
+							'message': 'You are not a player in the tiermaker. ',
+						});
+					}
 			}
 
 			res.locals.rsc_id = tm_results[0].rsc_id;
