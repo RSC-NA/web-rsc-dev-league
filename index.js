@@ -1,3 +1,5 @@
+require('ansi-colors');
+
 // if we're running in node, pull in our .env
 // we also have to fix out "password" to strip out 
 // any escaping that we need for Bun .env reading
@@ -7,7 +9,7 @@ if ( typeof Bun === 'undefined' ) {
 	process.env.DB_PASS = process.env.DB_PASS.replaceAll('\\','');
 	console.log(`    ${process.env.NODE_ENV}`);
 } else {
-	console.log('*** Bun runtime. :) ***');
+	console.log('*** Bun runtime. :) ***'.fg('green', 'bright').clearAll());
 	console.log(`    ${process.env.NODE_ENV}`);
 }
 
@@ -231,7 +233,7 @@ app.use(async (req, res, next) => {
 	res.locals.is_combines_admin = req.session.is_combines_admin;
 	res.locals.rostered = req.session.rostered;
 
-	console.log(`url: ${req.headers.host}${req.originalUrl} - [${req.session.nickname}]`);
+	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${req.session.nickname.fg('green','bright').clearAll()}]`);
 
 	//res.locals.user = req.session.user || {};
 	res.locals.user = await get_user(req.session.user_id);
