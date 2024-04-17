@@ -21,7 +21,7 @@ async function get_lobby(db,match_id) {
 			game_ids.push(results[i].id);
 			const game = results[i];
 			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
-			console.log('Generated Tier', game.tier);
+			console.log('Generated Tier for',match_id,'-', game.tier);
 			game.home = [];
 			game.away = [];
 			games[results[i].id] = game;
@@ -288,7 +288,6 @@ router.get('/lobby/:lobby_id', async (req, res) => {
 	try { 
 
 		lobby = await get_lobby(res.locals.adb, req.params.lobby_id);
-		console.log(res.locals.adb,lobby,req.params.lobby_id);
 
 		await res.locals.adb.end();
 
