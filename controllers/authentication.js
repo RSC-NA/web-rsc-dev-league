@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 
 router.use(bodyParser.text());
 
-
 router.get('/login_with_discord', (req, res) => {
 	const referrer = req.get('Referrer');
 	if ( referrer ) {
@@ -228,7 +227,7 @@ router.get('/oauth2', async (req, res) => {
 										user.rsc_id,
 										user.nickname,
 										discord_id,
-										ip,
+										req.ip,
 									], (err, _results) => {
 										if ( err ) { throw err; }
 
@@ -259,3 +258,4 @@ router.get('/callback', (req, res) => {
 	res.json(req.body);
 });
 
+module.exports = router;
