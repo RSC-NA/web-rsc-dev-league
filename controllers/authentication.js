@@ -75,7 +75,7 @@ router.get('/oauth2', async (req, res) => {
 			const discord_id = user_obj.id;
 			const nickname = user_obj.username;
 
-			console.log('User Found', discord_id, nickname);
+			console.log('User Found', user_obj, discord_id, nickname);
 
 			const query = `
 				SELECT 
