@@ -69,7 +69,7 @@ router.get('/oauth2', async (req, res) => {
 
 		const user_obj = await user.json();
 
-		if ( user_obj ) {
+		if ( user_obj && user_obj?.id && user_obj?.nickname ) {
 			const discord_id = user_obj.id;
 			const nickname = user_obj.global_name;
 
