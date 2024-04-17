@@ -91,13 +91,13 @@ router.use(async (req, res, next) => {
 			);
 
 			if ( ! tm_results || ! tm_results.length ) {
-					if ( ! req.originalUrl.includes('lobby') ) {
+					if ( req.originalUrl.includes('lobby') ) {
+						return next();
+					} else {
 						return res.json({
 							'status': 'error',
 							'message': 'You are not a player in the tiermaker. ',
 						});
-					} else {
-						next();
 					}
 			}
 
