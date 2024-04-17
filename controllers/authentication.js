@@ -39,12 +39,14 @@ router.get('/oauth2', async (req, res) => {
 
 	try {
 		const http_pre = req.headers.host.includes('localhost') ? 'http://' : 'https://';
+		const redirect_uri = `${http_pre}${req.headers.host}/oauth2`;
+		console.log(redirect_uri);
 		const params = new URLSearchParams({
 			client_id: process.env.DISCORD_CLIENT_ID,
 			client_secret: process.env.DISCORD_CLIENT_SECRET,
 			grant_type: 'authorization_code',
 			code: code,
-			redirect_uri: `${http_pre}${req.headers.host}/oauth2`,
+			redirect_uri: redirect_uri,
 			scope: 'identify'
 		});
 		const response = await fetch('https://discord.com/api/oauth2/token', {
@@ -69,9 +71,9 @@ router.get('/oauth2', async (req, res) => {
 
 		const user_obj = await user.json();
 
-		if ( user_obj && user_obj?.id && user_obj?.nickname ) {
+		if ( user_obj ) {
 			const discord_id = user_obj.id;
-			const nickname = user_obj.global_name;
+			const nickname = user_obj.username;
 
 			console.log('User Found', discord_id, nickname);
 
