@@ -224,6 +224,47 @@ router.get('/active', async(req,res) => {
 	res.json(games);
 });
 
+
+router.get('/lobby/:lobby_id', async (req, res) => {
+	if ( ! req.params.lobby_id ) {
+		return res.json({
+			'status': 'error',
+			'message': 'You must provide a lobby.',
+		});
+	}
+
+	try { 
+
+		lobby = await get_active(res.locals.adb, req.params.lobby_id);
+
+		await res.locals.adb.end();
+
+		if ( lobby ) {
+			return res.json(lobby);
+		} else {
+			return res.json({
+				'status': 'error',
+				'message': 'This lobby does not exist.',
+			});
+		}
+	} catch(e) {
+		const error = {
+			location: '/lobby',
+			e: e,
+			discord_id: res.locals.discord_id,
+			user: res.locals.user,
+		};
+		console.log(' ------------ ERROR -------------');	
+		console.log(error);
+		writeApiError(error);
+
+		return res.json({
+			'status': 'error',
+			'message': `Unknown error!`,
+		});
+	}
+});
+
 router.get('/lobby', async (req, res) => {
 	if ( ! res.locals.match ) {
 		return res.json({
