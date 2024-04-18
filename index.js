@@ -233,7 +233,7 @@ app.use(async (req, res, next) => {
 	res.locals.is_combines_admin = req.session.is_combines_admin;
 	res.locals.rostered = req.session.rostered;
 
-	const nick = req?.session?.nickname?.fg('green','bright').clearAll() ?? 'none'.fg('red').clearAll();
+	const nick = req?.session?.nickname.fg('green','bright').clearAll() ?? 'none'.fg('red').clearAll();
 	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}]`);
 
 	//res.locals.user = req.session.user || {};
