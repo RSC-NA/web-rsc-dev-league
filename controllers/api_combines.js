@@ -372,10 +372,6 @@ router.get('/lobby', async (req, res) => {
 });
 
 router.get('/check_in', async (req, res) => {
-	return res.json({
-		'status': 'error',
-		'message': 'The bot is turned off. Use https://devleague.rscna.com to check in.',
-	});
 	if ( res.locals.checked_in ) {
 		return res.json({
 			'status': 'error',
