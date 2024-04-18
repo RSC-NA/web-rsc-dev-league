@@ -113,6 +113,8 @@ function game_outcome(home_mmr, away_mmr, games) {
 }
 
 function rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
+	home_mmr = home_mmr / 3;
+	away_mmr = away_mmr / 3;
 	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
 	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
 
@@ -240,10 +242,12 @@ router.get('/mmr/:home/:away', (req, res) => {
 	const away_mmr = req.params.away.split(':')[0];
 	const away_wins = req.params.away.split(':')[1];
 
+	const k_factor = req.query.k_factor ?? 48;
+
 	const delta = rating_delta_series(home_mmr, away_mmr, {
 		home: home_wins,
 		away: away_wins,
-	});
+	}, k_factor);
 
 	return res.json(delta);
 });
