@@ -182,7 +182,7 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 						}
 
 						player.combines = results;
-						console.log('combines',results);
+						//console.log('combines',results);
 						return res.render('player', { player: player });
 					});
 				} else {

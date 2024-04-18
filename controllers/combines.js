@@ -234,6 +234,20 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 	}
 });
 
+router.get('/mmr/:home/:away', (req, res) => {
+	const home_mmr = req.params.home.split(':')[0];
+	const home_wins = req.params.home.split(':')[1];
+	const away_mmr = req.params.away.split(':')[0];
+	const away_wins = req.params.away.split(':')[1];
+
+	const delta = rating_delta_series(home_mmr, away_mmr, {
+		home: home_wins,
+		away: away_wins,
+	});
+
+	return res.json(delta);
+});
+
 router.get('/combines/matches', (req, res) => {
 	if ( ! res.locals?.user?.rsc_id ) {
 		return res.redirect('/');
