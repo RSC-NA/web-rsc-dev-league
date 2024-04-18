@@ -124,14 +124,14 @@ function rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
 
 	const results = { 
 		home: {
-			start: home_mmr,
+			start: parseInt(home_mmr),
 			delta: home_delta,
-			end: home_mmr + home_delta,
+			end: parseInt(home_mmr) + home_delta,
 		},
 		away: {
-			start: away_mmr,
+			start: parseInt(away_mmr),
 			delta: away_delta,
-			end: away_mmr + away_delta,
+			end: parseInt(away_mmr) + away_delta,
 		},
 	};
 
