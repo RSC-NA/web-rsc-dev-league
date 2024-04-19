@@ -229,7 +229,7 @@ router.use(async (req, res, next) => {
 router.get('/active', async(req,res) => {
 	const active_query = `
 		SELECT 
-			id,lobby_user,lobby_pass,home_wins,away_wins,
+			id,lobby_user,lobby_pass,home_wins,away_wins,home_mmr,
 			reported_rsc_id,confirmed_rsc_id,
 			completed,cancelled 
 		FROM combine_matches 
@@ -243,6 +243,7 @@ router.get('/active', async(req,res) => {
 			// TODO(erh): Add "getTierFromMMR()" for Nick
 			game_ids.push(results[i].id);
 			const game = results[i];
+			game.tier = getTierFromMMR(game.home_mmr);
 			game.home = [];
 			game.away = [];
 			games[results[i].id] = game;
