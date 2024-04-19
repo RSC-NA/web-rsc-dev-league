@@ -233,7 +233,7 @@ router.get('/active', async(req,res) => {
 			reported_rsc_id,confirmed_rsc_id,
 			completed,cancelled 
 		FROM combine_matches 
-		WHERE completed = 0
+		WHERE completed = 0 AND cancelled = 0
 	`;
 	const [results] = await res.locals.adb.query(active_query);
 	const games = {};
