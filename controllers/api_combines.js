@@ -244,6 +244,7 @@ router.get('/active', async(req,res) => {
 			game_ids.push(results[i].id);
 			const game = results[i];
 			game.tier = getTierFromMMR(game.home_mmr/3);
+			delete(game.home_mmr);
 			game.home = [];
 			game.away = [];
 			games[results[i].id] = game;
