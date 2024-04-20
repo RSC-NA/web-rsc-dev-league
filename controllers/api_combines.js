@@ -139,7 +139,7 @@ router.use(async (req, res, next) => {
 			);
 
 			if ( ! tm_results || ! tm_results.length ) {
-					if ( req.originalUrl.includes('lobby') ) {
+					if ( req.originalUrl.includes('lobby') || req.originalUrl.includes('games') ) {
 						return next();
 					} else {
 						return res.json({
@@ -200,11 +200,14 @@ router.use(async (req, res, next) => {
 			next();
 
 		} else {
-
-			return res.json({
-				'status': 'error',
-				'message': 'You must provide a `discord_id`.',
-			});
+			if ( req.originalUrl.includes('games') ) {
+				next();
+			} else {
+				return res.json({
+					'status': 'error',
+					'message': 'You must provide a `discord_id`.',
+				});
+			}
 
 		}
 
@@ -224,6 +227,34 @@ router.use(async (req, res, next) => {
 			'message': `Unknown error!`,
 		});
 	}
+});
+
+router.get('/games', async(req,res) => {
+	const players_query = `
+		SELECT
+			season,rsc_id,discord_id,name,tier,wins,losses,wins + losses AS games
+		FROM tiermaker 
+		WHERE season = ? AND (losses > 0 OR wins > 0)
+		ORDER BY rsc_id ASC  
+	`;
+	const [results] = await res.locals.adb.query(players_query, [res.locals.combines.season]);
+
+	return res.json(results);
+});
+router.get('/games/:rsc_id', async(req,res) => {
+	const players_query = `
+		SELECT
+			season,rsc_id,discord_id,name,tier,wins,losses,wins + losses AS games
+		FROM tiermaker 
+		WHERE season = ? AND rsc_id = ? AND (losses > 0 OR wins > 0)
+		ORDER BY rsc_id ASC  
+	`;
+	const [results] = await res.locals.adb.query(players_query, [
+		res.locals.combines.season,
+		req.params.rsc_id,
+	]);
+
+	return res.json(results);
 });
 
 router.get('/active', async(req,res) => {
