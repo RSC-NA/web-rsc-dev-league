@@ -241,17 +241,18 @@ router.get('/games', async(req,res) => {
 
 	return res.json(results);
 });
-router.get('/games/:rsc_id', async(req,res) => {
+router.get('/games/:rsc_id_or_discord_id', async(req,res) => {
 	const players_query = `
 		SELECT
 			season,rsc_id,discord_id,name,tier,wins,losses,wins + losses AS games
 		FROM tiermaker 
-		WHERE season = ? AND rsc_id = ? AND (losses > 0 OR wins > 0)
+		WHERE season = ? AND (rsc_id = ? OR discord_id = ?) AND (losses > 0 OR wins > 0)
 		ORDER BY rsc_id ASC  
 	`;
 	const [results] = await res.locals.adb.query(players_query, [
 		res.locals.combines.season,
-		req.params.rsc_id,
+		req.params.rsc_id_or_discord_id,
+		req.params.rsc_id_or_discord_id,
 	]);
 
 	return res.json(results);
