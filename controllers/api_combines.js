@@ -232,7 +232,8 @@ router.use(async (req, res, next) => {
 router.get('/games', async(req,res) => {
 	const players_query = `
 		SELECT
-			season,rsc_id,discord_id,name,tier,wins,losses,wins + losses AS games
+			season,rsc_id,discord_id,name,tier,wins,losses,
+			wins + losses AS games,wins / (wins+losses) as win_pct
 		FROM tiermaker 
 		WHERE season = ? AND (losses > 0 OR wins > 0)
 		ORDER BY rsc_id ASC  
@@ -244,7 +245,8 @@ router.get('/games', async(req,res) => {
 router.get('/games/:rsc_id_or_discord_id', async(req,res) => {
 	const players_query = `
 		SELECT
-			season,rsc_id,discord_id,name,tier,wins,losses,wins + losses AS games
+			season,rsc_id,discord_id,name,tier,wins,losses,
+			wins + losses AS games,wins / (wins+losses) as win_pct
 		FROM tiermaker 
 		WHERE season = ? AND (rsc_id = ? OR discord_id = ?) AND (losses > 0 OR wins > 0)
 		ORDER BY rsc_id ASC  
