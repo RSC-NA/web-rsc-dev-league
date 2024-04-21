@@ -240,6 +240,8 @@ router.get('/games', async(req,res) => {
 	`;
 	const [results] = await res.locals.adb.query(players_query, [res.locals.combines.season]);
 
+	await res.locals.adb.end();
+
 	return res.json(results);
 });
 router.get('/games/:rsc_id_or_discord_id', async(req,res) => {
@@ -256,6 +258,8 @@ router.get('/games/:rsc_id_or_discord_id', async(req,res) => {
 		req.params.rsc_id_or_discord_id,
 		req.params.rsc_id_or_discord_id,
 	]);
+
+	await res.locals.adb.end();
 
 	return res.json(results);
 });
