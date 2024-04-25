@@ -241,6 +241,30 @@ async function get_active(db) {
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
+router.get('/resend_bot', async (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	}
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	await notify_bot(db);
+
+	await db.end();
+
+	res.json({'done': 'success'});
+});
+
+
 router.all('/generate', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');

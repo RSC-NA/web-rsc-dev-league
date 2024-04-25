@@ -95,7 +95,7 @@
 	<div class="row mb-sm-4 mb-lg-0">
 		<div class="col-1 col-sm-2"></div>
 		<div class="col-10 col-sm-8">
-			<div class="alert alert-success d-flex align-items-center" role="alert">
+			<div class="alert <%- lobbies < 10 ? 'alert-warning' : 'alert-success'; %> d-flex align-items-center" role="alert">
 				<div class="bi flex-shrink-0 me-2">
 					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
 						<use xlink:href="#check-circle-fill"/>
@@ -107,7 +107,7 @@
 					</div>
 					<hr>
 					<%
-						if ( lobbies < 6 ) {
+						if ( lobbies < 10 ) {
 					%>
 					<p class="lead fw-bolder">
 						Be careful!
