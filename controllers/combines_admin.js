@@ -261,7 +261,7 @@ router.get('/resend_bot', async (req, res) => {
 
 	await db.end();
 
-	res.json({'done': 'success'});
+	res.redirect('/process');
 });
 
 
