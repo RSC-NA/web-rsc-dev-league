@@ -244,6 +244,7 @@ router.get('/games', async(req,res) => {
 
 	return res.json(results);
 });
+
 router.get('/games/:rsc_id_or_discord_id', async(req,res) => {
 	const players_query = `
 		SELECT

@@ -238,9 +238,284 @@ async function get_active(db) {
 	return games;
 }
 
+function rating_delta_series_overload(home_mmr, away_mmr, scores, k_factor=48) {
+	home_mmr = home_mmr / 3;
+	away_mmr = away_mmr / 3;
+	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
+	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
+
+	const home_result = scores.home / 3;
+	const away_result = scores.away / 3;
+
+	const home_delta = Math.round(k_factor * (home_result - home_win_chance));
+	const away_delta = Math.round(k_factor * (away_result - away_win_chance));
+
+	const results = { 
+		home: {
+			start: parseInt(home_mmr),
+			delta: home_delta,
+			end: parseInt(home_mmr) + home_delta,
+		},
+		away: {
+			start: parseInt(away_mmr),
+			delta: away_delta,
+			end: parseInt(away_mmr) + away_delta,
+		},
+	};
+
+	return results;
+}
+
+async function remove_previous_wins_overload(db, match) {
+	const tiermaker_query = `
+		UPDATE tiermaker set wins = ?, losses = ? WHERE rsc_id = ?
+	`;
+
+	for ( const rsc_id in match.players ) {
+		console.log('Updating...',rsc_id);
+		const p = match.players[rsc_id];
+		const new_mmr = p.start_mmr + delta[p.team].delta;
+		const new_wins = match.players.wins - (p.wins + scores[p.team]);
+		const new_losses = match.players.losses - (p.losses + (3 - scores[p.team]));
+		console.log(`Updating Wins for ${rsc_id}: ${new_wins} - ${new_losses}`);
+		await db.execute(tiermaker_query, [new_wins,new_losses,rsc_id]);
+	}
+
+	return true;
+}
+
+async function update_mmrs_overload(db, match, k_factor=48) {
+	const scores = { home: match.home_wins, away: match.away_wins };
+	const delta = rating_delta_series_overload(match.home_mmr, match.away_mmr, scores, k_factor);
+
+	const player_query = `
+		UPDATE combine_match_players SET end_mmr = ? WHERE match_id = ? AND rsc_id =?
+	`;
+	const tiermaker_query = `
+		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ?
+	`;
+
+	for ( const rsc_id in match.players ) {
+		console.log('Updating...',rsc_id);
+		const p = match.players[rsc_id];
+		const new_mmr = p.start_mmr + delta[p.team].delta;
+		const new_wins = p.wins + scores[p.team];
+		const new_losses = p.losses + (3 - scores[p.team]);
+		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
+		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id]);
+	}
+
+	match.delta = delta;
+	return match;
+}
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
+// this route takes a game that is completed and "rescores" the MMRs of everyone in the lobby.
+router.post('/combine/overload/:match_id', async (req, res) => {
+	const match_id = req.params.match_id;
+
+	const home_wins = parseInt(req.body.home_wins);
+	const away_wins = parseInt(req.body.away_wins);
+	
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+
+	if ( 
+		(home_wins < 0 || home_wins > 3) ||
+		(away_wins < 0 || away_wins > 3 ) ) {
+		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
+	}
+
+	if ( home_wins + away_wins != 3 ) {
+		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
+	}
+
+
+	const my_rsc_id = res.locals.user.rsc_id;
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const match_query = `
+		SELECT 
+			id, match_dtg, season, lobby_user, lobby_pass, home_mmr, away_mmr,
+			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, 
+			completed, cancelled 
+		FROM 
+			combine_matches 
+		WHERE id = ?
+	`;
+	const [match_results] = await db.execute(match_query, [match_id]);
+
+	let match = {};
+	if ( match_results && match_results.length ) {
+		match = match_results[0];
+		match.replays = [];
+		match.players = {};
+	}
+			
+	if ( home_wins === match.home_wins || away_wins === match.away_wins ) {
+		return res.redirect('/combine/${match_id}?error=AlreadyScored');
+	}
+
+	const players_query = `
+		SELECT 
+			p.id, p.rsc_id, p.team, p.start_mmr, p.end_mmr,
+			t.name,t.effective_mmr,t.wins,t.losses
+		FROM combine_match_players AS p
+		LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id
+		WHERE p.match_id = ?
+	`;
+	const [players_results] = await db.execute(players_query, [match_id]);
+
+	if ( players_results && players_results.length ) {
+		for ( let i = 0; i < players_results.length; ++i ) {
+			const p = players_results[i];
+			match.players[p.rsc_id] = p;
+		}
+	}
+
+	let can_save = false;
+	let can_report = false;
+	let can_confirm = false;
+	if ( req.session.is_admin || req.session.is_combines_admin ) {
+		can_save = true;
+		can_report = true;
+		can_confirm = true;
+	}
+
+	if ( ! can_save ) {
+		await db.end();
+		return res.redirect(`/combine/${match_id}?error=NotInLobby`);
+	}
+
+	if ( can_report && ! match.reported_rsc_id ) {
+		if ( match.confirmed_rsc_id && (match.home_wins || match.away_wins)) {
+			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
+				await db.end();
+				await send_bot_message(
+					actor,
+					'error',
+					'Score Report Mismatch',
+					`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
+					match
+				);
+				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
+			}
+		}
+
+		const completed = match.confirmed_rsc_id ? 1 : 0;
+		
+		const report_query = `
+			UPDATE combine_matches 
+			SET 
+				home_wins = ?, 
+				away_wins = ?, 
+				reported_rsc_id = ?,
+				completed = ?
+			WHERE id = ?
+		`;
+		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
+
+		if ( completed ) {	
+			await remove_previous_wins_overload(db, match, home_wins, away_wins);
+
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
+			await db.end();
+			await send_bot_message(
+				actor,
+				'success',
+				'Finished Game',
+				`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
+				match
+			);
+			return res.redirect(`/combine/${match_id}?finished`);
+		} else {
+			await db.end();
+			await send_bot_message(
+				actor,
+				'success',
+				'Reported Score',
+				`${home_wins}-${away_wins}`,
+				match
+			);
+			return res.redirect(`/combine/${match_id}?reported`);
+		}
+	} 
+
+	if ( can_confirm && ! match.confirmed_rsc_id ) {
+		if ( match.reported_rsc_id && (match.home_wins || match.away_wins)) {
+			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
+				await db.end();
+				await send_bot_message(
+					actor,
+					'error',
+					'Score Report Mismatch',
+					`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
+					match
+				);
+				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
+			}
+		}
+
+		const completed = match.reported_rsc_id ? 1 : 0;
+		
+		const report_query = `
+			UPDATE combine_matches 
+			SET 
+				home_wins = ?, 
+				away_wins = ?, 
+				confirmed_rsc_id = ?,
+				completed = ?
+			WHERE id = ?
+		`;
+		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
+
+		if ( completed) {	
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
+			await db.end();
+			await send_bot_message(
+				actor,
+				'success',
+				'Finished Game',
+				`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
+				match
+			);
+			return res.redirect(`/combine/${match_id}?finished`);
+		} else {
+			await db.end();
+			await send_bot_message(
+				actor,
+				'success',
+				'Reported Score',
+				`${home_wins}-${away_wins}`,
+				match
+			);
+			return res.redirect(`/combine/${match_id}?confirmed`);
+		}
+	}
+
+	await db.end();
+	await send_bot_message(
+		actor,
+		'error',
+		'Game Complete',
+		'This game has already ended. The score cannot be reported again.',
+		match
+	);
+	res.redirect(`/combine/${match_id}?error=AlreadyReported`);
+});
 router.get('/resend_bot', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');
@@ -263,7 +538,6 @@ router.get('/resend_bot', async (req, res) => {
 
 	res.redirect('/process');
 });
-
 
 router.all('/generate', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {

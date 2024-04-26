@@ -277,47 +277,49 @@
 			if ( is_admin||is_combines_admin ) { 
 		%>
 		<div class="row mb-2">
-			<h4>Admin Overload </h4>
-			<form action="/combine/overload/<%- match.id %>" method="post">
-				<div class="mb-3">
-					<label for="home_wins">Home Team Series Score</label>
-					<div class="input-group">
-						<input
-							type="number"
-							class="form-control"
-							name="home_wins"
-							id="home_wins"
-							placeholder=""
-							value="<%- match.home_wins %>"
-							max="3"
-							tabindex="1"
-							required
-						>
+			<div class="col-6">
+				<h4>Admin Overload </h4>
+				<form action="/combine/overload/<%- match.id %>" method="post">
+					<div class="mb-3">
+						<label for="home_wins">Home Team Series Score</label>
+						<div class="input-group">
+							<input
+								type="number"
+								class="form-control"
+								name="home_wins"
+								id="home_wins"
+								placeholder=""
+								value="<%- match.home_wins %>"
+								max="3"
+								tabindex="1"
+								required
+							>
+						</div>
 					</div>
-				</div>
-				<div class="mb-3">
-					<label for="away_wins">Away Team Series Score</label>
-					<div class="input-group">
-						<input
-							type="number"
-							class="form-control"
-							name="away_wins"
-							id="away_wins"
-							placeholder=""
-							value="<%- match.away_wins %>"
-							tabindex="2"
-							max="3"
-							required
-						>
-						<input
-							tabindex="3"
-							type="submit"
-							class=" btn btn-large btn-danger rounded"
-							value="Override Scores"
-						>
+					<div class="mb-3">
+						<label for="away_wins">Away Team Series Score</label>
+						<div class="input-group">
+							<input
+								type="number"
+								class="form-control"
+								name="away_wins"
+								id="away_wins"
+								placeholder=""
+								value="<%- match.away_wins %>"
+								tabindex="2"
+								max="3"
+								required
+							>
+							<input
+								tabindex="3"
+								type="submit"
+								class=" btn btn-large btn-danger rounded"
+								value="Override Scores"
+							>
+						</div>
 					</div>
-				</div>
-			</form>
+				</form>
+			</div>
 		</div>
 		<%
 			}
