@@ -990,6 +990,86 @@ router.get('/process', (req, res) => {
 	});
 });
 
+router.get('/process/waiting', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+
+	const players_query = `
+		SELECT 
+			t.id, t.rsc_id, t.name, t.tier, t.effective_mmr, t.current_mmr, 
+			t.count, t.keeper, t.wins, t.losses
+		FROM tiermaker AS t 
+		WHERE t.season = ?
+	`;
+	const players = {};
+	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				const p = results[i];
+
+				players[p.rsc_id] = {
+					'rsc_id': p.rsc_id,
+					'name': p.name, 
+					'tier': p.tier,
+					'effective_mmr': p.effective_mmr,
+					'current_mmr': p.current_mmr,
+					'count': p.count,
+					'keeper': p.keeper,
+					'wins': p.wins,
+					'losses': p.losses,
+					'games': p.wins + p.losses,
+				};
+			}
+		}
+	
+		const signups_query = `
+			SELECT 
+				s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
+				s.current_mmr, s.active, s.rostered
+			FROM combine_signups AS s 
+			WHERE 
+				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.rostered = 0 AND active = 0
+			ORDER BY s.current_mmr DESC
+		`;
+		const signups = {
+			'games': [],
+			'active': {},
+			'waiting': {},
+		};
+		req.db.query(signups_query, (err, results) => {
+			if ( err ) { throw err; }
+
+			if ( results.length ) {
+				for ( let i = 0; i < results.length; ++i ) {
+					const s = results[i];
+					const p = players[s.rsc_id];
+					//console.log(s,p);
+					p.signup_dtg = s.signup_dtg;
+					p.win_percentage = p.games ? 
+						parseFloat(((p.wins / p.games) * 100).toFixed(1)) : 
+						0;
+					p.mmr_delta = s.current_mmr - p.effective_mmr;
+
+					if ( s.active ) {
+						signups.active[s.rsc_id] = p;
+					} else {
+						signups.waiting[s.rsc_id] = p;
+					}
+				}
+			}
+
+			res.render('partials/combines/waiting', {
+				waiting_room: signups.waiting,
+				getTierFromMMR: getTierFromMMR,
+			});
+		});
+	});
+});
+
 router.get('/active', async (req, res) => {
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
