@@ -198,13 +198,12 @@ router.get('/combines/dashboard', (req, res) => {
 	const checked_in = res.locals.checked_in;
 
 	let status = null;
-	if ( user?.combines?.match?.id ) {
-		status = 'ready';
-		console.log(status);
-	}
-
 	if ( checked_in ) {
 		status = 'waiting';
+	}
+	
+	if ( user?.combines?.match?.id ) {
+		status = 'ready';
 	}
 	
 	res.render('partials/combines/dashboard', {
