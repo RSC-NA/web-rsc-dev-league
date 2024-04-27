@@ -14,6 +14,14 @@
 		missing = 6 - (ready % 6);
 		lobbies = (ready + missing) / 6;
 	}
+	const stat_colors = {
+		'great': 'text-success',
+		'ok': 'text-info',
+		'neutral': 'text-warning',
+		'bad': 'text-danger',
+		'none': 'text-muted',
+	};
+	let analysis = 'none';
 %> 
 
 <style type="text/css">
