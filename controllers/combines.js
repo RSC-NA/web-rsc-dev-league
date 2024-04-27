@@ -195,6 +195,7 @@ router.get('/combines/dashboard', (req, res) => {
 
 	const nickname = res.locals.nickname;	
 	const user = res.locals.user;	
+	const checked_in = res.locals.checked_in;
 
 	let status = null;
 	if ( user?.combines?.match?.id ) {
@@ -202,6 +203,10 @@ router.get('/combines/dashboard', (req, res) => {
 		console.log(status);
 	}
 
+	if ( checked_in ) {
+		status = 'waiting';
+	}
+	
 	res.render('partials/combines/dashboard', {
 		status: status,
 		user: user,
