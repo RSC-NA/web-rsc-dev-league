@@ -1,6 +1,37 @@
 
 <%- include('partials/header.ejs'); %>
 
+	<!-- check in features -->	
+	<style type="text/css">
+		dialog#confirmCheckIn {
+			background-color: #C2FFD7;
+			border-radius: 12px;
+			max-width: 50vw;
+		}
+
+		dialog#confirmCheckIn h4 {
+			text-decoration: underline;
+		}
+
+		dialog#confirmCheckIn::backdrop {
+			background-color:  #FF3400aa;
+		}
+	</style>
+
+	<dialog id="confirmCheckIn">
+		<h4>Confirm Check In</h4>
+		<p>
+			<strong>Warning!</strong> - Combines are your chance to show GMs that you're a 
+			player that they want to have on their team this season. Checking in for a match and 
+			not showing up is frustrating for the other 5 players in the lobby. To prevent this,
+			this software shows GMs a count of any matches you've missed. Continued abuse may result 
+			in your removal from RSC.
+		</p>
+		<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES.</h5>
+		<a class="btn btn-lg btn-primary" href="/combines/check_in/<%- user.rsc_id; %>" role="button">Confirm Check In!</a>
+		<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
+	</dialog>
+
 	<main class="container">
 		<div class="bg-light p-3 rounded">
 			<div class="row">
@@ -59,52 +90,22 @@
 		</div>
 
 		<div class="bg-light p-3 rounded">
-		<% if ( combine_day && combine_day != 'holiday' ) { %>
-			<% if ( nickname && user && user.combines.match && user.combines.match.id ) { %>
+			<% 
+				if ( nickname && user && user.combines.match && user.combines.match.id ) { 
+			%>
 
 				<%- include('partials/combines/dashboard.ejs', { status: 'ready', user: user }); %>
 
-			<% } else if ( nickname && ! checked_in && user && user.combines.active ) { %>
-
-			<!-- check in features -->	
-			<style type="text/css">
-				dialog#confirmCheckIn {
-					background-color: #C2FFD7;
-					border-radius: 12px;
-					max-width: 50vw;
-				}
-
-				dialog#confirmCheckIn h4 {
-					text-decoration: underline;
-				}
-
-				dialog#confirmCheckIn::backdrop {
-					background-color:  #FF3400aa;
-				}
-			</style>
-
-			<dialog id="confirmCheckIn">
-				<h4>Confirm Check In</h4>
-				<p>
-					<strong>Warning!</strong> - Combines are your chance to show GMs that you're a 
-					player that they want to have on their team this season. Checking in for a match and 
-					not showing up is frustrating for the other 5 players in the lobby. To prevent this,
-					this software shows GMs a count of any matches you've missed. Continued abuse may result 
-					in your removal from RSC.
-				</p>
-				<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES.</h5>
-				<a class="btn btn-lg btn-primary" href="/combines/check_in/<%- user.rsc_id; %>" role="button">Confirm Check In!</a>
-				<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
-			</dialog>
-
 			<% 
-				if ( combine_live ) {
+				} else if ( nickname && ! checked_in && user && user.combines.active ) { %>
+			<% 
+					if ( combine_live ) {
 			%>
 
 				<%- include('partials/combines/dashboard.ejs', { status: 'check-in', user: user }); %>
 
 			<%
-				} else {
+					} else {
 			%>
 			<h2>Soon!</h2>
 			<p>
@@ -120,14 +121,18 @@
 				>Check In!</a>
 			</span>
 			<%
-				}
+					}
 			%>
 
-			<% } else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) { %>
+			<% 
+				} else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) {
+			%>
 
 				<%- include('partials/combines/dashboard.ejs', { status: 'waiting', user: user }); %>
 
-			<% } else if ( nickname && user && ! user.combines.active ) { %>
+			<% 
+				} else if ( nickname && user && ! user.combines.active ) { 
+			%>
 			<h2>You Aren't In the Rolling Tier List</h2>
 			<p>
 				You don't currently have an entry in the Rolling Tier List. Processing new applicants
@@ -138,29 +143,14 @@
 				If you think this is an error, please reach out to the RSC Team by sending a DM to 
 				the bot <code>.MainModmail</code> on the RSC Discord server.
 			</p>
-			<% } else { %>
+			<% 
+				} else { 
+			%>
 			<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
-			<% } %>
+			<% 
+				} 
+			%>
 
-		<% } else if ( combine_day && combine_day == 'holiday' ) { %>
-			
-			<h2>Happy Holidays 🎆 from RSC!</h2>
-			<p>
-				Today is a Holiday and RSC is taking a much-needed vacation. Please enjoy time with your loved ones. ❤️
-			</p>
-
-		<% } else { %>
-
-			<h2>It is not an RSC Combine Day</h2>
-			<p>
-				Combines games are played every <strong>Monday, Wednesday, and Friday</strong> 
-				from <strong>8PM ET - 11PM ET</strong> until the draft. You can check in 
-				to play at 7:50PM.
-			</p>
-
-		<% } %>
-			
-		
 		</div>
 	</main>
 
