@@ -217,10 +217,10 @@
 					<% 
 						if ( Object.keys(ready_room).length ) {
 							let table_class = 'table-primary';
-							let n = 0;
+							let n = 1;
 							for ( const rsc_id in ready_room ) {
 								n++;
-								if ( n === 6 ) {
+								if ( n === 7 ) {
 									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
 									n = 0;
 								}
