@@ -1,0 +1,83 @@
+
+<%
+	if ( status === 'ready' ) {
+%>
+
+			<div 
+				id="combines_checkin_actions" 
+				hx-get="/combines/dashboard?status=Game"
+				hx-trigger="load delay:1m"
+				hx-swap="outerHTML"
+			>
+				<h2>Your Lobby is Ready!</h2>
+				<p class="lead">
+					Time to show your metal. Your lobby is ready to go.
+				</p>
+				<a class="btn btn-lg btn-success" href="/combine/<%- user.combines.match['id']; %>" role="button">
+					View Match Details
+				</a>
+				<script type="text/javascript">
+					function playSound() {
+						if ( window.in_game === false ) {
+							var audio = new Audio('/sounds/match_ready.mp3');
+							audio.play();
+							window.in_game = true;
+						}
+					}
+					setTimeout(playSound, 100);
+				</script>
+			</div>
+
+<%
+	} else if ( status === 'waiting') { 
+%>
+
+			<div 
+				id="combines_checkin_actions" 
+				hx-get="/combines/dashboard?status=CheckedIn"
+				hx-trigger="load delay:20s"
+				hx-swap="outerHTML"
+			>
+				<h2>You are checked in!</h2>
+				<p class="lead">
+					Lobbies are generated every 15-20 minutes. Stay at your computer and ready, as the lobbies could be 
+					created at any time.
+				</p>
+				<a class="btn btn-lg btn-danger" href="/combines/check_out/<%= user.rsc_id; %>" role="button">Check Out</a>
+				<script type="text/javascript">
+					window.in_game = false;
+				</script>
+			</div>
+
+<%
+	} else {
+%>
+
+			<div 
+				id="combines_checkin_actions" 
+			>
+				<a class="btn btn-lg btn-primary" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
+				<script type="text/javascript">
+					document.getElementById('checkInModal').addEventListener('click', function() {
+						document.getElementById('confirmCheckIn').showModal();
+					});
+
+					document.getElementById('backOut').addEventListener('click', function() {
+						document.getElementById('confirmCheckIn').close();
+					});
+				</script>
+				<script type="text/javascript">
+					function playSound() {
+						if ( window.in_game === true ) {
+							var audio = new Audio('/sounds/check_in_ready.mp3');
+							audio.play();
+							window.in_game = false;
+						}
+					}
+					setTimeout(playSound, 100);
+				</script>
+			</div>
+
+<%
+	}
+%>

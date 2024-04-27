@@ -191,6 +191,24 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 /*******************************************************
  ********************* User Views **********************
  ******************************************************/
+router.get('/combines/dashboard', (req, res) => {
+
+	const nickname = res.locals.nickname;	
+	const user = res.locals.user;	
+
+	let status = null;
+	if ( user?.combines?.match?.id ) {
+		status = 'ready';
+		console.log(status);
+	}
+
+	res.render('partials/combines/dashboard', {
+		status: status,
+		user: user,
+	});
+
+});
+
 router.get('/combines/matches/:rsc_id', async(req,res) => {
 	const user = res.locals.user;
 	const combine_season = res.locals.combines.season;
