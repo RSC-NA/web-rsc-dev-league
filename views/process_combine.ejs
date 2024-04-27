@@ -217,13 +217,13 @@
 					<% 
 						if ( Object.keys(ready_room).length ) {
 							let table_class = 'table-primary';
-							let n = 1;
+							let n = 0;
 							for ( const rsc_id in ready_room ) {
-								if ( n === 7 ) {
+								n++;
+								if ( n > 6 ) {
 									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
 									n = 0;
 								}
-								n++;
 								const p = ready_room[rsc_id];
 								if ( p.win_percentage > 60 ) {
 									analysis = 'great';
