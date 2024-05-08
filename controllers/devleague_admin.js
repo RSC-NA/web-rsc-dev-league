@@ -895,7 +895,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			// perm FAs don't show up in Count/Keeper sheet. We need to 
 			// calc their tier from MMR.
-			if ( ! ('tier' in players[ contractRows[i]['RSC Unique ID'] ]) ) {
+			if ( ! ('tier' in players[ contractRows[i]['RSC ID'] ]) ) {
 				players[contractRows[i]['RSC ID']]['mmr'] = contractRows[i]['Current MMR'];
 				players[contractRows[i]['RSC ID']]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']));
 			}
