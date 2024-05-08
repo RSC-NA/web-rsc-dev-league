@@ -160,11 +160,15 @@
 							</div>
 							<% 
 								if ( ! combines.active ) { 
+									if ( is_admin ) {
 							%>
 							<a class="nav-link <%- menu['process_gameday'] %>" href="/process_gameday">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area text-danger"></i></div>
 								Build by Tier
 							</a>
+							<%
+									}
+							%>
 							<a class="nav-link <%- menu['devleague'] %>" href="/devleague">
 								<div class="sb-nav-link-icon"><i class="fas fa-star text-danger"></i></div>
 								Build DevLeague
