@@ -931,6 +931,10 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			const player = players[rsc_id];
 			console.log(rsc_id, player['name']);
 
+			if ( player['status'] === 'Perm FA in Waiting.' ) {
+				continue; 
+			}
+
 			if ( ! player['tier'] ) {
 				player['tier'] = 'NONE';
 			}
