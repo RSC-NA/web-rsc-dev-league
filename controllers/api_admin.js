@@ -18,6 +18,7 @@ async function pull_stats(req, res) {
 	} 
 
 	let sheetId = '1aPQYsRc8KsepnoNTDK1UKKd7mrXPIr7EwVHsSlRud3k';
+	sheetId = '1nsmfFEA7UW3bSEdITMwUgRqIgMVj34H7AU_--Mp-jE4';
 
 	let teamStatsTable   = 'StreamTeamStats';
 	let playerStatsTable = 'StreamPlayerStats';
