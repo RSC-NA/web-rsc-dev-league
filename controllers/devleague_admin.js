@@ -168,7 +168,7 @@ router.get('/setup/devleague', async (req, res) => {
 
 router.all('/generate_team/:tier', async (req, res) => {
 
-	if ( ! req.session.is_admin && ! req.sessoin.is_devleague_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
 

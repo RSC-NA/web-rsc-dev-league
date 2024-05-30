@@ -215,7 +215,7 @@ router.get('/check_in/:match_day', (req, res) => {
 		const active = 0;
 		const status = req.session.user['status'];
 
-		console.log([ req.session.user_id, new Date(), season, match_day, active, status]);
+		//console.log([ req.session.user_id, new Date(), season, match_day, active, status]);
 		req.db.query(
 			'INSERT INTO signups (player_id, signup_dtg, season, match_day, active, status) VALUES (?, ?, ?, ?, ?, ?)',
 			[ req.session.user_id, new Date(), season, match_day, active, status],
