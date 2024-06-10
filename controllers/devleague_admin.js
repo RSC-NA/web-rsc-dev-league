@@ -876,6 +876,10 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	const mmrRows = await mmrSheet.getRows();
 
 	for ( let i = 0; i < mmrRows.length; i++ ) {
+		if ( ! mmrRows[i]['active_3s'] ) {
+			console.log(mmrRows[i]);
+		}
+
 		if ( mmrRows[i]['RSC ID'] in players ) {
 			//console.log('found', mmrRows[i]['RSC ID'], mmrRows[i]['Effective MMR'], mmrRows[i]['Tier']);
 			players[ mmrRows[i]['RSC ID'] ]['mmr'] = mmrRows[i]['Effective MMR'];
