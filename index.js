@@ -721,10 +721,12 @@ app.get('/ips', (req, res) => {
 		for ( let i = 0; i < results.length; ++i ) {
 			results[i]["date_logged_in"] = new Date(results[i]['date_logged_in']).toString();
 
-			if ( ! (results[i]['ip'] in ips) ) {
-				ips[results[i]['ip']] = results[i]['nickname'];
-			} else if ( ips[results[i]['ip']] !== results[i]['nickname'] ) {
-				results[i]['checkname'] = ips[results[i]['ip']];
+			if ( results[i]['ip'] ) {
+				if ( ! (results[i]['ip'] in ips) ) {
+					ips[results[i]['ip']] = results[i]['nickname'];
+				} else if ( ips[results[i]['ip']] !== results[i]['nickname'] ) {
+					results[i]['checkname'] = ips[results[i]['ip']];
+				}
 			}
 
 			stringifier.write(results[i]);
