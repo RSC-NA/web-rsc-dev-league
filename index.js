@@ -696,6 +696,45 @@ ORDER BY td.rsc_id, td.psyonix_season
 	});
 });
 
+app.get('/ips', (req, res) => {
+	if ( ! req.session.is_admin ) {
+		return res.redirect('/');
+	} 
+
+	const query = 'SELECT id,rsc_id,nickname,discord_id,ip,date_logged_in,NULL as check FROM player_ips';
+	connection.query(query, (err, results) => {
+		if ( err ) {
+			res.send(err);
+		}
+
+		const ips = {};
+
+		res.header('Content-type', 'text/csv');
+		res.attachment(`IP Check from ${date}.csv`);
+		const columns = [
+			'id', 'rsc_id', 'nickname', 
+			'discord_id', 'ip', 'date', 'check',
+		];
+		const stringifier = stringify({ header: true, columns: columns });
+		stringifier.pipe(res);
+
+		for ( let i = 0; i < results.length; ++i ) {
+			results[i]["date_logged_in"] = new Date(results[i]['date_logged_in']).toString();
+
+			if ( ! (results[i]['ip'] in ips) ) {
+				ips[results[i]['ip']] = results[i]['nickname'];
+			} else if ( ips[results[i]['ip']] !== results[i]['nickname'] ) {
+				results[i]['check'] = ips[results[i]['ip']];
+			}
+
+			stringifier.write(results[i]);
+		}
+		stringifier.end();
+
+	});
+
+});
+
 /*
  * RSC ID Player Name Tracker Link 1s MMR 1s Season Peak 1s GP 2s MMR 2s Season Peak 2s GP 3s MMR 3s Season Peak 3s GP Date Pulled
  */ 
