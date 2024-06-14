@@ -701,7 +701,7 @@ app.get('/ips', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	const query = 'SELECT id,rsc_id,nickname,discord_id,ip,date_logged_in,NULL as check FROM player_ips';
+	const query = 'SELECT id,rsc_id,nickname,discord_id,ip,date_logged_in,NULL as checkname FROM player_ips';
 	connection.query(query, (err, results) => {
 		if ( err ) {
 			res.send(err);
@@ -713,7 +713,7 @@ app.get('/ips', (req, res) => {
 		res.attachment(`IP Check.csv`);
 		const columns = [
 			'id', 'rsc_id', 'nickname', 
-			'discord_id', 'ip', 'date', 'check',
+			'discord_id', 'ip', 'date', 'checkname',
 		];
 		const stringifier = stringify({ header: true, columns: columns });
 		stringifier.pipe(res);
@@ -724,7 +724,7 @@ app.get('/ips', (req, res) => {
 			if ( ! (results[i]['ip'] in ips) ) {
 				ips[results[i]['ip']] = results[i]['nickname'];
 			} else if ( ips[results[i]['ip']] !== results[i]['nickname'] ) {
-				results[i]['check'] = ips[results[i]['ip']];
+				results[i]['checkname'] = ips[results[i]['ip']];
 			}
 
 			stringifier.write(results[i]);
