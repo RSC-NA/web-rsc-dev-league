@@ -713,7 +713,7 @@ app.get('/ips', (req, res) => {
 		res.attachment(`IP Check.csv`);
 		const columns = [
 			'id', 'rsc_id', 'nickname', 
-			'discord_id', 'ip', 'date', 'checkname',
+			'discord_id', 'ip', 'date_logged_in', 'checkname',
 		];
 		const stringifier = stringify({ header: true, columns: columns });
 		stringifier.pipe(res);
