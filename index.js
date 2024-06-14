@@ -710,7 +710,7 @@ app.get('/ips', (req, res) => {
 		const ips = {};
 
 		res.header('Content-type', 'text/csv');
-		res.attachment(`IP Check from ${date}.csv`);
+		res.attachment(`IP Check.csv`);
 		const columns = [
 			'id', 'rsc_id', 'nickname', 
 			'discord_id', 'ip', 'date', 'check',
