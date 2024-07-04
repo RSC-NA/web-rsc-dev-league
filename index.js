@@ -241,7 +241,7 @@ app.use(async (req, res, next) => {
 	if ( req?.body?.pulled_by ) {
 		nick = req.body.pulled_by.fg('yellow', 'bright').clearAll();
 	} else if ( req?.session?.nickname ) {
-		nick req?.session?.nickname?.fg('green','bright').clearAll();
+		nick = req.session.nickname.fg('green','bright').clearAll();
 	}
 
 	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}]`);
