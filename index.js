@@ -1,5 +1,9 @@
 require('ansi-colors');
 
+const banned_players = {
+	'754475185960255548': 'rage quitting',
+};
+
 // if we're running in node, pull in our .env
 // we also have to fix out "password" to strip out 
 // any escaping that we need for Bun .env reading
@@ -233,7 +237,13 @@ app.use(async (req, res, next) => {
 	res.locals.is_combines_admin = req.session.is_combines_admin;
 	res.locals.rostered = req.session.rostered;
 
-	const nick = req?.session?.nickname?.fg('green','bright').clearAll() ?? 'none'.fg('red').clearAll();
+	let nick = 'none'.fg('red').clearAll();
+	if ( req?.body?.pulled_by ) {
+		nick = req.body.pulled_by.fg('yellow', 'bright').clearAll();
+	} else if ( req?.session?.nickname ) {
+		nick req?.session?.nickname?.fg('green','bright').clearAll();
+	}
+
 	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}]`);
 
 	//res.locals.user = req.session.user || {};
