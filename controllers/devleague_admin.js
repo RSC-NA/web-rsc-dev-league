@@ -880,6 +880,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			//console.log(mmrRows[i]);
 			console.log('active_3s null', i, mmrRows[i]['RSC ID'] );
 			delete(mmrRows[i]);
+			continue;
 		}
 
 		if ( mmrRows[i]['RSC ID'] in players ) {
