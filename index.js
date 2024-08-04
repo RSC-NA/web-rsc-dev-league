@@ -17,6 +17,7 @@ if ( typeof Bun === 'undefined' ) {
 	console.log(`    ${process.env.NODE_ENV}`);
 }
 
+
 // Server app code below
 const express = require('express');
 const app = express();
@@ -114,6 +115,11 @@ app.use((req, res, next) => {
 		return res.redirect('http://devleague.rscna.com');
 	}
 
+	res.locals.debugObject = function (objects) {
+		return '<pre>' + JSON.stringify(objects, undefined, 4) + '</pre>';
+	};
+
+
 	next();
 });
 
@@ -136,22 +142,43 @@ async function get_user(user_id) {
 		queueLimit: 0
 	});
 
+	const season_query = `
+		SELECT 
+			(SELECT season FROM combine_settings WHERE league = 3 AND active = 1 ORDER BY id DESC limit 1) AS season_3s,
+			(SELECT season FROM combine_settings WHERE league = 2 AND active = 1 ORDER BY id DESC limit 1) AS season_2s
+	`;
+	const [seasons] = await db.query(season_query);
+	let season_3s = 0;
+	let season_2s = 0;
+	if ( seasons && seasons.length ) {
+		season_3s = seasons[0].season_3s;
+		season_2s = seasons[0].season_2s;
+	}
+
 	const query = `
 		SELECT 
 			p.id,p.nickname,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
-			p.combines_admin,c.name,c.mmr,c.tier,c.status,p.rsc_id,p.discord_id,
+			p.combines_admin,p.combines_admin_2s,
+			c.name,c.mmr,c.tier,c.status,p.rsc_id,p.discord_id,
 			c.active_3s,c.active_2s,
-			t.season,t.tier AS assigned_tier, t.count, t.keeper,
+			t.season,t.league,t.tier AS assigned_tier, t.count, t.keeper,
 			t.base_mmr, t.effective_mmr,t.current_mmr, 
-			t.wins,t.losses
+			t.wins,t.losses,
+			t2.season season_2s,t2.league AS league_2s,t2.tier AS assigned_tier_2s, 
+			t2.count AS count_2s, t2.keeper AS keeper_2s,
+			t2.base_mmr AS base_mmr_2s, t2.effective_mmr AS effective_mmr_2s,
+			t2.current_mmr AS current_mmr_2s, 
+			t2.wins AS wins_2s,t2.losses AS losses_2s
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
 		ON p.discord_id = c.discord_id 
 		LEFT JOIN tiermaker AS t 
-		ON p.discord_id = t.discord_id
+		ON p.discord_id = t.discord_id AND t.league = 3 AND t.season = ?
+		LEFT JOIN tiermaker AS t2 
+		ON p.discord_id = t2.discord_id AND t2.league = 2 AND t2.season = ?
 		WHERE p.id = ?
 	`;
-	const [results] = await db.query(query, [ user_id ]);
+	const [results] = await db.query(query, [ season_3s, season_2s, user_id ]);
 
 	if ( results && results.length ) {
 		const p = results[0];
@@ -178,6 +205,20 @@ async function get_user(user_id) {
 				waiting: {},
 				match: {},
 			},
+			combines_2s: {
+				active: p.current_mmr_2s ? true : false,
+				season: p.season_2s,
+				base_mmr: p.base_mmr_2s,
+				effective_mmr: p.effective_mmr_2s,
+				current_mmr: p.current_mmr_2s,
+				losses: p.losses_2s,
+				wins: p.wins_2s,
+				tier: p.assigned_tier_2s,
+				count: p.count_2s,
+				keeper: p.keeper_2s,
+				waiting: {},
+				match: {},
+			},
 			active_3s: p.active_3s,
 			active_2s: p.active_2s,
 			is_admin: p.admin ? true: false,
@@ -185,6 +226,7 @@ async function get_user(user_id) {
 			is_devleague_admin: p.devleague_admin ? true: false,
 			is_stats_admin: p.stats_admin ? true: false,
 			is_combines_admin: p.combines_admin ? true: false,
+			is_combines_admin_2s: p.combines_admin_2s ? true: false,
 		};
 		
 		db.end();
@@ -204,6 +246,7 @@ app.use(async (req, res, next) => {
 		'dashboard': '',
 		'devleague': '',
 		'/combines/process': '',
+		'/combines/process_2s': '',
 		'tournaments': '',
 		'tracker': '',
 		'championship': '',
@@ -213,6 +256,8 @@ app.use(async (req, res, next) => {
 		'manage_league': '',
 		'/combines/manage': '',
 		'/combines/history': '',
+		'/combines/manage_2s': '',
+		'/combines/history_2s': '',
 	};
 
 	let current_view = req.originalUrl.split('/')[1];
@@ -235,6 +280,7 @@ app.use(async (req, res, next) => {
 	res.locals.is_devleague_admin = req.session.is_devleague_admin;
 	res.locals.is_stats_admin = req.session.is_stats_admin;
 	res.locals.is_combines_admin = req.session.is_combines_admin;
+	res.locals.is_combines_admin_2s = req.session.is_combines_admin_2s;
 	res.locals.rostered = req.session.rostered;
 
 	let nick = 'none'.fg('red').clearAll();
@@ -318,7 +364,9 @@ app.use((req, res, next) => {
 	const query = `
 		SELECT 
 			season, active, live, tiermaker_url, k_factor, min_series
-		FROM combine_settings ORDER BY id DESC LIMIT 1
+		FROM combine_settings 
+		WHERE league = 3
+		ORDER BY id DESC LIMIT 1
 	`;
 	connection.query(query, (err, results) => {
 		if ( err ) { throw err; }
@@ -342,6 +390,49 @@ app.use((req, res, next) => {
 	});
 });
 
+// TWOS combines
+app.use((req, res, next) => {
+	const combines_2s = {
+		season: 7,
+		active: false,
+		live: false,
+		combine_day: false,
+		combine_live: false,
+		tiermaker_url: '',
+		k_factor: 32,
+		min_series: 10,
+	};
+
+	res.locals.combines_2s = combines_2s;
+
+	const query = `
+		SELECT 
+			season, active, live, tiermaker_url, k_factor, min_series
+		FROM combine_settings 
+		WHERE league = 2 
+		ORDER BY id DESC LIMIT 1
+	`;
+	connection.query(query, (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results.length ) {
+			const new_combines_settings = results[0];
+			if ( new_combines_settings.active && new_combines_settings.live ) {
+				new_combines_settings.combine_day = true;
+				new_combines_settings.combine_live = true;
+			} else if ( new_combines_settings.active && ! new_combines_settings.live ) {
+				const day = (new Date()).getDay();
+				if ( day === 1 || day === 3 || day === 5 ) {
+					new_combines_settings.combine_day = true;
+					new_combines_settings.combine_live = false;
+				}
+			}
+
+			res.locals.combines_2s = new_combines_settings;
+		}
+		next();
+	});
+});
 // tournaments middleware
 /*
 app.use((req, res, next) => {
@@ -423,20 +514,28 @@ app.use((req, res, next) => {
 // checked in middleware.
 // only really needed if the user is logged in AND it's a game day
 app.use((req, res, next) => {
-	res.locals.checked_in = false;
+	console.log(combineDays)
+	res.locals.checked_in    = false;
+	res.locals.checked_in_2s = false;
 	
 	const date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
 	res.locals.today = date;
 	res.locals.match_day = false;
 	res.locals.combine_day = false;
+	res.locals.combine_2s_day = false;
 	res.locals.combine_active = false;
+	res.locals.combine_2s_active = false;
 	res.locals.combine_live = res.locals.combines.live;
+	res.locals.combine_2s_live = res.locals.combines_2s.live;
 
 	if ( date in matchDays ) {
 		res.locals.match_day = matchDays[date];
 	}
-	if ( date in combineDays || res.locals.combine_live ) {
-		res.locals.combine_day = combineDays[date];
+	if ( date in combineDays['3s'] || res.locals.combine_live ) {
+		res.locals.combine_day = combineDays['3s'][date];
+	}
+	if ( date in combineDays['2s'] || res.locals.combine_2s_live ) {
+		res.locals.combine_2s_day = combineDays['2s'][date];
 	}
 
 	if ( res.locals.match_day && req.session.user_id ) {
@@ -465,10 +564,10 @@ app.use((req, res, next) => {
 				}
 			}
 		);
-	} else if ( res.locals.combine_day && res.locals.discord_id ) {
+	} else if ( (res.locals.combine_day || res.locals.combine_2s_day) && res.locals.discord_id ) {
 		const query = `
 			SELECT 
-				id,season,rsc_id,signup_dtg,current_mmr,active,rostered
+				id,season,league,rsc_id,signup_dtg,current_mmr,active,rostered
 			FROM combine_signups 
 			WHERE 
 				discord_id = ? AND 
@@ -483,12 +582,23 @@ app.use((req, res, next) => {
 			[ res.locals.discord_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
-					//console.log('Waiting in queue',results[0]);
-					res.locals.user.combines.waiting = results;
-					req.session.checked_in = true;
-					req.session.rostered = results[0].rostered;
-					res.locals.checked_in = req.session.checked_in;
-					res.locals.rostered = req.session.rostered;
+					for ( let i = 0; i < results.length; ++i ) {
+						//console.log('Waiting in queue',results[0]);
+						if ( results[i].league === 3 ) {
+							res.locals.user.combines.waiting = results[i];
+							req.session.checked_in = true;
+							res.locals.checked_in = req.session.checked_in;
+							req.session.rostered = results[i].rostered;
+							res.locals.rostered = req.session.rostered;
+						} else if ( results[i].league === 2 ) {
+							res.locals.user.combines_2s.waiting = results[i];
+							req.session.checked_in_2s = true;
+							res.locals.checked_in_2s = req.session.checked_in_2s;
+							req.session.rostered_2s = results[i].rostered;
+							res.locals.rostered_2s = req.session.rostered_2s;
+						}
+
+					}
 					next();
 				} else {
 					next();
@@ -532,10 +642,10 @@ async function db_get(query, params=null) {
 
 // combine match middleware. used if the player logged in has an active combine match 
 app.use(async (req, res, next) => {
-	if ( res.locals.combine_day && res.locals.user.rsc_id ) {
+	if ( (res.locals.combine_day || res.locals.combines_2s_day) && res.locals.user.rsc_id ) {
 		const query = `
 			SELECT 
-				m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass,
+				m.id, m.match_dtg, m.season, m.league, m.lobby_user, m.lobby_pass,
 				m.home_wins, m.away_wins, m.reported_rsc_id, m.confirmed_rsc_id,
 				m.completed, m.cancelled,
 				mp.rsc_id,mp.team
@@ -549,7 +659,13 @@ app.use(async (req, res, next) => {
 
 		const match = await db_get(query, [res.locals.user.rsc_id]);
 		if ( match && match.length ) {
-			res.locals.user.combines.match = match[0];
+			for ( let i = 0; i < match.length; ++i ) {
+				if ( match[i].league === 3 ) {
+					res.locals.user.combines.match = match[i];
+				} else if ( match[i].league === 2 ) {
+					res.locals.user.combines_2s.match = match[i];
+				}
+			}
 		}
 	}
 
@@ -586,8 +702,8 @@ app.use((req, res, next) => {
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
-	if ( res.locals.combines.active ) {
-		res.render('combines_dashboard', { match_days: combineDays });
+	if ( res.locals.combines.active || res.locals.combines_2s.active ) {
+		res.render('combines_dashboard', { combineDays: combineDays });
 	} else {
 		res.render('dashboard', { match_days: matchDays });
 	}

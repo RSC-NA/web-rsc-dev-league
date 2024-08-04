@@ -89,8 +89,20 @@
 						%>
 							<a class="nav-link <%- menu['combines_matches'] %>" href="/combines/matches">
 								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
-								S<%- combines.season %> Combines Matches
+								3s S<%- combines.season %> Combines
 							</a>
+						<%
+							}
+
+							if ( combines_2s.active ) { 
+						%>
+							
+							<a class="nav-link <%- menu['combines_matches_2s'] %>" href="/combines/matches_2s">
+								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
+								2s S<%- combines_2s.season %> Combines
+							</a>
+
+
 						<%
 							}
 
@@ -135,7 +147,7 @@
 							<!-- </a> -->
 
 						<%
-							if (is_admin || is_stats_admin || is_devleague_admin || is_combines_admin) {  
+							if (is_admin || is_stats_admin || is_devleague_admin || is_combines_admin || is_combines_admin_2s ) {  
 								/* admin-only functionality */ 
 								let badge_class = 'bg-secondary';
 								let pending_count = 0;
@@ -154,7 +166,7 @@
 						<%
 								if ( (is_admin || is_devleague_admin) ) {
 						%>
-							<div class="sb-sidenav-menu-heading">
+							<div class="sb-sidenav-menu-heading Elite">
 								<i class="fas fa-lock text-warning me-1"></i> 
 								DevLeague Admin
 							</div>
@@ -185,7 +197,7 @@
 
 								if ( (is_admin || is_combines_admin) ) {
 						%>
-							<div class="sb-sidenav-menu-heading">
+							<div class="sb-sidenav-menu-heading text-warning">
 								<i class="fas fa-lock text-warning me-1"></i> 
 								Combines Admin
 							</div>
@@ -201,6 +213,31 @@
 								Manage Combines
 							</a>
 							<a class="nav-link <%- menu['/combines/history'] %>" href="/combines/history">
+								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
+								Tiermaker
+							</a>
+		
+						<%
+								}
+
+								if ( (is_admin || is_combines_admin_2s) ) {
+						%>
+							<div class="sb-sidenav-menu-heading text-warning">
+								<i class="fas fa-lock text-warning me-1"></i> 
+								2s Combines Admin
+							</div>
+							
+							<% if ( combines_2s.active ) { %>
+							<a class="nav-link <%- menu['/combines/process_2s'] %>" href="/combines/process_2s">
+								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-info"></i></div>
+								Build Lobbies!
+							</a>
+							<% } %>
+							<a class="nav-link <%- menu['/combines/manage_2s'] %>" href="/combines/manage_2s">
+								<div class="sb-nav-link-icon"><i class="fas fa-gear text-success"></i></div>
+								Manage Combines
+							</a>
+							<a class="nav-link <%- menu['/combines/history_2s'] %>" href="/combines/history_2s">
 								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
 								Tiermaker
 							</a>

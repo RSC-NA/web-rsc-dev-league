@@ -8,11 +8,11 @@
 	const ready = Object.keys(ready_room).length;
 	let lobbies = 0;
 	let missing = 0;
-	if ( ready % 6 === 0 ) {
-		lobbies = ready / 6;
+	if ( ready % 4 === 0 ) {
+		lobbies = ready / 4;
 	} else {
-		missing = 6 - (ready % 6);
-		lobbies = (ready + missing) / 6;
+		missing = 4 - (ready % 4);
+		lobbies = (ready + missing) / 4;
 	}
 	const stat_colors = {
 		'great': 'text-success',
@@ -54,7 +54,7 @@
 
 <main class="container">
 	<div class="py-3 py-md-5 pb-md-2">
-		<h2>Combines Lobby Manager</h2>
+		<h2>RSC 2s Combines Lobby Manager</h2>
 		<p class="lead">
 			Every player that checks in for combines is placed in the "Waiting Room". Add them to the active queue to build a large 
 			enough pool of players to run the "Generate Lobbies" command.
@@ -75,7 +75,7 @@
 			</div>
 		</a>
 		<div id="collapse_games" class="card-body collapse">
-			<a href="/combines/resend_bot" class="btn btn-primary">Force Bot Resend</a>
+			<a href="/combines/resend_bot_2s" class="btn btn-primary">Force Bot Resend</a>
 			<ul style="list-style: none;" class="fw-bolder">
 			<%
 				if ( games.length ) {	
@@ -86,7 +86,7 @@
 					<span class="<%- tier; %> text-end d-inline-block px-1" style="width:100px;">
 						<%- tier; %>
 					</span>
-					<a href="/combine/<%- games[i].id; %>">
+					<a href="/combine/<%- games[i].id; %>/2">
 						<%- games[i].lobby_user; %>-<%- games[i].lobby_pass %>
 					</a>
 				</li>
@@ -116,7 +116,7 @@
 					</div>
 					<hr>
 					<%
-						if ( lobbies < 9 ) {
+						if ( lobbies < 6 ) {
 					%>
 					<p class="lead fw-bolder">
 						Be careful!
@@ -139,7 +139,7 @@
 					</p>
 
 					<div class="text-center">
-						<a href="/combines/generate" class="btn btn-success btn-lg">
+						<a href="/combines/generate/2" class="btn btn-success btn-lg">
 							<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
 								<span class="visually-hidden">Ready!</span>
 							</div>
@@ -159,7 +159,7 @@
 	<div class="row">
 	
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 mt-5 mt-lg-0">
-			<%- include('partials/combines/waiting.ejs', { league: 3, waiting_room: waiting_room }); %>
+			<%- include('partials/combines/waiting.ejs', { league: 2, waiting_room: waiting_room }); %>
 		</div>
 
 		<!-- primary FA signup / team generation -->
@@ -182,13 +182,13 @@
 							</div>
 							<hr>
 							<p class="text-xs">
-								Clicking the "Deactivate <%- 6 - missing; %>" button will remove the <%- 6 - missing; %> players that 
-								were the last to check in.
+								Clicking the "Deactivate <%- 4 - missing; %>" button will remove the <%- 4 - missing; %> 
+								players that were the last to check in.
 							</p>
 							<div class="text-end">
-								<a href="/combines/deactivate-last/<%- 6 - missing; %>" class="btn btn-sm btn-danger">
+								<a href="/combines/deactivate-last/<%- 4 - missing; %>/2" class="btn btn-sm btn-danger">
 									<i class="fa fa-user-xmark me-1"></i>
-									Deactivate <strong><%- 6 - missing; %></strong>
+									Deactivate <strong><%- 4 - missing; %></strong>
 								</a>
 							</div>
 						</div>
@@ -220,7 +220,7 @@
 							let n = 0;
 							for ( const rsc_id in ready_room ) {
 								n++;
-								if ( n > 6 ) {
+								if ( n > 4 ) {
 									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
 									n = 1;
 								}
@@ -270,7 +270,7 @@
 								</span>
 							</td>
 							<td class="p-0 text-center">
-								<a href="/combines/deactivate/<%- rsc_id; %>" 
+								<a href="/combines/deactivate/<%- rsc_id; %>/2" 
 									class="move-arrow-back h4 p-0 px-2 mb-0" style=""
 									title="Move player to waiting room.">
 									<span class="d-none d-xl-inline">&#10095;</span>
@@ -298,6 +298,10 @@
 
 		</div>
 
+	</div>
+
+	<div>
+		<%- debugObject(waiting_room); %>
 	</div>
 
 </main>

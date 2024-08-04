@@ -239,7 +239,7 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 		ON m.id = mp.match_id
 		LEFT JOIN tiermaker AS t 
 		ON mp.rsc_id = t.rsc_id AND m.season = t.season 
-		WHERE m.season = ? AND mp.rsc_id = ?
+		WHERE m.season = ? AND m.league = 3 AND mp.rsc_id = ?
 		ORDER BY id DESC
 	`;
 	const [matches] = await db.query(matches_query, [combine_season, req.params.rsc_id ]);
@@ -249,6 +249,52 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 	if ( matches && matches.length ) {
 		const name = matches[0].name;
 		return res.render('combine_matches', { 
+			name: name,
+			rsc_id: req.params.rsc_id,
+			matches: matches,
+		}); 
+	} else {
+		console.log('HERE HERE HERE');
+		return res.redirect('/');
+	}
+});
+
+router.get('/combines/matches_2s/:rsc_id', async(req,res) => {
+	const user = res.locals.user;
+	const combine_season = res.locals.combines.season;
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const matches_query = `
+		SELECT 
+			m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass, m.home_mmr, m.away_mmr,
+			m.home_wins, m.away_wins, m.reported_rsc_id, m.confirmed_rsc_id, 
+			m.completed, m.cancelled,
+			t.name
+		FROM combine_matches AS m 
+		LEFT JOIN combine_match_players AS mp 
+		ON m.id = mp.match_id
+		LEFT JOIN tiermaker AS t 
+		ON mp.rsc_id = t.rsc_id AND m.season = t.season 
+		WHERE m.season = ? AND m.league = 2 AND mp.rsc_id = ?
+		ORDER BY id DESC
+	`;
+	const [matches] = await db.query(matches_query, [combine_season, req.params.rsc_id ]);
+
+	await db.end();
+
+	if ( matches && matches.length ) {
+		const name = matches[0].name;
+		return res.render('combine_matches_2s', { 
 			name: name,
 			rsc_id: req.params.rsc_id,
 			matches: matches,
@@ -282,6 +328,13 @@ router.get('/combines/matches', (req, res) => {
 	return res.redirect('/combines/matches/' + res.locals.user.rsc_id);
 });
 
+router.get('/combines/matches_2s', (req, res) => {
+	if ( ! res.locals?.user?.rsc_id ) {
+		return res.redirect('/');
+	}
+	return res.redirect('/combines/matches_2s/' + res.locals.user.rsc_id);
+});
+
 router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, res) => {
 	const user = res.locals.user;
 	const combine_id = req.params.combine_id;
@@ -305,14 +358,16 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 	}
 });
 
-router.get('/combines/check_out/:discord_id', async (req, res) => {
-	if ( ! res.locals.checked_in ) {
+router.get('/combines/check_out/:discord_id/:league', async (req, res) => {
+	if ( ! res.locals.checked_in && ! res.locals.checked_in_2s ) {
 		return res.redirect('/?error=YouAreNotCheckedIn');
 	}
+
+	const league = req.params.league ? parseInt(req.params.league) : 3;
 	
 	const user = res.locals.user;
-	const ucombines = user.combines;
-	const combines = res.locals.combines;
+	const ucombines = league === 3 ? user.combines : user.combines_2s;
+	const combines = league === 3 ? res.locals.combines : res.locals.combines_2s;
 
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
@@ -329,13 +384,15 @@ router.get('/combines/check_out/:discord_id', async (req, res) => {
 		DELETE FROM combine_signups 
 		WHERE 
 			season = ? AND 
+			league = ? AND
 			rsc_id = ? AND 
 			discord_id = ? AND 
 			current_mmr = ? AND
 			rostered = 0
 	`;
 	const [inserted] = await db.query(query, [
-		res.locals.combines.season,
+		combines.season,
+		league,
 		user.rsc_id,
 		user.discord_id,
 		ucombines.current_mmr
@@ -354,17 +411,24 @@ router.get('/combines/check_out/:discord_id', async (req, res) => {
 		{}
 	);
 
-	return res.redirect('/?success=YouAreCheckedOut');
+	return res.redirect(`/?success=YouAreCheckedOut_${league}s`);
 });
 
-router.get('/combines/check_in/:discord_id', async (req, res) => {
-	if ( res.locals.checked_in ) {
-		return res.redirect('/?error=YouAreAlreadyCheckedIn');
+router.get('/combines/check_in/:discord_id/:league', async (req, res) => {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+console.log('1', league);
+	if ( league === 3 && res.locals.checked_in ) {
+		return res.redirect(`/?error=YouAreAlreadyCheckedIn_${league}s`);
+	} else if ( league === 2 && res.locals.checked_in_2s ) {
+		return res.redirect(`/?error=YouAreAlreadyCheckedIn_${league}s`);
 	}
 	
 	const user = res.locals.user;
-	const ucombines = user.combines;
-	const combines = res.locals.combines;
+	const ucombines = league === 3 ? user.combines : user.combines_2s;
+	const combines = league === 3 ? res.locals.combines : res.locals.combines_2s;
+
+console.log('2', league);
+	console.log(league,ucombines,combines);
 
 	if ( ! user || ! ucombines ) {
 		console.error('Missing ucombines?');
@@ -372,11 +436,11 @@ router.get('/combines/check_in/:discord_id', async (req, res) => {
 	}
 
 	if ( ucombines.season !== combines.season ) {
-		return res.redirect('/?error=YouAreInTheWrongSeason');
+		return res.redirect(`/?error=YouAreInTheWrongSeason_${league}s`);
 	}
 
 	if ( ! combines.live ) {
-		return res.redirect('?error=CombinesArentRunning');
+		return res.redirect(`?error=CombinesArentRunning_${league}s`);
 	}
 
 	const db = await mysqlP.createPool({
@@ -392,12 +456,15 @@ router.get('/combines/check_in/:discord_id', async (req, res) => {
 
 	const query = `
 		INSERT INTO combine_signups 
-			(season,rsc_id,discord_id,current_mmr) 
+			(season,league,rsc_id,discord_id,current_mmr) 
 		VALUES 
-			(     ?,     ?,         ?,          ?)
+			(     ?,     ?,     ?,         ?,          ?)
 	`;
+
+	console.log('inserting', [combines.season, league, user.rsc_id, user.discord_id, ucombines.current_mmr]);
 	const [inserted] = await db.query(query, [
-		res.locals.combines.season,
+		combines.season,
+		league,
 		user.rsc_id,
 		user.discord_id,
 		ucombines.current_mmr
@@ -422,7 +489,7 @@ router.get('/combines/check_in/:discord_id', async (req, res) => {
 /*******************************************************
  ******************** Admin Views *********************
  ******************************************************/
-router.post('/combine/:match_id', async (req, res) => {
+router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, res, next) => {
 	const match_id = req.params.match_id;
 
 	const home_wins = parseInt(req.body.home_wins);
@@ -433,17 +500,19 @@ router.post('/combine/:match_id', async (req, res) => {
 		discord_id: res.locals.user.discord_id,
 	};
 
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+
 	if ( 
-		(home_wins < 0 || home_wins > 5) ||
-		(away_wins < 0 || away_wins > 5 ) ) {
+		(home_wins < 0 || home_wins > 3) ||
+		(away_wins < 0 || away_wins > 3 ) ) {
 		// await send_bot_message(
 		// 	actor,
 		// 	'error',
 		// 	'Invalid Score',
 		// 	`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
-		// 	match
+		// xxatch
 		// );
-		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
+		return res.redirect(`/combine/${match_id}/${league}?error=InvalidScore`);
 	}
 
 	if ( home_wins + away_wins != 3 ) {
@@ -454,7 +523,7 @@ router.post('/combine/:match_id', async (req, res) => {
 		// 	`Tried to report an invalid score of ${home_wins}-${away_wins}.`,
 		// 	match
 		// );
-		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
+		return res.redirect(`/combine/${match_id}/${league}?error=InvalidScore`);
 	}
 
 	const my_rsc_id = res.locals.user.rsc_id;
@@ -530,7 +599,7 @@ router.post('/combine/:match_id', async (req, res) => {
 
 	if ( ! can_save ) {
 		await db.end();
-		return res.redirect(`/combine/${match_id}?error=NotInLobby`);
+		return res.redirect(`/combine/${match_id}/${league}?error=NotInLobby`);
 	}
 
 
@@ -545,7 +614,7 @@ router.post('/combine/:match_id', async (req, res) => {
 					`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
 					match
 				);
-				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
+				return res.redirect(`/combine/${match_id}/${league}?error=ScoreReportMismatch`);
 			}
 		}
 
@@ -572,7 +641,7 @@ router.post('/combine/:match_id', async (req, res) => {
 				`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
 				match
 			);
-			return res.redirect(`/combine/${match_id}?finished`);
+			return res.redirect(`/combine/${match_id}/${league}?finished`);
 		} else {
 			await db.end();
 			await send_bot_message(
@@ -582,7 +651,7 @@ router.post('/combine/:match_id', async (req, res) => {
 				`${home_wins}-${away_wins}`,
 				match
 			);
-			return res.redirect(`/combine/${match_id}?reported`);
+			return res.redirect(`/combine/${match_id}/${league}?reported`);
 		}
 	} 
 
@@ -597,7 +666,7 @@ router.post('/combine/:match_id', async (req, res) => {
 					`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
 					match
 				);
-				return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
+				return res.redirect(`/combine/${match_id}/${league}?error=ScoreReportMismatch`);
 			}
 		}
 
@@ -624,7 +693,7 @@ router.post('/combine/:match_id', async (req, res) => {
 				`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
 				match
 			);
-			return res.redirect(`/combine/${match_id}?finished`);
+			return res.redirect(`/combine/${match_id}/${league}?finished`);
 		} else {
 			await db.end();
 			await send_bot_message(
@@ -634,7 +703,7 @@ router.post('/combine/:match_id', async (req, res) => {
 				`${home_wins}-${away_wins}`,
 				match
 			);
-			return res.redirect(`/combine/${match_id}?confirmed`);
+			return res.redirect(`/combine/${match_id}/${league}?confirmed`);
 		}
 	}
 
@@ -646,15 +715,18 @@ router.post('/combine/:match_id', async (req, res) => {
 		'This game has already ended. The score cannot be reported again.',
 		match
 	);
-	res.redirect(`/combine/${match_id}?error=AlreadyReported`);
+	res.redirect(`/combine/${match_id}/${league}?error=AlreadyReported`);
 });
 
-router.get('/combine/:match_id', (req, res) => {
+router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 	const match_id = req.params.match_id;
+
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
 	const match_query = `
 		SELECT 
-			id, match_dtg, season, lobby_user, lobby_pass, home_mmr, away_mmr,
+			id, match_dtg, season, league, lobby_user, lobby_pass, home_mmr, away_mmr,
 			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, completed, cancelled 
 		FROM 
 			combine_matches 
@@ -676,11 +748,11 @@ router.get('/combine/:match_id', (req, res) => {
 					p.id, p.rsc_id, p.team, p.start_mmr, p.end_mmr,
 					t.name,t.effective_mmr,t.wins,t.losses
 				FROM combine_match_players AS p
-				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ?
+				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ? AND t.league = ?
 				WHERE p.match_id = ?
 			`;
 
-			req.db.query(players_query, [ res.locals.combines.season, match_id ], (err, results) => {
+			req.db.query(players_query, [ SEASON, league, match_id ], (err, results) => {
 				if ( err ) { throw err; }
 
 				if ( results && results.length ) {

@@ -95,6 +95,7 @@ CREATE TABLE players (
 	`devleague_admin` TINYINT NOT NULL DEFAULT 0,
 	`stats_admin` TINYINT NOT NULL DEFAULT 0,
 	`combines_admin` TINYINT NOT NULL DEFAULT 0,
+	`combines_admin_2s` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`),
 	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -303,6 +304,7 @@ CREATE TABLE `StreamPlayerStats2` (
 CREATE TABLE combine_settings (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
 	`active` TINYINT NOT NULL DEFAULT 1,
 	`live` TINYINT NOT NULL DEFAULT 1,
 	`tiermaker_url` VARCHAR(255) NOT NULL, 
@@ -314,6 +316,7 @@ CREATE TABLE combine_settings (
 CREATE TABLE tiermaker (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
 	`discord_id` VARCHAR(20),
 	`rsc_id` VARCHAR(10) NOT NULL,
 	`name` VARCHAR(100) NOT NULL DEFAULT '',
@@ -333,6 +336,7 @@ CREATE TABLE tiermaker (
 CREATE TABLE combine_signups (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
 	`rsc_id` VARCHAR(10) NOT NULL,
 	`discord_id` VARCHAR(20),
 	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
@@ -348,6 +352,7 @@ CREATE TABLE combine_matches (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`match_dtg` DATETIME NOT NULL DEFAULT NOW(),
 	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
 	`lobby_user` VARCHAR(50) NOT NULL DEFAULT '',
 	`lobby_pass` VARCHAR(50) NOT NULL DEFAULT '',
 	`home_mmr` INT UNSIGNED NOT NULL,

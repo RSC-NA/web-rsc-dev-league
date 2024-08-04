@@ -277,9 +277,6 @@
 			if ( is_admin||is_combines_admin ) { 
 		%>
 		<div class="row mb-2">
-			<div class="col-12">
-				<%- /*debugObject(match);*/ %>
-			</div>
 			<div class="col-6">
 				<h4>Admin Overload </h4>
 				<form action="/combines/overload/<%- match.id %>/<%- match.league; %>" method="post">
@@ -290,7 +287,7 @@
 								type="number"
 								class="form-control"
 								name="home_wins"
-								id="home_wins"
+								id="overload_home_wins"
 								placeholder=""
 								value="<%- match.home_wins %>"
 								max="5"
@@ -306,7 +303,7 @@
 								type="number"
 								class="form-control"
 								name="away_wins"
-								id="away_wins"
+								id="overload_away_wins"
 								placeholder=""
 								value="<%- match.away_wins %>"
 								tabindex="2"
@@ -382,7 +379,7 @@
 		<div class="row">
 			<div class="col-12">
 				<div class="bg-light">
-					<form action="/combine/<%- match.id %>/<%- match.league; %>" method="post">
+					<form action="/combine/<%- match.id %>" method="post">
 						<input type="hidden" name="reporter_team" value="<%- combine_player.team; %>">
 					<div class="row">
 						<div class="col-md-6">
@@ -420,7 +417,7 @@
 										placeholder=""
 										value="<%- match.home_wins %>"
 										max="3"
-										tabindex="4"
+										tabindex="1"
 										required
 									>
 								</div>
@@ -529,12 +526,12 @@
 										id="away_wins"
 										placeholder=""
 										value="<%- match.away_wins %>"
-										tabindex="5"
+										tabindex="2"
 										max="3"
 										required
 									>
 									<input
-										tabindex="6"
+										tabindex="3"
 										type="submit"
 										class=" btn btn-large btn-success rounded"
 										value="Verify Scores"
@@ -552,12 +549,12 @@
 										id="away_wins"
 										placeholder=""
 										value="<%- match.away_wins %>"
-										tabindex="5"
+										tabindex="2"
 										max="3"
 										required
 									>
 									<input
-										tabindex="6"
+										tabindex="3"
 										type="submit"
 										class=" btn btn-large btn-success rounded"
 										value="Submit Scores"

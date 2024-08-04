@@ -49,7 +49,7 @@ CREATE TABLE `StreamPlayerStats` (
   `Playmakers` int DEFAULT NULL,
   `Saviors` int DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=948 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +124,7 @@ CREATE TABLE `StreamTeamStats` (
   `OppSaves` int DEFAULT NULL,
   `OppShots` int DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -184,6 +184,108 @@ CREATE TABLE `bad_trackers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `combine_match_players`
+--
+
+DROP TABLE IF EXISTS `combine_match_players`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `combine_match_players` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `match_id` int unsigned NOT NULL,
+  `rsc_id` varchar(10) NOT NULL,
+  `team` varchar(15) NOT NULL,
+  `start_mmr` int unsigned NOT NULL DEFAULT '0',
+  `end_mmr` int unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=763 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `combine_matches`
+--
+
+DROP TABLE IF EXISTS `combine_matches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `combine_matches` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `match_dtg` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `season` int unsigned NOT NULL,
+  `lobby_user` varchar(50) NOT NULL DEFAULT '',
+  `lobby_pass` varchar(50) NOT NULL DEFAULT '',
+  `home_mmr` int unsigned NOT NULL,
+  `away_mmr` int unsigned NOT NULL,
+  `home_wins` int unsigned NOT NULL DEFAULT '0',
+  `away_wins` int unsigned NOT NULL DEFAULT '0',
+  `reported_rsc_id` varchar(10) DEFAULT NULL,
+  `confirmed_rsc_id` varchar(10) DEFAULT NULL,
+  `completed` tinyint unsigned NOT NULL DEFAULT '0',
+  `cancelled` tinyint unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `combine_replays`
+--
+
+DROP TABLE IF EXISTS `combine_replays`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `combine_replays` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `match_id` int unsigned NOT NULL,
+  `rsc_id` varchar(10) NOT NULL,
+  `replay` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `match_idx` (`match_id`),
+  KEY `player_idx` (`rsc_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `combine_settings`
+--
+
+DROP TABLE IF EXISTS `combine_settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `combine_settings` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `season` int unsigned NOT NULL,
+  `active` tinyint NOT NULL DEFAULT '1',
+  `live` tinyint NOT NULL DEFAULT '1',
+  `tiermaker_url` varchar(255) NOT NULL,
+  `k_factor` int unsigned NOT NULL DEFAULT '32',
+  `min_series` int unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `combine_signups`
+--
+
+DROP TABLE IF EXISTS `combine_signups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `combine_signups` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `season` int unsigned NOT NULL,
+  `rsc_id` varchar(10) NOT NULL,
+  `discord_id` varchar(20) DEFAULT NULL,
+  `signup_dtg` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `current_mmr` int unsigned NOT NULL,
+  `active` tinyint NOT NULL DEFAULT '0',
+  `rostered` tinyint NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `rsc_id_idx` (`rsc_id`),
+  KEY `lookup_idx` (`season`,`rsc_id`,`signup_dtg`)
+) ENGINE=InnoDB AUTO_INCREMENT=1213 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `contracts`
 --
 
@@ -202,7 +304,7 @@ CREATE TABLE `contracts` (
   `active_3s` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `discord_id_idx` (`discord_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7160 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -226,7 +328,7 @@ CREATE TABLE `league_settings` (
   `master` tinyint NOT NULL DEFAULT '0',
   `premier` tinyint NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,7 +350,25 @@ CREATE TABLE `matches` (
   `home_wins` int unsigned NOT NULL DEFAULT '0',
   `away_wins` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `player_ips`
+--
+
+DROP TABLE IF EXISTS `player_ips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `player_ips` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `rsc_id` varchar(10) DEFAULT NULL,
+  `nickname` varchar(255) NOT NULL,
+  `discord_id` varchar(20) NOT NULL,
+  `ip` varchar(18) DEFAULT NULL,
+  `date_logged_in` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -260,6 +380,7 @@ DROP TABLE IF EXISTS `players`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `players` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `rsc_id` varchar(10) DEFAULT NULL,
   `nickname` varchar(255) NOT NULL,
   `discord_id` varchar(20) NOT NULL,
   `admin` tinyint NOT NULL DEFAULT '0',
@@ -269,7 +390,22 @@ CREATE TABLE `players` (
   `combines_admin` tinyint NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `discord_id_idx` (`discord_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8067 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `expires` int unsigned NOT NULL,
+  `data` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  PRIMARY KEY (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -289,7 +425,7 @@ CREATE TABLE `signups` (
   `rostered` tinyint NOT NULL DEFAULT '0',
   `status` varchar(20) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=302 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -304,7 +440,7 @@ CREATE TABLE `team_players` (
   `team_id` int unsigned NOT NULL,
   `player_id` int unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=199 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -319,7 +455,34 @@ CREATE TABLE `teams` (
   `team_number` int unsigned NOT NULL,
   `tier` varchar(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tiermaker`
+--
+
+DROP TABLE IF EXISTS `tiermaker`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tiermaker` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `season` int unsigned NOT NULL,
+  `discord_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `rsc_id` varchar(10) NOT NULL,
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `tier` varchar(10) NOT NULL DEFAULT '',
+  `count` int unsigned DEFAULT NULL,
+  `keeper` int unsigned DEFAULT NULL,
+  `base_mmr` int unsigned NOT NULL DEFAULT '0',
+  `effective_mmr` int unsigned NOT NULL DEFAULT '0',
+  `current_mmr` int unsigned NOT NULL DEFAULT '0',
+  `wins` int unsigned NOT NULL DEFAULT '0',
+  `losses` int unsigned NOT NULL DEFAULT '0',
+  `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `discord_id_idx` (`discord_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1284 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

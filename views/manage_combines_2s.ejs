@@ -5,19 +5,20 @@
 	}
 
 	let load_sheet_disabled = false;
-	if ( combines && combines.tiermaker_url ) {
+	if ( combines_2s && combines_2s.tiermaker_url ) {
 		console.log('has_sheet');	
 	} else {
 		console.log('no sheet');
 		load_sheet_disabled = true;
 	}
+
 %>
 
 <%- include('partials/header.ejs'); %>
 
 <main class="container">
 	<div class="py-5">
-		<h2>Combines Management</h2>
+		<h2>2s Combines Management</h2>
 		<p class="lead">
 			These are the controls and settings for combine management.
 		</p>
@@ -26,12 +27,12 @@
 	<div class="row">
 		<div class="col-md-4 order-md-2 mb-4">
 			<h4 class="d-flex justify-content-between align-items-center mb-3">
-				<span class="text-muted">Active Leagues</span>
+				<span class="text-muted">Active Tiers</span>
 			</h4>
 
 			<div class="text-end mb-3">
 				<a
-					href="/combines/import/<%= tiermaker_sheet_id; %>"
+					href="/combines/import_2s/<%= tiermaker_sheet_id; %>"
 					class="btn btn-success form-control <%- load_sheet_disabled ? 'disabled' : ''; %>"
 				>
 					<i class="fas fa-table"></i>
@@ -88,12 +89,20 @@
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">League Combines Settings</h4>
 			
-			<form class="needs-validation" novalidate action="/combines/manage" method="post">
+			<form class="needs-validation" novalidate action="/combines/manage_2s" method="post">
 
 			<div class="mb-3">
 				<label for="season">Season</label>
 				<div class="input-group">
-					<input type="text" class="form-control" name="season" id="season" placeholder="season" value="<%= combines.season %>" required>
+					<input
+						type="text"
+						class="form-control"
+						name="season"
+						id="season"
+						placeholder="season"
+						value="<%= combines_2s.season %>"
+						required
+					>
 					<div class="invalid-feedback" style="width: 100%;">
 						Season is required
 					</div>
@@ -103,21 +112,42 @@
 			<div class="mb-3">
 				<label for="tiermaker_url">Tiermaker Sheet URL</label>
 				<div class="input-group">
-					<input type="text" class="form-control" name="tiermaker_url" id="tiermaker_url" placeholder="tiermaker_url" value="<%= combines.tiermaker_url %>">
+					<input
+						type="text"
+						class="form-control"
+						name="tiermaker_url"
+						id="tiermaker_url"
+						placeholder="tiermaker_url"
+						value="<%= combines_2s.tiermaker_url %>"
+					>
 				</div>
 			</div>
 			
 			<div class="mb-3">
 				<label for="k_factor">K-Factor</label>
 				<div class="input-group">
-					<input type="number" class="form-control" name="k_factor" id="k_factor" placeholder="K-Factor" value="<%= combines.k_factor; %>">
+					<input
+						type="number"
+						class="form-control"
+						name="k_factor"
+						id="k_factor"
+						placeholder="K-Factor"
+						value="<%= combines_2s.k_factor; %>"
+					>
 				</div>
 			</div>
 
 			<div class="mb-3">
 				<label for="min_series">Min Series</label>
 				<div class="input-group">
-					<input type="number" class="form-control" name="min_series" id="min_series" placeholder="Number of required series" value="<%= combines.min_series; %>">
+					<input
+						type="number"
+						class="form-control"
+						name="min_series"
+						id="min_series"
+						placeholder="Number of required series"
+						value="<%= combines_2s.min_series; %>"
+					>
 				</div>
 			</div>
 
@@ -134,7 +164,7 @@
 					type="checkbox" 
 					class="custom-control-input" 
 					name="active" id="active" 
-					<%- combines.active ? 'checked="checked"' : '' %>>
+					<%- combines_2s.active ? 'checked="checked"' : '' %>>
 				<label class="custom-control-label" for="active">Combine Offseason?</label>
 			</div>
 			
@@ -148,7 +178,7 @@
 					type="checkbox" 
 					class="custom-control-input" 
 					name="live" id="live" 
-					<%- combines.live ? 'checked="checked"' : '' %>>
+					<%- combines_2s.live ? 'checked="checked"' : '' %>>
 				<label class="custom-control-label" for="live">Are Combines CURRENTLY (8pm - 11pm) Active?</label>
 			</div>
 			<hr class="mb-4">

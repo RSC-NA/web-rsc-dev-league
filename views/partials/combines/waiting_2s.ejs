@@ -1,5 +1,6 @@
+				
 
-				<!-- hx-get="/combines/process/waiting/<%- league; %>" -->
+				<!-- hx-get="/combines/process_2s/waiting" -->
 				<!-- hx-trigger="load delay:10s" -->
 				<!-- hx-swap="outerHTML" -->
 			<div
@@ -7,7 +8,7 @@
 			>
 				<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
 					<span class="text-muted">Waiting Room</span>
-					<a href="/combines/activate/all/<%- league; %>" class="btn btn-info fw-bold">
+					<a href="/combines/activate_2s/all" class="btn btn-info fw-bold">
 						<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
 						<span class="d-xl-none d-lg-inline">&uarr;</span>
 						<i class="fas fa-user-plus"></i>
@@ -55,7 +56,7 @@
 					%>
 						<tr>
 							<td class="p-0 text-center">
-								<a href="/combines/activate/<%- rsc_id; %>/<%- league; %>" 
+								<a href="/combines/activate_2s/<%- rsc_id; %>" 
 									class="move-arrow h4 p-0 px-2 mb-0" style=""
 									title="Move player to ready room.">
 									<span class="d-none d-xl-inline">&#10094;</span>

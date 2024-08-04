@@ -3,22 +3,22 @@
 
 	<!-- check in features -->	
 	<style type="text/css">
-		dialog#confirmCheckIn {
+		dialog.confirmCheckIn {
 			background-color: #C2FFD7;
 			border-radius: 12px;
 			max-width: 50vw;
 		}
 
-		dialog#confirmCheckIn h4 {
+		dialog.confirmCheckIn h4 {
 			text-decoration: underline;
 		}
 
-		dialog#confirmCheckIn::backdrop {
+		dialog.confirmCheckIn::backdrop {
 			background-color:  #FF3400aa;
 		}
 	</style>
 
-	<dialog id="confirmCheckIn">
+	<dialog id="confirmCheckIn_3s" class="confirmCheckIn">
 		<h4>Confirm Check In</h4>
 		<p>
 			<strong>Warning!</strong> - Combines are your chance to show GMs that you're a 
@@ -28,8 +28,21 @@
 			in your removal from RSC.
 		</p>
 		<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES.</h5>
-		<a class="btn btn-lg btn-primary" href="/combines/check_in/<%- user.rsc_id; %>" role="button">Confirm Check In!</a>
-		<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
+		<a class="btn btn-lg btn-primary" href="/combines/check_in/<%- user.rsc_id; %>/3" role="button">Confirm Check In!</a>
+		<a class="btn btn-lg btn-danger" id="backOut_3s" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
+	</dialog>
+	<dialog id="confirmCheckIn_2s" class="confirmCheckIn">
+		<h4>Confirm Check In</h4>
+		<p>
+			<strong>Warning!</strong> - Combines are your chance to show GMs that you're a 
+			player that they want to have on their team this season. Checking in for a match and 
+			not showing up is frustrating for the other 3 players in the lobby. To prevent this,
+			this software shows GMs a count of any matches you've missed. Continued abuse may result 
+			in your removal from RSC.
+		</p>
+		<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES.</h5>
+		<a class="btn btn-lg btn-primary" href="/combines/check_in/<%- user.rsc_id; %>/2" role="button">Confirm Check In!</a>
+		<a class="btn btn-lg btn-danger" id="backOut_2s" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 	</dialog>
 
 	<main class="container">
@@ -45,81 +58,147 @@
 
 					<p class="lead">
 						The RSC Combines are a place to show your true skill and talent in RSC's offseason
-						prior to the RSC Draft. You'll play in sets of <strong>3</strong> sweaty matches with other players around your 
-						skill level to flex for GMs and Scouts.
+						prior to the RSC Draft. You'll play in sets of <strong>3</strong> sweaty 
+						matches with other players around your skill level to flex for GMs and Scouts.
 					</p>
-
-					<h3>Combines Info</h3>
+	
+				<% 
+					if ( combines.active ) {
+				%>
+					<h3>3s Combines Info</h3>
 					<p>
-						Every Monday, Wednesday, and Friday, show up on this website to check in and play in 
+						Every Monday and Wednesday show up on this website to check in and play in 
 						as many series as you can with other RSC draft hopefuls. Every 15-20 minutes from 
 						<strong>8:00PM</strong> to <strong>11:00PM</strong>, new teams will be generated from 
 						anyone checked in and ready to play. 
 					</p>
+				<%	
+					}
+				%>
+
+				<% 
+					if ( combines_2s.active ) {
+				%>
+					<h3>2s Combines Info</h3>
 					<p>
-						You'll be assigned a lobby and will hop in a VC to play a series of <strong>3</strong> games with your 
-						assigned team and do your absolute best to prove you're the right person for a starting 
-						spot on one of our 32 franchises.
+						Every Tuesday and Thursday show up on this website to check in and play in 
+						as many series as you can with other RSC draft hopefuls. Every 15-20 minutes from 
+						<strong>8:00PM</strong> to <strong>11:00PM</strong>, new teams will be generated from 
+						anyone checked in and ready to play. 
 					</p>
-					<p>
-						<strong>WARNING:</strong> Only check in if you are at your computer/console and ready to  
-						play. Checking in and then not being available for the full four games will make earning 
-						a roster spot difficult for the other five people in your lobby. Ditching queues will be 
-						treated as a serious behavior violation and will potentially make you ineligible to compete 
-						in RSC's upcoming season.
-					</p>
+				<%	
+					}
+				%>
 				</div>
 				<div class="col-md-4 matchDates">
-					<h4>Season <%= settings.season %> Dates</h4>
+					<%
+
+						for ( let league in combineDays ) {
+							const match_days = combineDays[league];
+							let combine_season = '';
+							if ( league === '3s' ) {
+								if ( combines.active ) {
+									combine_season = combines.season;
+								} else {
+									continue;
+								}
+							} else if ( league === '2s' ) {
+								if ( combines_2s.active ) {
+									combine_season = combines_2s.season;
+								} else {
+									continue;
+								}
+							}
+					%>
+					<h4>RSC <%- league; %> Season <%= combine_season; %> Dates</h4>
 					<ul class="dates">
 						<%
 							for ( let match_date in match_days ) {
 						%>
 
-						<li class="<%- match_date == today ? 'today' : '' %> <%- match_date == today && combine_day == 'holiday' ? 'holiday' : '' %>">
+						<li class="
+							<%- match_date == today ? 'today' : '' %> 
+							<%- match_date == today && combine_day == 'holiday' ? 'holiday' : '' %>
+						">
 							<%- match_date %> - 
-							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : 'Combine Day: <strong>' + match_days[match_date] + '</strong>' %>
+							<%- 
+								match_days[ match_date ] == 'holiday' ? 
+									'<strong>Holiday - No Games</strong>' : 
+									'Combine Day: <strong>' + match_days[match_date] + '</strong>' 
+							%>
 						</li>
 
 						<%
 							}
 						%>
 					</ul>
+					<%
+						}
+					%>
 				</div>
 			</div>
 		</div>
 
-		<div class="bg-light p-3 rounded">
+		<div class=" p-3 rounded bg-light border row">
+			<div class="col-12">
+				<p>
+					<strong>WARNING:</strong> Only check in if you are at your computer/console and ready to  
+					play. Checking in and then not being available for the full four games will make earning 
+					a roster spot difficult for the other five people in your lobby. Ditching queues will be 
+					treated as a serious behavior violation and will potentially make you ineligible to compete 
+					in RSC's upcoming season.
+				</p>
+			</div>
+			
 			<% 
-				if ( nickname && user && user.combines.match && user.combines.match.id ) { 
+				if ( combines.active ) {
 			%>
+			<div class="col-12 col-md-6">
+				<h2>RSC 3s Combines</h2>
 
-				<%- include('partials/combines/dashboard.ejs', { status: 'ready', user: user }); %>
+				<%
+					console.log(user);
+					if ( nickname && user && user.combines.match && user.combines.match.id ) { 
+				%>
 
-			<% 
-				} else if ( nickname && ! checked_in && user && user.combines.active ) { %>
-			<% 
-					if ( combine_live ) {
-			%>
+					<%- include('partials/combines/dashboard.ejs', { 
+							status: 'ready', 
+							user: user, 
+							league: '3s', 
+							match_id: user.combines.match.id, 
+					}); %>
 
-				<%- include('partials/combines/dashboard.ejs', { status: 'check-in', user: user }); %>
 
-			<%
-					} else {
-			%>
-			<h2>Soon!</h2>
-			<p>
-				Today is a day for combines, but we don't allow people to check in until 7:50PM ET. Come back later this 
-				evening for some awesome pre-season games.
-			</p>
-			<span id="button_friend" class="p-4">
-				<a
-					class="btn btn-lg btn-primary disabled"
-					href="javascript:void(0);"
-					role="button"
-					id="checkInModal"
-				>Check In!</a>
-			</span>
+				<% 
+					} else if ( nickname && ! checked_in && user && user.combines.active ) { %>
+				<% 
+						if ( combine_live ) {
+				%>
+					
+					<%- include('partials/combines/dashboard.ejs', { 
+							status: 'check-in', 
+							user: user, 
+							league: '3s', 
+							match_id: null, 
+					}); %>
+
+
+				<%
+						} else {
+				%>
+				<h3>Soon!</h3>
+				<p>
+					Today is a day for combines, but we don't allow people to check in until 7:50PM ET. Come back later this 
+					evening for some awesome pre-season games.
+				</p>
+				<span id="button_friend_3s" class="p-4">
+					<a
+						class="btn btn-lg btn-primary disabled"
+						href="javascript:void(0);"
+						role="button"
+						id="checkInModal"
+					>Check In!</a>
+				</span>
 			<%
 					}
 			%>
@@ -128,29 +207,128 @@
 				} else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) {
 			%>
 
-				<%- include('partials/combines/dashboard.ejs', { status: 'waiting', user: user }); %>
+				<%- include('partials/combines/dashboard.ejs', { 
+						status: 'waiting', 
+						user: user, 
+						league: '3s', 
+						match_id: null, 
+				}); %>
 
 			<% 
 				} else if ( nickname && user && ! user.combines.active ) { 
 			%>
-			<h2>You Aren't In the Rolling Tier List</h2>
-			<p>
-				You don't currently have an entry in the Rolling Tier List. Processing new applicants
-				is a manual process that takes several days. If you just <strong>recently</strong> signed up for RSC, 
-				it might be a few days before you've been correctly added to our systems.
-			</p>
-			<p>
-				If you think this is an error, please reach out to the RSC Team by sending a DM to 
-				the bot <code>.MainModmail</code> on the RSC Discord server.
-			</p>
+				<h2>You Aren't In the Rolling Tier List</h2>
+				<p>
+					You don't currently have an entry in the Rolling Tier List. Processing new applicants
+					is a manual process that takes several days. If you just <strong>recently</strong> signed up for RSC, 
+					it might be a few days before you've been correctly added to our systems.
+				</p>
+				<p>
+					If you think this is an error, please reach out to the RSC Team by sending a DM to 
+					the bot <code>.MainModmail</code> on the RSC Discord server.
+				</p>
 			<% 
 				} else { 
 			%>
-			<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+				<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
+			<% 
+				} 
+			%>
+				</div>
+			<%
+				} /* end of 3s combines active */
+
+				/* 2s COMBINES */
+				/* 2s COMBINES */
+				/* 2s COMBINES */
+				if ( combines_2s.active ) {
+			%>
+		
+				<div class="col-12 col-md-6 mt-4 mt-md-0">
+					<h2 class="">RSC 2s Combines</h2>
+
+				<% 
+				console.log('2s?', nickname ,checked_in_2s, user['rsc_id']);
+					if ( nickname && user && user.combines_2s.match && user.combines_2s.match.id ) { 
+				%>
+
+					<%- include('partials/combines/dashboard.ejs', { 
+							status: 'ready', 
+							user: user, 
+							league: '2s', 
+							match_id: user.combines_2s.match.id, 
+					}); %>
+
+				<% 
+					} else if ( nickname && ! checked_in_2s && user && user.combines_2s.active ) { %>
+				<% 
+						if ( combine_live ) {
+				%>
+
+					<%- include('partials/combines/dashboard.ejs', { 
+							status: 'check-in', 
+							user: user, 
+							league: '2s', 
+							match_id: null, 
+					}); %>
+
+				<%
+						} else {
+				%>
+					<h3>Soon!</h3>
+					<p>
+						Today is a day for combines, but we don't allow people to check in until 7:50PM ET. Come back later this 
+						evening for some awesome pre-season games.
+					</p>
+					<span id="button_friend" class="p-4">
+						<a
+							class="btn btn-lg btn-primary disabled"
+							href="javascript:void(0);"
+							role="button"
+							id="checkInModal"
+						>Check In!</a>
+					</span>
+			<%
+					}
+			%>
+
+			<% 
+				} else if ( nickname && checked_in_2s && "rsc_id" in user && user['rsc_id'] != null ) {
+			%>
+
+				<%- include('partials/combines/dashboard.ejs', { 
+					status: 'waiting', 
+					user: user,
+					league: '2s',
+					match_id: null,
+				}); %>
+
+			<% 
+				} else if ( nickname && user && ! user.combines_2s.active ) { 
+			%>
+					<h2>You Aren't In the Rolling Tier List</h2>
+					<p>
+						You don't currently have an entry in the Rolling Tier List. Processing new applicants
+						is a manual process that takes several days. If you just <strong>recently</strong> signed up for RSC, 
+						it might be a few days before you've been correctly added to our systems.
+					</p>
+					<p>
+						If you think this is an error, please reach out to the RSC Team by sending a DM to 
+						the bot <code>.MainModmail</code> on the RSC Discord server.
+					</p>
+			<% 
+				} else { 
+			%>
+					<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
 			<% 
 				} 
 			%>
 
+				</div> <!-- end of 2s .col -->
+	
+			<%
+				} /* end of 2s combines active */
+			%>
 		</div>
 	</main>
 
