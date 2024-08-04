@@ -514,7 +514,6 @@ app.use((req, res, next) => {
 // checked in middleware.
 // only really needed if the user is logged in AND it's a game day
 app.use((req, res, next) => {
-	console.log(combineDays)
 	res.locals.checked_in    = false;
 	res.locals.checked_in_2s = false;
 	

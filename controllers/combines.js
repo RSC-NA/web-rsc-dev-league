@@ -416,7 +416,6 @@ router.get('/combines/check_out/:discord_id/:league', async (req, res) => {
 
 router.get('/combines/check_in/:discord_id/:league', async (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
-console.log('1', league);
 	if ( league === 3 && res.locals.checked_in ) {
 		return res.redirect(`/?error=YouAreAlreadyCheckedIn_${league}s`);
 	} else if ( league === 2 && res.locals.checked_in_2s ) {
@@ -426,9 +425,6 @@ console.log('1', league);
 	const user = res.locals.user;
 	const ucombines = league === 3 ? user.combines : user.combines_2s;
 	const combines = league === 3 ? res.locals.combines : res.locals.combines_2s;
-
-console.log('2', league);
-	console.log(league,ucombines,combines);
 
 	if ( ! user || ! ucombines ) {
 		console.error('Missing ucombines?');
@@ -461,7 +457,6 @@ console.log('2', league);
 			(     ?,     ?,     ?,         ?,          ?)
 	`;
 
-	console.log('inserting', [combines.season, league, user.rsc_id, user.discord_id, ucombines.current_mmr]);
 	const [inserted] = await db.query(query, [
 		combines.season,
 		league,
