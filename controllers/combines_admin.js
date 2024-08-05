@@ -1937,12 +1937,12 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		'discord_id': discord_ids['RSC000302'],
 		'rsc_id': 'RSC000302',
 		'name': 'tehblister',
-		'tier': 'Premier',
+		'tier': 'Veteran',
 		'count': 1,
 		'keeper': 1,
-		'base_mmr': 2000,
-		'effective_mmr': 2000,
-		'current_mmr': 2000,
+		'base_mmr': 1450,
+		'effective_mmr': 1450,
+		'current_mmr': 1450,
 	};
 	console.log('blister', players['RSC000302']);
 
@@ -2088,12 +2088,12 @@ router.all('/import_2s/:tiermaker_sheet_id', async (req, res) => {
 		'discord_id': discord_ids['RSC000302'],
 		'rsc_id': 'RSC000302',
 		'name': 'tehblister',
-		'tier': 'Premier',
+		'tier': 'Veteran',
 		'count': 1,
 		'keeper': 1,
-		'base_mmr': 2000,
-		'effective_mmr': 2000,
-		'current_mmr': 2000,
+		'base_mmr': 1450,
+		'effective_mmr': 1450,
+		'current_mmr': 1450,
 	};
 	console.log('blister', players['RSC000302']);
 
