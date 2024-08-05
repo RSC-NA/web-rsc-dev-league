@@ -923,7 +923,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'rsc_id': tehblister_id,
 			'name': 'tehblister',
 			'discord_id': tehblister_discord_id,
-			'mmr': 1550,
+			'mmr': 1450,
 			'tier': 'Elite',
 			'status': 'Free Agent',
 		};
