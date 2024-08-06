@@ -87,7 +87,7 @@
 						<%
 							} else if ( combines.active && discord_id ) {
 						%>
-							<a class="nav-link <%- menu['combines_matches'] %>" href="/combine/matches">
+							<a class="nav-link <%- menu['combines_matches'] %>" href="/combine/matches/<%- user.rsc_id; %>">
 								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
 								3s S<%- combines.season %> Combines
 							</a>
