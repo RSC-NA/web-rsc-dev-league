@@ -145,6 +145,7 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 					return res.json(player);
 				}
 
+				console.log(res.locals.combines);
 				if ( res.locals.combines.active ) {
 					const combines_query = `
 						SELECT 
