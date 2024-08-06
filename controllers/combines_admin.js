@@ -694,7 +694,7 @@ router.get('/resend_bot', async (req, res) => {
 		queueLimit: 0
 	});
 
-	await notify_bot(db);
+	await notify_bot(db, 3);
 
 	await db.end();
 
