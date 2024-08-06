@@ -29,6 +29,21 @@
 					</div>
 					<span class="text-muted"><%- player.rsc_id; %></span>
 				</li>
+				<%
+					if ( player && player.combines.length ) {
+				%>
+				<li class="list-group-item d-flex justify-content-between lh-condensed">
+					<div>
+						<h6 class="my-0">Combines Matches</h6>
+					</div>
+					<span class="text-muted">
+						<a href="/combine/matches/<%- player.rsc_id; %>">Season <%= combines.season; %></a>
+					</span>
+				</li>
+
+				<%
+					}
+				%>
 				<li class="list-group-item d-flex justify-content-between lh-condensed">
 					<div>
 						<h6 class="my-0">Current Tier</h6>

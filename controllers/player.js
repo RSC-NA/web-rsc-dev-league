@@ -154,7 +154,7 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 						LEFT JOIN combine_match_players AS p 
 						ON c.id = p.match_id 
 						WHERE 
-							c.season = ? AND c.completed = 1 AND p.rsc_id = ? 
+							c.season = ? AND c.league = 3 AND c.completed = 1 AND p.rsc_id = ? 
 					`;
 					
 					req.db.query(combines_query, 
