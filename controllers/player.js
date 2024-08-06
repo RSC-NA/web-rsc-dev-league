@@ -63,6 +63,7 @@ WHERE c.rsc_id = ?
 		mmr:     0,
 		trackers: {},
 		pulls:    [],
+		combines: false,
 		active_3s: false,
 		active_2s: false,
 	};
@@ -183,6 +184,7 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 
 						player.combines = results;
 						//console.log('combines',results);
+						console.log('USING THE COMBINES ROUTE!');
 						return res.render('player', { player: player });
 					});
 				} else {
