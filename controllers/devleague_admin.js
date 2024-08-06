@@ -738,6 +738,77 @@ router.get('/process_gameday', (req, res) => {
 	});
 });
 
+router.get('/fix_discord', async(req,res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	}
+
+	// 135E24RWpTJqBdFqwoD4dOU0O_hb0KALtsv_gBVBYNlo
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const existing_query = `SELECT id,rsc_id,discord_id,name FROM tiermaker WHERE discord_id is null AND season = 21 AND league = 3`;
+	const [p_results] = await db.query(existing_query);
+	const existing = {};
+	if ( p_results && p_results.length ) {
+		for ( let i = 0; i < p_results.length; ++i ) {
+			const p = p_results[i];
+			existing[p.rsc_id] = p;
+		}
+	}
+
+	// 1. create google sheets object
+	const doc = new GoogleSpreadsheet('135E24RWpTJqBdFqwoD4dOU0O_hb0KALtsv_gBVBYNlo');
+	// 2. authenticate
+	doc.useApiKey(process.env.GOOGLE_API_KEY);
+
+	// 3. pull all relevant fields
+	await doc.loadInfo();
+
+	const sheet = doc.sheetsByTitle["Members"];
+	const rows = await sheet.getRows();
+
+	const players = {};
+	console.log('Importing Players from Master Member Sheet...');
+	if ( ! rows ) {
+		return res.json({'error': 'Google rows was empty. :(', });
+	}
+
+	const updates = {};
+	for ( let i = 0; i < rows.length; i++ ) {
+		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC ID'] || ! rows[i]['Discord ID'] ) {
+			continue;
+		}
+
+		if ( rows[i]['RSC ID'] && existing[rows[i]['RSC ID']] ) {
+			updates[rows[i]['RSC ID']] = rows[i]['Discord ID']; 
+		}
+	}
+
+	console.log(`    Players found...${Object.keys(updates).length}`);
+
+	const update_query = `UPDATE tiermaker SET discord_id = ? WHERE rsc_id = ?`;
+	for ( const rsc_id in updates ) {
+		const discord_id = updates[rsc_id];
+
+		await db.query(update_query, [discord_id,rsc_id]);
+	}
+
+	db.end();
+
+	
+	console.log(updates);
+	res.json(updates);
+
+});
 router.get('/import_players/:contract_sheet_id', async(req,res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
