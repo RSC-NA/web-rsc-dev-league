@@ -209,6 +209,7 @@ router.get('/combines/dashboard', (req, res) => {
 	res.render('partials/combines/dashboard', {
 		status: status,
 		user: user,
+		league: '3s',
 	});
 
 });
