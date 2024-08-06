@@ -15,9 +15,9 @@
 
 				<!-- hx-get="/combines/dashboard?status=Game<%- league_url; %>" -->
 				<!-- hx-trigger="load delay:1m" -->
+				<!-- hx-swap="outerHTML" -->
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
-				hx-swap="outerHTML"
 			>
 				<h2>Your Lobby is Ready!</h2>
 				<p class="lead">
@@ -46,11 +46,11 @@
 	} else if ( status === 'waiting') { 
 %>
 
+				<!-- hx-get="/combines/dashboard?status=CheckedIn<%- league_url; %>"  -->
+				<!-- hx-trigger="load delay:20s" -->
+				<!-- hx-swap="outerHTML" -->
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
-				hx-get="/combines/dashboard?status=CheckedIn<%- league_url; %>" 
-				hx-trigger="load delay:20s"
-				hx-swap="outerHTML"
 			>
 				<h2>You are checked in!</h2>
 				<p class="lead">
