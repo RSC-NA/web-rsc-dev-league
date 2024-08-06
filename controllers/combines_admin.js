@@ -1236,10 +1236,13 @@ router.all(['/deactivate/:rsc_id', '/deactivate/:rsc_id/:league'], (req, res) =>
 	}
 });
 
-router.get('/history', (req, res) => {
+router.get(['/history', '/history/:league'], (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');
 	} 
+
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const season = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
 	let csv = false;
 	if ( req.query.csv ) {
@@ -1316,14 +1319,14 @@ router.get('/history', (req, res) => {
 			t.id, t.rsc_id, t.name, t.tier, t.base_mmr, t.effective_mmr, t.current_mmr, 
 			t.count, t.keeper, t.wins, t.losses
 		FROM tiermaker AS t 
-		WHERE t.season = ? AND t.league = 3 ${and_where}
+		WHERE t.season = ? AND t.league = ? ${and_where}
 		ORDER BY ${order} ${dir}
 		LIMIT ${limit}
 		OFFSET ${page_offset}
 	`;
 	const players = {};
 
-	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {
+	req.db.query(players_query, [ season, league ], (err, results) => {
 		if ( err ) { throw err; }
 
 		if ( results.length ) {
@@ -1355,11 +1358,11 @@ router.get('/history', (req, res) => {
 			SELECT 
 				count(*) AS total
 			FROM tiermaker AS t 
-			WHERE t.season = ? AND t.league = 3 ${and_where}
+			WHERE t.season = ? AND t.league = ? ${and_where}
 			ORDER BY ${order} ${dir}
 		`;
 		console.log(and_where);
-		req.db.query(count_query, [ res.locals.combines.season ], (err, results) => {
+		req.db.query(count_query, [ season, league ], (err, results) => {
 			if ( err ) { throw err; }
 
 			if ( results && results.length ) {
