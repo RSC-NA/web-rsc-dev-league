@@ -140,7 +140,7 @@ function rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
 	return results;
 }
 
-async function update_mmrs(db, match, k_factor=48) {
+async function update_mmrs(db, match, k_factor=48, league, season) {
 	const scores = { home: match.home_wins, away: match.away_wins };
 	const delta = rating_delta_series(match.home_mmr, match.away_mmr, scores, k_factor);
 
@@ -148,7 +148,7 @@ async function update_mmrs(db, match, k_factor=48) {
 		UPDATE combine_match_players SET end_mmr = ? WHERE match_id = ? AND rsc_id =?
 	`;
 	const tiermaker_query = `
-		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ?
+		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?
 	`;
 
 	for ( const rsc_id in match.players ) {
@@ -158,7 +158,7 @@ async function update_mmrs(db, match, k_factor=48) {
 		const new_wins = p.wins + scores[p.team];
 		const new_losses = p.losses + (3 - scores[p.team]);
 		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
-		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id]);
+		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id,league,season]);
 	}
 
 	match.delta = delta;
@@ -497,6 +497,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 	};
 
 	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
 	if ( 
 		(home_wins < 0 || home_wins > 3) ||
@@ -628,7 +629,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
 
 		if ( completed ) {	
-			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor, SEASON);
 			await db.end();
 			await send_bot_message(
 				actor,
@@ -679,8 +680,8 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		`;
 		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
 
-		if ( completed) {	
-			const delta = await update_mmrs(db, match, res.locals.combines.k_factor);
+		if ( completed ) {	
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor, SEASON);
 			await db.end();
 			await send_bot_message(
 				actor,

@@ -314,7 +314,7 @@ function rating_delta_series_overload(home_mmr, away_mmr, scores, k_factor=48) {
 // 	LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.league = ?
 // 	WHERE p.match_id = ?
 // `;
-async function remove_previous_wins_overload(db, match, league) {
+async function remove_previous_wins_overload(db, match, home_wins, away_wins, league, season) {
 	const tiermaker_query = `
 		UPDATE tiermaker set wins = ?, losses = ? WHERE rsc_id = ? AND league = ?
 	`;
@@ -334,7 +334,7 @@ async function remove_previous_wins_overload(db, match, league) {
 	return true;
 }
 
-async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_factor=48) {
+async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_factor=48, league, season) {
 	const scores = { home: new_home_wins, away: new_away_wins };
 	const delta = rating_delta_series_overload(match.home_mmr, match.away_mmr, scores, k_factor);
 
@@ -342,7 +342,7 @@ async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_f
 		UPDATE combine_match_players SET end_mmr = ? WHERE match_id = ? AND rsc_id =?
 	`;
 	const tiermaker_query = `
-		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ?
+		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?
 	`;
 
 	console.log(scores);
@@ -355,7 +355,7 @@ async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_f
 		const new_wins = p.wins + scores[p.team];
 		const new_losses = p.losses + (3 - scores[p.team]);
 		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
-		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id,match.league]);
+		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id,match.league,season]);
 	}
 
 	match.delta = delta;
@@ -372,6 +372,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 	const away_wins = parseInt(req.body.away_wins);
 
 	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const season = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 	
 	const actor = {
 		nickname: res.locals.user.nickname,
@@ -485,7 +486,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 			`;
 			await db.execute(report_query, [home_wins, away_wins, COMPLETED, match_id]);
 
-			await remove_previous_wins_overload(db, match, home_wins, away_wins);
+			await remove_previous_wins_overload(db, match, home_wins, away_wins, league, SEASON);
 
 			let k_factor = null;
 			if ( league === 2 ) {
@@ -494,7 +495,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 				k_factor = res.locals.combines.k_factor;
 			}
 
-			const delta = await update_mmrs_overload(db, match, home_wins, away_wins, k_factor);
+			const delta = await update_mmrs_overload(db, match, home_wins, away_wins, k_factor, league, SEASON);
 			await db.end();
 			await send_bot_message(
 				actor,
