@@ -191,7 +191,7 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 /*******************************************************
  ********************* User Views **********************
  ******************************************************/
-router.get('/combines/dashboard', (req, res) => {
+router.get('/combine/dashboard', (req, res) => {
 
 	const nickname = res.locals.nickname;	
 	const user = res.locals.user;	
@@ -214,7 +214,7 @@ router.get('/combines/dashboard', (req, res) => {
 
 });
 
-router.get('/combines/matches/:rsc_id', async(req,res) => {
+router.get('/combine/matches/:rsc_id', async(req,res) => {
 	const user = res.locals.user;
 	const combine_season = res.locals.combines.season;
 	
@@ -228,7 +228,7 @@ router.get('/combines/matches/:rsc_id', async(req,res) => {
 		connectionLimit: 10,
 		queueLimit: 0
 	});
-
+console.log('match page', req.params.rsc_id);
 	const matches_query = `
 		SELECT 
 			m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass, m.home_mmr, m.away_mmr,
@@ -329,7 +329,7 @@ router.get('/combines/matches', (req, res) => {
 	return res.redirect('/combines/matches/' + res.locals.user.rsc_id);
 });
 
-router.get('/combines/matches_2s', (req, res) => {
+router.get('/combine/matches_2s', (req, res) => {
 	if ( ! res.locals?.user?.rsc_id ) {
 		return res.redirect('/');
 	}
@@ -359,7 +359,7 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 	}
 });
 
-router.get('/combines/check_out/:discord_id/:league', async (req, res) => {
+router.get('/combine/check_out/:discord_id/:league', async (req, res) => {
 	if ( ! res.locals.checked_in && ! res.locals.checked_in_2s ) {
 		return res.redirect('/?error=YouAreNotCheckedIn');
 	}
@@ -415,7 +415,7 @@ router.get('/combines/check_out/:discord_id/:league', async (req, res) => {
 	return res.redirect(`/?success=YouAreCheckedOut_${league}s`);
 });
 
-router.get('/combines/check_in/:discord_id/:league', async (req, res) => {
+router.get('/combine/check_in/:rsc_id/:league', async (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	if ( league === 3 && res.locals.checked_in ) {
 		return res.redirect(`/?error=YouAreAlreadyCheckedIn_${league}s`);

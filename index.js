@@ -537,6 +537,7 @@ app.use((req, res, next) => {
 		res.locals.combine_2s_day = combineDays['2s'][date];
 	}
 
+		console.log(res.locals.discord_id, res.locals.combine_day, 'here');
 	if ( res.locals.match_day && req.session.user_id ) {
 		const query = `
 			SELECT id,active,rostered 

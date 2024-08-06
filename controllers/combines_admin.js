@@ -365,6 +365,284 @@ async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_f
  ******************** Admin Views *********************
  ******************************************************/
 // this route takes a game that is completed and "rescores" the MMRs of everyone in the lobby.
+/*
+async function (db, match, k_factor=48, league, season) {
+	const scores = { home: match.home_wins, away: match.away_wins };
+	const delta = rating_delta_series(match.home_mmr, match.away_mmr, scores, k_factor);
+
+	const player_query = `
+		UPDATE combine_match_players SET end_mmr = ? WHERE match_id = ? AND rsc_id =?
+	`;
+	const tiermaker_query = `
+		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?
+	`;
+
+	for ( const rsc_id in match.players ) {
+		console.log('Updating...',rsc_id);
+		const p = match.players[rsc_id];
+		const new_mmr = p.start_mmr + delta[p.team].delta;
+		const new_wins = p.wins + scores[p.team];
+		const new_losses = p.losses + (3 - scores[p.team]);
+		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
+		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id,league,season]);
+	}
+
+	match.delta = delta;
+	return match;
+}
+*/
+
+router.get('/fix_rscids/:league/:season', async (req, res) => {
+	const league = parseInt(req.params.league);
+	const season = parseInt(req.params.season);
+	
+	const DO_UPDATE = req.query.update ? true : false;
+
+	const query = `
+		SELECT 
+			p.id,p.rsc_id,p.discord_id,p.nickname,
+			t.rsc_id AS t_rsc_id,t.discord_id AS t_discord_id, 
+			t.name 
+		FROM players AS p 
+		LEFT JOIN tiermaker AS t 
+		ON p.discord_id = t.discord_id AND t.season = ? AND league = ?
+		WHERE p.rsc_id is null AND t.discord_id IS NOT null
+	`;
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const [broken] = await db.execute(query, [season, league]);
+
+	if ( DO_UPDATE ) {
+		const update_query = 'UPDATE players SET rsc_id = ?, nickname = ? WHERE id = ?';
+		for ( let i = 0; i < broken.length; ++i ) {
+			const p = broken[i];
+			await db.execute(update_query, [p.t_rsc_id, p.name, p.id]);
+		}
+	}
+
+	await db.end();
+
+	res.json(broken);
+});
+
+// route to re-run MMR calculations based on match results
+router.get('/recalculate/:league/:season', async (req, res) => {
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const DO_UPDATE = req.query.update ? true : false;
+
+	const league = req.params.league;
+	const season = req.params.season;
+
+	console.log('recalculating', league, season);
+	console.log(DO_UPDATE ? 'Performing Update...' : 'Simulating...');
+
+	tiermaker = {};
+	const players_query = `
+		SELECT 
+			id,discord_id,rsc_id,name,tier,
+			base_mmr,effective_mmr,effective_mmr AS current_mmr,
+			0 as wins, 0 as losses 
+		FROM tiermaker 
+		WHERE league = ? AND season = ?
+	`;
+	const [player_results] = await db.execute(players_query, [league, season]);
+	if ( player_results && player_results.length ) {
+		for ( let i = 0; i < player_results.length; ++i ) {
+			const p = player_results[i];
+			tiermaker[p.rsc_id] = p;
+		}
+	}
+
+	const matches = {};
+	const matches_query = `
+		SELECT 
+			id, match_dtg, 
+			home_mmr, away_mmr, null AS real_mmrs, 
+			home_wins, away_wins,
+			null AS delta,
+			null AS players 
+		FROM combine_matches 
+		WHERE league = ? AND season = ? 
+		AND completed = 1 AND cancelled = 0 
+		ORDER BY id ASC
+	`;
+	const [match_results] = await db.execute(matches_query, [league, season]);
+	if ( match_results && match_results.length ) {
+		for ( let i = 0; i < match_results.length; ++i ) {
+			const match = match_results[i];
+			match.players = {};
+			matches[match.id] = match;
+		}
+	}
+
+	const match_players = `
+		SELECT 
+			id,match_id,rsc_id,team,
+			start_mmr,end_mmr,
+			0 as real_start_mmr, 0 as real_end_mmr,
+			0 as new_start_mmr, 0 as delta, 0 as new_end_mmr
+		FROM combine_match_players 
+		WHERE match_id IN (
+			SELECT id FROM combine_matches 
+			WHERE 
+				league = ? AND season = ? AND 
+				completed = 1 AND cancelled = 0
+		)
+	`;
+	const [match_players_results] = await db.execute(match_players, [league,season]);
+	if ( match_players_results && match_players_results.length ) {
+		for ( let i = 0; i < match_players_results.length; ++i ) {
+			const p = match_players_results[i];
+			if ( p.match_id in matches ) {
+				matches[p.match_id]['players'][p.rsc_id] = p;
+			}
+		}
+	}
+
+	const changes = {
+		matches: {},
+		match_players: {},
+		tiermaker: {},
+	};
+
+	for ( const match_id in matches ) {
+		const match = matches[match_id];
+
+		const real_mmrs = {
+			home: 0,
+			away: 0,
+		};
+
+		for ( const rsc_id in match['players'] ) {
+			const p = match['players'][rsc_id];
+			if ( ! (rsc_id in tiermaker) ) {
+				console.log('missing player', rsc_id, `match=${match.id}`);
+			} else { 
+				match['players'][rsc_id]['real_start_mmr'] = tiermaker[rsc_id].current_mmr;
+				match['players'][rsc_id]['new_start_mmr'] = tiermaker[rsc_id].current_mmr;
+				match['players'][rsc_id]['new_end_mmr'] = tiermaker[rsc_id].current_mmr;
+				real_mmrs[p.team] += tiermaker[rsc_id].current_mmr;
+			}
+		}
+
+		matches[match_id].real_mmrs = real_mmrs;
+		
+		changes.matches[match_id] = {
+			id: match.id,
+			home_mmr: match.real_mmrs.home,	
+			away_mmr: match.real_mmrs.away,	
+		};
+			
+		const delta = rating_delta_series(
+			real_mmrs.home,
+			real_mmrs.away,
+			{ home: match.home_wins, away: match.away_wins },
+			k_factor = 32
+		);
+
+		matches[match_id].delta = delta;
+
+		for ( const rsc_id in match['players'] ) {
+			const p = match['players'][rsc_id];
+
+			// if ( ! ( match_id in changes.match_players ) ) {
+			// 	changes.match_players[match_id] = {};
+			// }
+		
+			if ( ! (rsc_id in tiermaker) ) {
+				console.log('WTF');
+				console.log(rsc_id,match);
+			} else {
+
+				match['players'][rsc_id]['new_end_mmr'] += delta[p.team].delta;
+				match['players'][rsc_id]['delta'] += delta[p.team].delta;
+				tiermaker[rsc_id].current_mmr = match['players'][rsc_id]['new_end_mmr'];
+				if ( p.team === 'home' ) {
+					tiermaker[rsc_id].wins += match.home_wins;
+					tiermaker[rsc_id].losses += match.away_wins;
+				} else {
+					tiermaker[rsc_id].wins += match.away_wins;
+					tiermaker[rsc_id].losses += match.home_wins;
+				}
+				changes.match_players[p.id] = {
+					id: p.id,
+					match_id: p.match_id,
+					start_mmr: p.new_start_mmr,
+					end_mmr: p.new_end_mmr,
+				};
+			}
+		}
+
+		matches[match_id] = match;
+	}
+
+	for ( const rsc_id in tiermaker ) {
+		const p = tiermaker[rsc_id];
+
+		if ( p.wins || p.losses ) {
+			changes.tiermaker[rsc_id] = p;
+		}
+	}
+
+	if ( DO_UPDATE ) {
+
+		const queries = {
+			matches: 'UPDATE combine_matches SET home_mmr = ?, away_mmr = ? WHERE id = ?',
+			match_players: 'UPDATE combine_match_players SET start_mmr = ?, end_mmr = ? WHERE id = ?',
+			tiermaker: 'UPDATE tiermaker SET current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?',
+		};
+		for ( const change_type in changes ) {
+			let updated = 0;
+
+			const change_list = changes[change_type];
+
+			const query = queries[change_type];
+			console.log(query);
+
+			for ( const id in change_list ) {
+				const record = change_list[id];
+				let update_vals = [];
+				if ( change_type === 'matches' ) {
+					update_vals = [ record.home_mmr, record.away_mmr, record.id ];
+				} else if ( change_type === 'match_players' ) {
+					update_vals = [ record.start_mmr, record.end_mmr, record.id ];
+				} else if ( change_type === 'tiermaker' ) {
+					update_vals = [ record.current_mmr, record.wins, record.losses, record.rsc_id, league, season ];
+				}
+
+				await db.execute(query, update_vals);
+
+				console.log(update_vals);
+			}
+		}
+	}
+
+	await db.end();
+
+	res.json(changes);
+
+});
+
 router.post('/overload/:match_id/:league', async (req, res) => {
 	const match_id = req.params.match_id;
 
@@ -1045,6 +1323,7 @@ router.get('/history', (req, res) => {
 		OFFSET ${page_offset}
 	`;
 	const players = {};
+
 	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {
 		if ( err ) { throw err; }
 
