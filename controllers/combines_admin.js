@@ -202,6 +202,7 @@ async function notify_bot(db, league) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
 	const games = await get_active(db, league);
 	if ( games && Object.keys(games).length ) {
+		console.log(games);
 		try {
 			await fetch('http://localhost:8008/combines_match', {
 				method: 'POST',
