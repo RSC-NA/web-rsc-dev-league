@@ -198,9 +198,9 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 }
 
 
-async function notify_bot(db, league) {
+async function notify_bot(db, league, season) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
-	const games = await get_active(db, league);
+	const games = await get_active(db, league, season);
 	if ( games && Object.keys(games).length ) {
 		console.log(games);
 		try {
@@ -220,7 +220,7 @@ async function notify_bot(db, league) {
 	console.log('SENDING STUFF TO THE BOT CMPLETE');
 }
 
-async function get_active(db, league) {
+async function get_active(db, league, season) {
 	const active_query = `
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
@@ -250,10 +250,10 @@ async function get_active(db, league) {
 				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
 			FROM combine_match_players AS p 
 			LEFT JOIN tiermaker AS t 
-			ON p.rsc_id = t.rsc_id AND t.league = ?
+			ON p.rsc_id = t.rsc_id AND t.season = ? AND t.league = ?
 			WHERE p.match_id in (?)
 		`;
-		const [p_results] = await db.query(players_query, [league, game_ids]);
+		const [p_results] = await db.query(players_query, [season, league, game_ids]);
 		if ( p_results && p_results.length ) {
 			for ( let i = 0; i < p_results.length; ++i ) {
 				const p = p_results[i];
@@ -695,7 +695,7 @@ router.get('/resend_bot', async (req, res) => {
 		queueLimit: 0
 	});
 
-	await notify_bot(db, 3);
+	await notify_bot(db, 3, res.locals.combines.season);
 
 	await db.end();
 
@@ -817,7 +817,7 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 		`;
 		await db.execute(rostered_query, [league]);
 
-		await notify_bot(db, league);
+		await notify_bot(db, league, SEASON);
 
 		await db.end();
 
