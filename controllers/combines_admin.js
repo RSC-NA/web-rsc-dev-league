@@ -202,7 +202,7 @@ async function notify_bot(db, league, season) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
 	const games = await get_active(db, league, season);
 	if ( games && Object.keys(games).length ) {
-		console.log(games);
+
 		try {
 			await fetch('http://localhost:8008/combines_match', {
 				method: 'POST',
@@ -1351,7 +1351,7 @@ router.get('/process', (req, res) => {
 			if ( results.length ) {
 				for ( let i = 0; i < results.length; ++i ) {
 					const s = results[i];
-					console.log(s);
+					//console.log(s);
 					const p = players[s.rsc_id];
 
 					if ( ! p || ! s ) {
