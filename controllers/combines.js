@@ -629,7 +629,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
 
 		if ( completed ) {	
-			const delta = await update_mmrs(db, match, res.locals.combines.k_factor, SEASON);
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor,league, SEASON);
 			await db.end();
 			await send_bot_message(
 				actor,
@@ -681,7 +681,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
 
 		if ( completed ) {	
-			const delta = await update_mmrs(db, match, res.locals.combines.k_factor, SEASON);
+			const delta = await update_mmrs(db, match, res.locals.combines.k_factor, league, SEASON);
 			await db.end();
 			await send_bot_message(
 				actor,
