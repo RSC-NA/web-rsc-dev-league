@@ -698,7 +698,7 @@ router.get('/resend_bot', async (req, res) => {
 
 	await db.end();
 
-	res.redirect('/process');
+	res.redirect('/combines/process');
 });
 
 router.all(['/generate', '/generate/:league'], async (req, res) => {
