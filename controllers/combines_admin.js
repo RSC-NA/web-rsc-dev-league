@@ -604,36 +604,35 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 		}
 	}
 
-	if ( DO_UPDATE ) {
+	const queries = {
+		matches: 'UPDATE combine_matches SET home_mmr = ?, away_mmr = ? WHERE id = ?',
+		match_players: 'UPDATE combine_match_players SET start_mmr = ?, end_mmr = ? WHERE id = ?',
+		tiermaker: 'UPDATE tiermaker SET current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?',
+	};
+	for ( const change_type in changes ) {
+		let updated = 0;
 
-		const queries = {
-			matches: 'UPDATE combine_matches SET home_mmr = ?, away_mmr = ? WHERE id = ?',
-			match_players: 'UPDATE combine_match_players SET start_mmr = ?, end_mmr = ? WHERE id = ?',
-			tiermaker: 'UPDATE tiermaker SET current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?',
-		};
-		for ( const change_type in changes ) {
-			let updated = 0;
+		const change_list = changes[change_type];
 
-			const change_list = changes[change_type];
+		const query = queries[change_type];
+		console.log(query);
 
-			const query = queries[change_type];
-			console.log(query);
-
-			for ( const id in change_list ) {
-				const record = change_list[id];
-				let update_vals = [];
-				if ( change_type === 'matches' ) {
-					update_vals = [ record.home_mmr, record.away_mmr, record.id ];
-				} else if ( change_type === 'match_players' ) {
-					update_vals = [ record.start_mmr, record.end_mmr, record.id ];
-				} else if ( change_type === 'tiermaker' ) {
-					update_vals = [ record.current_mmr, record.wins, record.losses, record.rsc_id, league, season ];
-				}
-
-				await db.execute(query, update_vals);
-
-				console.log(update_vals);
+		for ( const id in change_list ) {
+			const record = change_list[id];
+			let update_vals = [];
+			if ( change_type === 'matches' ) {
+				update_vals = [ record.home_mmr, record.away_mmr, record.id ];
+			} else if ( change_type === 'match_players' ) {
+				update_vals = [ record.start_mmr, record.end_mmr, record.id ];
+			} else if ( change_type === 'tiermaker' ) {
+				update_vals = [ record.current_mmr, record.wins, record.losses, record.rsc_id, league, season ];
 			}
+
+			if ( DO_UPDATE ) {
+				await db.execute(query, update_vals);
+			}
+
+			console.log(update_vals);
 		}
 	}
 
