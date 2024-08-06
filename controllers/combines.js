@@ -118,8 +118,8 @@ function rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
 	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
 	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
 
-	const home_result = scores.home / 5;
-	const away_result = scores.away / 5;
+	const home_result = scores.home / 3;
+	const away_result = scores.away / 3;
 
 	const home_delta = Math.round(k_factor * (home_result - home_win_chance));
 	const away_delta = Math.round(k_factor * (away_result - away_win_chance));
