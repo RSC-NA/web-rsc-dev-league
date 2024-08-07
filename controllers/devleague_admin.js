@@ -825,7 +825,7 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 		queueLimit: 0
 	});
 
-	const existing_query = `SELECT id,nickname,discord_id FROM players`;
+	const existing_query = `SELECT id,rsc_id,nickname,discord_id FROM players`;
 	const [p_results] = await db.query(existing_query);
 	const existing = {};
 	if ( p_results && p_results.length ) {
@@ -835,20 +835,20 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 		}
 	}
 
-
+	// API master member sheet = 135E24RWpTJqBdFqwoD4dOU0O_hb0KALtsv_gBVBYNlo
 	// 1. create google sheets object
-	const doc = new GoogleSpreadsheet(req.params.contract_sheet_id);
+	const doc = new GoogleSpreadsheet('135E24RWpTJqBdFqwoD4dOU0O_hb0KALtsv_gBVBYNlo');
 	// 2. authenticate
 	doc.useApiKey(process.env.GOOGLE_API_KEY);
 
 	// 3. pull all relevant fields
 	await doc.loadInfo();
 
-	const sheet = doc.sheetsByTitle["Players"];
+	const sheet = doc.sheetsByTitle["Members"];
 	const rows = await sheet.getRows();
 
 	const players = {};
-	console.log('Importing Players from Contract Sheet...');
+	console.log('Importing Players from API Master Members Sheet...');
 	if ( ! rows ) {
 		return res.json({'error': 'Google rows was empty. :(', });
 	}
