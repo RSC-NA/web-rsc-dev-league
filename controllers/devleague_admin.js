@@ -810,6 +810,8 @@ router.get('/fix_discord', async(req,res) => {
 
 });
 router.get('/import_players/:contract_sheet_id', async(req,res) => {
+	const returnUrl = req.query.return ? `/${req.query.return}` : '/manage_league';
+
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
@@ -900,8 +902,8 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 	};
 	
 	console.log(output);
-	res.json(output);
 
+	return res.redirect(`${returnUrl}?new=${output.new}&updated=${output.updated}&skipped=${output.skipped}`);
 });
 
 router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
@@ -909,6 +911,18 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		return res.redirect('/');
 	} 
 
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+ 	const tier = req.params.tier;
 	// 1. create google sheets object
 	const doc = new GoogleSpreadsheet(req.params.contract_sheet_id);
 	// 2. authenticate
@@ -917,27 +931,33 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// 3. pull all relevant fields
 	await doc.loadInfo();
 
-	const sheet = doc.sheetsByTitle["Players"];
-	const rows = await sheet.getRows();
+	//const sheet = doc.sheetsByTitle["Players"];
+	//const rows = await sheet.getRows();
 
 	const players = {};
 
-	console.log('Importing contracts...');
+	console.log('Importing Players from Players Table...');
 
-	for ( let i = 0; i < rows.length; i++ ) {
-		if ( ! rows[i]['Player Name'] || ! rows[i]['RSC ID'] || ! rows[i]['Discord ID'] ) {
-			continue;
-		}
-		players[ rows[i]['RSC ID'] ] = {
-			'rsc_id': rows[i]['RSC ID'],
-			'name': rows[i]['Player Name'],
-			'discord_id': rows[i]['Discord ID'],
-			'active_2s': false,
-			'active_3s': false,
-			'status': 'Non-playing',
-		};
-		if ( rows[i]['3v3 Active/Returning'] == "TRUE" ) { 
-			players[ rows[i]['RSC ID'] ].active_3s = true;
+	const players_query = `
+		SELECT id,rsc_id,nickname,discord_id
+		FROM players 
+		WHERE rsc_id IS NOT null
+		ORDER BY rsc_id ASC
+	`;
+
+	const [player_rows] = await db.execute(players_query);
+
+	if ( player_rows && player_rows.length ) {
+		for ( let i = 0; i < player_rows.length; i++ ) {
+			const p = player_rows[i];
+			players[ p.rsc_id ] = {
+				'rsc_id': p.rsc_id,
+				'name': p.nickname,
+				'discord_id': p.discord_id,
+				'active_2s': false,
+				'active_3s': false,
+				'status': 'Non-playing',
+			};
 		}
 	}
 
@@ -979,6 +999,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			}
 
 			players[ contractRows[i]['RSC ID'] ]['status'] = contractRows[i]['Contract Status'];
+			players[ contractRows[i]['RSC ID'] ]['active_3s'] = contractRows[i]['Active'] === 'TRUE' ? true : false;
 
 		}
 	}
@@ -987,18 +1008,18 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// always add "tehblister" to the list in case he isn't playing
 	// Added for development in S17 so that I could test things 
 	// while non-playing.
-	let tehblister_id = 'RSC000302';
-	let tehblister_discord_id = '207266416355835904';
-	if ( ! (tehblister_id in players) ) {
-		players[tehblister_id] = {
-			'rsc_id': tehblister_id,
-			'name': 'tehblister',
-			'discord_id': tehblister_discord_id,
-			'mmr': 1450,
-			'tier': 'Elite',
-			'status': 'Free Agent',
-		};
-	}
+	// let tehblister_id = 'RSC000302';
+	// let tehblister_discord_id = '207266416355835904';
+	// if ( ! (tehblister_id in players) ) {
+	// 	players[tehblister_id] = {
+	// 		'rsc_id': tehblister_id,
+	// 		'name': 'tehblister',
+	// 		'discord_id': tehblister_discord_id,
+	// 		'mmr': 1450,
+	// 		'tier': 'Elite',
+	// 		'status': 'Free Agent',
+	// 	};
+	// }
 
 	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }

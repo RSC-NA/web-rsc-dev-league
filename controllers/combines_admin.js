@@ -2200,6 +2200,8 @@ async function get_rsc_discord_map() {
 }
 
 router.all('/import/:tiermaker_sheet_id', async (req, res) => {
+	const returnUrl = req.query.return ? `/${req.query.return}` : '/manage_league';
+
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');
 	} 
