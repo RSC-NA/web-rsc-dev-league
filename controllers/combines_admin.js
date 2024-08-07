@@ -396,7 +396,7 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 	const league = parseInt(req.params.league);
 	const season = parseInt(req.params.season);
 	
-	const DO_UPDATE = req.query.update ? true : false;
+	const DO_UPDATE = req.query.update ? req.query.update : false;
 
 	const query = `
 		SELECT 
@@ -406,7 +406,7 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 		FROM players AS p 
 		LEFT JOIN tiermaker AS t 
 		ON p.discord_id = t.discord_id AND t.season = ? AND league = ?
-		WHERE p.rsc_id is null AND t.discord_id IS NOT null
+		WHERE (p.rsc_id is null AND t.discord_id IS NOT null) OR (p.nickname != t.name) 
 	`;
 	
 	const db = await mysqlP.createPool({
@@ -422,7 +422,19 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 
 	const [broken] = await db.execute(query, [season, league]);
 
-	if ( DO_UPDATE ) {
+	if ( DO_UPDATE && DO_UPDATE === 'rsc_id' ) {
+		const update_query = 'UPDATE players SET rsc_id = ? WHERE id = ?';
+		for ( let i = 0; i < broken.length; ++i ) {
+			const p = broken[i];
+			await db.execute(update_query, [p.t_rsc_id, p.id]);
+		}
+	} else if ( DO_UPDATE && DO_UPDATE === 'names' ) {
+		const update_query = 'UPDATE players SET nickname = ? WHERE id = ?';
+		for ( let i = 0; i < broken.length; ++i ) {
+			const p = broken[i];
+			await db.execute(update_query, [p.name, p.id]);
+		}
+	} else if ( DO_UPDATE && DO_UPDATE === 'all' ) {
 		const update_query = 'UPDATE players SET rsc_id = ?, nickname = ? WHERE id = ?';
 		for ( let i = 0; i < broken.length; ++i ) {
 			const p = broken[i];
@@ -432,8 +444,11 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 
 	await db.end();
 	res.json({
-		message: DO_UPDATE ? 'Updated Records' : 'Send ?update=true to process these accounts.',
-		broken: broken,
+		update: DO_UPDATE ? DO_UPDATE : false,
+		update_all: DO_UPDATE && DO_UPDATE === 'all' ? 'Updated All Records' : 'Send ?update=all to update RSC_ID and player nickname',
+		update_names: DO_UPDATE && DO_UPDATE === 'names' ? 'Updated Names Records' : 'Send ?update=names to process NICKNAMES ONLY.',
+		update_rsc_id: DO_UPDATE && DO_UPDATE === 'rsc_id' ? 'Updated RSC IDs' : 'Send ?update=rsc_id to process RSC_IDs ONLY.',
+		desynced: broken,
 	});
 });
 
