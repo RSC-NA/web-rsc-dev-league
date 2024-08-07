@@ -431,8 +431,10 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 	}
 
 	await db.end();
-
-	res.json(broken);
+	res.json({
+		message: DO_UPDATE ? 'Updated Records' : 'Send ?update=true to process these accounts.',
+		broken: broken,
+	});
 });
 
 // route to re-run MMR calculations based on match results

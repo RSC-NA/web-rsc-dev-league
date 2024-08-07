@@ -246,6 +246,7 @@
 								}
 
 								if ( is_admin || is_stats_admin ) {
+
 						%>
 							<div class="sb-sidenav-menu-heading">Trackers</div>
 							<a class="nav-link" href="/bump_api">
@@ -316,6 +317,16 @@
 								});
 							</script>
 						<% 
+								}
+
+								if ( is_admin ) {
+						%>
+							<div class="sb-sidenav-menu-heading">Admin Fix Actions</div>
+							<a class="nav-link" href="/combines/fix_rscids/3/<%- combines.season; %>">
+								<div class="sb-nav-link-icon"><i class="fas fa-user-plus"></i></div>
+								Fix Null RSC IDs
+							</a>
+						<%
 								}
 							}
 						%>
