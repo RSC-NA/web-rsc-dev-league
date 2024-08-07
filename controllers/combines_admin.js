@@ -448,7 +448,7 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 		update_all: DO_UPDATE && DO_UPDATE === 'all' ? 'Updated All Records' : 'Send ?update=all to update RSC_ID and player nickname',
 		update_names: DO_UPDATE && DO_UPDATE === 'names' ? 'Updated Names Records' : 'Send ?update=names to process NICKNAMES ONLY.',
 		update_rsc_id: DO_UPDATE && DO_UPDATE === 'rsc_id' ? 'Updated RSC IDs' : 'Send ?update=rsc_id to process RSC_IDs ONLY.',
-		desynced: broken,
+		desynced: broken && broken.length ? broken : 'No accounts currently desynced. Nothing to do!',
 	});
 });
 
