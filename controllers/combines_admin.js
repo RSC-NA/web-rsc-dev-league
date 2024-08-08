@@ -420,8 +420,8 @@ router.get('/fix_discord_ids/:league/:season', async (req, res) => {
 			t.rsc_id as t_rsc_id,t.discord_id as t_discord_id,t.name 
 		FROM players AS p 
 		LEFT JOIN tiermaker as t 
-		ON t.season = ? AND t.league = ? AND p.rsc_id = t.rsc_id
-		WHERE t.discord_id is null
+		ON p.rsc_id = t.rsc_id AND t.season = ?
+		WHERE t.discord_id is null AND t.season = ?
 	`;
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
@@ -434,7 +434,7 @@ router.get('/fix_discord_ids/:league/:season', async (req, res) => {
 		queueLimit: 0
 	});
 
-	const [broken] = await db.execute(query, [season, league]);
+	const [broken] = await db.execute(query, [season]);
 	const updates = [];
 	const update_query = 'UPDATE tiermaker SET discord_id = ? WHERE season = ? AND league = ? AND rsc_id = ?';
 	if ( broken && broken.length ) {
