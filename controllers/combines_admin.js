@@ -744,9 +744,9 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
 	}
 
-	if ( home_wins + away_wins != 3 ) {
-		return res.redirect(`/combine/${match_id}?error=InvalidScore`);
-	}
+	// if ( home_wins + away_wins != 3 ) {
+	// 	return res.redirect(`/combine/${match_id}?error=InvalidScore`);
+	// }
 
 
 	const my_rsc_id = res.locals.user.rsc_id;
