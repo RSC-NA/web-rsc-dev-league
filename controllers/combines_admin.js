@@ -319,15 +319,17 @@ async function remove_previous_wins_overload(db, match, home_wins, away_wins, le
 		UPDATE tiermaker set wins = ?, losses = ? WHERE rsc_id = ? AND league = ?
 	`;
 
+	//console.log('update wins');
+	//console.log(match, home_wins, away_wins);
+
 	for ( const rsc_id in match.players ) {
-		console.log('Updating...',rsc_id);
 		const p = match.players[rsc_id];
 		const home_wins = match.home_wins;
 		const away_wins = match.away_wins;
 
-		const new_wins   = p.wins   - (p.team === 'home' ? home_wins : away_wins);
-		const new_losses = p.losses - (p.team === 'home' ? away_wins : home_wins);
-		console.log(`Updating Wins for ${rsc_id}: ${new_wins} - ${new_losses}`);
+		const new_wins   = p.wins   - (p.team === 'home' ? match.home_wins : match.away_wins);
+		const new_losses = p.losses - (p.team === 'home' ? match.away_wins : match.home_wins);
+		console.log(`Updating: [${p.team}] ${p.name}, ${rsc_id}: ${p.wins}-${p.losses} -> ${new_wins}-${new_losses}`);
 		await db.execute(tiermaker_query, [new_wins,new_losses,rsc_id,match.league]);
 	}
 
@@ -349,13 +351,27 @@ async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_f
 	console.log(delta);
 
 	for ( const rsc_id in match.players ) {
-		console.log('Updating...',rsc_id);
 		const p = match.players[rsc_id];
+		
+		let new_p_wins = 0;
+		let new_p_losses = 0;
+		if ( p.team === 'home' ) {
+			new_p_wins   = p.wins - match.home_wins;
+			new_p_losses = p.losses - match.away_wins;
+			new_p_wins += new_home_wins;
+			new_p_losses += new_away_wins;
+		} else {
+			new_p_wins   = p.wins - match.away_wins;
+			new_p_losses = p.losses - match.home_wins;
+			new_p_wins += new_away_wins;
+			new_p_losses += new_home_wins;
+		}
+
+		console.log(`Updating: [${p.team}] ${p.name}, ${rsc_id}: ${p.wins}-${p.losses} -> ${new_p_wins}-${new_p_losses}`);
+
 		const new_mmr = p.start_mmr + delta[p.team].delta;
-		const new_wins = p.wins + scores[p.team];
-		const new_losses = p.losses + (3 - scores[p.team]);
 		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
-		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id,match.league,season]);
+		await db.execute(tiermaker_query, [new_mmr,new_p_wins,new_p_losses,rsc_id,match.league,season]);
 	}
 
 	match.delta = delta;
@@ -391,6 +407,55 @@ async function (db, match, k_factor=48, league, season) {
 	return match;
 }
 */
+
+router.get('/fix_discord_ids/:league/:season', async (req, res) => {
+	const league = parseInt(req.params.league);
+	const season = parseInt(req.params.season);
+	
+	const DO_UPDATE = req.query.update ? req.query.update : false;
+
+	const query = `
+		SELECT 
+			p.rsc_id as p_rsc_id,p.discord_id as p_discord_id,p.nickname,
+			t.rsc_id as t_rsc_id,t.discord_id as t_discord_id,t.name 
+		FROM players AS p 
+		LEFT JOIN tiermaker as t 
+		ON t.season = ? AND t.league = ? AND p.rsc_id = t.rsc_id
+		WHERE t.discord_id is null
+	`;
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const [broken] = await db.execute(query, [season, league]);
+
+	const update_query = 'UPDATE tiermaker SET discord_id = ? WHERE season = ? AND league = ? AND rsc_id = ?';
+	if ( broken && broken.length ) {
+		for ( let i = 0; i < broken.length; ++i ) {
+			if ( broken[i].p_discord_id ) {
+				if ( DO_UPDATE ) {
+					const updated = [broken[i].p_discord_id, season, league, broken[i].p_rsc_id];
+					await db.execute(update_query, updated);
+					updates.push(updated);
+				} else {
+					const updated = [broken[i].p_discord_id, season, league, broken[i].p_rsc_id];
+					updates.push(updated);
+				}
+			}
+		}
+	}
+
+	await db.end();
+	res.json(updates);
+	
+});
 
 router.get('/fix_rscids/:league/:season', async (req, res) => {
 	const league = parseInt(req.params.league);
@@ -708,7 +773,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 	`;
 	const [match_results] = await db.execute(match_query, [match_id]);
 
-	console.log('overload', home_wins,away_wins, match_results[0]);
+	//console.log('overload', home_wins,away_wins, match_results[0]);
 
 	let match = {};
 	if ( match_results && match_results.length ) {
@@ -729,7 +794,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 		LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.league = ? AND t.season = ?
 		WHERE p.match_id = ?
 	`;
-	const [players_results] = await db.execute(players_query, [match_id, league, SEASON]);
+	const [players_results] = await db.execute(players_query, [league, SEASON, match_id]);
 
 	if ( players_results && players_results.length ) {
 		for ( let i = 0; i < players_results.length; ++i ) {
@@ -780,7 +845,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 			`;
 			await db.execute(report_query, [home_wins, away_wins, COMPLETED, match_id]);
 
-			await remove_previous_wins_overload(db, match, home_wins, away_wins, league, SEASON);
+			//await remove_previous_wins_overload(db, match, home_wins, away_wins, league, SEASON);
 
 			let k_factor = null;
 			if ( league === 2 ) {
