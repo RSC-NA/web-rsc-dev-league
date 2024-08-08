@@ -445,7 +445,7 @@ router.get('/fix_discord_ids/:league/:season', async (req, res) => {
 					await db.execute(update_query, updated);
 					updates.push(updated);
 				} else {
-					const updated = [broken[i].p_discord_id, season, league, broken[i].p_rsc_id];
+					const updated = [broken[i].t_discord_id,broken[i].p_discord_id,broken[i].name, season, league, broken[i].p_rsc_id];
 					updates.push(updated);
 				}
 			}
