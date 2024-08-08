@@ -640,9 +640,6 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 			id: match.id,
 			home_mmr: match.real_mmrs.home,	
 			away_mmr: match.real_mmrs.away,	
-			k_factor: k_factor,
-			players: {},
-			orig_delta: {},
 		};
 
 		const delta = rating_delta_series(
