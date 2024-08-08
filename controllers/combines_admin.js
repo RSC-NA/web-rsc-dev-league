@@ -435,7 +435,7 @@ router.get('/fix_discord_ids/:league/:season', async (req, res) => {
 	});
 
 	const [broken] = await db.execute(query, [season, league]);
-
+	const updates = [];
 	const update_query = 'UPDATE tiermaker SET discord_id = ? WHERE season = ? AND league = ? AND rsc_id = ?';
 	if ( broken && broken.length ) {
 		for ( let i = 0; i < broken.length; ++i ) {
