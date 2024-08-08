@@ -782,9 +782,9 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 		match.players = {};
 	}
 	
-	if ( home_wins === match.home_wins || away_wins === match.away_wins ) {
-		return res.redirect(`/combine/${match_id}/${league}?error=AlreadyScored`);
-	}
+	// if ( home_wins === match.home_wins || away_wins === match.away_wins ) {
+	// 	return res.redirect(`/combine/${match_id}/${league}?error=AlreadyScored`);
+	// }
 
 	const players_query = `
 		SELECT 
