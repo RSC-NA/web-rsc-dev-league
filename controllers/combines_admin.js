@@ -532,8 +532,8 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 
 	const DO_UPDATE = req.query.update ? true : false;
 
-	const league = req.params.league;
-	const season = req.params.season;
+	const league = parseInt(req.params.league);
+	const season = parseInt(req.params.season);
 
 	console.log('recalculating', league, season);
 	console.log(DO_UPDATE ? 'Performing Update...' : 'Simulating...');
@@ -629,19 +629,29 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 
 		matches[match_id].real_mmrs = real_mmrs;
 		
+		let k_factor = null;
+		if ( league === 2 ) {
+			k_factor = res.locals.combines_2s.k_factor;
+		} else if ( league === 3 ) {
+			k_factor = res.locals.combines.k_factor;
+		}
+		
 		changes.matches[match_id] = {
 			id: match.id,
 			home_mmr: match.real_mmrs.home,	
 			away_mmr: match.real_mmrs.away,	
+			k_factor: k_factor,
+			players: {},
+			orig_delta: {},
 		};
-			
+
 		const delta = rating_delta_series(
 			real_mmrs.home,
 			real_mmrs.away,
 			{ home: match.home_wins, away: match.away_wins },
-			k_factor = 32
+			k_factor,
 		);
-
+		
 		matches[match_id].delta = delta;
 
 		for ( const rsc_id in match['players'] ) {
@@ -670,7 +680,7 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 					id: p.id,
 					match_id: p.match_id,
 					start_mmr: p.new_start_mmr,
-					end_mmr: p.new_end_mmr,
+					end_mmr: match['players'][rsc_id]['new_end_mmr'],
 				};
 			}
 		}
@@ -697,7 +707,7 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 		const change_list = changes[change_type];
 
 		const query = queries[change_type];
-		console.log(query);
+		//console.log(query);
 
 		for ( const id in change_list ) {
 			const record = change_list[id];
@@ -714,12 +724,12 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 				await db.execute(query, update_vals);
 			}
 
-			console.log(update_vals);
+			//console.log(update_vals);
 		}
 	}
 
 	await db.end();
-
+	
 	res.json(changes);
 
 });
@@ -1669,7 +1679,7 @@ router.get('/process', (req, res) => {
 			t.id, t.rsc_id, t.name, t.tier, t.effective_mmr, t.current_mmr, 
 			t.count, t.keeper, t.wins, t.losses
 		FROM tiermaker AS t 
-		WHERE t.season = ? AND t.league = 3
+		WHERE t.season = ?
 	`;
 	const players = {};
 	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {

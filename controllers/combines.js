@@ -559,10 +559,10 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 			p.id, p.rsc_id, p.team, p.start_mmr, p.end_mmr,
 			t.name,t.effective_mmr,t.wins,t.losses
 		FROM combine_match_players AS p
-		LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id
+		LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ?
 		WHERE p.match_id = ?
 	`;
-	const [players_results] = await db.execute(players_query, [match_id]);
+	const [players_results] = await db.execute(players_query, [SEASON, match_id]);
 
 	if ( players_results && players_results.length ) {
 		for ( let i = 0; i < players_results.length; ++i ) {
