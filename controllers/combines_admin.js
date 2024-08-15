@@ -408,6 +408,25 @@ async function (db, match, k_factor=48, league, season) {
 }
 */
 
+router.get('/check_games', async(req,res) => {
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+	const league = 3;
+	const season = 21;
+	const games = await get_active(db, league, season);
+
+	await db.end();
+	res.json(games);
+});
+
 router.get('/fix_discord_ids/:league/:season', async (req, res) => {
 	const league = parseInt(req.params.league);
 	const season = parseInt(req.params.season);
