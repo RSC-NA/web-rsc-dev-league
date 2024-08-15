@@ -338,6 +338,7 @@ router.post('/score/:match_id', (req, res) => {
 });
 
 router.get('/match/:match_id', (req, res) => {
+	return res.json({'no': 'You are in the wrong place'});
 	const matchQuery = `
 		SELECT 
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
