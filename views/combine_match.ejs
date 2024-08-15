@@ -239,7 +239,7 @@
 				let alert_class = 'alert-success';
 				let alert_title = 'The Grind Continues!';
 				let message = 'Thank you for reporting the score. Please return to <a href="/">https://devleague.rscna.com</a> to check in for the next series.';
-				if ( success === 'reported' ) {
+				if ( success === 'reported' && ! match.completed ) {
 					alert_class = 'alert-warning';
 					alert_title = 'Waiting For Verification';
 					message = 'Thank you for reporting the score. <strong>When the opposing team also reports the score, you will be able to check in for the next series.</strong><br><br>You will <strong>NOT</strong> be able to check in for another series until your opponent has verified.';
