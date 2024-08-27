@@ -4,12 +4,21 @@ const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
+const guild_league = {
+	'395806681994493964': 3, 
+	'809939294331994113': 2,
+};
+const league_guild = {
+	3: '395806681994493964',
+	2: '809939294331994113',
+};
+
 async function get_lobby(db,match_id) {
 	const active_query = `
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
 			reported_rsc_id,confirmed_rsc_id,home_mmr as tier,
-			completed,cancelled 
+			completed,cancelled,league AS guild_id
 		FROM combine_matches 
 		WHERE id = ?
 	`;
@@ -20,6 +29,7 @@ async function get_lobby(db,match_id) {
 		for ( let i = 0; i < results.length; ++i ) {
 			game_ids.push(results[i].id);
 			const game = results[i];
+			game.guild_id = league_guild[game.guild_id];
 			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
 			console.log('Generated Tier for',match_id,'-', game.tier);
 			game.home = [];
@@ -33,8 +43,10 @@ async function get_lobby(db,match_id) {
 			SELECT 
 				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
 			FROM combine_match_players AS p 
+			LEFT JOIN combine_matches AS m 
+			ON p.match_id = m.id 
 			LEFT JOIN tiermaker AS t 
-			ON p.rsc_id = t.rsc_id 
+			ON p.rsc_id = t.rsc_id AND m.season = t.season AND m.league = t.league
 			WHERE p.match_id in (?)
 		`;
 		const [p_results] = await db.query(players_query, [game_ids]);
@@ -57,7 +69,7 @@ async function get_active(db,match_id) {
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
 			reported_rsc_id,confirmed_rsc_id,home_mmr as tier,
-			completed,cancelled 
+			completed,cancelled,league AS guild_id
 		FROM combine_matches 
 		WHERE completed = 0 AND cancelled = 0 AND id = ?
 	`;
@@ -68,6 +80,7 @@ async function get_active(db,match_id) {
 		for ( let i = 0; i < results.length; ++i ) {
 			game_ids.push(results[i].id);
 			const game = results[i];
+			game.guild_id = league_guild[game.guild_id];
 			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
 			console.log('Generated Tier', game.tier);
 			game.home = [];
@@ -81,8 +94,10 @@ async function get_active(db,match_id) {
 			SELECT 
 				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
 			FROM combine_match_players AS p 
+			LEFT JOIN combine_matches AS m 
+			ON p.match_id = m.id
 			LEFT JOIN tiermaker AS t 
-			ON p.rsc_id = t.rsc_id 
+			ON p.rsc_id = t.rsc_id AND m.league = t.league AND m.season = t.season
 			WHERE p.match_id in (?)
 		`;
 		const [p_results] = await db.query(players_query, [game_ids]);
@@ -109,18 +124,37 @@ router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
 router.use(async (req, res, next) => {
+	res.locals.league = 3;
+	res.locals.guild_id = league_guild[3];
 	res.locals.discord_id = null;
 	res.locals.checked_in = false;
 	
 	if ( req.method === 'GET') {
 		res.locals.discord_id = req.query.discord_id;
+		if ( 'guild_id' in req.query ) {
+			if ( req.query.guild_id !== res.locals.guild_id ) {
+				if ( req.query.guild_id in guild_league ) {
+					res.locals.guild_id = req.query.guild_id;
+					res.locals.league = guild_league[req.query.guild_id];
+				}
+			}
+		}
 	} else {
 		res.locals.discord_id = req.body.discord_id;
+		if ( 'guild_id' in req.body ) {
+			if ( req.body.guild_id !== res.locals.guild_id ) {
+				if ( req.query.guild_id in guild_league ) {
+					res.locals.guild_id = req.body.guild_id;
+					res.locals.league = guild_league[req.body.guild_id];
+				}
+			}
+		}
 	}
+	res.locals.combines_season = res.locals.league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
 	try {
 
-		console.log("\n", '--- COMBINES API ROUTE ---');
+		console.log(`\n--- COMBINES API ROUTE --- League: ${res.locals.league} - ${res.locals.guild_id}`);
 		res.locals.adb = await mysqlP.createPool({
 			host: process.env.DB_HOST,
 			user: process.env.DB_USER,
@@ -134,8 +168,8 @@ router.use(async (req, res, next) => {
 
 		if ( res.locals.discord_id ) {
 			const [tm_results] = await res.locals.adb.query(
-				'SELECT rsc_id,name,current_mmr FROM tiermaker WHERE discord_id = ? AND season = ?',
-				[res.locals.discord_id, res.locals.combines.season]
+				'SELECT rsc_id,name,current_mmr FROM tiermaker WHERE discord_id = ? AND season = ? AND league = ?',
+				[res.locals.discord_id, res.locals.combines_season, res.locals.league]
 			);
 
 			if ( ! tm_results || ! tm_results.length ) {
@@ -157,12 +191,12 @@ router.use(async (req, res, next) => {
 			SELECT id,active,rostered FROM combine_signups 
 			WHERE 
 				discord_id = ? AND 
-				season = ? AND signup_dtg > DATE_SUB(now(), INTERVAL 2 HOUR)
+				season = ? AND league = ? AND signup_dtg > DATE_SUB(now(), INTERVAL 2 HOUR)
 			ORDER BY id DESC 
 			LIMIT 1
 			`;
 
-			const [signupResults] = await res.locals.adb.query(query, [ res.locals.discord_id, res.locals.combines.season ]);
+			const [signupResults] = await res.locals.adb.query(query, [ res.locals.discord_id, res.locals.combines_season , res.locals.league]);
 			res.locals.checked_in = false;
 			if ( signupResults && signupResults[0] ) {
 				const signup = signupResults[0];
@@ -235,10 +269,10 @@ router.get('/games', async(req,res) => {
 			season,rsc_id,discord_id,name,tier,wins,losses,
 			wins + losses AS games,((wins / (wins+losses)) *100) as win_pct
 		FROM tiermaker 
-		WHERE season = ? AND (losses > 0 OR wins > 0)
+		WHERE season = ? AND league = ? AND (losses > 0 OR wins > 0)
 		ORDER BY rsc_id ASC  
 	`;
-	const [results] = await res.locals.adb.query(players_query, [res.locals.combines.season]);
+	const [results] = await res.locals.adb.query(players_query, [res.locals.combines_season, res.locals.league]);
 
 	await res.locals.adb.end();
 
@@ -251,11 +285,12 @@ router.get('/games/:rsc_id_or_discord_id', async(req,res) => {
 			season,rsc_id,discord_id,name,tier,wins,losses,
 			wins + losses AS games,((wins / (wins+losses)) * 100) as win_pct
 		FROM tiermaker 
-		WHERE season = ? AND (rsc_id = ? OR discord_id = ?) AND (losses > 0 OR wins > 0)
+		WHERE season = ? AND league = ? AND (rsc_id = ? OR discord_id = ?) AND (losses > 0 OR wins > 0)
 		ORDER BY rsc_id ASC  
 	`;
 	const [results] = await res.locals.adb.query(players_query, [
-		res.locals.combines.season,
+		res.locals.combines_season,
+		res.locals.league,
 		req.params.rsc_id_or_discord_id,
 		req.params.rsc_id_or_discord_id,
 	]);
@@ -270,11 +305,12 @@ router.get('/active', async(req,res) => {
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,home_mmr,
 			reported_rsc_id,confirmed_rsc_id,
-			completed,cancelled 
+			completed,cancelled,
+			league AS guild_id
 		FROM combine_matches 
-		WHERE completed = 0 AND cancelled = 0
+		WHERE completed = 0 AND cancelled = 0 AND league = ? AND season = ?
 	`;
-	const [results] = await res.locals.adb.query(active_query);
+	const [results] = await res.locals.adb.query(active_query, [res.locals.league, res.locals.combines_season]);
 	const games = {};
 	const game_ids = [];
 	if ( results && results.length ) {
@@ -282,6 +318,7 @@ router.get('/active', async(req,res) => {
 			// TODO(erh): Add "getTierFromMMR()" for Nick
 			game_ids.push(results[i].id);
 			const game = results[i];
+			game.guild_id = league_guild[game.guild_id];
 			game.tier = getTierFromMMR(game.home_mmr/3);
 			delete(game.home_mmr);
 			game.home = [];
@@ -295,8 +332,10 @@ router.get('/active', async(req,res) => {
 			SELECT 
 				t.discord_id,p.rsc_id,p.match_id,p.team,t.name
 			FROM combine_match_players AS p 
+			LEFT JOIN combine_matches AS m 
+			ON p.match_id = m.id
 			LEFT JOIN tiermaker AS t 
-			ON p.rsc_id = t.rsc_id 
+			ON p.rsc_id = t.rsc_id AND m.league = t.league AND m.season = t.season
 			WHERE p.match_id in (?)
 		`;
 		const [p_results] = await res.locals.adb.query(players_query, [game_ids]);
@@ -375,7 +414,7 @@ router.get('/lobby', async (req, res) => {
 			LEFT JOIN combine_match_players AS p 
 			ON m.id = p.match_id 
 			LEFT JOIN tiermaker AS t 
-			ON p.rsc_id = t.rsc_id
+			ON p.rsc_id = t.rsc_id AND m.season = t.season AND m.league = t.league
 			WHERE m.completed = 0 AND m.cancelled = 0 AND t.discord_id = ?
 		`;
 		const [results] = await res.locals.adb.query(active_query,[res.locals.discord_id]);
@@ -440,12 +479,13 @@ router.get('/check_in', async (req, res) => {
 
 		const query = `
 			INSERT INTO combine_signups 
-				(season,rsc_id,discord_id,current_mmr) 
+				(season,league,rsc_id,discord_id,current_mmr) 
 			VALUES 
-				(     ?,     ?,         ?,          ?)
+				(     ?,     ?,     ?,         ?,          ?)
 		`;
 		const [inserted] = await res.locals.adb.query(query, [
-			res.locals.combines.season,
+			res.locals.combines_season,
+			res.locals.league,
 			res.locals.rsc_id,
 			res.locals.discord_id,
 			res.locals.current_mmr,
@@ -488,7 +528,7 @@ router.get('/check_out', async (req, res) => {
 
 		const user = res.locals.user;
 		const ucombines = user.combines;
-		const combines = res.locals.combines;
+		const combines = res.locals.league === 3 ? res.locals.combines : res.locals.combines_2s;
 
 		if ( ! combines.live ) {
 			return res.json({
@@ -501,6 +541,7 @@ router.get('/check_out', async (req, res) => {
 			DELETE FROM combine_signups 
 			WHERE 
 				season = ? AND 
+				league = ? AND 
 				rsc_id = ? AND 
 				discord_id = ? AND 
 				rostered = 0 AND 
@@ -508,7 +549,8 @@ router.get('/check_out', async (req, res) => {
 		`;
 
 		const [deletedId] = await res.locals.adb.query(query, [
-			res.locals.combines.season,
+			res.locals.combines_season,
+			res.locals.league,
 			res.locals.rsc_id,
 			res.locals.discord_id
 		]);

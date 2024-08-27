@@ -7,6 +7,11 @@ const fs = require('fs');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { stringify } = require('csv-stringify');
 
+const league_guild = {
+	3: '395806681994493964',
+	2: '809939294331994113',
+};
+
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
@@ -198,12 +203,13 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
 }
 
 
-async function notify_bot(db, league, season) {
+async function notify_bot(db, league, season, guild_id) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
-	const games = await get_active(db, league, season);
+	const games = await get_active(db, league, season, guild_id);
 	if ( games && Object.keys(games).length ) {
 
 		try {
+			console.log(`SENDING TO BOT`, games);
 			await fetch('http://localhost:8008/combines_match', {
 				method: 'POST',
 				headers: {
@@ -218,9 +224,11 @@ async function notify_bot(db, league, season) {
 	}
 
 	console.log('SENDING STUFF TO THE BOT CMPLETE');
+
+	return games;
 }
 
-async function get_active(db, league, season) {
+async function get_active(db, league, season, guild_id) {
 	const active_query = `
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
@@ -236,6 +244,7 @@ async function get_active(db, league, season) {
 		for ( let i = 0; i < results.length; ++i ) {
 			game_ids.push(results[i].id);
 			const game = results[i];
+			game.guild_id = guild_id;
 			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
 			console.log('Generated Tier', game.tier);
 			game.home = [];
@@ -1065,11 +1074,15 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 	// res.redirect(`/combine/${match_id}?error=AlreadyReported`);
 });
 
-router.get('/resend_bot', async (req, res) => {
+router.get('/resend_bot/:league', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');
 	}
 	
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = league === 2 ? res.locals.combines_2s.season : res.locals.combines.season;
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
+
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USER,
@@ -1081,11 +1094,15 @@ router.get('/resend_bot', async (req, res) => {
 		queueLimit: 0
 	});
 
-	await notify_bot(db, 3, res.locals.combines.season);
+	await notify_bot(db, league, SEASON, guild_id);
 
 	await db.end();
 
-	res.redirect('/combines/process');
+	if ( league === 2 ) {
+	    return res.redirect('/combines/process_2s');
+	}
+
+	return res.redirect('/combines/process');
 });
 
 router.all(['/generate', '/generate/:league'], async (req, res) => {
@@ -1096,8 +1113,9 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const TEAM_SIZE = league === 2 ? 4 : 6;
 	const SEASON = league === 2 ? res.locals.combines_2s.season : res.locals.combines.season;
+	const guild_id = league === 3 ? league_guild[3] : league_guild[2];
 
-	console.log('GENERATING TEAMS FOR ', league, `size: ${TEAM_SIZE}, SEASON: ${SEASON}`);
+	console.log('GENERATING TEAMS FOR ', league, `size: ${TEAM_SIZE}, SEASON: ${SEASON}, GUILD_ID: ${guild_id}`);
 
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
@@ -1203,9 +1221,11 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 		`;
 		await db.execute(rostered_query, [league]);
 
-		await notify_bot(db, league, SEASON);
+		const bot_input = await notify_bot(db, league, SEASON, guild_id);
 
 		await db.end();
+
+	return res.json(bot_input);
 
 		if ( league === 2 ) {
 			return res.redirect('/combines/process_2s?success');
@@ -1602,7 +1622,7 @@ router.get('/history_2s', (req, res) => {
 		OFFSET ${page_offset}
 	`;
 	const players = {};
-	req.db.query(players_query, [ res.locals.combines.season ], (err, results) => {
+	req.db.query(players_query, [ res.locals.combines_2s.season ], (err, results) => {
 		if ( err ) { throw err; }
 
 		if ( results.length ) {
@@ -1638,7 +1658,7 @@ router.get('/history_2s', (req, res) => {
 			ORDER BY ${order} ${dir}
 		`;
 		console.log(and_where);
-		req.db.query(count_query, [ res.locals.combines.season ], (err, results) => {
+		req.db.query(count_query, [ res.locals.combines_2s.season ], (err, results) => {
 			if ( err ) { throw err; }
 
 			if ( results && results.length ) {
@@ -1647,7 +1667,7 @@ router.get('/history_2s', (req, res) => {
 					if ( csv ) {
 						/* CSV Output if ?csv=true is sent */
 						res.header('Content-type', 'text/csv');
-						res.attachment(`S${res.locals.combines.season} Combines.csv`);
+						res.attachment(`S${res.locals.combines_2s.season} Combines.csv`);
 						const columns = [
 							'RSC ID', 'Player Name', 'Initial Tier', 
 							'Base MMR', 'Effective MMR', 'Δ', 'Combines MMR',

@@ -8,6 +8,11 @@ const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
+const league_guild = {
+	3: '395806681994493964',
+	2: '809939294331994113',
+};
+
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
@@ -165,9 +170,11 @@ async function update_mmrs(db, match, k_factor=48, league, season) {
 	return match;
 }
 
-async function send_bot_message(actor, status, message_type, message, match={}) {
-	console.log(`[BOT-${status}:${match?.id || null}] ${actor.nickname} did "${message}"`);
+async function send_bot_message(league, actor, status, message_type, message, match={}) {
+	console.log(`[BOT-${league}s-${status}:${match?.id || null}] ${actor.nickname} did "${message}"`);
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
 	const outbound = {
+		guild_id: guild_id,
 		actor: actor,
 		status: status,
 		message_type: message_type,
@@ -192,7 +199,6 @@ async function send_bot_message(actor, status, message_type, message, match={}) 
  ********************* User Views **********************
  ******************************************************/
 router.get('/combine/dashboard', (req, res) => {
-
 	const nickname = res.locals.nickname;	
 	const user = res.locals.user;	
 	const checked_in = res.locals.checked_in;
@@ -228,7 +234,6 @@ router.get('/combine/matches/:rsc_id', async(req,res) => {
 		connectionLimit: 10,
 		queueLimit: 0
 	});
-console.log('match page', req.params.rsc_id);
 	const matches_query = `
 		SELECT 
 			m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass, m.home_mmr, m.away_mmr,
@@ -405,6 +410,7 @@ router.get('/combine/check_out/:discord_id/:league', async (req, res) => {
 		discord_id: res.locals.user.discord_id,
 	};
 	await send_bot_message(
+		league,
 		actor,
 		'success',
 		'Checked In',
@@ -471,6 +477,7 @@ router.get('/combine/check_in/:rsc_id/:league', async (req, res) => {
 		discord_id: res.locals.user.discord_id,
 	};
 	await send_bot_message(
+		league,
 		actor,
 		'success',
 		'Checked In',
@@ -605,6 +612,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
 				await db.end();
 				await send_bot_message(
+					league,
 					actor,
 					'error',
 					'Score Report Mismatch',
@@ -632,6 +640,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 			const delta = await update_mmrs(db, match, res.locals.combines.k_factor,league, SEASON);
 			await db.end();
 			await send_bot_message(
+				league,
 				actor,
 				'success',
 				'Finished Game',
@@ -642,6 +651,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		} else {
 			await db.end();
 			await send_bot_message(
+				league,
 				actor,
 				'success',
 				'Reported Score',
@@ -657,6 +667,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 			if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
 				await db.end();
 				await send_bot_message(
+					league,
 					actor,
 					'error',
 					'Score Report Mismatch',
@@ -684,6 +695,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 			const delta = await update_mmrs(db, match, res.locals.combines.k_factor, league, SEASON);
 			await db.end();
 			await send_bot_message(
+				league,
 				actor,
 				'success',
 				'Finished Game',
@@ -694,6 +706,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		} else {
 			await db.end();
 			await send_bot_message(
+				league,
 				actor,
 				'success',
 				'Reported Score',
@@ -706,6 +719,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 
 	await db.end();
 	await send_bot_message(
+		league,
 		actor,
 		'error',
 		'Game Complete',
