@@ -27,6 +27,16 @@ li.today {
 	text-decoration: underline;
 	list-style-type: '⚽';
 }
+li.today.championship {
+	padding: 4px 8px;
+	font-weight: bold;
+	font-size: 1.5rem;
+	background-color: #85ffce;
+	border-radius: 6px;
+	list-style-type: '👑';	
+	text-decoration: none;
+	border: 1px solid #e67e22;
+}
 
 ol>li.today {
 	list-style-type: decimal;

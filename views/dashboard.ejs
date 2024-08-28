@@ -50,11 +50,35 @@
 					<ul class="dates">
 						<%
 							for ( let match_date in match_days ) {
+								const css_classes = [];
+								if ( match_date === today ) {
+									css_classes.push('today');
+								} 
+								if ( match_days[match_date] === 'holiday' ) {
+									css_classes.push('holiday');
+								} 
+								if ( match_days[match_date] === 99 ) {
+									css_classes.push('championship');
+								}
 						%>
 
-						<li class="<%- match_date == today ? 'today' : '' %> <%- match_date == today && match_day == 'holiday' ? 'holiday' : '' %>">
+						<li class="<%- css_classes.join(' '); %>">
+							<%
+								if ( match_days[match_date] !== 99 ) {
+							%>
 							<%- match_date %> - 
 							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : 'Match Day: <strong>' + match_days[match_date] + '</strong>' %>
+							<%
+								} else {
+							%>
+							<span style="font-size: 1.4rem;">
+							<strong>Dev League Championship</strong>
+							<br>
+							<%- match_date %>
+							</span>
+							<%
+								}
+							%>
 						</li>
 
 						<%
