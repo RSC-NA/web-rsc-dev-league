@@ -179,15 +179,18 @@ function rating_delta(home_mmr, away_mmr, winner, k_factor = 32) {
 	return results;
 }
 
-async function send_bot_message(actor, status, message_type, message, match={}) {
-	console.log(`[BOT-${status}:${match?.id || null}] ${actor.nickname} did "${message}"`);
+async function send_bot_message(league, actor, status, message_type, message, match={}) {
+	console.log(`[BOT-${league}s-${status}:${match?.id || null}] ${actor.nickname} did "${message}"`);
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
 	const outbound = {
+		guild_id: guild_id,
 		actor: actor,
 		status: status,
 		message_type: message_type,
 		message: message,
 		match_id: match?.id || null,
 	};
+	console.log(outbound);
 	try {
 		await fetch('http://localhost:8008/combines_event', {
 			method: 'POST',
@@ -207,7 +210,7 @@ async function notify_bot(db, league, season, guild_id) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
 	const games = await get_active(db, league, season, guild_id);
 	if ( games && Object.keys(games).length ) {
-
+		console.log(games);
 		try {
 			console.log(`SENDING TO BOT`, games);
 			await fetch('http://localhost:8008/combines_match', {
@@ -764,6 +767,75 @@ router.get('/recalculate/:league/:season', async (req, res) => {
 
 });
 
+router.get('/admin/:match_id/:league/cancel', async(req, res) => {
+	const match_id = req.params.match_id;
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+	const match = { id: match_id };
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = 'UPDATE combine_matches SET cancelled = 1 WHERE id = ?';
+	const [updated] = await db.execute(query, [match_id]);
+
+	await send_bot_message(
+		league,
+		actor,
+		'success',
+		'Finished Game',
+		`This match has been cancelled. You may now queue again.`,
+		match
+	);
+
+	await db.end();
+
+	return res.redirect(`/combine/${match_id}/${league}?cancelled=true`);
+});
+
+router.get('/admin/:match_id/:league/resume', async(req, res) => {
+	const match_id = req.params.match_id;
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
+	const match = { id: match_id };
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const query = 'UPDATE combine_matches SET cancelled = 0 WHERE id = ?';
+	const [updated] = await db.execute(query, [match_id]);
+
+	await notify_bot(db, league, SEASON, guild_id);
+
+	await db.end();
+
+	return res.redirect(`/combine/${match_id}/${league}?resumed=true`);
+});
+
 router.post('/overload/:match_id/:league', async (req, res) => {
 	const match_id = req.params.match_id;
 
@@ -897,6 +969,7 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 			const delta = await update_mmrs_overload(db, match, home_wins, away_wins, k_factor, league, SEASON);
 			await db.end();
 			await send_bot_message(
+				league,
 				actor,
 				'success',
 				'Finished Game',
@@ -941,142 +1014,6 @@ router.post('/overload/:match_id/:league', async (req, res) => {
 
 	await db.end();
 	return res.redirect(`/combine/${match_id}/${league}?updated`);
-
-
-	// if ( can_report && match.reported_rsc_id ) {
-	// 	if ( match.home_wins || match.away_wins ) {
-	// 		if ( match.home_wins !== home_wins ) {
-	// 			const report_query = `
-	// 				UPDATE combine_matches 
-	// 				SET 
-	// 					home_wins = ?, 
-	// 					away_wins = ?, 
-	// 					reported_rsc_id = ?
-	// 				WHERE id = ?
-	// 			`;
-	// 			await db.execute(report_query, [home_wins, away_wins, my_rsc_id, match_id]);
-	// 		}
-	// 	}
-	// }
-	//
-	// if ( )
-
-	//
-	// if ( can_report && ! match.reported_rsc_id ) {
-	// 	if ( match.confirmed_rsc_id && (match.home_wins || match.away_wins)) {
-	// 		if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
-	// 			await db.end();
-	// 			await send_bot_message(
-	// 				actor,
-	// 				'error',
-	// 				'Score Report Mismatch',
-	// 				`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
-	// 				match
-	// 			);
-	// 			return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
-	// 		}
-	// 	}
-	//
-	// 	const completed = match.confirmed_rsc_id ? 1 : 0;
-	// 	
-	// 	const report_query = `
-	// 		UPDATE combine_matches 
-	// 		SET 
-	// 			home_wins = ?, 
-	// 			away_wins = ?, 
-	// 			reported_rsc_id = ?,
-	// 			completed = ?
-	// 		WHERE id = ?
-	// 	`;
-	// 	await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
-	//
-	// 	if ( completed ) {	
-	// 		await remove_previous_wins_overload(db, match, home_wins, away_wins);
-	//
-	// 		const delta = await update_mmrs_overload(db, match, res.locals.combines.k_factor);
-	// 		await db.end();
-	// 		await send_bot_message(
-	// 			actor,
-	// 			'success',
-	// 			'Finished Game',
-	// 			`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
-	// 			match
-	// 		);
-	// 		return res.redirect(`/combine/${match_id}?finished`);
-	// 	} else {
-	// 		await db.end();
-	// 		await send_bot_message(
-	// 			actor,
-	// 			'success',
-	// 			'Reported Score',
-	// 			`${home_wins}-${away_wins}`,
-	// 			match
-	// 		);
-	// 		return res.redirect(`/combine/${match_id}?reported`);
-	// 	}
-	// } 
-	//
-	// if ( can_confirm && ! match.confirmed_rsc_id ) {
-	// 	if ( match.reported_rsc_id && (match.home_wins || match.away_wins)) {
-	// 		if ( match.home_wins !== home_wins || match.away_wins !== away_wins ) {
-	// 			await db.end();
-	// 			await send_bot_message(
-	// 				actor,
-	// 				'error',
-	// 				'Score Report Mismatch',
-	// 				`Score was ${match.home_wins}-${match.away_wins} and received ${home_wins}-${away_wins}.`,
-	// 				match
-	// 			);
-	// 			return res.redirect(`/combine/${match_id}?error=ScoreReportMismatch`);
-	// 		}
-	// 	}
-	//
-	// 	const completed = match.reported_rsc_id ? 1 : 0;
-	// 	
-	// 	const report_query = `
-	// 		UPDATE combine_matches 
-	// 		SET 
-	// 			home_wins = ?, 
-	// 			away_wins = ?, 
-	// 			confirmed_rsc_id = ?,
-	// 			completed = ?
-	// 		WHERE id = ?
-	// 	`;
-	// 	await db.execute(report_query, [home_wins, away_wins, my_rsc_id, completed, match_id]);
-	//
-	// 	if ( completed) {	
-	// 		const delta = await update_mmrs_overload(db, match, res.locals.combines.k_factor);
-	// 		await db.end();
-	// 		await send_bot_message(
-	// 			actor,
-	// 			'success',
-	// 			'Finished Game',
-	// 			`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
-	// 			match
-	// 		);
-	// 		return res.redirect(`/combine/${match_id}?finished`);
-	// 	} else {
-	// 		await db.end();
-	// 		await send_bot_message(
-	// 			actor,
-	// 			'success',
-	// 			'Reported Score',
-	// 			`${home_wins}-${away_wins}`,
-	// 			match
-	// 		);
-	// 		return res.redirect(`/combine/${match_id}?confirmed`);
-	// 	}
-	// }
-	//
-	// await db.end();
-	// await send_bot_message(
-	// 	actor,
-	// 	'error',
-	// 	'Game Complete',
-	// 	'This game has already ended. The score cannot be reported again.',
-	// 	match
-	// );
-	// res.redirect(`/combine/${match_id}?error=AlreadyReported`);
 });
 
 router.get('/resend_bot/:league', async (req, res) => {

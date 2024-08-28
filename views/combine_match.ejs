@@ -279,10 +279,6 @@
 			}
 		%>
 
-		<%
-			if ( ! match.cancelled && user.rsc_id ) {
-		%>
-
 		<% 
 			if ( CAN_ADMIN ) {
 		%>
@@ -290,8 +286,37 @@
 			<div class="col-12">
 				<%- /*debugObject(match);*/ %>
 			</div>
+			<h4 class="mb-2">Admin Controls</h4>
 			<div class="col-6">
-				<h4>Admin Overload </h4>
+				<%
+					if ( ! match.cancelled ) {
+				%>
+				<h5>Cancel Game</h5>
+				<p class="small">
+					Cancelling a game will allow every player in this lobby to requeue. No MMRs will be changed, but the VCs <strong>will be 
+					deleted.</strong>
+				</p>
+				<a tabindex="1" href="/combines/admin/<%- match.id; %>/<%- match.league; %>/cancel" class="btn btn-danger">Cancel Game</a>
+				<% 
+					} else {
+				%>
+				<h5>Resume Cancelled Game</h5>
+				<p class="small">
+					Clicking the "Resume Cancelled Game" button will mark this game as not cancelled and will allow players to resume playing. It will also 
+					<strong>create new VC lobbies.</strong>
+				</p>
+				<a tabindex="1" href="/combines/admin/<%- match.id; %>/<%- match.league; %>/resume" class="btn btn-primary">Resume Cancelled Game</a>
+				<% 
+					}
+				%>
+
+			</div>
+			<div class="col-6">
+				<h5>Override Scores</h5>
+				<%
+					if ( ! match.cancelled ) {
+				%>
+				<p class="small">Overriding scores of a finished game will re-calculate player MMR gain/loss.</p>
 				<form action="/combines/overload/<%- match.id %>/<%- match.league; %>" method="post">
 					<div class="mb-3">
 						<label for="home_wins">Home Team Series Score</label>
@@ -332,11 +357,23 @@
 						</div>
 					</div>
 				</form>
+				<% 
+					} else {
+				%>
+				<p class="lead">You may not override scores of cancelled games.</p>
+				<%
+					}
+				%>
 			</div>
 		</div>
 		<%
-			}
+			} // end of admin controls
 		%>
+
+		<%
+			if ( ! match.cancelled && user.rsc_id ) {
+		%>
+
 
 		<div class="row mb-2">
 			<div class="col-md-6">
