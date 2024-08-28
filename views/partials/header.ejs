@@ -244,44 +244,56 @@
 						<%
 								}
 
-								if ( is_admin || is_stats_admin ) {
+								if ( is_admin || is_stats_admin || is_combines_admin || is_combines_admin_2s ) {
+									if ( is_admin || is_combines_admin || is_combines_admin_2s ) {
+										const tracker_status = SEND_TO_API_SERVER ? 'text-success' : 'text-danger';
 
 						%>
 							<div class="sb-sidenav-menu-heading">Trackers</div>
 							<a class="nav-link" href="/bump_api">
-								<div class="sb-nav-link-icon"><i class="fas fa-power-off"></i></div>
+								<div class="sb-nav-link-icon <%- tracker_status; %>">
+									<i class="fas fa-power-off"></i>
+								</div>
 								Toggle API
 								<% if ( ! SEND_TO_API_SERVER ) { %>
 								<span class="badge ms-2 bg-danger">off</span>
+								<% } else { %>
+								<span class="badge ms-2 bg-success text-light">on</span>
 								<% } %>
 							</a>
-							<%
-									if ( pending_count || bad_pending_count ) {
-							%>
+								<%
+										if ( pending_count || bad_pending_count ) {
+								%>
 							<hr>
-							<%
-									}
-						
-									if ( pending_count ) {
-							%>
+								<%
+										}
+							
+										if ( pending_count ) {
+								%>
 							<a class="nav-link" href="/send_tracker_data">
 								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
 								Store Trackers
 								<span class="badge ms-2 <%- badge_class %>"><%- pending_count %></span>
 							</a>
-							<%
-									}
-							
-									if ( pending_count ) {
-							%>
+								<%
+										}
+								
+										if ( pending_count ) {
+								%>
 							<a class="nav-link" href="/send_bad_trackers">
 								<div class="sb-nav-link-icon"><i class="fas fa-triangle-exclamation"></i></div>
 								Store Bad
 								<span class="badge ms-2 <%- bad_badge_class %>"><%- bad_pending_count %></span>
 							</a>
+								<%
+										}
+								%>
 							<%
-									}
+									} // end of admin/combines/combines_2s
+
+									// admin/combines/combines_2s/stats
 							%>
+
 							<div class="sb-sidenav-menu-heading">Slow Actions</div>
 							<a class="nav-link" href="#" id="run3sStats">
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
@@ -291,10 +303,16 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
 								Update 2s Stats
 							</a>
+								<%
+									if ( is_admin || is_combines_admin_2s || is_combines_admin ) {
+								%>
 							<a class="nav-link" href="/import_trackers">
-								<div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+								<div class="sb-nav-link-icon text-success"><i class="fas fa-table"></i></div>
 								Import Trackers
 							</a>
+								<%
+									}
+								%>
 							<dialog id="run3sModal">
 								<h3>Are you sure you want to run 3s stats? This takes a while.</h3>
 								<a href="/pull_stats" class="btn btn-primary">Confirm!</a>
@@ -318,11 +336,11 @@
 						<% 
 								}
 
-								if ( is_admin ) {
+								if ( is_admin || is_combines_admin_2s || is_combines_admin ) {
 						%>
 							<div class="sb-sidenav-menu-heading">Admin Fix Actions</div>
 							<a class="nav-link" href="/combines/fix_rscids/3/<%- combines.season; %>">
-								<div class="sb-nav-link-icon"><i class="fas fa-user-plus"></i></div>
+								<div class="sb-nav-link-icon text-warning"><i class="fas fa-user-plus"></i></div>
 								Fix Null RSC IDs
 							</a>
 						<%

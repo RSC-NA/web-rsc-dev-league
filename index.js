@@ -1437,7 +1437,10 @@ app.get('/import_trackers', async (req, res) => {
 });
 
 app.get('/bump_api', (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( 
+		! req.session.is_admin && ! req.session.is_stats_admin &&
+		! req.session.is_combines_admin && ! req.session.is_combines_admin_2s
+	) {
 		return res.redirect('/');
 	}
 
