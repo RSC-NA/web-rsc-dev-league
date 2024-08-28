@@ -106,6 +106,7 @@ CREATE TABLE player_ips (
 	`nickname` VARCHAR(255) NOT NULL,
 	`discord_id` VARCHAR(20) NOT NULL,
 	`ip` VARCHAR(18),
+	`sus` TINYINT NOT NULL DEFAULT 0,
 	`date_logged_in` DATETIME NOT NULL DEFAULT now(),
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

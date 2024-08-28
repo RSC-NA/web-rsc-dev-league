@@ -127,7 +127,7 @@ app.use((req, res, next) => {
 // primary middleware -- check user session, set up local vars
 // for templates, etc. 
 
-async function get_user(user_id) {
+async function get_user(user_id, ip) {
 	if ( ! user_id ) { 
 		return {}; 
 	}
@@ -229,6 +229,58 @@ async function get_user(user_id) {
 			is_combines_admin: p.combines_admin ? true: false,
 			is_combines_admin_2s: p.combines_admin_2s ? true: false,
 		};
+
+		if ( ip && user.rsc_id && user.discord_id ) {
+			const check_ip_query = `
+				SELECT id,nickname,rsc_id,discord_id,ip,sus 
+				FROM player_ips
+				WHERE rsc_id = ? OR discord_id = ? OR ip = ?
+			`;
+			const [ip_lookup] = await db.query(check_ip_query, [ user.rsc_id, user.discord_id, ip ]);
+
+			if ( ip_lookup && ip_lookup.length ) {
+				let IP_EXISTS = false;
+				let SUS_RECORDS = [];
+				for ( let i = 0; i < ip_lookup.length; ++i ) {
+					const p_ip = ip_lookup[i];
+					if ( p_ip.rsc_id !== user.rsc_id || p_ip.discord_id !== user.discord_id ) {
+						if ( p_ip.sus === 0 ) {
+							console.error(`Found sus user!`);
+							console.log(
+								`${p_ip.nickname},${p_ip.rsc_id},${p_ip.discord_id}`, '!=', 
+								`${user.nickname},${user.rsc_id},${user.discord_id}`
+							);
+							SUS_RECORDS.push(p_ip.id);
+						}
+					} else {
+						if ( ip === p_ip.ip ) {
+							IP_EXISTS = true;
+						}
+					}
+				}
+
+				if ( ! IP_EXISTS ) {
+					const sus = SUS_RECORDS.length === 0 ? false : true;
+					const ip_query = `
+					insert into player_ips (rsc_id, nickname, discord_id, ip, sus) 
+					values (?, ?, ?, ?, ?)`;
+					await db.query(ip_query, [user.rsc_id, user.nickname, user.discord_id, ip, sus]);
+				} 
+
+				if ( SUS_RECORDS.length ) {
+					const sus_query = `
+						UPDATE player_ips SET sus = 1 WHERE id in (?)
+					`;
+					await db.query(sus_query, [SUS_RECORDS]);
+				}
+			} else {
+				const ip_query = `
+				insert into player_ips (rsc_id, nickname, discord_id, ip) 
+				values (?, ?, ?, ?)`;
+				await db.query(ip_query, [user.rsc_id, user.nickname, user.discord_id, ip]);
+			}
+
+		}
 		
 		db.end();
 		return user;
@@ -295,7 +347,7 @@ app.use(async (req, res, next) => {
 	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] ip:${ip}`);
 
 	//res.locals.user = req.session.user || {};
-	res.locals.user = await get_user(req.session.user_id);
+	res.locals.user = await get_user(req.session.user_id, ip);
 
 	res.locals.SEND_TO_API_SERVER = SEND_TO_API_SERVER;
 	
