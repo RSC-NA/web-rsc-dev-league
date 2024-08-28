@@ -291,7 +291,7 @@ app.use(async (req, res, next) => {
 		nick = req.session.nickname.fg('green','bright').clearAll();
 	}
 
-	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] : ip:${req.ip}`);
+	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] : ip:${req.ip} ips:${req.ips}`);
 
 	//res.locals.user = req.session.user || {};
 	res.locals.user = await get_user(req.session.user_id);
