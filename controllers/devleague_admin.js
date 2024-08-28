@@ -614,7 +614,7 @@ router.get('/devleague', async (req, res) => {
 		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
 	) AND
 	rostered = 0
-	ORDER BY s.id ASC
+	ORDER BY c.mmr DESC
 	`; 
 
 	const signups = {
