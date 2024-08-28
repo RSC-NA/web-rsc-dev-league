@@ -1230,8 +1230,6 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 
 		await db.end();
 
-	return res.json(bot_input);
-
 		if ( league === 2 ) {
 			return res.redirect('/combines/process_2s?success');
 		} else {
