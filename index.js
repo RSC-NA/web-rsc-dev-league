@@ -580,6 +580,7 @@ app.use((req, res, next) => {
 			query,
 			[ res.locals.discord_id ],
 			(_err, results) => {
+				console.log(results);
 				if ( results && results.length > 0 ) {
 					for ( let i = 0; i < results.length; ++i ) {
 						//console.log('Waiting in queue',results[0]);
@@ -641,7 +642,7 @@ async function db_get(query, params=null) {
 
 // combine match middleware. used if the player logged in has an active combine match 
 app.use(async (req, res, next) => {
-	if ( (res.locals.combine_day || res.locals.combines_2s_day) && res.locals.user.rsc_id ) {
+	if ( (res.locals.combine_day || res.locals.combines_2_day) && res.locals.user.rsc_id ) {
 		const query = `
 			SELECT 
 				m.id, m.match_dtg, m.season, m.league, m.lobby_user, m.lobby_pass,
