@@ -80,7 +80,7 @@
 			<%
 				if ( games.length ) {	
 					for ( let i = 0; i < games.length; ++i ) {
-						const tier = getTierFromMMR(games[i].home_mmr / 3);
+						const tier = getTierFromMMR(games[i].home_mmr / 3, 3);
 			%>
 				<li>
 					<span class="<%- tier; %> text-end d-inline-block px-1" style="width:100px;">

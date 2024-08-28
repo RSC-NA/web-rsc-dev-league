@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const { mmrRange, getTierFromMMR } = require('../mmrs');
+const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
@@ -169,7 +169,7 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 						
 						for ( let i = 0; i < results.length; ++i ) {
 							const r = results[i];
-							results[i].tier = getTierFromMMR(r.home_mmr / 3);
+							results[i].tier = getTierFromMMR(r.home_mmr / 3, 3);
 							if ( r.team === 'home' ) {
 								record.wins += r.home_wins;
 								record.losses += r.away_wins;

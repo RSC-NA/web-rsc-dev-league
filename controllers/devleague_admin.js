@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const mysqlP = require('mysql2/promise');
-const { _mmrRange, getTierFromMMR } = require('../mmrs');
+const { _mmrRange_3s, _mmrRange_2s, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -47,8 +47,8 @@ async function make_lobby_devleague(db, lobby) {
 	console.log('LOBBY MMRS');
 	console.log('Home: ', lobby.home.mmr / 3);
 	console.log('Away: ', lobby.away.mmr / 3);
-	console.log(getTierFromMMR(lobby.home.mmr / 3));
-	const home_tier = getTierFromMMR(lobby.home.mmr / 3);
+	console.log(getTierFromMMR(lobby.home.mmr / 3), 3);
+	const home_tier = getTierFromMMR(lobby.home.mmr / 3, 3);
 
 	// create teams 
 	const team_query = 'INSERT INTO teams (team_number, tier) VALUES (?, ?)';
@@ -225,18 +225,18 @@ router.all('/generate_team/:tier', async (req, res) => {
 		}
 	} else if ( tier === 'all' ) {
 		playersQuery = `
-SELECT
-p.id,c.name,c.mmr,c.tier,c.rsc_id
-FROM signups AS s
-LEFT JOIN players AS p 
-ON p.id = s.player_id
-LEFT JOIN contracts AS c 
-ON p.discord_id = c.discord_id 
-WHERE 
-s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
-s.active = 1 AND 
-s.rostered = 0
-ORDER BY c.mmr DESC
+			SELECT
+				p.id,c.name,c.mmr,c.tier,c.rsc_id
+			FROM signups AS s
+			LEFT JOIN players AS p 
+				ON p.id = s.player_id
+			LEFT JOIN contracts AS c 
+				ON p.discord_id = c.discord_id 
+			WHERE 
+				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.active = 1 AND 
+				s.rostered = 0
+			ORDER BY c.mmr DESC
 		`;
 		tier_params = null;
 	}
@@ -494,7 +494,8 @@ router.all('/devleague/deactivate-last/:amount', (req, res) => {
 		WHERE 
 			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
 			active = 1 AND
-			rostered = 0
+			rostered = 0 AND 
+			status in ('Signed', 'Renewed', 'Mid-Contract', 'Rostered')
 		ORDER BY signup_dtg DESC 
 		LIMIT ?
 	`;
@@ -995,7 +996,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			// calc their tier from MMR.
 			if ( ! ('tier' in players[ contractRows[i]['RSC ID'] ]) ) {
 				players[contractRows[i]['RSC ID']]['mmr'] = contractRows[i]['Current MMR'];
-				players[contractRows[i]['RSC ID']]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']));
+				players[contractRows[i]['RSC ID']]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']), 3);
 			}
 
 			players[ contractRows[i]['RSC ID'] ]['status'] = contractRows[i]['Contract Status'];

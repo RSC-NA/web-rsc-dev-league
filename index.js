@@ -66,7 +66,7 @@ const API_HOST = 'api.rscna.com';
 // TODO(erh): this can probably be moved into a database table
 const matchDays = require('./matchDays');
 const combineDays = require('./combineDays');
-const { mmrRange, getTierFromMMR } = require('./mmrs');
+const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('./mmrs');
 
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mysqlP = require('mysql2/promise');
-const { _mmrRange, getTierFromMMR } = require('../mmrs');
+const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
 const guild_league = {
@@ -18,19 +18,28 @@ async function get_lobby(db,match_id) {
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
 			reported_rsc_id,confirmed_rsc_id,home_mmr as tier,
-			completed,cancelled,league AS guild_id
+			completed,cancelled,league AS guild_id,
 		FROM combine_matches 
 		WHERE id = ?
 	`;
 	const [results] = await db.query(active_query, [match_id]);
 	const games = {};
 	const game_ids = [];
+	let league = 3;
+	let team_size = 3;
 	if ( results && results.length ) {
 		for ( let i = 0; i < results.length; ++i ) {
 			game_ids.push(results[i].id);
 			const game = results[i];
+			if ( game.guild_id === 3 ) {
+				league = 3;
+				team_size = 3;
+			} else if ( game.guild_id === 2 ) {
+				league = 2;
+				team_size = 2;
+			}
 			game.guild_id = league_guild[game.guild_id];
-			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
+			game.tier = getTierFromMMR(Math.floor(game.tier / team_size), league);
 			console.log('Generated Tier for',match_id,'-', game.tier);
 			game.home = [];
 			game.away = [];
@@ -76,12 +85,21 @@ async function get_active(db,match_id) {
 	const [results] = await db.query(active_query, [match_id]);
 	const games = {};
 	const game_ids = [];
+	let league = 3;
+	let team_size = 3;
 	if ( results && results.length ) {
 		for ( let i = 0; i < results.length; ++i ) {
 			game_ids.push(results[i].id);
 			const game = results[i];
+			if ( game.guild_id === 3 ) {
+				league = 3;
+				team_size = 3;
+			} else if ( game.guild_id === 2 ) {
+				league = 2;
+				team_size = 2;
+			}
 			game.guild_id = league_guild[game.guild_id];
-			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
+			game.tier = getTierFromMMR(Math.floor(game.tier / team_size), league);
 			console.log('Generated Tier', game.tier);
 			game.home = [];
 			game.away = [];
@@ -313,13 +331,22 @@ router.get('/active', async(req,res) => {
 	const [results] = await res.locals.adb.query(active_query, [res.locals.league, res.locals.combines_season]);
 	const games = {};
 	const game_ids = [];
+	let league = 3;
+	let team_size = 3;
 	if ( results && results.length ) {
 		for ( let i = 0; i < results.length; ++i ) {
 			// TODO(erh): Add "getTierFromMMR()" for Nick
 			game_ids.push(results[i].id);
 			const game = results[i];
+			if ( game.guild_id === 3 ) {
+				league = 3;
+				team_size = 3;
+			} else if ( game.guild_id === 2 ) {
+				league = 2;
+				team_size = 2;
+			}
 			game.guild_id = league_guild[game.guild_id];
-			game.tier = getTierFromMMR(game.home_mmr/3);
+			game.tier = getTierFromMMR(game.home_mmr/team_size, league);
 			delete(game.home_mmr);
 			game.home = [];
 			game.away = [];

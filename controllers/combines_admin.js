@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const mysqlP = require('mysql2/promise');
-const { _mmrRange, getTierFromMMR } = require('../mmrs');
+const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
 const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -229,6 +229,11 @@ async function notify_bot(db, league, season, guild_id) {
 }
 
 async function get_active(db, league, season, guild_id) {
+	let team_size = 3;
+	if ( league === 2 ) {
+		team_size = 2;
+	}
+
 	const active_query = `
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
@@ -245,7 +250,7 @@ async function get_active(db, league, season, guild_id) {
 			game_ids.push(results[i].id);
 			const game = results[i];
 			game.guild_id = guild_id;
-			game.tier = getTierFromMMR(Math.floor(game.tier / 3));
+			game.tier = getTierFromMMR(Math.floor(game.tier / team_size), league);
 			console.log('Generated Tier', game.tier);
 			game.home = [];
 			game.away = [];
@@ -1470,7 +1475,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 					'base_mmr': p.base_mmr,
 					'effective_mmr': p.effective_mmr,
 					'current_mmr': p.current_mmr,
-					'combines_tier': getTierFromMMR(p.current_mmr),
+					'combines_tier': getTierFromMMR(p.current_mmr, league),
 					'count': p.count,
 					'keeper': p.keeper,
 					'wins': p.wins,
@@ -1638,7 +1643,7 @@ router.get('/history_2s', (req, res) => {
 					'base_mmr': p.base_mmr,
 					'effective_mmr': p.effective_mmr,
 					'current_mmr': p.current_mmr,
-					'combines_tier': getTierFromMMR(p.current_mmr),
+					'combines_tier': getTierFromMMR(p.current_mmr, 2),
 					'count': p.count,
 					'keeper': p.keeper,
 					'wins': p.wins,
@@ -2489,13 +2494,14 @@ router.all('/import_2s/:tiermaker_sheet_id', async (req, res) => {
 	// 3. pull all relevant fields
 	await doc.loadInfo();
 
-	const sheet = doc.sheetsByTitle["9 Tier"];
+	const sheet = doc.sheetsByTitle["8 Tier"];
 	const rows = await sheet.getRows();
 
 	const discord_ids = await get_rsc_discord_map();
 
 	const players = {};
 	// add tehblister
+	/*
 	players['RSC000302'] = {
 		'season': res.locals.combines_2s.season,
 		'discord_id': discord_ids['RSC000302'],
@@ -2508,7 +2514,8 @@ router.all('/import_2s/:tiermaker_sheet_id', async (req, res) => {
 		'effective_mmr': 1450,
 		'current_mmr': 1450,
 	};
-	console.log('blister', players['RSC000302']);
+	*/
+	//console.log('blister', players['RSC000302']);
 
 	console.log('Importing tiermaker...');
 	for ( let i = 0; i < rows.length; i++ ) {
@@ -2516,6 +2523,8 @@ router.all('/import_2s/:tiermaker_sheet_id', async (req, res) => {
 		if ( ! row['Player Name'] || ! row['RSC ID'] ) {
 			continue;
 		}
+
+		//console.log(row._rawData);
 		const rsc_id = row['RSC ID'];
 		players[ rsc_id ] = {
 			'season': res.locals.combines_2s.season,
