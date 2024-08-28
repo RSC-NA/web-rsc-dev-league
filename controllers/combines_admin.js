@@ -517,6 +517,7 @@ router.get('/fix_rscids/:league/:season', async (req, res) => {
 	}
 
 	await db.end();
+
 	res.json({
 		update: DO_UPDATE ? DO_UPDATE : false,
 		update_all: DO_UPDATE && DO_UPDATE === 'all' ? 'Updated All Records' : 'Send ?update=all to update RSC_ID and player nickname',

@@ -701,7 +701,7 @@ router.get('/process_gameday', (req, res) => {
 		DATE(signup_dtg) = CURDATE() OR 
 		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
 	)
-	ORDER BY s.id ASC
+	ORDER BY c.mmr DESC 
 	`; 
 
 	req.db.query(signups_query, (err, results) => {
