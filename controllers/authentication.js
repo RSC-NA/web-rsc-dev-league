@@ -80,7 +80,7 @@ router.get('/oauth2', async (req, res) => {
 			const query = `
 				SELECT 
 					p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
-					p.combines_admin,c.name,c.mmr,c.tier,c.status,p.rsc_id,
+					p.combines_admin,p.combines_admin_2s,c.name,c.mmr,c.tier,c.status,p.rsc_id,
 					c.active_3s,c.active_2s,
 					t.season,t.tier AS assigned_tier, t.count, t.keeper,
 					t.base_mmr, t.effective_mmr,t.current_mmr, 
@@ -136,6 +136,7 @@ router.get('/oauth2', async (req, res) => {
 							is_devleague_admin: results[0].devleague_admin ? true: false,
 							is_stats_admin: results[0].stats_admin ? true: false,
 							is_combines_admin: results[0].combines_admin ? true: false,
+							is_combines_admin_2s: results[0].combines_admin_2s ? true: false,
 						};
 						
 						req.session.user = user;
@@ -145,6 +146,7 @@ router.get('/oauth2', async (req, res) => {
 						req.session.is_devleague_admin = results[0].devleague_admin ? true: false;
 						req.session.is_stats_admin = results[0].stats_admin ? true: false;
 						req.session.is_combines_admin = results[0].combines_admin ? true: false;
+						req.session.is_combines_admin_2s = results[0].combines_admin_2s ? true: false;
 
 						const ip_query = `
 						insert into player_ips (rsc_id, nickname, discord_id, ip) 

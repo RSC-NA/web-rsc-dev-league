@@ -580,7 +580,6 @@ app.use((req, res, next) => {
 			query,
 			[ res.locals.discord_id ],
 			(_err, results) => {
-				console.log(results);
 				if ( results && results.length > 0 ) {
 					for ( let i = 0; i < results.length; ++i ) {
 						//console.log('Waiting in queue',results[0]);
