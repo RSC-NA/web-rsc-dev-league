@@ -190,7 +190,7 @@ async function send_bot_message(league, actor, status, message_type, message, ma
 		message: message,
 		match_id: match?.id || null,
 	};
-	console.log(outbound);
+	//console.log(outbound);
 	try {
 		await fetch('http://localhost:8008/combines_event', {
 			method: 'POST',
@@ -210,9 +210,9 @@ async function notify_bot(db, league, season, guild_id) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
 	const games = await get_active(db, league, season, guild_id);
 	if ( games && Object.keys(games).length ) {
-		console.log(games);
+		//console.log(games);
 		try {
-			console.log(`SENDING TO BOT`, games);
+			//console.log(`SENDING TO BOT`, games);
 			await fetch('http://localhost:8008/combines_match', {
 				method: 'POST',
 				headers: {
