@@ -398,34 +398,9 @@ async function update_mmrs_overload(db, match, new_home_wins, new_away_wins, k_f
  ******************** Admin Views *********************
  ******************************************************/
 // this route takes a game that is completed and "rescores" the MMRs of everyone in the lobby.
-/*
-async function (db, match, k_factor=48, league, season) {
-	const scores = { home: match.home_wins, away: match.away_wins };
-	const delta = rating_delta_series(match.home_mmr, match.away_mmr, scores, k_factor);
-
-	const player_query = `
-		UPDATE combine_match_players SET end_mmr = ? WHERE match_id = ? AND rsc_id =?
-	`;
-	const tiermaker_query = `
-		UPDATE tiermaker set current_mmr = ?, wins = ?, losses = ? WHERE rsc_id = ? AND league = ? AND season = ?
-	`;
-
-	for ( const rsc_id in match.players ) {
-		console.log('Updating...',rsc_id);
-		const p = match.players[rsc_id];
-		const new_mmr = p.start_mmr + delta[p.team].delta;
-		const new_wins = p.wins + scores[p.team];
-		const new_losses = p.losses + (3 - scores[p.team]);
-		await db.execute(player_query, [new_mmr, match.id, rsc_id]);
-		await db.execute(tiermaker_query, [new_mmr,new_wins,new_losses,rsc_id,league,season]);
-	}
-
-	match.delta = delta;
-	return match;
-}
-*/
-
-router.get('/check_games', async(req,res) => {
+router.get('/check_games/:league/:season', async(req,res) => {
+	const league = parseInt(req.params.league);
+	const season = parseInt(req.params.season);
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USER,
@@ -436,8 +411,6 @@ router.get('/check_games', async(req,res) => {
 		connectionLimit: 10,
 		queueLimit: 0
 	});
-	const league = 3;
-	const season = 21;
 	const games = await get_active(db, league, season);
 
 	await db.end();
@@ -1182,14 +1155,13 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 });
 
 router.all(['/activate/:rsc_id', '/activate/:rsc_id/:league'], (req, res) => {
-	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		return res.redirect('/');
 	} 
 	
 	const single_where = req.params.rsc_id !== 'all' ? "rsc_id = ? AND" : '';
-
-	const league = req.params.league ? parseInt(req.params.league) : 3;
-
 	const query = `
 		UPDATE combine_signups SET 
 			active = 1
@@ -1225,10 +1197,11 @@ router.all(['/activate/:rsc_id', '/activate/:rsc_id/:league'], (req, res) => {
 });
 
 router.all(['/deactivate-last/:amount', '/deactivate-last/:amount/:league'], (req, res) => {
-	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		return res.redirect('/');
 	} 
-	
 
 	const query = `
 		UPDATE combine_signups SET 
@@ -1244,8 +1217,6 @@ router.all(['/deactivate-last/:amount', '/deactivate-last/:amount/:league'], (re
 		console.log('WTF?', parseInt(req.params.amount) );
 		return res.redirect('/combines/process');
 	}
-
-	const league = req.params.league ? parseInt(req.params.league) : 3;
 
 	console.log(`DEACTIVATE LAST`, req.params.amount, league);
 
@@ -1263,11 +1234,11 @@ router.all(['/deactivate-last/:amount', '/deactivate-last/:amount/:league'], (re
 
 
 router.all(['/deactivate/:rsc_id', '/deactivate/:rsc_id/:league'], (req, res) => {
-	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		return res.redirect('/');
 	} 
-	
-	const league = req.params.league ? parseInt(req.params.league) : 3;
 	
 	const single_where = req.params.rsc_id !== 'all' ? "rsc_id = ? AND" : '';
 	const query = `
@@ -1305,11 +1276,11 @@ router.all(['/deactivate/:rsc_id', '/deactivate/:rsc_id/:league'], (req, res) =>
 });
 
 router.get(['/history', '/history/:league'], (req, res) => {
-	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		return res.redirect('/');
 	} 
-
-	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const season = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
 	let csv = false;
@@ -1748,6 +1719,7 @@ router.get('/process', (req, res) => {
 		});
 	});
 });
+
 router.get('/process_2s', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_combines_admin_2s ) {
 		return res.redirect('/');
@@ -1850,11 +1822,11 @@ router.get('/process_2s', (req, res) => {
 });
 
 router.get(['/process/waiting', '/process/waiting/:league'], (req, res) => {
-	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		return res.redirect('/');
 	} 
-
-	const league = req.params.league ? parseInt(req.params.league) : 3;
 
 	const players_query = `
 		SELECT 
@@ -1986,7 +1958,7 @@ router.get('/active', async (req, res) => {
 		}
 	}
 
-	db.end();
+	await db.end();
 
 	res.json(games);
 });
@@ -2215,7 +2187,7 @@ router.get(['/setup', '/setup/:league'], async (req, res) => {
 		}
 	}
 
-	db.end();
+	await db.end();
 
 	if ( league === 2 ) {
 		res.redirect('/combines/process_2s');
@@ -2238,7 +2210,7 @@ async function get_rsc_discord_map() {
 
 	const query = `SELECT rsc_id,discord_id FROM players`;
 	const [results] = await db.query(query);
-	db.end();
+	await db.end();
 
 	const players = {};
 	if ( results && results.length ) {
@@ -2398,6 +2370,8 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 
 		res.redirect(re_url);
 	} else {
+
+		await db.end();
 		res.redirect(re_url);
 	}
 
@@ -2537,6 +2511,8 @@ router.all('/import_2s/:tiermaker_sheet_id', async (req, res) => {
 
 		res.redirect(re_url);
 	} else {
+		await db.end();
+
 		res.redirect(re_url);
 	}
 

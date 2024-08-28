@@ -70,12 +70,14 @@
 		>
 			<div class="card-header">
 				<h4>Active Games: <%- games.length; %>
-				<button class="btn btn-primary btn-sm float-end">Show Active Games</button>
+					<button class="btn btn-primary btn-sm float-end">Show Active Games</button>
 				</h4>
 			</div>
 		</a>
 		<div id="collapse_games" class="card-body collapse">
 			<a href="/combines/resend_bot/2" class="btn btn-primary">Force Bot Resend</a>
+			<a href="/combines/check_games/2/<%- combines_2s.season; %>" 
+				class="btn btn-warning btn-sm float-end ms-2">Games Data Model</a>
 			<ul style="list-style: none;" class="fw-bolder">
 			<%
 				if ( games.length ) {	

@@ -813,7 +813,10 @@ router.get('/fix_discord', async(req,res) => {
 router.get('/import_players/:contract_sheet_id', async(req,res) => {
 	const returnUrl = req.query.return ? `/${req.query.return}` : '/manage_league';
 
-	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+	if ( 
+		! req.session.is_admin && ! req.session.is_devleague_admin 
+		&& ! req.session.is_combines_admin && ! req.session.is_combines_admin_2s
+	) {
 		return res.redirect('/');
 	}
 	

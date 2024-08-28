@@ -32,11 +32,20 @@
 
 			<div class="text-end mb-3">
 				<a
-					href="/combines/import_2s/<%= tiermaker_sheet_id; %>"
-					class="btn btn-success form-control <%- load_sheet_disabled ? 'disabled' : ''; %>"
+					href="/import_players/<%= tiermaker_sheet_id; %>?return=combines/manage_2s"
+					class="btn btn-success form-control text-start <%- load_sheet_disabled ? 'disabled' : ''; %>"
 				>
 					<i class="fas fa-table"></i>
-					Load Tiermaker
+					Step #1 - Import Master Member Sheet
+				</a>
+			</div>
+			<div class="text-end mb-3">
+				<a
+					href="/combines/import_2s/<%= tiermaker_sheet_id; %>?return=combines/manage_2s"
+					class="btn btn-success form-control text-start <%- load_sheet_disabled ? 'disabled' : ''; %>"
+				>
+					<i class="fas fa-table"></i>
+					Step #2 - Load Tiermaker
 				</a>
 			</div>
 
