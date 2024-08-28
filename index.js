@@ -94,6 +94,7 @@ app.use(cors({
 
 app.use( express.static('static') ); 
 app.set('view engine', 'ejs');
+app.set('trust proxy', true);
 
 app.use(bodyParser.json());
 
@@ -290,7 +291,7 @@ app.use(async (req, res, next) => {
 		nick = req.session.nickname.fg('green','bright').clearAll();
 	}
 
-	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}]`);
+	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] : ip:${req.ip}`);
 
 	//res.locals.user = req.session.user || {};
 	res.locals.user = await get_user(req.session.user_id);
