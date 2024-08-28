@@ -583,7 +583,11 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 	let can_confirm = false;
 
 
-	if ( req.session.is_admin || req.session.is_combines_admin ) {
+	if ( 
+		req.session.is_admin || 
+		(req.session.is_combines_admin && league === 3) || 
+		(req.session.is_combines_admin_2s && league === 2) 
+	) {
 		can_save = true;
 		can_report = true;
 		can_confirm = true;
@@ -748,6 +752,10 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 
 		if ( results && results.length ) {
 			const match = results[0];
+
+			if ( league !== match.league ) {
+				return res.redirect(`/combine/${match.id}/${match.league}`);
+			}
 			
 			match.players = {
 				home: [],

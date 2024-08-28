@@ -3,6 +3,16 @@
 
 <%
 
+	let CAN_ADMIN = false;
+	if ( is_admin ) {
+		CAN_ADMIN = true;
+	}
+	if ( match.league === 3 && is_combines_admin ) {
+		CAN_ADMIN = true;
+	} else if ( match.league === 2 && is_combines_admin_2s ) {
+		CAN_ADMIN = true;
+	}
+
 	const submitted_scores = {
 		home: null,
 		away: null,
@@ -30,7 +40,7 @@
 	}
 
 	const has_scored = (match.reported_rsc_id && match.confirmed_rsc_id) ? true : false;
-	const can_report = is_admin || is_combines_admin || user.rsc_id in lobby ? true : false;
+	const can_report = CAN_ADMIN || user.rsc_id in lobby ? true : false;
 	const combine_player = user.rsc_id in lobby ? lobby[user.rsc_id] : {};
 
 	const teamOneMmr = match.home_mmr;
@@ -102,7 +112,7 @@
 							</table>
 						</div>
 						<% 
-							if ( is_admin || is_combines_admin ) {
+							if ( CAN_ADMIN ) {
 
 								const prediction = [];
 								let win_prediction = homeDelta > 0 ? 'Home' : 'Away';
@@ -274,7 +284,7 @@
 		%>
 
 		<% 
-			if ( is_admin||is_combines_admin ) { 
+			if ( CAN_ADMIN ) {
 		%>
 		<div class="row mb-2">
 			<div class="col-12">
@@ -387,7 +397,7 @@
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-primary text-white rounded p-2">
-								<%= (is_admin||is_combines_admin) ? '[' + teamOneMmr + '] ' : '' %>Home Team
+								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team
 							</h3>
 							<%
 								let homeClass = 'bg-info';
@@ -472,7 +482,7 @@
 
 										</td>
 										<% 
-											if ( (is_admin || is_combines_admin) || ! combines.active ) {
+											if ( CAN_ADMIN ) {
 										%>
 										<td class="text-end">
 											<%- p.start_mmr; %>
@@ -496,7 +506,7 @@
 
 						<div class="col-md-6">
 							<h3 class="bg-warning rounded p-2">
-								<%= (is_admin||is_combines_admin) ? '[' + teamTwoMmr + '] ' : '' %>Away Team
+								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team
 							</h3>
 							<%
 								if ( has_scored ) {
@@ -615,7 +625,7 @@
 
 										</td>
 										<% 
-											if ( (is_admin || is_combines_admin) || ! combines.active ) {
+											if ( CAN_ADMIN ) {
 										%>
 										<td class="text-end">
 											<%- p.start_mmr; %>
