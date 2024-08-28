@@ -34,8 +34,7 @@ router.get('/logout', (req, res) => {
 router.get('/oauth2', async (req, res) => {
 	const code = req.query.code;
 	
-	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	console.log(req.headers['x-forwarded-for'], req.connection.remoteAddress,req.socket.remoteAddress);
+	const ip = req.headers['cf-connecting-ip'] || req.ip;
 	console.log('THE IP IS', ip);
 
 	try {
