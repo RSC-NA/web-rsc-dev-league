@@ -20,7 +20,7 @@ function writeError(error) {
 function get_rand_word() {
 	const words = [
 		'octane', 'gizmo', 'breakout', 'merc', 'hotshot', 'gizmo', 'backfire',
-		'x-devil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
+		'xdevil', 'paladin', 'hog', 'road', 'venom', 'dominus', 'luigi', 
 		'mario', 'samus', 'sweet', 'tooth', 'aftershock', 'grog', 'esper', 
 		'marauder', 'masamune', 'proteus', 'ripper', 'scarab', 'takumi',
 		'triton', 'vulcan', 'zippy', 'backfire', 'paladin', 'hotshot', 'gizmo',

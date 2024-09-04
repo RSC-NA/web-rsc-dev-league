@@ -989,6 +989,7 @@ const tracker_queue = {};
 
 async function grabMoreTrackers() {
 	let error = false;
+	// https://api.rscna.com/api/v1/tracker-links/next/?format=json&limit=25
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	const url = `https://${API_HOST}/api/v1/tracker-links/next/?format=json&limit=25`;
 	const response = await fetch(url).catch(e => {console.log(`Error: ${e}`); error = true; });
