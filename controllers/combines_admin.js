@@ -1411,7 +1411,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 					if ( csv ) {
 						/* CSV Output if ?csv=true is sent */
 						res.header('Content-type', 'text/csv');
-						res.attachment(`S${res.locals.combines.season} Combines.csv`);
+						res.attachment(`S${season} Combines.csv`);
 						const columns = [
 							'RSC ID', 'Player Name', 'Initial Tier', 
 							'Base MMR', 'Effective MMR', 'Δ', 'Combines MMR',
