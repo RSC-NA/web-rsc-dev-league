@@ -95,7 +95,7 @@ async function pull_stats(req, res) {
 	const TeamStatsSheet = doc.sheetsByTitle['Team Stats'];
 	const TeamStatsRows  = await TeamStatsSheet.getRows();
 	for ( let i = 0; i < TeamStatsRows.length; i++ ) {
-
+		if ( TeamStatsRows[i]['Team'] === '' ) { continue; }
 		teamStats.push({
 			'Season'     : res.locals.settings.season,// external
 			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
