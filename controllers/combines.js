@@ -331,14 +331,14 @@ router.get('/combines/matches', (req, res) => {
 		return res.redirect('/');
 	}
 
-	return res.redirect('/combines/matches/' + res.locals.user.rsc_id);
+	return res.redirect('/combine/matches/' + res.locals.user.rsc_id);
 });
 
 router.get('/combines/matches_2s', (req, res) => {
 	if ( ! res.locals?.user?.rsc_id ) {
 		return res.redirect('/');
 	}
-	return res.redirect('/combines/matches_2s/' + res.locals.user.rsc_id);
+	return res.redirect('/combine/matches_2s/' + res.locals.user.rsc_id);
 });
 
 router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, res) => {
