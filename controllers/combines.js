@@ -267,7 +267,7 @@ router.get('/combine/matches/:rsc_id', async(req,res) => {
 
 router.get('/combines/matches_2s/:rsc_id', async(req,res) => {
 	const user = res.locals.user;
-	const combine_season = res.locals.combines.season;
+	const combine_season = res.locals.combines_2s.season;
 	
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
