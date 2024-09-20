@@ -265,7 +265,7 @@ router.get('/combine/matches/:rsc_id', async(req,res) => {
 	}
 });
 
-router.get('/combines/matches_2s/:rsc_id', async(req,res) => {
+router.get('/combine/matches_2s/:rsc_id', async(req,res) => {
 	const user = res.locals.user;
 	const combine_season = res.locals.combines_2s.season;
 	
@@ -334,7 +334,7 @@ router.get('/combines/matches', (req, res) => {
 	return res.redirect('/combines/matches/' + res.locals.user.rsc_id);
 });
 
-router.get('/combine/matches_2s', (req, res) => {
+router.get('/combines/matches_2s', (req, res) => {
 	if ( ! res.locals?.user?.rsc_id ) {
 		return res.redirect('/');
 	}
