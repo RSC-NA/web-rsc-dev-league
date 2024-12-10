@@ -101,6 +101,92 @@
 	<% 
 		if ( ! missing && lobbies >= 1 ) {
 	%>
+	<div class="row mb-sm-4 mb-lg-0">
+		<div class="col-1 col-sm-2"></div>
+		<div class="col-10 col-sm-8">
+			<div class="alert <%- lobbies < 9 ? 'alert-danger' : 'alert-success'; %> d-flex align-items-center" role="alert">
+				<div class="bi flex-shrink-0 me-2">
+					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+						<use xlink:href="#check-circle-fill"/>
+					</svg>
+				</div>
+				<div class="flex-fill">
+					<div class="display-5 alert-heading">
+						Aww yeah! Game Time!
+					</div>
+					<hr>
+					<%
+						if ( lobbies < 9 ) {
+					%>
+					<p class="lead fw-bolder">
+						Be careful!
+					</p>
+					<p>
+						<small>
+							Clicking this button with just a few lobbies is <strong>PROBABLY</strong> a really 
+							bad idea. Ideally, we probably want 15-20 lobbies every time we click this button to ensure 
+							a balanced distribution of player skill. If you're about to click this with less than 6 lobbies,
+							you're either <code>tehblister</code> or we're testing it and not using it for real combines.
+						</small>
+					</p>
+					<%
+						}
+					%>
+					<p class="lead">
+						If you're happy and have a large <strong>Ready Room</strong>, it's probably safe to 
+						kick things off. Anybody that shows up late or didn't fit in this generation will stick around
+						in the waiting room for the next session (15-30 minutes).
+					</p>
+
+					<div class="text-center">
+						<a href="/combines/generate" class="btn btn-success btn-lg">
+							<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
+								<span class="visually-hidden">Ready!</span>
+							</div>
+							Generate <%- lobbies > 1 ? `${lobbies} Lobbies!` : `${lobbies} Lobby`; %>
+							<i class="fa fa-car-burst text-warning"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-1 col-sm-2"></div>
+	</div>
+
+	<%
+		} else if ( missing ) {
+	%>
+
+	<div class="row mb-sm-4 mb-lg-0">
+		<div class="col-1 col-sm-2"></div>
+		<div class="col-10 col-sm-8">
+			<div class="alert alert-warning d-flex align-items-center" role="alert">
+				<div class="bi flex-shrink-0 me-2">
+					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
+						<use xlink:href="#exclamation-triangle-fill"/>
+					</svg>
+				</div>
+				<div class="flex-fill">
+					<div class="h5 alert-heading">
+						<%- missing; %> more for <%- lobbies; %> lobbies
+					</div>
+					<hr>
+					<p class="text-xs">
+						Clicking the "Deactivate <%- 6 - missing; %>" button will remove the <%- 6 - missing; %> players that 
+						were the last to check in.
+					</p>
+					<div class="text-end">
+						<a href="/combines/deactivate-last/<%- 6 - missing; %>" class="btn btn-sm btn-danger">
+							<i class="fa fa-user-xmark me-1"></i>
+							Deactivate <strong><%- 6 - missing; %></strong>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-1 col-sm-2"></div>
+	</div>
+
 	<%
 		}
 	%>
@@ -116,83 +202,9 @@
 			<div class="mb-3 row">
 				<div class="col-6 col-lg-4 h3 fw-bolder text-success">Ready Room</div>
 				<div class="col-8">
-
-				<% 
-					if ( ! missing && lobbies >= 1 ) {
-				%>
-
-					<div class="alert <%- lobbies < 9 ? 'alert-danger' : 'alert-success'; %> d-flex align-items-center" role="alert">
-						<div class="bi flex-shrink-0 me-2">
-							<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
-								<use xlink:href="#check-circle-fill"/>
-							</svg>
-						</div>
-						<div class="flex-fill">
-							<div class="display-5 alert-heading">
-								Aww yeah! Game Time!
-							</div>
-							<hr>
-							<%
-								if ( lobbies < 9 ) {
-							%>
-							<p class="lead fw-bolder">
-								Be careful!
-							</p>
-							<p>
-								<small>
-									Clicking this button with just a few lobbies is <strong>PROBABLY</strong> a really 
-									bad idea. Ideally, we probably want 15-20 lobbies every time we click this button to ensure 
-									a balanced distribution of player skill. If you're about to click this with less than 6 lobbies,
-									you're either <code>tehblister</code> or we're testing it and not using it for real combines.
-								</small>
-							</p>
-							<%
-								}
-							%>
-							<p class="lead">
-								If you're happy and have a large <strong>Ready Room</strong>, it's probably safe to 
-								kick things off. Anybody that shows up late or didn't fit in this generation will stick around
-								in the waiting room for the next session (15-30 minutes).
-							</p>
-
-							<div class="text-center">
-								<a href="/combines/generate" class="btn btn-success btn-lg">
-									<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
-										<span class="visually-hidden">Ready!</span>
-									</div>
-									Generate <%- lobbies > 1 ? `${lobbies} Lobbies!` : `${lobbies} Lobby`; %>
-									<i class="fa fa-car-burst text-warning"></i>
-								</a>
-							</div>
-						</div>
-					</div>
-				</div>
 				<%
-					} else if ( missing ) {
+					if ( missing ) {
 				%>
-					<div class="alert alert-warning d-flex align-items-center" role="alert">
-						<div class="bi flex-shrink-0 me-2">
-							<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
-								<use xlink:href="#exclamation-triangle-fill"/>
-							</svg>
-						</div>
-						<div class="flex-fill">
-							<div class="h5 alert-heading">
-								<%- missing; %> more for <%- lobbies; %> lobbies
-							</div>
-							<hr>
-							<p class="text-xs">
-								Clicking the "Deactivate <%- 6 - missing; %>" button will remove the <%- 6 - missing; %> players that 
-								were the last to check in.
-							</p>
-							<div class="text-end">
-								<a href="/combines/deactivate-last/<%- 6 - missing; %>" class="btn btn-sm btn-danger">
-									<i class="fa fa-user-xmark me-1"></i>
-									Deactivate <strong><%- 6 - missing; %></strong>
-								</a>
-							</div>
-						</div>
-					</div>
 
 				<%
 					}
