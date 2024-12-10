@@ -2258,19 +2258,19 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 
 	const players = {};
 	// add tehblister
-	// players['RSC000302'] = {
-	// 	'season': res.locals.combines.season,
-	// 	'discord_id': discord_ids['RSC000302'],
-	// 	'rsc_id': 'RSC000302',
-	// 	'name': 'tehblister',
-	// 	'tier': 'Veteran',
-	// 	'count': 1,
-	// 	'keeper': 1,
-	// 	'base_mmr': 1450,
-	// 	'effective_mmr': 1450,
-	// 	'current_mmr': 1450,
-	// };
-	// console.log('blister', players['RSC000302']);
+	players['RSC000302'] = {
+		'season': res.locals.combines.season,
+		'discord_id': discord_ids['RSC000302'],
+		'rsc_id': 'RSC000302',
+		'name': 'tehblister',
+		'tier': 'Veteran',
+		'count': 1,
+		'keeper': 1,
+		'base_mmr': 1450,
+		'effective_mmr': 1450,
+		'current_mmr': 1450,
+	};
+	console.log('blister', players['RSC000302']);
 
 	console.log('Importing tiermaker...');
 	for ( let i = 0; i < rows.length; i++ ) {
