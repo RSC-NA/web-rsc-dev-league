@@ -573,7 +573,7 @@ app.use((req, res, next) => {
 	
 	const date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
 	res.locals.today = date;
-	res.locals.match_day = false;
+	res.locals.match_day = new Date(new Date().setHours(8)).toISOString().split('T')[0];
 	res.locals.combine_day = false;
 	res.locals.combine_2s_day = false;
 	res.locals.combine_active = false;
