@@ -590,8 +590,7 @@ app.use((req, res, next) => {
 	if ( date in combineDays['2s'] || res.locals.combine_2s_live ) {
 		res.locals.combine_2s_day = combineDays['2s'][date];
 	}
-
-	if ( res.locals.match_day && req.session.user_id ) {
+	if ( res.locals.match_day && req.session.user_id && ! res.locals.combine_live ) {
 		const query = `
 			SELECT id,active,rostered 
 			FROM signups 
@@ -650,6 +649,8 @@ app.use((req, res, next) => {
 							req.session.rostered_2s = results[i].rostered;
 							res.locals.rostered_2s = req.session.rostered_2s;
 						}
+
+						console.log("CHECKED IN,", res.locals.user.combines.waiting, res.locals.checked_in)
 
 					}
 					next();
@@ -755,6 +756,12 @@ app.use((req, res, next) => {
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
+	console.log(res.locals.combines.active, combineDays);
+	console.log(
+		res.locals.nickname,
+		res.locals.user.combines,
+		res.locals.checked_in
+	);
 	if ( res.locals.combines.active || res.locals.combines_2s.active ) {
 		res.render('combines_dashboard', { combineDays: combineDays, league: res.locals.combines.active ? '3s' : '2s' });
 	} else {
