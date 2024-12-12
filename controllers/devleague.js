@@ -206,6 +206,7 @@ router.get('/championship', (req, res) => {
 });
 
 router.get('/check_in/:match_day', (req, res) => {
+	return res.send("YOU ARE RUINING EVERYTHING. STOP BEING LIKE THIS.");
 	if ( req.session.discord_id && ! req.session.checked_in && req.session.user.active_3s ) {
 		// TODO(get season and match day from somewhere)
 		const season = res.locals.settings.season;
