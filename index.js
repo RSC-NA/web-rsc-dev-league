@@ -571,9 +571,9 @@ app.use((req, res, next) => {
 	res.locals.checked_in    = false;
 	res.locals.checked_in_2s = false;
 	
-	const date = new Date(new Date().setHours(12)).toISOString().split('T')[0];
+	const date = new Date(new Date().setHours(8)).toISOString().split('T')[0];
 	res.locals.today = date;
-	res.locals.match_day = new Date(new Date().setHours(8)).toISOString().split('T')[0];
+	res.locals.match_day = false;
 	res.locals.combine_day = false;
 	res.locals.combine_2s_day = false;
 	res.locals.combine_active = false;
@@ -649,8 +649,6 @@ app.use((req, res, next) => {
 							req.session.rostered_2s = results[i].rostered;
 							res.locals.rostered_2s = req.session.rostered_2s;
 						}
-
-						console.log("CHECKED IN,", res.locals.user.combines.waiting, res.locals.checked_in)
 
 					}
 					next();
@@ -756,12 +754,6 @@ app.use((req, res, next) => {
  ******************************************************/
 app.get('/', (req, res) => {
 	// TODO(load template)
-	console.log(res.locals.combines.active, combineDays);
-	console.log(
-		res.locals.nickname,
-		res.locals.user.combines,
-		res.locals.checked_in
-	);
 	if ( res.locals.combines.active || res.locals.combines_2s.active ) {
 		res.render('combines_dashboard', { combineDays: combineDays, league: res.locals.combines.active ? '3s' : '2s' });
 	} else {
