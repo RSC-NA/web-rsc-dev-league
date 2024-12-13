@@ -17,7 +17,7 @@
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
 				hx-get="/combine/dashboard?status=Game<%- league_url; %>"
-				hx-trigger="load delay:10s"
+				hx-trigger="load delay:2m"
 				hx-swap="outerHTML"
 			>
 				<h2>Your Lobby is Ready!</h2>
@@ -50,7 +50,7 @@
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
 				hx-get="/combine/dashboard?status=CheckedIn<%- league_url; %>"
-				hx-trigger="load delay:10s"
+				hx-trigger="load delay:1m"
 				hx-swap="outerHTML"
 			>
 				<h2>You are checked in!</h2>
