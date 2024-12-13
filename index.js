@@ -344,7 +344,8 @@ app.use(async (req, res, next) => {
 	}
 
 	const ip = req.headers['cf-connecting-ip'] || req.ip;
-	console.log(`url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] ip:${ip}`);
+	const log_date = new Date(new Date().setHours(4)).toISOString().split('T');
+	console.log(`[${log_date[0]} ${log_date[1]}] url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] ip:${ip}`);
 
 	//res.locals.user = req.session.user || {};
 	res.locals.user = await get_user(req.session.user_id, ip);
@@ -571,7 +572,7 @@ app.use((req, res, next) => {
 	res.locals.checked_in    = false;
 	res.locals.checked_in_2s = false;
 	
-	const date = new Date(new Date().setHours(8)).toISOString().split('T')[0];
+	const date = new Date(new Date().setHours(4)).toISOString().split('T')[0];
 	res.locals.today = date;
 	res.locals.match_day = false;
 	res.locals.combine_day = false;
