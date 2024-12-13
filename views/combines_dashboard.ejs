@@ -169,7 +169,9 @@
 
 
 				<% 
-					} else if ( nickname && ! checked_in && user && user.combines.active ) { %>
+					} else if ( nickname && ! checked_in && user && user.combines.active ) { 
+						if ( combine_live ) {
+				%>
 					
 					<%- include('partials/combines/dashboard.ejs', { 
 							status: 'check-in', 
@@ -178,9 +180,8 @@
 							match_id: null, 
 					}); %>
 
-
 				<%
-						if (0) {
+						} else {
 				%>
 				<h3>Soon!</h3>
 				<p>

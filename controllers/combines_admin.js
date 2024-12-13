@@ -2170,7 +2170,7 @@ router.get(['/setup', '/setup/:league'], async (req, res) => {
 			rsc_id,discord_id,season,current_mmr 
 		FROM tiermaker 
 		WHERE league = ? AND season = ? 
-		ORDER BY rand() LIMIT 100
+		ORDER BY rand() LIMIT 20 
 	`;
 	const [results] = await db.execute(query, [league, season]);
 

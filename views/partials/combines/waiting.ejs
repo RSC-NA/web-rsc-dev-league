@@ -7,6 +7,24 @@
 			>
 				<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
 					<span class="text-muted">Waiting Room</span>
+					<div class="h4 text-muted">
+					<%
+						let players_waiting = 0;
+						if ( Object.keys(waiting_room).length ) {
+							players_waiting = Object.keys(waiting_room).length;
+						}
+	
+						if ( players_waiting ) {
+							const team_avail = Math.floor(players_waiting / 6)
+							const remaining = players_waiting % 6;
+					%>
+						<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
+						%><%- (remaining > 0 && team_avail > 0) ? ' + ' : ''; 
+						%><%- remaining > 0 ? remaining + (remaining == 1 ? ' player' : ' players') : ''; %>
+					<%
+						}
+					%>
+					</div>
 					<a href="/combines/activate/all/<%- league; %>" class="btn btn-info fw-bold">
 						<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
 						<span class="d-xl-none d-lg-inline">&uarr;</span>

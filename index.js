@@ -625,10 +625,7 @@ app.use((req, res, next) => {
 			WHERE 
 				discord_id = ? AND 
 				rostered = 0 AND
-				( 
-					DATE(signup_dtg) = CURDATE() OR 
-					DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
-				)
+				signup_dtg > DATE_SUB(now(), interval 2 hour)
 		`;
 		connection.query(
 			query,
@@ -756,7 +753,10 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
 	// TODO(load template)
 	if ( res.locals.combines.active || res.locals.combines_2s.active ) {
-		res.render('combines_dashboard', { combineDays: combineDays, league: res.locals.combines.active ? '3s' : '2s' });
+		res.render('combines_dashboard', {
+			combineDays: combineDays,
+			league: res.locals.combines.active ? '3s' : '2s',
+		});
 	} else {
 		res.render('dashboard', { match_days: matchDays });
 	}
