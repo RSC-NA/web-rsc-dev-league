@@ -1252,6 +1252,7 @@ router.all(['/deactivate/:rsc_id', '/deactivate/:rsc_id/:league'], (req, res) =>
 			active = 1 AND
 			rostered = 0
 	`;
+
 	
 	if ( req.params.rsc_id !== 'all' ) {
 		req.db.query(query, [ req.params.rsc_id, league ], (err,results) => {
@@ -1264,7 +1265,7 @@ router.all(['/deactivate/:rsc_id', '/deactivate/:rsc_id/:league'], (req, res) =>
 			}
 		});
 	} else {
-		req.db.query(query, (err,results) => {
+		req.db.query(query, [league], (err,results) => {
 			if ( err ) { throw err; }
 
 			if ( league === 2 ) {
@@ -1698,6 +1699,8 @@ router.get('/process', (req, res) => {
 				}
 			}
 
+
+
 			const active_query = `
 				SELECT 
 					id,lobby_user,lobby_pass,home_mmr 
@@ -1715,6 +1718,7 @@ router.get('/process', (req, res) => {
 					signups: signups,
 					games: games,
 					getTierFromMMR: getTierFromMMR,
+					delay: 10,
 				});
 			});
 		});
@@ -1816,6 +1820,7 @@ router.get('/process_2s', (req, res) => {
 					signups: signups,
 					games: games,
 					getTierFromMMR: getTierFromMMR,
+					delay: 10,
 				});
 			});
 		});
@@ -1823,6 +1828,8 @@ router.get('/process_2s', (req, res) => {
 });
 
 router.get(['/process/waiting', '/process/waiting/:league'], (req, res) => {
+	const delay = req.query.delay ? parseInt(req.query.delay) : 10;
+	const last  = req.query.last ? parseInt(req.query.last) : 0;
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
 	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
@@ -1896,11 +1903,12 @@ router.get(['/process/waiting', '/process/waiting/:league'], (req, res) => {
 					}
 				}
 			}
-
+			console.log(Object.keys(signups.waiting).length)
 			res.render('partials/combines/waiting', {
 				league: league,
 				waiting_room: signups.waiting,
 				getTierFromMMR: getTierFromMMR,
+				delay: last != Object.keys(signups.waiting).length ? 10 : delay + 20, 
 			});
 		});
 	});

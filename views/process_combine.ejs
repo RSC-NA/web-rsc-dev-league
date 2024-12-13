@@ -199,14 +199,45 @@
 
 		<!-- primary FA signup / team generation -->
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 order-first">
-			<div class="mb-3 row">
-				<div class="col-6 col-lg-4 h3 fw-bolder text-success">Ready Room</div>
-			</div>
+			<h3 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
+				<span class="text-success fw-bolder">Ready Room</span>
+				<div class="h4 text-muted">
+				
+				<%
+					let players_ready = 0;
+					if ( Object.keys(ready_room).length ) {
+						players_ready = Object.keys(ready_room).length;
+					}
+
+
+					if ( players_ready ) {
+						const team_avail = Math.floor(players_ready / 6)
+						const extra = players_ready % 6;
+				%>
+					<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
+					%><%- (extra > 0 && team_avail > 0) ? ' + ' : ''; 
+					%><%- extra > 0 ? '<span class="text-danger">' + extra + (extra == 1 ? ' player' : ' players') : '' + '</span>'; %>
+				<%
+					}
+				%>
+				</div>
+				<a
+					href="/combines/deactivate/all/3"
+					class="btn btn-warning fw-bold <%- players_ready == 0 ? 'disabled' :''; %>"
+					role="button"
+					<%- players_ready == 0 ? 'aria-disabled="true"' :''; %>
+				>
+					<i class="fas fa-user-minus"></i>
+					Remove All
+					<span class="d-xl-inline d-lg-none d-none">&#11022;</span>
+					<span class="d-xl-none d-lg-inline">&darr;</span>
+				</a>
+			</h3>
 
 			<div class="mb-3">
 				<table class="table table-hover">
 					<thead>
-						<tr>
+						<tr class="table-success">
 							<th class="text-center">MMR</th>
 							<th class="text-center">&Delta;</th>
 							<th>Player</th>
@@ -219,15 +250,23 @@
 
 					<% 
 						if ( Object.keys(ready_room).length ) {
+
+							const extra_players = players_ready % 6;
+
 							let table_class = 'table-primary';
 							let n = 0;
+
 							for ( const rsc_id in ready_room ) {
+								const p = ready_room[rsc_id];
+								if ( n === 0 ) {
+									console.log(p)
+								}
+
 								n++;
 								if ( n > 6 ) {
 									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
 									n = 1;
 								}
-								const p = ready_room[rsc_id];
 								if ( p.win_percentage > 60 ) {
 									analysis = 'great';
 								} else if ( p.win_percentage > 52 ) {
