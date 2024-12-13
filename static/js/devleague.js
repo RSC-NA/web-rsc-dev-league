@@ -1,3 +1,7 @@
+const DevLeague = {
+	in_game: false,
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	const timeEls = document.querySelectorAll('.timeago');
 	if ( timeEls && timeEls.length ) {

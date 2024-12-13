@@ -8,18 +8,17 @@
 		league_id = 2;
 	}
 
-	console.log("STATUS:", status)
 %>
 
 <%
 	if ( status === 'ready' ) {
 %>
 
-				<!-- hx-get="/combines/dashboard?status=Game<%- league_url; %>" -->
-				<!-- hx-trigger="load delay:1m" -->
-				<!-- hx-swap="outerHTML" -->
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
+				hx-get="/combine/dashboard?status=Game<%- league_url; %>"
+				hx-trigger="load delay:10s"
+				hx-swap="outerHTML"
 			>
 				<h2>Your Lobby is Ready!</h2>
 				<p class="lead">
@@ -27,17 +26,17 @@
 				</p>
 				<a
 					class="btn btn-lg btn-success"
-					href="/combine/<%- match_id; %>/<%- league_id; %>"
+					href="/combine/<%- user.combines.match.id; %>/<%- league_id; %>"
 					role="button"
 				>
 					View Match Details
 				</a>
 				<script type="text/javascript">
 					function playSound() {
-						if ( window.in_game === false ) {
+						if ( DevLeague.in_game === false ) {
 							var audio = new Audio('/sounds/match_ready.mp3');
 							audio.play();
-							window.in_game = true;
+							DevLeague.in_game = true;
 						}
 					}
 					setTimeout(playSound, 100);
@@ -48,11 +47,11 @@
 	} else if ( status === 'waiting') { 
 %>
 
-				<!-- hx-get="/combines/dashboard?status=CheckedIn<%- league_url; %>"  -->
-				<!-- hx-trigger="load delay:20s" -->
-				<!-- hx-swap="outerHTML" -->
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
+				hx-get="/combine/dashboard?status=CheckedIn<%- league_url; %>"
+				hx-trigger="load delay:10s"
+				hx-swap="outerHTML"
 			>
 				<h2>You are checked in!</h2>
 				<p class="lead">
@@ -65,7 +64,7 @@
 					role="button"
 				>Check Out</a>
 				<script type="text/javascript">
-					window.in_game = false;
+					DevLeague.in_game = false;
 				</script>
 			</div>
 
@@ -93,10 +92,10 @@
 				</script>
 				<script type="text/javascript">
 					function playSound() {
-						if ( window.in_game === true ) {
+						if ( DevLeague.in_game === true ) {
 							var audio = new Audio('/sounds/check_in_ready.mp3');
 							audio.play();
-							window.in_game = false;
+							DevLeague.in_game = false;
 						}
 					}
 					setTimeout(playSound, 100);

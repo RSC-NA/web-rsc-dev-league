@@ -216,6 +216,7 @@ router.get('/combine/dashboard', (req, res) => {
 		status: status,
 		user: user,
 		league: '3s',
+		match_id: user?.combines?.match?.id ?? null,
 	});
 
 });
