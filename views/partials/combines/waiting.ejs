@@ -3,6 +3,8 @@
 	if ( Object.keys(waiting_room).length ) {
 		players_waiting = Object.keys(waiting_room).length;
 	}
+	const team_avail = Math.floor(players_waiting / 6)
+	const remaining = players_waiting % 6;
 
 	let load_delay = delay ? delay : 10;
 
@@ -18,14 +20,17 @@
 				hx-trigger="load delay:<%- load_delay; %>s"
 				hx-swap="outerHTML"
 			>
+				<script type="text/javascript">
+					if ( DevLeague.threshold < <%- team_avail; %> ) {
+						setTimeout(DevLeague.playReady, 100);
+					}
+				</script>
 				<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
 					<span class="text-muted">Waiting Room</span>
 					<div class="h4 text-muted">
 					
 					<%
 						if ( players_waiting ) {
-							const team_avail = Math.floor(players_waiting / 6)
-							const remaining = players_waiting % 6;
 					%>
 						<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
 						%><%- (remaining > 0 && team_avail > 0) ? ' + ' : ''; 
