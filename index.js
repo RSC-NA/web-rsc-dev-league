@@ -961,19 +961,21 @@ app.get('/numbers/:date', (req, res) => {
 			];
 			const stringifier = stringify({ header: true, columns: columns });
 			stringifier.pipe(res);
+			if (results && results.length) {
 
 			console.log(`Numbers Records: ${results.length}`);
-			for ( let i = 0; i < results.length; ++i ) {
-				// I just saved us 200 seconds
-				results[i]["Player Name"] = name_map[ results[i]['RSC_ID'] ];
+				for ( let i = 0; i < results.length; ++i ) {
+					// I just saved us 200 seconds
+					results[i]["Player Name"] = name_map[ results[i]['RSC_ID'] ];
 
-				results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
-				if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
-					results[i]['1s GP'] = 0;
-					results[i]['2s GP'] = 0;
-					results[i]['3s GP'] = 0;
+					results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
+					if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
+						results[i]['1s GP'] = 0;
+						results[i]['2s GP'] = 0;
+						results[i]['3s GP'] = 0;
+					}
+					stringifier.write(results[i]);
 				}
-				stringifier.write(results[i]);
 			}
 			stringifier.end();
 		});
