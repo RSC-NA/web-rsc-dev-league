@@ -999,6 +999,12 @@ async function grabMoreTrackers() {
 		console.log("Error fetching more trackers. Aborting...");
 		return false;
 	}
+	
+	if ( response.status == 500 ) {
+		console.error("invalid response", response);
+		return false;
+	}
+
 	const trackers = await response.json();
 
 	if ( ! trackers || ! trackers.length ) {
