@@ -1410,7 +1410,7 @@ app.get('/send_bad_trackers', (req, res) => {
 });
 
 app.get('/import_trackers', async (req, res) => {
-	if ( ! req.session.is_admin ) {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
 		return res.redirect('/');
 	} 
 
