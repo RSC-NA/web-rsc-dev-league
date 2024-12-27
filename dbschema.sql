@@ -268,6 +268,8 @@ CREATE TABLE `StreamPlayerStats` (
 	`HatTricks` int DEFAULT NULL,
 	`Playmakers` int DEFAULT NULL,
 	`Saviors` int DEFAULT NULL,
+	`Demos` int DEFAULT NULL,
+	`DemosTaken` int DEFAULT NULL,
 	PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -297,6 +299,8 @@ CREATE TABLE `StreamPlayerStats2` (
 	`HatTricks` int DEFAULT NULL,
 	`Playmakers` int DEFAULT NULL,
 	`Saviors` int DEFAULT NULL,
+	`Demos` int DEFAULT NULL,
+	`DemosTaken` int DEFAULT NULL,
 	PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

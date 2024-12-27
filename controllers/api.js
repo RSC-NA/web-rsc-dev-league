@@ -51,7 +51,7 @@ router.get('/players', (req, res) => {
 		tableName = 'StreamPlayerStats2';
 	}
 
-	let query = `SELECT id, season, tier, teamName, playerName, gp, gw, gl, wPct, mvPs, pts, goals, assists, saves, shots, shotPct, ppg, gpg, apg, svPG, soPG, cycles, hatTricks, playmakers, saviors FROM ${tableName} ORDER BY playerName`;
+	let query = `SELECT id, season, tier, teamName, playerName, gp, gw, gl, wPct, mvPs, pts, goals, assists, saves, shots, shotPct, ppg, gpg, apg, svPG, soPG, cycles, hatTricks, playmakers, saviors, demos, demostaken AS demos_taken FROM ${tableName} ORDER BY playerName`;
 	req.db.query(query, (err, results) => {
 		res.json(results);
 	});
@@ -66,7 +66,7 @@ router.get('/players/:teamName', (req, res) => {
 		tableName = 'StreamPlayerStats2';
 	}
 
-	let query = `SELECT id, season, tier, teamName, playerName, gp, gw, gl, wPct, mvPs, pts, goals, assists, saves, shots, shotPct, ppg, gpg, apg, svPG, soPG, cycles, hatTricks, playmakers, saviors FROM ${tableName} WHERE teamName = ? ORDER BY playerName`;
+	let query = `SELECT id, season, tier, teamName, playerName, gp, gw, gl, wPct, mvPs, pts, goals, assists, saves, shots, shotPct, ppg, gpg, apg, svPG, soPG, cycles, hatTricks, playmakers, saviors, demos, demostaken AS demos_taken FROM ${tableName} WHERE teamName = ? ORDER BY playerName`;
 	req.db.query(query, [req.params.teamName], (err, results) => {
 		res.json(results);
 	});

@@ -176,6 +176,8 @@ async function pull_stats(req, res) {
 			HatTricks: forceInt(row['Hat Tricks']), 
 			Playmakers: forceInt(row['Playmakers']),
 			Saviors: forceInt(row['Saviors']),
+			Demos: forceInt(row['demos inflicted']),
+			DemosTaken: forceInt(row['demos taken']),
 		});
 	}
 
