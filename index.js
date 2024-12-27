@@ -834,7 +834,7 @@ app.get('/bad_trackers', (req, res) => {
 			b.sent_to_api AS "Sent to API",
 			b.date_pulled AS "Date Pulled",b.pulled_by AS "Pulled By"
 		FROM bad_trackers AS b 
-		LEFT JOIN trackres AS t ON b.tracker_link = t.tracker_link 
+		LEFT JOIN trackers AS t ON b.tracker_link = t.tracker_link 
 		ORDER BY b.tracker_link, b.id ASC 
 	`;
 
