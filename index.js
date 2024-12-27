@@ -824,8 +824,45 @@ ORDER BY psyonix_season DESC
 });
 
 /*
- * RSC ID Player Name Tracker Link 1s MMR 1s Season Peak 1s GP 2s MMR 2s Season Peak 2s GP 3s MMR 3s Season Peak 3s GP Date Pulled
+ * Pull unique bad trackers
  */ 
+app.get('/bad_trackers', (req, res) => {
+	const query = `
+		SELECT 
+			b.id,t.rsc_id AS "RSC_ID", t.name AS "Player Name",
+			b.tracker_link AS "Tracker Link",
+			b.sent_to_api AS "Sent to API",
+			b.date_pulled AS "Date Pulled",b.pulled_by AS "Pulled By"
+		FROM bad_trackers AS b 
+		LEFT JOIN trackres AS t ON b.tracker_link = t.tracker_link 
+		ORDER BY b.tracker_link, b.id ASC 
+	`;
+
+	const date = new Date().toISOString();
+	connection.query(query, (err, results) => {
+		if ( err ) {
+			res.send(err);
+		}
+		res.header('Content-type', 'text/csv');
+		res.attachment(`Bad Tracker List ${date}.csv`);
+		const columns = [
+			'id','RSC_ID', 'Player Name', 'Tracker Link',
+			'Date Pulled', 'Pulled By', 'Sent to API',
+		];
+		const stringifier = stringify({ header: true, columns: columns });
+		stringifier.pipe(res);
+		for ( let i = 0; i < results.length; ++i ) {
+			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
+			stringifier.write(results[i]);
+		}
+		stringifier.end();
+	});
+
+});
+
+/*
+ * RSC ID Player Name Tracker Link 1s MMR 1s Season Peak 1s GP 2s MMR 2s Season Peak 2s GP 3s MMR 3s Season Peak 3s GP Date Pulled
+ */
 app.get('/numbers_by_player/:rsc_id', (req, res) => {
 	const rsc_id = req.params?.rsc_id;
 	if ( ! rsc_id ) {
