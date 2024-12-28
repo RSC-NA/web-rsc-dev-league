@@ -817,9 +817,25 @@ ORDER BY psyonix_season DESC
 			
 		if ( 'json' in req.query ) {
 			return res.json(results);
-		}
+		} else {
 
-		return res.render('mmr', { pulls: results });
+			res.header('Content-type', 'text/csv');
+			res.attachment(`Tracker Data for ${req.params.rsc_id}.csv`);
+			const columns = [
+				'psyonix_season', 'tracker_link', 'rsc_id',
+				'gp_3s', 'mmr_3s', 'peak_3s', 'gp_2s', 'mmr_2s', 'peak_2s',
+				'gp_1s', 'mmr_1s', 'peak_1s',
+				'date_pulled', 'pulled_by',
+			];
+			const stringifier = stringify({ header: true, columns: columns });
+			stringifier.pipe(res);
+			for ( let i = 0; i < results.length; ++i ) {
+				results[i]["date_pulled"] = new Date(results[i]['date_pulled']).toString();
+				stringifier.write(results[i]);
+			}
+			stringifier.end();
+		}
+		// return res.render('mmr', { pulls: results });
 	});
 });
 
