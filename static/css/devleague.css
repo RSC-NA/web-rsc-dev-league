@@ -1,6 +1,13 @@
 /*
 <html lang="en" data-bs-theme="dark" style="scrollbar-color: #021e3a #000f1e;">
 */
+a {
+	color: #98c1ff;
+}
+a:hover {
+	color: #76a0ee;
+}
+
 .page-item.disabled .page-link, .dark .page-item.disabled .dataTable-pagination a, .dark .dataTable-pagination .page-item.disabled a, .dark .dataTable-pagination li.disabled .page-link, .dark .dataTable-pagination li.disabled a {
   color: #3f3f6a;
   pointer-events: none;
