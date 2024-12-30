@@ -9,7 +9,7 @@ a:hover {
 }
 
 .page-item.disabled .page-link, .dark .page-item.disabled .dataTable-pagination a, .dark .dataTable-pagination .page-item.disabled a, .dark .dataTable-pagination li.disabled .page-link, .dark .dataTable-pagination li.disabled a {
-  color: #3f3f6a;
+  color: #adadb9;
   pointer-events: none;
   background-color: #021e3a;
   border-color: #dee2e6;
