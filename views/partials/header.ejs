@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark" style="scrollbar-color: #021e3a #000f1e;">
 	<head>
 		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -26,21 +26,35 @@
 		<script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 	</head>
 	<body class="sb-nav-fixed">
-		<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+		<nav
+			class="sb-topnav navbar navbar-expand navbar-dark bg-dark"
+			style="background-color: #000f1e !important; color: #fff;"
+		>
 			<!-- Navbar Brand-->
 			<a class="navbar-brand ps-3" href="/">
 				<img src="/images/rsc-xx-pride.png" style="float:left;margin-top:0px;height:64px;" alt="RSC Logo">
 				<div>Rocket Soccar</div><div>Confederation</div> 
 			</a>
 			<!-- Sidebar Toggle-->
-			<button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+			<button
+				class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
+				id="sidebarToggle"
+				href="#!"
+			><i class="fas fa-bars"></i></button>
 			<!-- Navbar Search-->
 			<form method="get" action="/search">
 				<div class="input-group">
 					<div class="form-outline w-75 ms-4">
-						<input type="search" id="find_header" name="find" class="form-control" placeholder="Search for anything" value="" />
+						<input
+							type="search"
+							id="find_header"
+							name="find"
+							class="form-control text-white bg-dark"
+							placeholder="Search for anything"
+							value=""
+						/>
 					</div>
-					<button type="button" class="btn btn-primary d-none d-md-block">
+					<button type="button" class="btn btn-outline-primary d-none d-md-block">
 						<i class="fas fa-search"></i>
 					</button>
 				</div>
@@ -50,7 +64,7 @@
 				<li class="nav-item dropdown">
 					<% if ( discord_id) { %>
 					<a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span><%= nickname %></span></a>
-					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+					<ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="navbarDropdown">
 							<!-- <li><a class="dropdown-item" href="/player/<%= discord_id %>">View Profile</a></li> -->
 							<li><a class="dropdown-item" href="/logout">Log Out</a></li>
 						<% } else { %>
@@ -64,7 +78,11 @@
 		</nav>
 		<div id="layoutSidenav">
 			<div id="layoutSidenav_nav">
-				<nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+				<nav
+					class="sb-sidenav accordion sb-sidenav-dark"
+					id="sidenavAccordion"
+					style="background-color: #000f1e; color: #fff;"
+				>
 					<div class="sb-sidenav-menu">
 						<div class="nav">
 							<div class="sb-sidenav-menu-heading">Core</div>
@@ -352,5 +370,5 @@
 					</div>
 				</nav>
 			</div>
-			<div id="layoutSidenav_content">
+			<div id="layoutSidenav_content" class="bg-dark text-light">
 

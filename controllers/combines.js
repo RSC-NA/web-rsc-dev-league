@@ -548,7 +548,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 		SELECT 
 			id, match_dtg, season, lobby_user, lobby_pass, home_mmr, away_mmr,
 			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, 
-			completed, cancelled 
+			completed, cancelled
 		FROM 
 			combine_matches 
 		WHERE id = ?
@@ -582,7 +582,6 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 	let can_save = false;
 	let can_report = false;
 	let can_confirm = false;
-
 
 	if ( 
 		req.session.is_admin || 
@@ -739,11 +738,16 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
+	let team_size = 3;
+	if (league === 2) {
+		team_size = 2;
+	}
 
 	const match_query = `
 		SELECT 
 			id, match_dtg, season, league, lobby_user, lobby_pass, home_mmr, away_mmr,
-			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, completed, cancelled 
+			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, completed, cancelled,
+			home_mmr AS tier
 		FROM 
 			combine_matches 
 		WHERE id = ?
@@ -753,6 +757,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 
 		if ( results && results.length ) {
 			const match = results[0];
+			match.tier = getTierFromMMR(Math.floor(match.tier/team_size), league);
 
 			if ( league !== match.league ) {
 				return res.redirect(`/combine/${match.id}/${match.league}`);
@@ -766,7 +771,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 			const players_query = `
 				SELECT 
 					p.id, p.rsc_id, p.team, p.start_mmr, p.end_mmr,
-					t.name,t.effective_mmr,t.wins,t.losses
+					t.name,t.effective_mmr,t.wins,t.losses,t.tier
 				FROM combine_match_players AS p
 				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ? AND t.league = ?
 				WHERE p.match_id = ?

@@ -41,7 +41,7 @@
 						let awayTeam = matches[i].lobby_pass;
 						const scored_class = (matches[i].home_wins || matches[i].away_wins) ? 'bg-success bg-opacity-25 border-success border rounded fw-bold' : 'bg-secondary bg-opacity-25 border rounded text-muted';
 			%>
-				<li class="list-group-item d-flex justify-content-between 1h-condensed">
+				<li class="list-group-item list-group-item-dark d-flex justify-content-between 1h-condensed">
 					<div class="<%- scored_class; %> px-2 pb-1 me-2 align-middle">
 						<h5 class="my-0">[<%- matches[i].home_wins %> - <%- matches[i].away_wins %>]</h5>
 					</div>

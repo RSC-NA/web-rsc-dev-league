@@ -139,7 +139,7 @@
 			<div class="row">
 				<div class="col-12">
 					<div class="text-center">
-						<nav aria-label="">
+						<nav aria-label="" class="dark">
 							<ul class="pagination justify-content-end">
 								<% 
 									const pages = Math.floor(total / limit) + 1;
@@ -202,7 +202,13 @@
 			<div class="row">
 				<div class="col-12 col-md-3">
 					<label for="limit">Limit</label>
-					<select name="limit" id="limit" onchange="set_page_size(this);">
+					<select
+						name="limit"
+						id="limit"
+						onchange="set_page_size(this);"
+						class="text-white"
+						style="background-color:#000f1e;"
+					>
 						<% 
 							for ( let lim in limits ) {
 						%>
@@ -214,7 +220,13 @@
 				</div>
 				<div class="col-12 col-md-3">
 					<label for="show">Show</label>
-					<select name="show" id="show" onchange="set_visibility(this);">
+					<select
+						name="show"
+						id="show"
+						onchange="set_visibility(this);"
+						class="text-white"
+						style="background-color:#000f1e;"
+					>
 						<% 
 							for ( let vis in visibilities ) {
 						%>
@@ -232,7 +244,7 @@
 				<div class="col-12 col-md-2 text-end h-2">
 					<a
 						href="/combines/history?<%- query.toString(); %>&csv=true"
-						class="btn btn-warning fw-bold"
+						class="btn btn-outline-warning fw-bold"
 						title="Download Combine Tiermaker"
 					>
 						<i class="fas fa-file-arrow-down me-1"></i>
@@ -241,7 +253,7 @@
 				</div>
 			</div>
 			<div class="mb-3">
-				<table class="table table-hover">
+				<table class="table table-hover table-dark">
 					<thead>
 						<tr>
 							<th></th>
@@ -308,7 +320,7 @@
 								Combines MMR
 								<%- arrows['current_mmr']; %>
 							</th>
-							<th class="text-center">
+							<th class="text-center" colspan="2">
 								Combine Tier
 							</th>
 							<th
@@ -369,6 +381,7 @@
 								</a>
 							</td>
 							<td class="fw-bolder">
+								<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
 								<a href="/combine/matches/<%= rsc_id; %>"><%= p.name; %></a>
 							</td>
 							<td class="text-start bg-<%- p.tier; %>">
@@ -406,6 +419,9 @@
 									<%= p.current_mmr; %>
 								</span>
 							</td>
+							<td class="text-end">
+								<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
+							</td>
 							<td class="text-start bg-<%- p.combines_tier; %>">
 								<%- p.combines_tier; %>
 							</td>
@@ -435,7 +451,7 @@
 				</table>
 			
 				<div class="text-center">
-					<nav aria-label="">
+					<nav aria-label="" class="dark">
 						<ul class="pagination justify-content-center">
 							<% 
 								if ( page <= 1 ) {

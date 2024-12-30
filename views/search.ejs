@@ -29,7 +29,7 @@
 	</script>
 
 	<main class="container">
-		<div class="bg-light p-3 rounded">
+		<div class="bg-dark text-light p-3 rounded">
 			<div class="row">
 				<div class="col-md-12">
 
@@ -38,9 +38,16 @@
 					<form method="get" action="/search" class="mb-4">
 						<div class="input-group">
 							<div class="form-outline w-50">
-								<input type="search" id="find" name="find" class="form-control" value="<%= needle ? needle : ''; %>" />
+								<input
+									type="search"
+									id="find"
+									name="find"
+									class="form-control text-white"
+									style="background-color:#021e3a;"
+									value="<%= needle ? needle : ''; %>"
+								/>
 							</div>
-							<button type="button" class="btn btn-primary">
+							<button type="button" class="btn btn-outline-primary">
 								<i class="fas fa-search"></i>
 							</button>
 						</div>
@@ -52,7 +59,7 @@
 					<hr class="mb-4">
 					<h2 class="mt-4"><%- results.length; %> results for "<%= needle; %>"</h2>
 
-					<table class="table table-striped">
+					<table class="table table-striped table-dark">
 						<thead>
 							<tr>
 								<th scope="col">RSC ID</th>

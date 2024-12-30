@@ -27,7 +27,7 @@
 			<div class="text-end mb-3">
 				<a
 					href="/import_players/<%= contract_sheet_id; %>?return=manage_league"
-					class="btn btn-success form-control text-start"
+					class="btn btn-outline-success form-control text-start"
 				>
 					<i class="fas fa-table"></i>
 					Step #1 - Import Master Member Sheet
@@ -36,7 +36,7 @@
 			<div class="text-end mb-3">
 				<a
 					href="/import_contracts/<%= contract_sheet_id; %>?return=manage_league"
-					class="btn btn-success form-control text-start"
+					class="btn btn-outline-primary form-control text-start"
 				>
 					<i class="fas fa-table"></i>
 					Step #2 - Load Contracts
@@ -44,91 +44,91 @@
 			</div>
 
 			<ul class="list-group mb-3">
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.premier ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Premier</h6>
+						<h6 class="my-0"><img height="24" src="/icons/premier.png"> Premier</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Premier']['total'] - tiers['Premier']['fa'] %> Signed / <%= tiers['Premier']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.master ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Master</h6>
+						<h6 class="my-0"><img height="24" src="/icons/master.png"> Master</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Master']['total'] - tiers['Master']['fa'] %> Signed / <%= tiers['Master']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.elite ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Elite</h6>
+						<h6 class="my-0"><img height="24" src="/icons/elite.png"> Elite</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Elite']['total'] - tiers['Elite']['fa'] %> Signed / <%= tiers['Elite']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.veteran ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Veteran</h6>
+						<h6 class="my-0"><img height="24" src="/icons/veteran.png"> Veteran</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Veteran']['total'] - tiers['Veteran']['fa'] %> Signed / <%= tiers['Veteran']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.rival ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Rival</h6>
+						<h6 class="my-0"><img height="24" src="/icons/rival.png"> Rival</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Rival']['total'] - tiers['Rival']['fa'] %> Signed / <%= tiers['Rival']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.challenger ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Challenger</h6>
+						<h6 class="my-0"><img height="24" src="/icons/challenger.png"> Challenger</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Challenger']['total'] - tiers['Challenger']['fa'] %> Signed / <%= tiers['Challenger']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.prospect ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Prospect</h6>
+						<h6 class="my-0"><img height="24" src="/icons/prospect.png"> Prospect</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Prospect']['total'] - tiers['Prospect']['fa'] %> Signed / <%= tiers['Prospect']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.contender ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Contender</h6>
+						<h6 class="my-0"><img height="24" src="/icons/contender.png"> Contender</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Contender']['total'] - tiers['Contender']['fa'] %> Signed / <%= tiers['Contender']['fa'] %> FA</span>
 				</li>
 
-				<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.amateur ? 'class="text-success"' : '' %>>
-						<h6 class="my-0">Amateur</h6>
+						<h6 class="my-0"><img height="24" src="/icons/amateur.png"> Amateur</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
 					<span class="text-muted"><%= tiers['Amateur']['total'] - tiers['Amateur']['fa'] %> Signed / <%= tiers['Amateur']['fa'] %> FA</span>
 				</li>
 				
-				<li class="list-group-item d-flex justify-content-between">
-					<span>FA</span>
-					<strong><%= tiers['all']['fa'] %></strong>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between">
+					<h6 class="my-0 text-light"><img height="24" src="/icons/drafteligible.png"> FA</h6>
+					<strong class="text-light"><%= tiers['all']['fa'] %></strong>
 				</li>
 
-				<!-- <li class="list-group-item d-flex justify-content-between">
+				<!-- <li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between">
 					<span>PermFA</span>
 					<strong>86</strong>
 				</li> -->
 
-				<li class="list-group-item d-flex justify-content-between">
-					<span>Total Players</span>
-					<strong><%= tiers['all']['total'] %></strong>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between">
+					<span class="text-light">Total Players</span>
+					<strong class="text-light"><%= tiers['all']['total'] %></strong>
 				</li>
 				
 			</ul>
@@ -144,7 +144,16 @@
 			<div class="mb-3">
 				<label for="season">Season</label>
 				<div class="input-group">
-					<input type="text" class="form-control" name="season" id="season" placeholder="season" value="<%= settings.season %>" required>
+					<input
+						type="text"
+						class="form-control text-white"
+						name="season"
+						id="season"
+						placeholder="season"
+						value="<%= settings.season %>"
+						style="background-color:#000f1e;"
+						required
+					>
 					<div class="invalid-feedback" style="width: 100%;">
 						Season is required
 					</div>
@@ -154,7 +163,16 @@
 			<div class="mb-3">
 				<label for="contract_url">Contract Sheet</label>
 				<div class="input-group">
-					<input type="text" class="form-control" name="contract_url" id="contract_url" placeholder="contract_url" value="<%= settings.contract_url %>" required>
+					<input
+						type="text"
+						class="form-control text-white"
+						name="contract_url"
+						id="contract_url"
+						placeholder="contract_url"
+						value="<%= settings.contract_url %>"
+						style="background-color:#000f1e;"
+						required
+					>
 					<div class="invalid-feedback" style="width: 100%;">
 						Contract sheet URL is required.
 					</div>
@@ -202,7 +220,7 @@
 		
 			<hr class="mb-4">
 			
-			<button class="btn btn-primary btn-lg btn-block" type="submit">Update League Settings</button>
+			<button class="btn btn-outline-primary btn-lg btn-block" type="submit">Update League Settings</button>
 			
 			</form>
 		</div>

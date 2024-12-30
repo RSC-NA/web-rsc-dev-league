@@ -60,7 +60,7 @@
 			enough pool of players to run the "Generate Lobbies" command.
 		</p>
 	</div>
-	<div class="card mb-4">
+	<div class="card mb-4" style="background-color:#000f1e;">
 		<a
 			data-bs-toggle="collapse"
 			href="#collapse_games"
@@ -75,7 +75,7 @@
 			</div>
 		</a>
 		<div id="collapse_games" class="card-body collapse">
-			<a href="/combines/resend_bot/3" class="btn btn-primary">Force Bot Resend</a>
+			<a href="/combines/resend_bot/3" class="btn btn-outline-primary mb-2">Force Bot Resend</a>
 			<ul style="list-style: none;" class="fw-bolder">
 			<%
 				if ( games.length ) {	
@@ -83,8 +83,9 @@
 						const tier = getTierFromMMR(games[i].home_mmr / 3, 3);
 			%>
 				<li>
-					<span class="<%- tier; %> text-end d-inline-block px-1" style="width:100px;">
+					<span class="<%- tier; %> text-end d-inline-block px-1" style="width:140px;">
 						<%- tier; %>
+						<img height="18" src="/icons/<%- tier.toLowerCase(); %>.png">
 					</span>
 					<a href="/combine/<%- games[i].id; %>">
 						<%- games[i].lobby_user; %>-<%- games[i].lobby_pass %>
@@ -223,7 +224,7 @@
 				</div>
 				<a
 					href="/combines/deactivate/all/3"
-					class="btn btn-warning fw-bold <%- players_ready == 0 ? 'disabled' :''; %>"
+					class="btn btn-outline-warning fw-bold <%- players_ready == 0 ? 'disabled' :''; %>"
 					role="button"
 					<%- players_ready == 0 ? 'aria-disabled="true"' :''; %>
 				>
@@ -235,9 +236,9 @@
 			</h3>
 
 			<div class="mb-3">
-				<table class="table table-hover">
+				<table class="table table-hover table-dark">
 					<thead>
-						<tr class="table-success">
+						<tr class="border border-success">
 							<th class="text-center">MMR</th>
 							<th class="text-center">&Delta;</th>
 							<th>Player</th>

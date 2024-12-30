@@ -60,9 +60,17 @@
 
 <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
-<main class="container mt-2 p-2">
-	<div class="bg-light p-2 rounded">
-		<h1>Combine Match Info</h1>
+<main class="container bg-dark mt-2 p-2">
+	<div class="bg-dark p-2 rounded">
+		<h1>
+		Combine Match Info
+		<img
+			src="/icons/<%- match.tier.toLowerCase(); %>.png"
+			title="<%- match.tier; %>"
+			height="48"
+			alt="<%- match.tier; %> icon"
+		>
+		</h1>
 		<p class="lead">
 			Please find the lobby information provided below. If you have any questions or problems, please ask for help
 			in <a href="https://discord.com/channels/395806681994493964/1220034175835312228">#combines-help</a>.
@@ -71,15 +79,21 @@
 		<div class="row">
 			
 			<div class="col-12">
-				<div class="bg-light p-2 rounded border-rounded">
+				<div class="bg-dark text-light p-2 rounded border-rounded">
 					<p class="lead">This is a <strong>3-game</strong> series.</p>
 					<div class="row">
 						<div class="col-md-4 col-12">
-							<table class="table">
+							<table class="table table-dark">
 								<thead>
 									<tr>
 										<th colspan="2">
 											Lobby Info
+											<img
+												src="/icons/<%- match.tier.toLowerCase(); %>.png"
+												title="<%- match.tier; %>"
+												height="16"
+												alt="<%- match.tier; %> icon"
+											>
 										</th>
 									</tr>
 								</thead>
@@ -136,7 +150,7 @@
 								}
 						%>
 						<div class="col-md-4 col-12">
-							<table class="table">
+							<table class="table table-dark">
 								<thead>
 									<tr>
 										<th colspan="3">
@@ -199,7 +213,7 @@
 					</div>
 					<% if ( ! has_scored ) { %>
 
-					<h3 class="text-center bg-danger bg-opacity-50">BOTH TEAMS MUST REPORT THE SCORE!</h3>
+					<h3 class="text-center bg-danger bg-opacity-50 p-2">BOTH TEAMS MUST REPORT THE SCORE!</h3>
 					<% } %>
 					
 				</div>
@@ -283,9 +297,6 @@
 			if ( CAN_ADMIN ) {
 		%>
 		<div class="row mb-2">
-			<div class="col-12">
-				<%- /*debugObject(match);*/ %>
-			</div>
 			<h4 class="mb-2">Admin Controls</h4>
 			<div class="col-6">
 				<%
@@ -296,7 +307,7 @@
 					Cancelling a game will allow every player in this lobby to requeue. No MMRs will be changed, but the VCs <strong>will be 
 					deleted.</strong>
 				</p>
-				<a tabindex="1" href="/combines/admin/<%- match.id; %>/<%- match.league; %>/cancel" class="btn btn-danger">Cancel Game</a>
+				<a tabindex="1" href="/combines/admin/<%- match.id; %>/<%- match.league; %>/cancel" class="btn btn-outline-danger">Cancel Game</a>
 				<% 
 					} else {
 				%>
@@ -323,13 +334,14 @@
 						<div class="input-group">
 							<input
 								type="number"
-								class="form-control"
+								class="form-control bg-dark text-white"
 								name="home_wins"
 								id="home_wins"
 								placeholder=""
 								value="<%- match.home_wins %>"
 								max="5"
 								tabindex="1"
+								style="background-color:#000f1e;"
 								required
 							>
 						</div>
@@ -339,19 +351,20 @@
 						<div class="input-group">
 							<input
 								type="number"
-								class="form-control"
+								class="form-control text-white"
 								name="away_wins"
 								id="away_wins"
 								placeholder=""
 								value="<%- match.away_wins %>"
 								tabindex="2"
-								max="5"
+								max="5" 
+								style="background-color:#000f1e;"
 								required
 							>
 							<input
 								tabindex="3"
 								type="submit"
-								class=" btn btn-large btn-danger rounded"
+								class=" btn btn-large btn-outline-danger rounded"
 								value="Override Scores"
 							>
 						</div>
@@ -375,7 +388,7 @@
 		%>
 
 
-		<div class="row mb-2">
+		<div class="row mb-4">
 			<div class="col-md-6">
 				<h4>Upload Replays</h4>
 				<script type="text/javascript">
@@ -398,7 +411,7 @@
 						}
 					};
 				</script>
-				<form action="/combine/<%- match.id; %>/upload" method="post" class="dropzone" id="replay-dropzone"> </form>
+				<form action="/combine/<%- match.id; %>/upload" method="post" style="background-color: #000f1e;border:1px solid #021e3a;" class="dropzone fw-bolder text-white" id="replay-dropzone"> </form>
 
 			</div>
 
@@ -428,7 +441,7 @@
 		
 		<div class="row">
 			<div class="col-12">
-				<div class="bg-light">
+				<div class="">
 					<form action="/combine/<%- match.id %>/<%- match.league; %>" method="post">
 						<input type="hidden" name="reporter_team" value="<%- combine_player.team; %>">
 					<div class="row">
@@ -461,13 +474,14 @@
 								<div class="input-group">
 									<input
 										type="number"
-										class="form-control"
+										class="form-control text-white"
 										name="home_wins"
 										id="home_wins"
 										placeholder=""
 										value=""
 										max="3"
 										tabindex="4"
+										style="background-color:#000f1e;"
 										required
 									>
 								</div>
@@ -475,7 +489,7 @@
 							<% 
 								} 
 							%>
-							<table class="table">
+							<table class="table table-dark">
 								<thead>
 									<tr>
 										<th>Player</th>
@@ -497,6 +511,13 @@
 								%>
 									<tr class="fs-5">
 										<td>
+											<img
+												src="/icons/<%- p.tier.toLowerCase(); %>.png"
+												title="<%- p.tier; %>"
+												style=""
+												height="16"
+												alt="<%- p.tier; %> icon"
+											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>">
 													<%= p.name %></a>
@@ -571,19 +592,20 @@
 								<div class="input-group">
 									<input
 										type="number"
-										class="form-control"
+										class="form-control text-white"
 										name="away_wins"
 										id="away_wins"
 										placeholder=""
 										value=""
 										tabindex="5"
 										max="3"
+										style="background-color:#000f1e;"
 										required
 									>
 									<input
 										tabindex="6"
 										type="submit"
-										class=" btn btn-large btn-success rounded"
+										class="btn btn-large btn-success rounded"
 										value="Verify Scores"
 									>
 								</div>
@@ -594,13 +616,14 @@
 								<div class="input-group">
 									<input
 										type="number"
-										class="form-control"
+										class="form-control text-white"
 										name="away_wins"
 										id="away_wins"
 										placeholder=""
 										value=""
 										tabindex="5"
 										max="3"
+										style="background-color:#000f1e;"
 										required
 									>
 									<input
@@ -618,7 +641,7 @@
 								}
 							%>
 
-							<table class="table">
+							<table class="table table-dark">
 								<thead>
 									<tr>
 										<th>Player</th>
@@ -640,6 +663,12 @@
 								%>
 									<tr class="fs-5">
 										<td>
+											<img
+												src="/icons/<%- p.tier.toLowerCase(); %>.png"
+												title="<%- p.tier; %>"
+												height="16"
+												alt="<%- p.tier; %> icon"
+											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>"
 													><%= p.name %></a>

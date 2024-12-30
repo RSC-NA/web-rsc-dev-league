@@ -1,3 +1,24 @@
+/*
+<html lang="en" data-bs-theme="dark" style="scrollbar-color: #021e3a #000f1e;">
+*/
+.page-item.disabled .page-link, .dark .page-item.disabled .dataTable-pagination a, .dark .dataTable-pagination .page-item.disabled a, .dark .dataTable-pagination li.disabled .page-link, .dark .dataTable-pagination li.disabled a {
+  color: #3f3f6a;
+  pointer-events: none;
+  background-color: #021e3a;
+  border-color: #dee2e6;
+  font-style: italic;
+}
+
+.dark .page-item.active .page-link, .dark .page-item.active .dataTable-pagination a, .dark .dataTable-pagination .page-item.active a, .dark .dataTable-pagination li.active .page-link, .dark .dataTable-pagination li.active a {
+  color: #cde4ff;
+  background-color: #021e6a;
+  border-color: #dee2e6;
+}
+.dark .page-link, .dataTable-pagination a {
+  background-color: #021e3a;
+  color: #cde4ff;
+}
+
 .border-round,
 .border-rounded {
 	border-radius: 0.5rem;
@@ -10,7 +31,11 @@ div.matchDates {
 	padding: 10px;
 }
 
-div.matchDats h4 {
+div.matchDates.dark {
+	background-color: #162e49;
+}
+
+div.matchDates h4 {
 	text-decoration: underline;
 }
 
@@ -27,6 +52,10 @@ li.today {
 	text-decoration: underline;
 	list-style-type: '⚽';
 }
+.dark li.today {
+	background-color: #79047c;
+}
+
 li.today.championship {
 	padding: 4px 8px;
 	font-weight: bold;
@@ -38,6 +67,11 @@ li.today.championship {
 	border: 1px solid #e67e22;
 }
 
+.dark li.today.championship {
+	background-color: #0f4c34;
+	border: 1px solid #b7b014;
+}
+
 ol>li.today {
 	list-style-type: decimal;
 	text-decoration: none;
@@ -46,6 +80,10 @@ ol>li.today {
 li.today.holiday {
 	list-style-type: '🏖️';
 	background-color: #fa7b7b;
+}
+.dark li.today.holiday {
+	list-style-type: '🏖️';
+	background-color: #930a0a;
 }
 
 .bg-Premier { background-color: #d600d6 !important; font-weight: bold; }

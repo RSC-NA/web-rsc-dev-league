@@ -42,7 +42,7 @@
 					<a
 						href="/combines/activate/all/<%- league; %>"
 						role="button"
-						class="btn btn-info fw-bold <%- players_waiting == 0 ? 'disabled' :''; %>"
+						class="btn btn-outline-info fw-bold <%- players_waiting == 0 ? 'disabled' :''; %>"
 						<%- players_waiting == 0 ? 'aria-disabled="true"' :''; %>
 					>
 						<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
@@ -52,9 +52,9 @@
 					</a>
 				</h4>
 
-				<table class="table table-hover table-secondary">
+				<table class="table table-hover table-dark">
 					<thead>
-						<tr>
+						<tr class="border border-primary">
 							<th></th>
 							<th class="text-center">MMR</th>
 							<th class="text-center">&Delta;</th>
