@@ -1,6 +1,21 @@
 /*
 <html lang="en" data-bs-theme="dark" style="scrollbar-color: #021e3a #000f1e;">
 */
+.sb-sidenav-dark .sb-sidenav-menu .nav-link {
+	color: rgba(255,255,255,80%);
+}
+.sb-sidenav-dark .sb-sidenav-menu .sb-sidenav-menu-heading {
+	color: #cde4ff;
+}
+.sb-sidenav .sb-sidenav-menu .nav .sb-sidenav-menu-heading {
+	padding: 1.25rem 1rem 0.25rem;
+
+}
+.sb-sidenav .sb-sidenav-menu .nav .nav-link {
+	padding-top: 0.45rem;
+	padding-bottom: 0.45rem;
+}
+
 a {
 	color: #98c1ff;
 }

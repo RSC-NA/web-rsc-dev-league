@@ -184,8 +184,8 @@
 						<%
 								if ( (is_admin || is_devleague_admin) ) {
 						%>
-							<div class="sb-sidenav-menu-heading Elite">
-								<i class="fas fa-lock text-warning me-1"></i> 
+							<div class="sb-sidenav-menu-heading">
+								<i class="fas fa-lock text-muted me-1"></i> 
 								DevLeague Admin
 							</div>
 							<% 
@@ -214,9 +214,11 @@
 								}
 
 								if ( (is_admin || is_combines_admin) ) {
+									const combines_lock = combines.active ? 
+										'fa-lock-open text-primary' : 'fa-lock text-muted';
 						%>
-							<div class="sb-sidenav-menu-heading text-warning">
-								<i class="fas fa-lock text-warning me-1"></i> 
+							<div class="sb-sidenav-menu-heading">
+								<i class="fas <%- combines_lock; %> me-1"></i> 
 								Combines Admin
 							</div>
 							
@@ -225,22 +227,24 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-info"></i></div>
 								Build Lobbies!
 							</a>
+							<a class="nav-link <%- menu['/combines/history'] %>" href="/combines/history">
+								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
+								Tiermaker
+							</a>
 							<% } %>
 							<a class="nav-link <%- menu['/combines/manage'] %>" href="/combines/manage">
 								<div class="sb-nav-link-icon"><i class="fas fa-gear text-success"></i></div>
 								Manage Combines
 							</a>
-							<a class="nav-link <%- menu['/combines/history'] %>" href="/combines/history">
-								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
-								Tiermaker
-							</a>
 		
 						<%
 								}
 								if ( (is_admin || is_combines_admin_2s) ) {
+									const combines_lock = combines_2s.active ? 
+										'fa-lock-open text-primary' : 'fa-lock text-muted';
 						%>
-							<div class="sb-sidenav-menu-heading text-warning">
-								<i class="fas fa-lock text-warning me-1"></i> 
+							<div class="sb-sidenav-menu-heading">
+								<i class="fas <%- combines_lock; %> me-1"></i> 
 								2s Combines Admin
 							</div>
 							
@@ -249,14 +253,14 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-info"></i></div>
 								Build Lobbies!
 							</a>
+							<a class="nav-link <%- menu['/combines/history_2s'] %>" href="/combines/history_2s">
+								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
+								Tiermaker
+							</a>
 							<% } %>
 							<a class="nav-link <%- menu['/combines/manage_2s'] %>" href="/combines/manage_2s">
 								<div class="sb-nav-link-icon"><i class="fas fa-gear text-success"></i></div>
 								Manage Combines
-							</a>
-							<a class="nav-link <%- menu['/combines/history_2s'] %>" href="/combines/history_2s">
-								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
-								Tiermaker
 							</a>
 		
 						<%
