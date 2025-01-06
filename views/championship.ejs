@@ -2,7 +2,7 @@
 <%- include('partials/header.ejs'); %>
 
 	<main class="container">
-		<div class="bg-light p-3 rounded">
+		<div class="p-3 rounded">
 			<div class="row">
 				<div class="col-md-7">
 
@@ -38,7 +38,7 @@
 					</p>
 
 				</div>
-				<div class="col-md-4 matchDates">
+				<div class="col-md-4 matchDates dark">
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {
