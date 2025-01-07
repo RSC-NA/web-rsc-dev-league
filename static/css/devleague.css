@@ -16,12 +16,14 @@
 	padding-bottom: 0.45rem;
 }
 
+/*
 a {
 	color: #98c1ff;
 }
 a:hover {
 	color: #76a0ee;
 }
+*/
 
 .page-item.disabled .page-link, .dark .page-item.disabled .dataTable-pagination a, .dark .dataTable-pagination .page-item.disabled a, .dark .dataTable-pagination li.disabled .page-link, .dark .dataTable-pagination li.disabled a {
   color: #adadb9;
