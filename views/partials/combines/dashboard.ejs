@@ -83,8 +83,15 @@
 				<h2>You Are Banned!</h2>
 				<p class="lead">
 					You were banned on <%- user.ban.banned_on; %>. Please message 
-					ModMail if you believe this to be in error.
+					ModMail if you believe this to be in error. 
 				</p>
+
+				<div class="p-4 border mb-4">
+					<h4>Banned By</h4>
+					<%- user.ban.banned_by_name; %>
+					<h4>Ban Reason</h4>
+					<pre class="mb-0"><%- user.ban.note; %></pre>
+				</div>
 				<a
 					class="btn btn-lg btn-danger disabled"
 					href="#"

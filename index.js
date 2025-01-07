@@ -170,8 +170,11 @@ async function get_user(user_id, ip) {
 			t2.base_mmr AS base_mmr_2s, t2.effective_mmr AS effective_mmr_2s,
 			t2.current_mmr AS current_mmr_2s, 
 			t2.wins AS wins_2s,t2.losses AS losses_2s,
-			ban.id as ban_id,ban.created_dtg as banned_on,ban.expires_dtg as ban_expire,
-			ban.banned_by, ban.note
+
+			ban.id as ban_id, ban.created_dtg as banned_on,
+			ban.expires_dtg as ban_expire,
+			ban.banned_by, ban.note AS ban_note,
+			ban_user.nickname AS banned_by_name
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
 		ON p.discord_id = c.discord_id 
@@ -181,6 +184,8 @@ async function get_user(user_id, ip) {
 		ON p.discord_id = t2.discord_id AND t2.league = 2 AND t2.season = ?
 		LEFT JOIN player_bans AS ban 
 			ON p.discord_id = ban.discord_id
+		LEFT JOIN players AS ban_user 
+			ON ban.banned_by = ban_user.id
 		WHERE p.id = ?
 	`;
 	const [results] = await db.query(query, [ season_3s, season_2s, user_id ]);
@@ -201,6 +206,7 @@ async function get_user(user_id, ip) {
 				created: p.banned_on,
 				expires: p.expires_dtg,
 				banned_by: p.banned_by,
+				banned_by_name: p.banned_by_name,
 				note: p.ban_note,
 			},
 			combines: {
