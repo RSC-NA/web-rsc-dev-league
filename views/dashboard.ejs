@@ -123,7 +123,29 @@
 				<a class="btn btn-lg btn-danger" id="backOut" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 			</dialog>
 
+			<%
+				if ( user.ban.id ) {
+			%>
+			<h2>You Are Banned!</h2>
+			<p class="lead">
+				You were banned on <%- user.ban.banned_on; %>. Please message 
+				ModMail if you believe this to be in error. 
+			</p>
+
+			<div class="p-4 border mb-4">
+				<h4>Banned By</h4>
+				<%- user.ban.banned_by_name; %>
+				<h4>Ban Reason</h4>
+				<pre class="mb-0"><%- user.ban.note; %></pre>
+			</div>
+			<a class="btn btn-lg btn-danger disabled" href="javascript:void(0);">You Are Banned!</a>
+			<%
+				} else {
+			%>
 			<a class="btn btn-lg btn-primary" href="javascript:void(0);" role="button" id="checkInModal">Check In!</a>
+			<%
+				}
+			%>
 
 			<script type="text/javascript">
 				document.getElementById('checkInModal').addEventListener('click', function() {

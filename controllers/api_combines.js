@@ -215,7 +215,7 @@ router.use(async (req, res, next) => {
 			if ( tm_results[0].ban_id ) {
 				return res.json({
 					'status': 'error',
-					'message': 'You are banned. Reason: ' + tm_results[0].ban_note,
+					'message': "You are banned from participating in Combines. \n\n__**Reason**__:```" + tm_results[0].ban_note + "```",
 				});
 			}
 
