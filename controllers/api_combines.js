@@ -185,8 +185,19 @@ router.use(async (req, res, next) => {
 		});
 
 		if ( res.locals.discord_id ) {
+			const tm_query = `
+				SELECT 
+					t.rsc_id,t.name,t.current_mmr,
+					b.id AS ban_id, b.note AS ban_note,
+					b.banned_by, b.created_dtg AS banned_on
+					
+				FROM tiermaker AS t 
+				LEFT JOIN player_bans AS b 
+					ON t.discord_id = b.discord_id
+				WHERE t.discord_id = ? AND t.season = ? AND t.league = ?
+			`
 			const [tm_results] = await res.locals.adb.query(
-				'SELECT rsc_id,name,current_mmr FROM tiermaker WHERE discord_id = ? AND season = ? AND league = ?',
+				tm_query,
 				[res.locals.discord_id, res.locals.combines_season, res.locals.league]
 			);
 
@@ -199,6 +210,13 @@ router.use(async (req, res, next) => {
 							'message': 'You are not a player in the tiermaker. ',
 						});
 					}
+			}
+
+			if ( tm_results[0].ban_id ) {
+				return res.json({
+					'status': 'error',
+					'message': 'You are banned.',
+				});
 			}
 
 			res.locals.rsc_id = tm_results[0].rsc_id;
