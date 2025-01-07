@@ -215,7 +215,7 @@ router.use(async (req, res, next) => {
 			if ( tm_results[0].ban_id ) {
 				return res.json({
 					'status': 'error',
-					'message': 'You are banned.',
+					'message': 'You are banned. Reason: ' + tm_results[0].ban_note,
 				});
 			}
 
