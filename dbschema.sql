@@ -1,3 +1,15 @@
+CREATE TABLE player_bans (
+	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`banned_by` BIGINT(11) UNSIGNED NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`discord_id` VARCHAR(20),
+	`created_dtg` DATETIME NOT NULL DEFAULT now(),
+	`expires_dtg` DATETIME,
+	`note` TEXT,
+	PRIMARY KEY(`id`),
+	INDEX `discord_idx` (`discord_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE tournaments (
 	`id` BIGINT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`title` VARCHAR(255) NOT NULL,

@@ -169,7 +169,9 @@ async function get_user(user_id, ip) {
 			t2.count AS count_2s, t2.keeper AS keeper_2s,
 			t2.base_mmr AS base_mmr_2s, t2.effective_mmr AS effective_mmr_2s,
 			t2.current_mmr AS current_mmr_2s, 
-			t2.wins AS wins_2s,t2.losses AS losses_2s
+			t2.wins AS wins_2s,t2.losses AS losses_2s,
+			ban.id as ban_id,ban.created_dtg as banned_on,ban.expires_dtg as ban_expire,
+			ban.banned_by, ban.note
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
 		ON p.discord_id = c.discord_id 
@@ -177,6 +179,8 @@ async function get_user(user_id, ip) {
 		ON p.discord_id = t.discord_id AND t.league = 3 AND t.season = ?
 		LEFT JOIN tiermaker AS t2 
 		ON p.discord_id = t2.discord_id AND t2.league = 2 AND t2.season = ?
+		LEFT JOIN player_bans AS ban 
+			ON p.discord_id = ban.discord_id
 		WHERE p.id = ?
 	`;
 	const [results] = await db.query(query, [ season_3s, season_2s, user_id ]);
@@ -192,6 +196,13 @@ async function get_user(user_id, ip) {
 			status: p.status,
 			rsc_id: p.rsc_id,
 			discord_id: p.discord_id,
+			ban: {
+				id: p.ban_id,
+				created: p.banned_on,
+				expires: p.expires_dtg,
+				banned_by: p.banned_by,
+				note: p.ban_note,
+			},
 			combines: {
 				active: p.current_mmr ? true : false,
 				season: p.season,
@@ -229,6 +240,8 @@ async function get_user(user_id, ip) {
 			is_combines_admin: p.combines_admin ? true: false,
 			is_combines_admin_2s: p.combines_admin_2s ? true: false,
 		};
+
+		console.log('ban?', user.ban, user.discord_id);
 
 		if ( ip && user.rsc_id && user.discord_id ) {
 			const check_ip_query = `

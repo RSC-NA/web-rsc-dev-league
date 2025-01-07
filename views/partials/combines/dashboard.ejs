@@ -74,6 +74,26 @@
 
 <%
 	} else {
+		if ( user.ban.id ) {
+%>
+
+			<div 
+				id="combines_checkin_actions<%- league_url; %>" 
+			>
+				<h2>You Are Banned!</h2>
+				<p class="lead">
+					You were banned on <%- user.ban.banned_on; %>. Please message 
+					ModMail if you believe this to be in error.
+				</p>
+				<a
+					class="btn btn-lg btn-danger disabled"
+					href="#"
+					role="button"
+					id="checkInModal<%- league_url; %>"
+				>You are banned!</a>
+			</div>
+<%
+		} else {
 %>
 
 			<div 
@@ -105,6 +125,11 @@
 					<!-- setTimeout(playSound, 100); -->
 				</script>
 			</div>
+
+<%
+		}
+%>
+
 
 <%
 	}
