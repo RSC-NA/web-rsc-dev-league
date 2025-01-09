@@ -247,8 +247,6 @@ async function get_user(user_id, ip) {
 			is_combines_admin_2s: p.combines_admin_2s ? true: false,
 		};
 
-		console.log('ban?', user.ban, user.discord_id);
-
 		if ( ip && user.rsc_id && user.discord_id ) {
 			const check_ip_query = `
 				SELECT id,nickname,rsc_id,discord_id,ip,sus 
