@@ -2,7 +2,7 @@
 <%- include('partials/header.ejs'); %>
 
 <main class="container mt-2 p-2">
-	<div class="bg-light p-2 rounded">
+	<div class="bg-dark p-2 rounded">
 		<h1>Development League Match Info</h1>
 		<p class="lead">
 			Please find the lobby information provided below. If you have any questions or problems, please ask for help
@@ -14,7 +14,7 @@
 		</p>
 		<div class="row">
 			<div class="col-9">
-				<div class="bg-light p-2 rounded">
+				<div class="bg-dark p-2 rounded">
 					<h2>
 						<span class="<%= tier; %>"><%= tier; %></span> Lobby Info
 					</h2>
@@ -96,13 +96,14 @@
 								<div class="input-group">
 									<input
 										type="number"
-										class="form-control"
+										class="form-control text-white"
 										name="home_wins"
 										id="home_wins"
 										placeholder="2"
 										value="<%- home_wins %>"
 										max="4"
 										tabindex="1"
+										style="background-color:#000f1e;"
 										required
 									>
 								</div>
@@ -112,6 +113,13 @@
 							%>
 							<ul style="list-style: none;">
 								<li>
+									<img
+										src="/icons/<%- players[0].tier.toLowerCase(); %>.png"
+										title="<%- players[0].tier; %>"
+										style=""
+										height="16"
+										alt="<%- players[0].tier; %> icon"
+									>
 									<% 
 										if ( is_admin || is_devleague_admin ) {
 									%>
@@ -129,6 +137,13 @@
 									[Makes lobby]
 								</li>
 								<li>
+									<img
+										src="/icons/<%- players[1].tier.toLowerCase(); %>.png"
+										title="<%- players[1].tier; %>"
+										style=""
+										height="16"
+										alt="<%- players[1].tier; %> icon"
+									>
 									<% 
 										if ( is_admin || is_devleague_admin ) {
 									%>
@@ -143,6 +158,13 @@
 									<a href="/player/<%= players[1].rsc_id; %>"><%= players[1].name %></a>
 								</li>
 								<li>
+									<img
+										src="/icons/<%- players[2].tier.toLowerCase(); %>.png"
+										title="<%- players[2].tier; %>"
+										style=""
+										height="16"
+										alt="<%- players[2].tier; %> icon"
+									>
 									<% 
 										if ( is_admin || is_devleague_admin ) {
 									%>
@@ -186,18 +208,19 @@
 								<div class="input-group">
 									<input
 										type="number"
-										class="form-control"
+										class="form-control text-white"
 										name="away_wins"
 										id="away_wins"
 										placeholder="2"
 										value="<%- away_wins %>"
 										tabindex="2"
 										max="4"
+										style="background-color:#000f1e;"
 										required
 									>
 									<input
 										type="submit"
-										class="btn btn-large btn-primary"
+										class="btn btn-large btn-outline-success fw-bolder"
 										value="Submit Scores"
 										tabindex="3"
 									>
@@ -208,6 +231,13 @@
 							%>
 							<ul style="list-style:none;">
 								<li>
+									<img
+										src="/icons/<%- players[3].tier.toLowerCase(); %>.png"
+										title="<%- players[3].tier; %>"
+										style=""
+										height="16"
+										alt="<%- players[3].tier; %> icon"
+									>
 									<% 
 										if ( is_admin || is_devleague_admin ) {
 									%>
@@ -225,6 +255,13 @@
 									[Uploads replays/screenshots]
 								</li>
 								<li>
+									<img
+										src="/icons/<%- players[4].tier.toLowerCase(); %>.png"
+										title="<%- players[4].tier; %>"
+										style=""
+										height="16"
+										alt="<%- players[4].tier; %> icon"
+									>
 									<% 
 										if ( is_admin || is_devleague_admin ) {
 									%>
@@ -239,6 +276,13 @@
 									<a href="/player/<%= players[4].rsc_id; %>"><%= players[4].name %></a>
 								</li>
 								<li>
+									<img
+										src="/icons/<%- players[5].tier.toLowerCase(); %>.png"
+										title="<%- players[5].tier; %>"
+										style=""
+										height="16"
+										alt="<%- players[5].tier; %> icon"
+									>
 									<% 
 										if ( is_admin || is_devleague_admin ) {
 									%>

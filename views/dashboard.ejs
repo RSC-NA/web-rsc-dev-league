@@ -45,7 +45,7 @@
 						for the rest of the current season.</strong>
 					</p>
 				</div>
-				<div class="col-md-4 matchDates">
+				<div class="col-md-4 matchDates dark">
 					<h4>Season <%= settings.season %> Dates</h4>
 					<ul class="dates">
 						<%
@@ -89,7 +89,7 @@
 			</div>
 		</div>
 
-		<div class="bg-light p-3 rounded">
+		<div class="bg-dark p-3 rounded">
 		<% if ( match_day && match_day != 'holiday' ) { %>
 
 			<% if ( nickname && ! checked_in && user && user['active_3s'] && settings[ user.tier.toLowerCase() ] != 0 ) { %>
