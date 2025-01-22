@@ -1,0 +1,93 @@
+
+<%- include('partials/header.ejs'); %>
+
+<main class="container-xl">
+	<div class="py-0 mt-2">
+		<h2>Dev League Software Bans</h2>
+		<p class="lead">
+			Below is a list of all active bans in Dev League.
+		</p>
+	</div>
+	<div class="row">
+		<div class="col order-md-1">
+
+			<ul>
+
+			<%
+				if ( bans && bans.length ) {
+
+					const cur_time = new Date().getTime();
+
+					for ( let i = 0; i < bans.length; i++ ) {
+						const ban = bans[i];
+						const b_date = ban.created_dtg.toLocaleDateString();
+						const e_date = ban.expires_dtg ? ban.expires_dtg.toLocaleDateString() : 'n/a';
+
+						const e_time = ban.expires_dtg ? ban.expires_dtg.getTime() : null;
+						let ban_status = 'active';
+
+						if ( e_time && e_time < (new Date()).getTime() ) {
+							ban_status = 'expired';
+						}
+
+			%>
+				<li class="list-group-item dark d-flex flex-row justify-content-between 1h-condensed matchDates">
+					<div class="my-0  w-50 align-middle">
+						<h5 class="my-0">
+							<%- ban.nickname; %> <%- ban_status; %> <%- e_time %> <%- new Date().getTime(); %> <%- e_time < (new Date).getTime(); %>
+						</h5>
+						<span>
+						From: <strong><%- b_date; %></strong>
+						</span>
+						<% if ( e_date !== 'n/a' ) { %>
+						<span class="">
+							To: <strong><%- e_date; %></srtong>
+						</span>
+						<% } %>
+						<div>
+							<span>
+								<strong>Discord ID</strong>
+								<code><%- ban.discord_id; %></code>
+							</span>
+							::
+							<span>
+								<strong>RSC_ID</strong>
+								<code><%- ban.rsc_id; %></code>
+							</span>
+						</div>
+						<h6 class="mt-2">Reason</h6>
+						<p class="text-light p-2 border">
+							<%- ban.note; %>
+						</p>
+					</div>
+					<span class="">
+					</span>
+					<div class="px-0 pb-1 me-2 align-middle">
+						<h5 class="my-0 text-info">
+							<span class="text-light fw-light h6">banned by:</span>
+							<%- ban.banned_by_nickname; %>
+						</h5>
+					</div>
+					<div class="text-end">
+						<a href="/ban/<%- ban.id; %>/expire" class="btn btn-sm btn-outline-info">
+							Expire Ban
+						</a>
+					</div>
+				</li>
+			<%				
+
+					} // end of total loop
+			%>
+
+			</ul>
+				
+
+			<%		
+				}
+			%>
+
+		</div>
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>

@@ -205,6 +205,41 @@ router.get('/championship', (req, res) => {
 	});
 });
 
+router.get('/ban/:ban_id/expire', (req, res) => {
+	const query = `
+		UPDATE player_bans SET expires_dtg = now() where id = ?
+	`;
+	req.db.query(query, [req.params.ban_id], (err, results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect('/bans');
+	})
+});
+
+router.get('/bans', (req, res) => {
+	console.log('here');
+	const query = `
+		SELECT 
+			b.id,b.banned_by,pp.nickname AS banned_by_nickname,
+			p.nickname as nickname,
+			b.rsc_id,b.discord_id,b.created_dtg,b.expires_dtg,
+			b.note
+		FROM player_bans AS b 
+		LEFT JOIN players AS pp ON b.banned_by = pp.id 
+		LEFT JOIN players AS p ON b.rsc_id = p.rsc_id
+		ORDER BY b.created_dtg
+		`;
+
+	req.db.query(query, (err, results) => {
+		if ( err ) { throw err; }
+
+		if ( results ) {
+			const bans = results;
+			res.render('bans', {bans: bans});
+		}
+	});
+});
+
 router.get('/check_in/:match_day', (req, res) => {
 	if ( req.session.discord_id && ! req.session.checked_in && req.session.user.active_3s ) {
 		// TODO(get season and match day from somewhere)

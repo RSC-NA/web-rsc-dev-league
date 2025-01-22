@@ -49,6 +49,10 @@ a:hover {
 }
 
 /* devleague specific styles */
+li.list-group-item.dark {
+	background-color: #162e49;
+	color: #cde4ff;
+}
 div.matchDates {
 	background-color: #cde4ff;
 	border-radius: 0.5rem;
