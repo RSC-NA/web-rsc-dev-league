@@ -334,30 +334,36 @@ router.get('/match', (req, res) => {
 	req.db.query(matchQuery, [ player_id, player_id ], (err, results) => {
 		if ( err ) { throw err; }
 
-		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
-		const tier = results[0].tier;	
-		const home_team = results[0].lobby_user.split('_')[1];
-		const away_team = results[0].lobby_pass.split('_')[1];
-		let score_title = '';
-
-		if ( scored ) {
-			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
+		if ( results[0].id ) {
+			return res.redirect(`/match/${results[0].id}`);
 		}
 
-		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
+		return res.redirect('/');
 
-		res.render('match', { 
-			season: results[0].season, 
-			match_day: results[0].match_day, 
-			tier: tier, 
-			match_id: results[0].id,
-			lobby_user: results[0].lobby_user, 
-			lobby_pass: results[0].lobby_pass, 
-			home_wins: results[0].home_wins,
-			away_wins: results[0].away_wins,
-			has_scored: scored,
-			players: results,
-		});
+		// const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
+		// const tier = results[0].tier;	
+		// const home_team = results[0].lobby_user;
+		// const away_team = results[0].lobby_pass;
+		// let score_title = '';
+		//
+		// if ( scored ) {
+		// 	score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
+		// }
+		//
+		// res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
+		//
+		// res.render('match', { 
+		// 	season: results[0].season, 
+		// 	match_day: results[0].match_day, 
+		// 	tier: tier, 
+		// 	match_id: results[0].id,
+		// 	lobby_user: results[0].lobby_user, 
+		// 	lobby_pass: results[0].lobby_pass, 
+		// 	home_wins: results[0].home_wins,
+		// 	away_wins: results[0].away_wins,
+		// 	has_scored: scored,
+		// 	players: results,
+		// });
 	});
 });
 
@@ -402,8 +408,8 @@ router.get('/match/:match_id', (req, res) => {
 
 		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
 		const tier = results[0].tier;	
-		const home_team = results[0].lobby_user.split('_')[1];
-		const away_team = results[0].lobby_pass.split('_')[1];
+		const home_team = results[0].lobby_user;
+		const away_team = results[0].lobby_pass;
 		let score_title = '';
 		if ( scored ) {
 			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
@@ -422,7 +428,6 @@ router.get('/match/:match_id', (req, res) => {
 			players: results,
 		});
 	});
-
 });
 
 router.get('/matches', (req, res) => {
