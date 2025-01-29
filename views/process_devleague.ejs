@@ -53,19 +53,23 @@
 			Teams button.
 		</p>
 	</div>
+
 	<div class="card mb-4">
-		<div class="card-header text-black">
-			<h4>Active Games: <%- games.length; %>
-				<a
-					class="btn btn-primary btn-sm float-end"
-					data-bs-toggle="collapse"
-					href="#collapse_games"
-					role="button"
-					aria-expanded="false"
-					aria-controls="collapse_games"
-				>show</a>
-			</h4>
-		</div>
+		<a
+			class="btn btn-primary btn-sm float-end"
+			data-bs-toggle="collapse"
+			href="#collapse_games"
+			role="button"
+			aria-expanded="false"
+			aria-controls="collapse_games">
+
+			<div class="card-header text-black">
+				<h4>Active Games: <%- games.length; %>
+				<button class="btn btn-primary btn-sm float-end">Show Active Games</button>
+				</h4>
+			</div>
+		</a>
+
 		<div id="collapse_games" class="card-body collapse">
 			<ul>
 			<%
@@ -87,7 +91,7 @@
 	</div>
 
 	<% 
-		if ( ! missing && lobbies >= 1 ) {
+		if ( lobbies >= 1 && ! missing ) {
 	%>
 	<div class="row mb-sm-4 mb-lg-0">
 		<div class="col-1 col-sm-2"></div>
@@ -100,7 +104,7 @@
 				</div>
 				<div class="flex-fill">
 					<div class="display-5 alert-heading">
-						Aww yeah! Game Time!
+						Aww yeah! Game Time! <%- lobbies; %> - <%- missing %>
 					</div>
 					<hr>
 					<%
@@ -140,23 +144,88 @@
 		<div class="col-1 col-sm-2"></div>
 	</div>
 	<%
+		} else if ( lobbies > 1 && missing ) {
+	%>
+
+	<div class="row mb-sm-4 mb-lg-0">
+		<div class="col-1 col-sm-2"></div>
+		<div class="col-10 col-sm-8">
+			<div class="alert alert-danger d-flex align-items-center" role="alert">
+				<div class="bi flex-shrink-0 me-2">
+					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+						<use xlink:href="#exclamation-triangle-fill"/>
+					</svg>
+				</div>
+				<div class="flex-fill">
+					<div class="display-5 alert-heading">
+						Missing <%- missing %> more player<%- missing == 1 ? '' : 's'; %>!
+					</div>
+					<hr>
+					<p class="lead">
+						This queue needs <%- missing; %> additional player<%- missing == 1 ? '' : 's'; %> to have <strong><%- lobbies + 1; %></strong>
+						lobbies. Either deativate the last <%- 6 - missing; %> or wait for a few stragglers.
+					</p>
+
+					<div class="text-center">
+						<a href="/devleague/deactivate-last/<%- 6 - missing; %>" class="btn btn-danger btn-lg">
+							Deactivate the Last <%- 6 - missing; %>
+							<i class="fa fa-car-burst text-warning"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-1 col-sm-2"></div>
+	</div>
+
+
+	<%
 		}
 	%>
 
 	<div class="row">
 
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 mt-5 mt-lg-0">
+
+
 			<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
 				<span class="text-muted">Waiting Room</span>
-				<a href="/devleague/activate/all" class="btn btn-info fw-bold">
+
+				<div class="h4 text-muted">
+				
+				<%
+					let players_waiting = 0;
+					if ( Object.keys(waiting_room).length ) {
+						players_waiting = Object.keys(waiting_room).length;
+					}
+					const team_avail = Math.floor(players_waiting / 6)
+					const remaining = players_waiting % 6;
+
+					if ( players_waiting ) {
+				%>
+					<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
+					%><%- (remaining > 0 && team_avail > 0) ? ' + ' : ''; 
+					%><%- remaining > 0 ? remaining + (remaining == 1 ? ' player' : ' players') : ''; %>
+				<%
+					}
+				%>
+				</div>
+
+				<a
+					href="/devleague/activate/all"
+					role="button"
+					class="btn btn-outline-info fw-bold <%- players_waiting == 0 ? 'disabled' :''; %>"
+					<%- players_waiting == 0 ? 'aria-disabled="true"' :''; %>
+				>
 					<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
 					<span class="d-xl-none d-lg-inline">&uarr;</span>
 					<i class="fas fa-user-plus"></i>
 					Add All
 				</a>
+
 			</h4>
 
-			<table class="table table-hover">
+			<table class="table table-dark">
 				<thead>
 					<tr>
 						<th></th>
@@ -178,8 +247,16 @@
 						'none': 'text-muted',
 					};
 					let analysis = 'none';
+					let table_class = "table-success";
+					let n = 0;
 					if ( Object.keys(waiting_room).length ) {
 						for ( const rsc_id in waiting_room ) {
+							n++
+							if ( n > 6 ) {
+								table_class = table_class === 'table-info' ? 'table-success' : 'table-info';
+								n = 1;
+							}
+
 							const p = waiting_room[rsc_id];
 							if ( p.win_percentage > 60 ) {
 								analysis = 'great';
@@ -194,8 +271,8 @@
 							}
 
 				%>
-					<tr>
-						<td class="p-0 text-center">
+					<tr class="<%- table_class; %>">
+						<td class="p-0 text-center"> <!--p-0 text-center"> -->
 							<a href="/devleague/activate/<%- p.player_id; %>" 
 								class="move-arrow h4 p-0 px-2 mb-0" style=""
 								title="Move player to ready room.">
@@ -209,7 +286,14 @@
 								<%= p.mmr; %>
 							</span>
 						</td>
-						<td class="text-center bg-<%- p.tier; %>">
+						<td class="text-center ">
+							<img
+								src="/icons/<%- p.tier.toLowerCase(); %>.png"
+								title="<%- p.tier; %>"
+								style=""
+								height="16"
+								alt="<%- p.tier; %> icon"
+							>
 							<span class=""><%- p.tier; %></span>
 						</td>
 						<td class="fw-bolder">
@@ -244,44 +328,44 @@
 
 		<!-- primary FA signup / team generation -->
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 order-first">
-			<div class="mb-3 row">
-				<div class="col-6 col-lg-4 h3 fw-bolder text-success">Ready Room</div>
-				<div class="col-8">
+			<h3 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
+				<span class="text-success fw-bolder">Ready Room</span>
+				<div class="h4 text-muted">
+				
 				<%
-					if ( missing ) {
-				%>
-					<div class="alert alert-warning d-flex align-items-center" role="alert">
-						<div class="bi flex-shrink-0 me-2">
-							<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
-								<use xlink:href="#exclamation-triangle-fill"/>
-							</svg>
-						</div>
-						<div class="flex-fill">
-							<div class="h5 alert-heading">
-								<%- missing; %> more for <%- lobbies; %> lobbies
-							</div>
-							<hr>
-							<p class="text-xs">
-								Clicking the "Deactivate <%- 6 - missing; %>" button will remove the <%- 6 - missing; %> players that 
-								were the last to check in.
-							</p>
-							<div class="text-end">
-								<a href="/devleague/deactivate-last/<%- 6 - missing; %>" class="btn btn-sm btn-danger">
-									<i class="fa fa-user-xmark me-1"></i>
-									Deactivate <strong><%- 6 - missing; %></strong>
-								</a>
-							</div>
-						</div>
-					</div>
+					let players_ready = 0;
+					if ( Object.keys(ready_room).length ) {
+						players_ready = Object.keys(ready_room).length;
+					}
 
+
+					if ( players_ready ) {
+						const team_avail = Math.floor(players_ready / 6)
+						const extra = players_ready % 6;
+				%>
+					<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
+					%><%- (extra > 0 && team_avail > 0) ? ' + ' : ''; 
+					%><%- extra > 0 ? '<span class="text-danger">' + extra + (extra == 1 ? ' player' : ' players') : '' + '</span>'; %>
 				<%
 					}
 				%>
 				</div>
-			</div>
+				<a
+					href="/devleague/deactivate/all"
+					class="btn btn-outline-warning fw-bold <%- players_ready == 0 ? 'disabled' :''; %>"
+					role="button"
+					<%- players_ready == 0 ? 'aria-disabled="true"' :''; %>
+				>
+					<i class="fas fa-user-minus"></i>
+					Remove All
+					<span class="d-xl-inline d-lg-none d-none">&#11022;</span>
+					<span class="d-xl-none d-lg-inline">&darr;</span>
+				</a>
+			</h3>
+
 
 			<div class="mb-3">
-				<table class="table table-hover">
+				<table class="table table-dark">
 					<thead>
 						<tr>
 							<th class="text-center">MMR</th>
@@ -296,8 +380,23 @@
 
 					<% 
 						if ( Object.keys(ready_room).length ) {
+							const extra_players = players_ready % 6;
+
+							let table_class = 'table-primary';
+							let n = 0;
+
 							for ( const rsc_id in ready_room ) {
 								const p = ready_room[rsc_id];
+								if ( n === 0 ) {
+									console.log(p)
+								}
+
+								n++;
+								if ( n > 6 ) {
+									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
+									n = 1;
+								}
+
 								if ( p.win_percentage > 60 ) {
 									analysis = 'great';
 								} else if ( p.win_percentage > 52 ) {
@@ -311,7 +410,7 @@
 								}
 
 					%>
-						<tr>
+						<tr class="<%- table_class; %>">
 							<td class="text-center">
 								<span class="text-primary fw-bold">
 									<%= p.mmr; %>

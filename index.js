@@ -33,6 +33,7 @@ const sessionStore = new MySQLStore({}, connection);
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const path = require('path');
 
 // controllers
 const auth_controller = require('./controllers/authentication');
@@ -809,6 +810,142 @@ app.use(player_controller);
 app.use(tournaments_controller);
 app.use(tournaments_admin_controller);
 
+app.get('/logo', (req,res) => {
+
+});
+
+const API_FRANCHISES = {};
+const API_LOGOS      = {};
+
+app.get('/franchises', async(req, res) => {
+	if ( Object.keys(API_FRANCHISES).length === 0 ) {
+		await get_logos_and_cache();
+	}
+	
+	res.json(API_FRANCHISES);
+});
+
+app.get('/franchise/:franchise_name', async(req, res) => {
+	const logo_request = req.params.franchise_name;
+	
+	if ( Object.keys(API_FRANCHISES).length === 0 ) {
+		await get_logos_and_cache();
+	}
+
+	const franchise_key = normalize_franchise_name(req.params.franchise_name);
+
+	if ( franchise_key in API_FRANCHISES ) {
+		return res.json(API_FRANCHISES[franchise_key]);
+	}
+
+	return res.json({ key: franchise_key, error: 'Franchise not found using that key.'});
+});
+
+app.get('/logo/:franchise_image', async (req,res) => {
+	const logo_request = req.params.franchise_image;
+
+	if ( Object.keys(API_FRANCHISES).length === 0 ) {
+		await get_logos_and_cache();
+	}
+
+	let franchise_key = '';
+
+	const parts = logo_request.split('.');
+	if ( parts[0] ) {
+		let filetype = '.png';
+		if ( parts[1] ) {
+			filetype = parts[1].toLowerCase();
+		}
+
+		// normalize team names. turn every name provided 
+		// into a safe name to use in every location
+		// Fifty-Fifty Pizzeria = 'fiftyfiftypizzeria'
+		// The Elements = 'elements'
+		franchise_key = normalize_franchise_name(parts[0]);
+	}
+
+	console.log(`Image Request for [${franchise_key}]`);
+
+	if ( franchise_key && franchise_key in API_LOGOS ) {
+		const IMAGE_DIR = path.join(__dirname, 'RSC_LOGOS');
+
+		if ( ! fs.existsSync(IMAGE_DIR) ) {
+			fs.mkdirSync(IMAGE_DIR, { recursive: true });
+		}
+
+		const imagePath = path.join(IMAGE_DIR, `${franchise_key}.png`);
+		if ( fs.existsSync(imagePath) ) {
+			return res.sendFile(imagePath);
+		}
+
+		await saveLogo(franchise_key, API_LOGOS[franchise_key], imagePath);
+
+		return res.sendFile(imagePath);
+	} else {
+		return res.status(404).send(`Franchise not found for "${franchise_key}`);
+	}
+});
+
+async function saveLogo(franchise_key, image_url, imagePath) {
+	console.log('Caching Image to disk', franchise_key, image_url, imagePath);
+    const response = await fetch(image_url);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+	fs.createWriteStream(imagePath).write(buffer);
+
+	return true;
+}
+
+function normalize_franchise_name(franchise) {
+	franchise = franchise.replaceAll('_', ' ').replaceAll('-', ' ');
+	franchise = franchise.toLowerCase().replaceAll('the ', '');
+	franchise = franchise.replaceAll(' ', '');
+	
+	return franchise;
+}
+
+async function get_logos_and_cache() {
+	let error = false;
+
+	// https://api.rscna.com/api/v1/franchises/
+	const url = `https://${API_HOST}/api/v1/franchises/?limit=300`;
+	const headers = {
+		'accept': 'application/json',
+		'Content-Type': 'application/json',
+		'Authorization': `Api-Key ${process.env.RSC_API_KEY_2}`,
+	};
+	console.log(`Grabbing current franchises`, url);
+	const response = await fetch(url, { headers: headers, }).catch(e => {
+		console.log(`Error: ${e}`); error = true; 
+	});
+	if ( error ) {
+		console.log("Error getting franchise info from API");
+		return false;
+	}
+	
+	if ( response.status == 500 ) {
+		console.error("invalid response", response);
+		return false;
+	}
+
+	const franchises = await response.json();
+
+	if ( ! franchises || ! franchises.length ) {
+		console.error('No franchises came back from the API');
+		return false;
+	} 
+
+	for ( let i = 0; i < franchises.length; ++i ) {
+		const franchise = franchises[i];
+		const normalized_name = normalize_franchise_name(franchise.name)
+
+		API_FRANCHISES[normalized_name] = franchise;
+		API_LOGOS[normalized_name] = franchise.logo;
+	}
+
+	console.log('Loaded Franchise Data - ' + Object.keys(API_FRANCHISES).length, 'total');	
+	return true;
+}
 
 app.get('/test', (_req, res) => {
 	res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
@@ -1783,5 +1920,10 @@ app.use((err, req, res, next) => {
     stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
   });
 });
+
+/********************************************************
+ ****************** STARTUP FUNCTION ********************
+ *******************************************************/
+get_logos_and_cache();
 
 app.listen(3030, () => console.log("Server running... on port", process.env.PORT));

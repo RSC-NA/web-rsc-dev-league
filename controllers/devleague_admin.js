@@ -482,7 +482,6 @@ async function get_stats(db, season) {
 	return players;
 }
 
-
 router.all('/devleague/deactivate-last/:amount', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
