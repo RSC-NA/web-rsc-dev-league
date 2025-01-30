@@ -815,6 +815,7 @@ app.get('/logo', (req,res) => {
 });
 
 const API_FRANCHISES = {};
+const API_FRANCHISE_PREFIX = {};
 const API_LOGOS      = {};
 
 app.get('/franchises', async(req, res) => {
@@ -836,6 +837,11 @@ app.get('/franchise/:franchise_name', async(req, res) => {
 
 	if ( franchise_key in API_FRANCHISES ) {
 		return res.json(API_FRANCHISES[franchise_key]);
+	}
+
+	// or if they sent in the Discord tag version like <0>
+	if ( franchise_key in API_FRANCHISE_PREFIX ) {
+		return res.json(API_FRANCHISES[API_FRANCHISE_PREFIX[franchise_key]]);
 	}
 
 	return res.json({ key: franchise_key, error: 'Franchise not found using that key.'});
@@ -939,6 +945,8 @@ async function get_logos_and_cache() {
 		const franchise = franchises[i];
 		const normalized_name = normalize_franchise_name(franchise.name)
 
+		API_FRANCHISES[normalized_name] = franchise;
+		API_FRANCHISE_PREFIX[franchise.prefix] = normalized_name;
 		API_FRANCHISES[normalized_name] = franchise;
 		API_LOGOS[normalized_name] = franchise.logo;
 	}
