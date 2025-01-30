@@ -290,6 +290,34 @@ router.all('/generate_team/:tier', async (req, res) => {
 
 });
 
+router.get('/match/:match_id/cancel', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect(`/match/${req.params.match_id}`);
+	}
+});
+
+router.get('/match/:match_id/resume', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect(`/match/${req.params.match_id}`);
+	}
+});
+
+router.post('/admin-score/:match_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect(`/match/${req.params.match_id}`);
+	}
+
+	const home_wins = req.body.home_wins;
+	const away_wins = req.body.away_wins;
+	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ?, reported_rsc_id = ? WHERE id = ?';
+
+	req.db.query(scoreQuery, [ home_wins, away_wins, res.locals.user.rsc_id, req.params.match_id ], (err, _results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect(`/match/${req.params.match_id}`);
+	});
+});
+
 router.get('/match/:team_id/confirm-sub/:player_id/:sub_player_id', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');

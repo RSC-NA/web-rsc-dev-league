@@ -1,75 +1,447 @@
 
 <%- include('partials/header.ejs'); %>
 
-<main class="container mt-2 p-2">
+<%
+
+	let CAN_ADMIN = false;
+	if ( user.is_admin ) {
+		CAN_ADMIN = true;
+	}
+	if ( user.is_devleague_admin ) {
+		CAN_ADMIN = true;
+	}
+
+	const submitted_scores = {
+		home: null,
+		away: null,
+	};
+
+	const lobby = {
+		'mmrs': {
+			'home': 0,
+			'away': 0,
+		},
+		'home': {},
+		'away': {},
+	};
+	// flat object for checking to see if the RSC_ID belongs
+	const lobby_players = {};
+	for ( let i = 0; i < players.length; ++i ) {
+		if ( i < 3 ) {
+			const p = players[i];
+			p.team = 'Home';
+			p.special = '';
+			if ( i === 0 ) {
+				p.special = 'Makes Lobby';
+			}
+			lobby.home[p.rsc_id] = p;
+			lobby_players[p.rsc_id] = p;
+
+			lobby.mmrs.home += p.mmr;
+		} else {
+			const p = players[i];
+			p.team = 'Away';
+			p.special = '';
+			if ( i === 3 ) {
+				p.special = 'Uploads Replays';
+			}
+			lobby.away[p.rsc_id] = p;
+			lobby_players[p.rsc_id] = p;
+
+			lobby.mmrs.away += p.mmr;
+		}
+	}
+
+	const can_report = CAN_ADMIN || user.rsc_id in lobby_players ? true : false;
+	const match_player = user.rsc_id in lobby_players ? lobby_players[user.rsc_id] : {};
+
+	const teamOneMmr = Math.round(lobby.mmrs.home / 3);
+	const teamTwoMmr = Math.round(lobby.mmrs.away / 3);
+	const homeDelta  = teamOneMmr - teamTwoMmr;
+	const homeDeltaAbs = Math.abs(homeDelta);
+%>
+
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+<main class="container bg-dark mt-2 p-2">
 	<div class="bg-dark p-2 rounded">
-		<h1>Development League Match Info</h1>
+		<h1>
+		Dev League Match Info
+		<img
+			src="/icons/<%- tier.toLowerCase(); %>.png"
+			title="<%- tier; %>"
+			height="48"
+			alt="<%- tier; %> icon"
+		>
+		</h1>
 		<p class="lead">
 			Please find the lobby information provided below. If you have any questions or problems, please ask for help
 			in <a href="https://discord.com/channels/395806681994493964/1013519443684511834">#dev-league</a>.
 		</p>
 		<p>
-			Games must start promptly at <strong>8:00</strong>. The home team is responsible for creating the lobby. The Away Team is responsible 
-			for <a href="https://www.rocketsoccarconfederation.com/replay-and-screenshot-uploads/">uploading replays and screenshots</a> to the RSC Website.
+			Games must start promptly at <strong>8:00</strong>. The home team 
+			is responsible for creating the lobby. The Away Team is responsible 
+			for <strong>uploading replays in the form provided below</strong>.
 		</p>
+
 		<div class="row">
-			<div class="col-9">
-				<div class="bg-dark p-2 rounded">
-					<h2>
-						<span class="<%= tier; %>"><%= tier; %></span> Lobby Info
-					</h2>
+			<div class="col-12">
+				<div class="bg-dark text-light p-2 rounded border-rounded">
 					<p class="lead">This is a <strong>4-game</strong> series.</p>
+					<div class="row">
+						<div class="col-md-4 col-12">
+							<table class="table table-dark">
+								<thead>
+									<tr>
+										<th colspan="2">
+											Lobby Info
+											<img
+												src="/icons/<%- tier.toLowerCase(); %>.png"
+												title="<%- tier; %>"
+												height="16"
+												alt="<%- tier; %> icon"
+											>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-end">Match:</td>	
+										<td>
+											<strong>
+												<%- has_scored ? 'completed' : 'active'; %>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">Username:</td>	
+										<td>
+											<strong><code class="h4">
+												<%- lobby_user; %>
+											</code></strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">Password:</td>	
+										<td>
+											<strong><code class="h4">
+												<%- lobby_pass; %>
+											</code></strong>
+										</td>	
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<% 
+							if ( CAN_ADMIN ) {
 
-					<ul>
-						<li>Tier: <strong class="<%= tier; %>"><%= tier %></strong></li>
-						<li>Lobby Username: <strong><%= lobby_user %></strong></li>
-						<li>Lobby Password: <strong><%= lobby_pass %></strong></li>
-					</ul>
+								const prediction = [];
+								let win_prediction = homeDelta > 0 ? 'Home' : 'Away';
+								let win_class = homeDelta > 0 ? 'bg-info bg-opacity-50' : 'bg-warning bg-opacity-50';
 
-					<% 
-						const teamOneMmr = Math.round((players[0].mmr + players[1].mmr + players[2].mmr) / 3);
-						const teamTwoMmr = Math.round((players[3].mmr + players[4].mmr + players[5].mmr) / 3);
-						const homeDelta  = teamOneMmr - teamTwoMmr;
-						const homeDeltaAbs = Math.abs(homeDelta);
+								let magnitude = '';
+								if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
+									magnitude = 'slight';
+								} else if ( homeDeltaAbs >= 10 && homeDeltaAbs < 20 ) {
+									magnitude = 'large';
+								} else if ( homeDeltaAbs >= 20 && homeDeltaAbs <= 40 ) {
+									magnitude = 'massive';
+								} else if ( homeDeltaAbs >= 40 ) {
+									magnitude = 'overwhelming';
+								}
 
-						const prediction = [];
-						const win_prediction = homeDelta > 0 ? 'Home' : 'Away';
-						let magnitude = '';
-						if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
-							magnitude = 'slight';
-						} else if ( homeDeltaAbs >= 10 && homeDeltaAbs < 20 ) {
-							magnitude = 'large';
-						} else if ( homeDeltaAbs >= 20 && homeDeltaAbs <= 40 ) {
-							magnitude = 'massive';
-						} else if ( homeDeltaAbs >= 40 ) {
-							magnitude = 'overwhelming';
-						}
-						
-						if ( is_admin || is_devleague_admin ) {
-							if ( magnitude ) {
-					%> 
-					<h3 class="p-2 text-center <%- win_prediction === 'Home' ? 'bg-primary text-white' : 'bg-warning text-black'; %>">
-						<%- win_prediction; %> has a <em><%- magnitude; %></em> predicted advantage.
-						<span class="text-muted">+<%- homeDeltaAbs; %></span>
-					</h3>
-					<%
-							} else {
-					%>
+								if ( ! magnitude ) {
+									win_class = 'bg-secondary';
+									win_prediction = 'even';
+									magnitude = 'even';
+								}
+						%>
+						<div class="col-md-4 col-12">
+							<table class="table table-dark">
+								<thead>
+									<tr>
+										<th colspan="3">
+											<i class="fas fa-lock"></i> 
+											Admin Details
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="text-end">MMR Delta:</td>	
+										<td colspan="2">
+											<strong>
+												Home 
+												<%- lobby.mmrs.home - lobby.mmrs.away; %>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">
+											Reported:
+										</td>	
+										<td colspan="2">
+											<strong>
+												<a href="/players/<%- reported_rsc_id; %>">
+													<%- reported_rsc_id in lobby_players ? 
+														lobby_players[reported_rsc_id].name : reported_rsc_id; %>
+												</a>
+											</strong>
+										</td>	
+									</tr>
+									<tr>
+										<td class="text-end">
+											Predicted:
+										</td>
+										<td class="<%- win_class; %> fw-bold">
+											<%- win_prediction; %> 
+										</td>
+										<td class="fw-bold fst-italic">
+											<%- magnitude; %>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+							<%
+								}
+							%>
+					</div>
+					<% if ( ! has_scored ) { %>
 
-					<h3 class="p-2 text-center bg-secondary">
-						No team has a statistical advantage.
-						<span class="text-muted">+<%- homeDeltaAbs; %></span>
-					</h3>
-					<%
+					<h3 class="text-center bg-danger bg-opacity-50 p-2">BOTH TEAMS MUST REPORT THE SCORE!</h3>
+					<% } %>
+					
+				</div>
+			</div>
+		</div>
+
+		<%
+			if ( error ) {		
+				const errors = {
+					'InvalidScore': 'You have entered a score that is impossible.',
+					'NotInLobby': 'You are not a participant of this lobby. You cannot report this score.',
+					'ScoreReportMismatch': 'You have reported a score that is different from what the other team has reported.',
+				};
+		%>
+
+		<div class="row">
+			<div class="col-8 mx-auto">
+				<div class="alert alert-danger d-flex align-items-center" role="alert">
+					<div class="bi flex-shrink-0 me-2">
+						<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
+							<use xlink:href="#exclamation-triangle-fill"/>
+						</svg>
+					</div>
+					<div class="flex-fill">
+						<div class="h4 alert-heading">
+							<%- error; %>
+						</div>
+						<hr>
+						<p class="lead">
+							<%- errors[error]; %>
+						</p>
+						<p class="text-sm">
+							If you are unable to correct this issue, please ask for help in 
+							<a href="https://discord.com/channels/395806681994493964/1222954461601988618"
+								>#combines-general</a>.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<%
+			}
+		%>
+
+		<%
+			if ( has_scored ) {
+				let alert_class = 'alert-success';
+				let alert_title = 'The Grind Continues!';
+				let message = 'Thank you for reporting the score and playing in tonight\'s Dev League. See you at the next game.';
+		%>
+		<div class="row">
+			<div class="col-8 mx-auto">
+				<div class="alert <%- alert_class; %> d-flex align-items-center" role="alert">
+					<div class="bi flex-shrink-0 me-2">
+						<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+							<use xlink:href="#check-circle-fill"/>
+						</svg>
+					</div>
+					<div class="flex-fill">
+						<div class="display-5 alert-heading">
+							<%- alert_title; %>
+						</div>
+						<hr>
+						<p class="lead">
+							<%- message; %>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<%
+			}
+		%>
+
+		<% 
+			if ( CAN_ADMIN ) {
+		%>
+		<div class="row mb-2">
+			<h4 class="mb-2">Admin Controls</h4>
+			<div class="col-6">
+				<%
+					if ( ! cancelled ) {
+				%>
+				<h5>Cancel Game</h5>
+				<p class="small">
+					Cancelling a game will allow every player in this lobby to requeue. No MMRs will be changed, but the VCs <strong>will be 
+					deleted.</strong>
+				</p>
+				<a tabindex="1" href="/match/<%- match_id; %>/cancel" class="btn btn-outline-danger">Cancel Game</a>
+				<% 
+					} else {
+				%>
+				<h5>Resume Cancelled Game</h5>
+				<p class="small">
+					Clicking the "Resume Cancelled Game" button will mark this game as not cancelled and will allow players to resume playing. It will also 
+					<strong>create new VC lobbies.</strong>
+				</p>
+				<a tabindex="1" href="/match/<%- match_id; %>/resume" class="btn btn-primary">Resume Cancelled Game</a>
+				<% 
+					}
+				%>
+
+			</div>
+			<div class="col-6">
+				<h5>Override Scores</h5>
+				<%
+					if ( ! cancelled ) {
+				%>
+				<p class="small">Overriding scores of a finished game will re-calculate player MMR gain/loss.</p>
+				<form action="/admin-score/<%- match_id %>" method="post">
+					<div class="mb-3">
+						<label for="home_wins">Home Team Series Score</label>
+						<div class="input-group">
+							<input
+								type="number"
+								class="form-control text-white"
+								name="home_wins"
+								id="home_wins"
+								placeholder=""
+								value="<%- home_wins %>"
+								max="5"
+								tabindex="1"
+								style="background-color:#000f1e;"
+								required
+							>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="away_wins">Away Team Series Score</label>
+						<div class="input-group">
+							<input
+								type="number"
+								class="form-control text-white"
+								name="away_wins"
+								id="away_wins"
+								placeholder=""
+								value="<%- away_wins %>"
+								tabindex="2"
+								max="5" 
+								style="background-color:#000f1e;"
+								required
+							>
+							<input
+								tabindex="3"
+								type="submit"
+								class=" btn btn-large btn-outline-danger rounded"
+								value="Override Scores"
+							>
+						</div>
+					</div>
+				</form>
+				<% 
+					} else {
+				%>
+				<p class="lead">You may not override scores of cancelled games.</p>
+				<%
+					}
+				%>
+			</div>
+		</div>
+		<%
+			} // end of admin controls
+		%>
+
+		<%
+			if ( ! cancelled && can_report ) {
+		%>
+
+		<div class="row mb-4">
+			<div class="col-md-6">
+				<h4>Upload Replays</h4>
+				<script type="text/javascript">
+					Dropzone.options.replayDropzone = {
+						paramName: 'replay',
+						withCredentials: true,
+						accept: (file, done) => {
+							console.log('FILE IS BEING UPLOADED', file);
+							const fileSplit = file.name.split('.');
+							if ( fileSplit.length === 2 && fileSplit[1] === 'replay' ) {
+								done();
 							}
+														
+						},
+						renameFile: (file) => {
+							const fileSplit = file.name.split('.');
+							const new_file_name = `<%- match_id; %>_<%- user.rsc_id %>-${fileSplit[0]}.${fileSplit[1]}`;
+							file.name = new_file_name;
+							return new_file_name;
 						}
-					%>
+					};
+				</script>
+				<form
+					action="/match-upload/<%- match_id; %>/<%- season; %>/<%- match_day; %>" method="POST"
+					style="background-color: #000f1e;border:1px solid #021e3a;"
+					class="dropzone fw-bolder text-white" id="replay-dropzone"
+				> </form>
+
+			</div>
+
+			<div class="col-md-6">
+				<%
+					if ( replays && replays.length ) {
+				%>
+				<h3>Replays</h3>
+				<ul>
+				<%
+						for ( let i = 0; i < replays.length; ++i ) { 
+				%>
+					<li>
+						<%- replays[i].rsc_id; %>: 
+						<a href="<%- replays[i].path; %>">
+							<%- replays[i].replay; %>
+						</a>
+					</li>
+				<%
+						}
+				%>
+				</ul>
+				<%
+					}
+				%>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-12">
+				<div class="">
 					<form action="/score/<%- match_id %>" method="post">
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-primary text-white rounded p-2">
-								<%= (is_admin||is_devleague_admin) ? `[${teamOneMmr}]` : '' %>
-								Home Team - <%= lobby_user %>
+								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team
 							</h3>
 							<%
 								let homeClass = 'bg-info';
@@ -89,101 +461,84 @@
 							<% 
 								}
 
-								if ( ! has_scored || (is_admin || is_devleague_admin) ) {
+								if ( ! has_scored && active && can_report ) {
 							%>
 							<div class="mb-3">
-								<label for="name">Home Team Series Score</label>
+								<label for="home_wins">Home Team Series Score</label>
 								<div class="input-group">
 									<input
 										type="number"
 										class="form-control text-white"
 										name="home_wins"
 										id="home_wins"
-										placeholder="2"
-										value="<%- home_wins %>"
+										placeholder=""
+										value=""
 										max="4"
-										tabindex="1"
+										tabindex="4"
 										style="background-color:#000f1e;"
 										required
 									>
 								</div>
 							</div>
 							<% 
-								}
+								} 
 							%>
-							<ul style="list-style: none;">
-								<li>
-									<img
-										src="/icons/<%- players[0].tier.toLowerCase(); %>.png"
-										title="<%- players[0].tier; %>"
-										style=""
-										height="16"
-										alt="<%- players[0].tier; %> icon"
-									>
-									<% 
-										if ( is_admin || is_devleague_admin ) {
-									%>
-									<a
-										href="/match/<%- players[0].team_id; %>/sub/<%- players[0].player_id; %>"
-										class="text-success"
-									><i class="fas fa-recycle"></i></a>
-									(<span class="text-muted"><%- players[0].mmr; %></span>)
-									<%
-										}
-									%>
-									<strong>
-									<a href="/player/<%= players[0].rsc_id; %>"><%= players[0].name %></a>
-									</strong> 
-									[Makes lobby]
-								</li>
-								<li>
-									<img
-										src="/icons/<%- players[1].tier.toLowerCase(); %>.png"
-										title="<%- players[1].tier; %>"
-										style=""
-										height="16"
-										alt="<%- players[1].tier; %> icon"
-									>
-									<% 
-										if ( is_admin || is_devleague_admin ) {
-									%>
-									<a
-										href="/match/<%- players[1].team_id; %>/sub/<%- players[1].player_id; %>"
-										class="text-success"
-									><i class="fas fa-recycle"></i></a>
-									(<span class="text-muted"><%- players[1].mmr; %></span>)
-									<%
-										}
-									%>
-									<a href="/player/<%= players[1].rsc_id; %>"><%= players[1].name %></a>
-								</li>
-								<li>
-									<img
-										src="/icons/<%- players[2].tier.toLowerCase(); %>.png"
-										title="<%- players[2].tier; %>"
-										style=""
-										height="16"
-										alt="<%- players[2].tier; %> icon"
-									>
-									<% 
-										if ( is_admin || is_devleague_admin ) {
-									%>
-									<a
-										href="/match/<%- players[2].team_id; %>/sub/<%- players[2].player_id; %>"
-										class="text-success"
-									><i class="fas fa-recycle"></i></a>
-									(<span class="text-muted"><%- players[2].mmr; %></span>)
-									<%
-										}
-									%>
-									<a href="/player/<%= players[2].rsc_id; %>"><%= players[2].name %></a>
-								</li>
-							</ul>
+							<table class="table table-dark">
+								<thead>
+									<tr>
+										<th>Player</th>
+										<th class="text-center">MMR</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+								<%
+									for ( const rsc_id in lobby.home ) {
+										const p = lobby.home[rsc_id];
+								%>
+									<tr class="fs-5">
+										<td>
+											<img
+												src="/icons/<%- p.tier.toLowerCase(); %>.png"
+												title="<%- p.tier; %>"
+												style=""
+												height="16"
+												alt="<%- p.tier; %> icon"
+											>
+											<strong>
+												<a href="/player/<%= p.rsc_id; %>">
+													<%= p.name %></a>
+											</strong> 
+										</td>
+										<td class="text-center">
+											<%- p.mmr; %>
+										</td>
+										<td>
+										<% 
+											if ( reported_rsc_id === p.rsc_id ) { 
+										%>
+											<strong class="text-success ms-1">reported</strong>
+										<%
+											}
+											if ( p.special ) { 
+										%>
+											<span class="text-danger fw-bold">[<%- p.special; %>]</span>
+										<% 
+											}
+										%>
+
+										</td>
+									</tr>
+								<%
+									}
+								%>
+								</tbody>
+							</table>
 						</div>
+
 						<div class="col-md-6">
-							<h3 class="bg-warning rounded p-2">
-								<%= (is_admin||is_devleague_admin) ? `[${teamTwoMmr}]` : '' %>
-								Away Team - <%= lobby_pass %>
+							<h3 class="bg-warning rounded p-2 text-black">
+								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team
 							</h3>
 							<%
 								if ( has_scored ) {
@@ -201,102 +556,87 @@
 							<% 
 								}
 
-								if ( ! has_scored || (is_admin || is_devleague_admin) ) {
+								if ( ! has_scored && active && can_report ) {
 							%>
 							<div class="mb-3">
-								<label for="name">Away Team Series Score</label>
+								<label for="away_wins">Away Team Series Score</label>
 								<div class="input-group">
 									<input
 										type="number"
 										class="form-control text-white"
 										name="away_wins"
 										id="away_wins"
-										placeholder="2"
-										value="<%- away_wins %>"
-										tabindex="2"
+										placeholder=""
+										value=""
+										tabindex="5"
 										max="4"
 										style="background-color:#000f1e;"
 										required
 									>
 									<input
+										tabindex="6"
 										type="submit"
-										class="btn btn-large btn-outline-success fw-bolder"
+										class=" btn btn-large btn-success rounded"
 										value="Submit Scores"
-										tabindex="3"
 									>
 								</div>
 							</div>
 							<%
 								}
 							%>
-							<ul style="list-style:none;">
-								<li>
-									<img
-										src="/icons/<%- players[3].tier.toLowerCase(); %>.png"
-										title="<%- players[3].tier; %>"
-										style=""
-										height="16"
-										alt="<%- players[3].tier; %> icon"
-									>
-									<% 
-										if ( is_admin || is_devleague_admin ) {
-									%>
-									<a
-										href="/match/<%- players[3].team_id; %>/sub/<%- players[3].player_id; %>"
-										class="text-success"
-									><i class="fas fa-recycle"></i></a>
-									(<span class="text-muted"><%- players[3].mmr; %></span>)
-									<%
-										}
-									%>
-									<strong>
-									<a href="/player/<%= players[3].rsc_id; %>"><%= players[3].name %></a>
-									</strong> 
-									[Uploads replays/screenshots]
-								</li>
-								<li>
-									<img
-										src="/icons/<%- players[4].tier.toLowerCase(); %>.png"
-										title="<%- players[4].tier; %>"
-										style=""
-										height="16"
-										alt="<%- players[4].tier; %> icon"
-									>
-									<% 
-										if ( is_admin || is_devleague_admin ) {
-									%>
-									<a
-										href="/match/<%- players[4].team_id; %>/sub/<%- players[4].player_id; %>"
-										class="text-success"
-									><i class="fas fa-recycle"></i></a>
-									(<span class="text-muted"><%- players[4].mmr; %></span>)
-									<%
-										}
-									%>
-									<a href="/player/<%= players[4].rsc_id; %>"><%= players[4].name %></a>
-								</li>
-								<li>
-									<img
-										src="/icons/<%- players[5].tier.toLowerCase(); %>.png"
-										title="<%- players[5].tier; %>"
-										style=""
-										height="16"
-										alt="<%- players[5].tier; %> icon"
-									>
-									<% 
-										if ( is_admin || is_devleague_admin ) {
-									%>
-									<a
-										href="/match/<%- players[5].team_id; %>/sub/<%- players[5].player_id; %>"
-										class="text-success"
-									><i class="fas fa-recycle"></i></a>
-									(<span class="text-muted"><%- players[5].mmr; %></span>)
-									<%
-										}
-									%>
-									<a href="/player/<%= players[5].rsc_id; %>"><%= players[5].name %></a>
-								</li>
-							</ul>
+
+							<table class="table table-dark">
+								<thead>
+									<tr>
+										<th>Player</th>
+										<th class="text-center">MMR</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>
+								<%
+									for ( const rsc_id in lobby.away ) {
+										const p = lobby.away[rsc_id];
+								%>
+									<tr class="fs-5">
+										<td>
+											<img
+												src="/icons/<%- p.tier.toLowerCase(); %>.png"
+												title="<%- p.tier; %>"
+												height="16"
+												alt="<%- p.tier; %> icon"
+											>
+											<strong>
+												<a href="/player/<%= p.rsc_id; %>" class="text-warning"
+													><%= p.name %></a>
+											</strong> 
+										</td>
+										<td class="text-center">
+											<%- p.mmr; %>
+										</td>
+										<td>
+										<% 
+											if ( reported_rsc_id === p.rsc_id ) { 
+										%>
+											<strong class="text-success ms-1">confirmed</strong>
+										<%
+											} 
+											if ( p.special ) { 
+										%>
+											<span class="text-danger fw-bold">[<%- p.special; %>]</span>
+										<% 
+											} 
+										%>
+
+										</td>
+
+									</tr>
+								<%
+									}
+								%>
+								</tbody>
+							</table>
+
 						</div>
 					</div>
 					</form>
@@ -304,13 +644,17 @@
 				</div>
 			</div>
 		</div>
+		<% 
+			}
+		%>
 	</div>
 
-	<hr class="mb-4">
 	<% if ( is_admin ) { %>
-	<pre><%- JSON.stringify(players, undefined, 4); %></pre>
+	<hr class="mb-4">
+	<pre><%- JSON.stringify(lobby, undefined, 4); %></pre>
 	<% } %>
 
 </main>
 
 <%- include('partials/footer.ejs'); %>
+

@@ -1,5 +1,49 @@
 const express = require('express');
 const router = express.Router();
+const upload = require('./upload_devleague');
+
+// router.post('/score/:match_id', (req, res) => {
+// 	const home_wins = req.body.home_wins;
+// 	const away_wins = req.body.away_wins;
+// 	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ? WHERE id = ?';
+// 	req.db.query(scoreQuery, [ home_wins, away_wins, req.params.match_id ], (err, _results) => {
+// 		if ( err ) { throw err; }
+//
+// 		return res.redirect(`/match/${req.params.match_id}`);
+// 	});
+// });
+router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'), async(req, res) => {
+	const user = res.locals.user;
+	const match_id = parseInt(req.params.match_id);
+	const season = parseInt(req.params.season);
+	const match_day = parseInt(req.params.match_day);
+
+			//const replay_path = `static/devleague_replays/S${season}/MD${day}`;
+	console.log('WE ARE HERE');
+
+	if ( ! season && ! match_day && ! match_id ) {
+		return res.json({'success': false});
+	}
+
+	console.log(req.file.originalname);
+	const file_name = req.file.originalname;
+
+	try { 
+
+	const query = `INSERT INTO match_replays (match_id,season,match_day,rsc_id,replay) VALUES (?, ?, ?, ?, ?)`;
+	req.db.query(query, [match_id, season, match_day, user.rsc_id, file_name], (err, results) => {
+		if ( err ) { throw err; }
+
+		res.json({'success': true });
+	});
+	} catch(e) { 
+		console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
+		console.log(` Match ID: ${match_id}`);
+		console.log(`    Match: https://devleague.rscna.com/match/${match_id}`);
+
+		res.json({'success': false });
+	}
+});
 
 router.get(['/devstats', '/devstats/:season'], (req, res) => {
 	const season = req.params.season ? req.params.season : res.locals.settings.season;
@@ -368,20 +412,26 @@ router.get('/match', (req, res) => {
 });
 
 router.post('/score/:match_id', (req, res) => {
+	console.log('here', req.body.home_wins, req.body.away_wins, res.locals.user.rsc_id);
 	const home_wins = req.body.home_wins;
 	const away_wins = req.body.away_wins;
-	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ? WHERE id = ?';
-	req.db.query(scoreQuery, [ home_wins, away_wins, req.params.match_id ], (err, _results) => {
-		if ( err ) { throw err; }
+	const rsc_id = res.locals.user.rsc_id;
+	const match_id = req.params.match_id;
+	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ?, reported_rsc_id = ? WHERE id = ? AND cancelled = 0';
+	console.log('here', home_wins, away_wins, rsc_id, match_id);
 
-		return res.redirect(`/match/${req.params.match_id}`);
+	console.log(scoreQuery);
+	req.db.query(scoreQuery, [ home_wins, away_wins, rsc_id, match_id ], (err, _results) => {
+		if ( err ) { console.error(err); }
+
+		res.redirect(`/match/${match_id}`);
 	});
 });
 
 router.get('/match/:match_id', (req, res) => {
 	const matchQuery = `
 		SELECT 
-			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
+			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, m.reported_rsc_id, m.cancelled,
 			t.tier,
 			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id, c.discord_id,
 			m.home_wins, m.away_wins
@@ -415,17 +465,40 @@ router.get('/match/:match_id', (req, res) => {
 			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
 		}
 		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
-		res.render('match', { 
+		
+
+		const match = { 
 			season: results[0].season, 
 			match_id: match_id,
+			cancelled: results[0].cancelled,
+			active: ( ! scored && ! results[0].cancelled ),
 			tier: tier,
 			match_day: results[0].match_day, 
 			lobby_user: results[0].lobby_user, 
 			lobby_pass: results[0].lobby_pass, 
 			home_wins: results[0].home_wins,
 			away_wins: results[0].away_wins,
+			reported_rsc_id: results[0].reported_rsc_id,
 			has_scored: scored,
 			players: results,
+			replays: {},
+			error: null,
+		};
+
+		const replayQuery = `
+			SELECT 
+				r.id,r.match_id,r.season,r.match_day,r.rsc_id,r.replay,r.created_dtg,
+				p.nickname,
+				CONCAT("/devleague_replays/s", r.season, "/md", r.match_day, "/", r.replay) AS path
+
+			FROM match_replays AS r 
+			LEFT JOIN players AS p ON r.rsc_id = p.rsc_id
+			WHERE r.match_id = ?
+		`;
+		req.db.query(replayQuery, [req.params.match_id], (err, results) => {
+			match.replays = results;	
+
+			res.render('match', match);
 		});
 	});
 });

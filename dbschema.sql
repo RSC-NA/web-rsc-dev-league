@@ -158,9 +158,24 @@ CREATE TABLE matches (
 	`away_team_id` INT UNSIGNED NOT NULL,
 	`lobby_user` VARCHAR(50) NOT NULL DEFAULT '',
 	`lobby_pass` VARCHAR(50) NOT NULL DEFAULT '',
+	`reported_rsc_id` VARCHAR(10) NULL,
 	`home_wins` INT UNSIGNED NOT NULL DEFAULT 0,
 	`away_wins` INT UNSIGNED NOT NULL DEFAULT 0,
+	`cancelled` TINYINT NOT NULL DEFAULT 0,
 	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE match_replays (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`match_id` INT UNSIGNED NOT NULL,
+	`season` INT UNSIGNED NOT NULL,
+	`match_day` INT UNSIGNED NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`replay` VARCHAR(200) NOT NULL,
+	`created_dtg` DATETIME NOT NULL DEFAULT NOW(),
+	PRIMARY KEY(`id`),
+	INDEX `match_idx` (`match_id`),
+	INDEX `player_idx` (`rsc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE league_settings (
