@@ -133,6 +133,17 @@
 						<% } %>
 
 						<%
+							if ( is_admin || is_stats_admin || is_combines_admin || is_devleague_admin ) {
+						%>
+
+							<a class="nav-link" href="/devleague-replays">
+								<div class="sb-nav-link-icon"><i class="fas fa-download text-primary"></i></div>
+								s<%- settings.season; %> Replays
+							</a>
+
+						<%
+							}
+
 							//console.log('Future Tournaments:', future_tournaments);
 							//console.log('My Tournaments:', my_tournaments);
 							if ( future_tournaments.total ) {

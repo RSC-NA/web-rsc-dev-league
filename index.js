@@ -34,6 +34,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 
 // controllers
 const auth_controller = require('./controllers/authentication');
@@ -778,6 +779,37 @@ app.get('/', (req, res) => {
 	} else {
 		res.render('dashboard', { match_days: matchDays });
 	}
+});
+
+app.get('/devleague-replays', (req, res) => {
+	const replays_path = `./static/devleague_replays/s${res.locals.settings.season}`;
+	const file_name = `RSC-s${res.locals.settings.season}-replays.zip`;
+	const output = fs.createWriteStream(file_name);
+	const archive = archiver('zip', {
+		zlib: { level: 9 },
+	});
+
+	console.log('trying to zip', replays_path);
+
+	output.on('close', () => {
+		console.log('stats download complete!');
+		res.download(file_name, file_name, (err) => {
+			if ( err ) {
+				console.error(err);
+			} else {
+				fs.unlinkSync(file_name);
+			}
+		});
+	});
+
+	archive.on('error', (err) => {
+		console.error(err);
+		res.status(500).send('could not create zip');
+	});
+
+	archive.pipe(output);
+	archive.directory(replays_path, false);
+	archive.finalize();
 });
 
 app.get('/dev_dashboard', (req, res) => {

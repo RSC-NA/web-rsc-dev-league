@@ -21,6 +21,7 @@
   "homepage": "https://github.com/RSC-NA/web-rsc-dev-league#readme",
   "dependencies": {
     "ansi-colors": "github:blister/ansi-colors",
+    "archiver": "^7.0.1",
     "atob": "^2.1.2",
     "axios": "^1.5.0",
     "better-sqlite3-session-store": "^0.1.0",
