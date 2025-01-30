@@ -811,7 +811,20 @@ app.use(tournaments_controller);
 app.use(tournaments_admin_controller);
 
 app.get('/logo', (req,res) => {
-
+	const frans = {};
+	for ( const fkey in API_FRANCHISES ) {
+		const f = API_FRANCHISES[fkey];
+		frans[f.name] = {
+			franchise: f.name,
+			prefix: f.prefix,
+			logo: `https://devleague.rscna.com/logo/${fkey}.png`,
+		};
+	}
+	res.json({
+		'error': "You must provide a FRANCHISE_NAME or PREFIX to retrieve the logo.",
+		'format': '/franchise/[$FRANCHISE_NAME].png',
+		'available': frans,
+	});
 });
 
 const API_FRANCHISES = {};
@@ -868,6 +881,12 @@ app.get('/logo/:franchise_image', async (req,res) => {
 		// Fifty-Fifty Pizzeria = 'fiftyfiftypizzeria'
 		// The Elements = 'elements'
 		franchise_key = normalize_franchise_name(parts[0]);
+
+		if ( ! (franchise_key in API_FRANCHISES) ) {
+			if ( parts[0] in API_FRANCHISE_PREFIX ) {
+				franchise_key = API_FRANCHISE_PREFIX[parts[0]];
+			}
+		}
 	}
 
 	console.log(`Image Request for [${franchise_key}]`);
