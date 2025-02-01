@@ -318,7 +318,7 @@ router.post('/admin-score/:match_id', (req, res) => {
 	});
 });
 
-router.get('/match/:team_id/confirm-sub/:player_id/:sub_player_id', (req, res) => {
+router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
