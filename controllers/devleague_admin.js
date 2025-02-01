@@ -360,6 +360,7 @@ router.get('/match/:team_id/sub/:player_id', (req, res) => {
 		return res.redirect('/');
 	}
 
+	
 	const query = `
 		SELECT 
 			p.id,p.nickname,p.rsc_id,c.mmr,c.tier
@@ -375,7 +376,7 @@ router.get('/match/:team_id/sub/:player_id', (req, res) => {
 		if ( err ) { throw err; }
 
 		const template = {
-			match_id: req.params.match_id,
+			match_id: req.params.team_id,
 			player: {},
 			available: {},
 		};
@@ -391,11 +392,14 @@ router.get('/match/:team_id/sub/:player_id', (req, res) => {
 
 			res.render('sub', {
 				team_id: parseInt(req.params.team_id),
+				player_id: parseInt(req.params.player_id),
 				available: template.available,
 				player: template.player,
 			});
 		}
+
 	});
+
 });
 
 router.get('/make_active/:signup_id', (req, res) => {

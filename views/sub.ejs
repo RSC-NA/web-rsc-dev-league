@@ -40,7 +40,16 @@
 						<%
 							} else {
 								for ( const p_id in available ) {
+									let mmr_low = 500;
+									let mmr_high = 2500;
+									if ( player ) {
+										mmr_low = player.mmr - 200;	
+										mmr_high = player.mmr + 200;	
+									}
+
 									const p = available[ p_id ];
+									if ( p.mmr < mmr_low ) { continue; }
+									if ( p.mmr > mmr_high ) { continue; }
 						%>
 							<tr>
 								<th scope="row">
@@ -57,7 +66,7 @@
 								<td class="bg-<%- p.tier; %>"><%= p.tier; %></td>
 								<td class="text-center">
 									<a 
-										href="/match/<%- team_id; %>/confirm-sub/<%- player.id; %>/<%- p.id; %>"
+										href="/match/<%- team_id; %>/confirm-sub/<%- player_id; %>/<%- p.id; %>"
 										class="btn btn-primary btn-sm">
 										<i class="fas fa-recycle"></i> Sub
 									</a>
