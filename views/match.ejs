@@ -486,6 +486,9 @@
 							<table class="table table-dark">
 								<thead>
 									<tr>
+										<% if ( CAN_ADMIN ) { %>
+										<th>sub</th>
+										<% } %>
 										<th>Player</th>
 										<th class="text-center">MMR</th>
 										<th></th>
@@ -497,6 +500,13 @@
 										const p = lobby.home[rsc_id];
 								%>
 									<tr class="fs-5">
+										<% if ( CAN_ADMIN ) { %>
+										<td class="text-center">
+											<a href="/match/<%- match_id; %>/sub/<%- p.id; %>"
+												class="text-success"
+											><i class="fas fa-recycle"></i></a>
+										</td>
+										<% } %>
 										<td>
 											<img
 												src="/icons/<%- p.tier.toLowerCase(); %>.png"
@@ -588,6 +598,9 @@
 							<table class="table table-dark">
 								<thead>
 									<tr>
+										<% if ( CAN_ADMIN ) { %>
+										<th>sub</th>
+										<% } %>
 										<th>Player</th>
 										<th class="text-center">MMR</th>
 										<th></th>
@@ -599,6 +612,13 @@
 										const p = lobby.away[rsc_id];
 								%>
 									<tr class="fs-5">
+										<% if ( CAN_ADMIN ) { %>
+										<td class="text-center">
+											<a href="/match/<%- match_id; %>/sub/<%- p.id; %>"
+												class="text-success"
+											><i class="fas fa-recycle"></i></a>
+										</td>
+										<% } %>
 										<td>
 											<img
 												src="/icons/<%- p.tier.toLowerCase(); %>.png"
