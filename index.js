@@ -76,6 +76,8 @@ function writeError(error) {
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
+app.use( express.static('static') ); 
+
 app.use( express.urlencoded({ extended: true }) );
 
 const title = 'RSC Development League';
@@ -94,7 +96,6 @@ app.use(cors({
 	origin: '*'
 }));
 
-app.use( express.static('static') ); 
 app.set('view engine', 'ejs');
 app.set('trust proxy', true);
 
@@ -185,7 +186,7 @@ async function get_user(user_id, ip) {
 		LEFT JOIN tiermaker AS t2 
 		ON p.discord_id = t2.discord_id AND t2.league = 2 AND t2.season = ?
 		LEFT JOIN player_bans AS ban 
-			ON p.discord_id = ban.discord_id
+			ON p.discord_id = ban.discord_id AND ban.expires_dtg is null
 		LEFT JOIN players AS ban_user 
 			ON ban.banned_by = ban_user.id
 		WHERE p.id = ?
