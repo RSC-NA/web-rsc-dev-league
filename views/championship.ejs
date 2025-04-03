@@ -125,7 +125,7 @@
 							for ( let player in leaderboard ) {
 								count++;
 
-								if ( count > 15 ) {
+								if ( count > 10 ) {
 									break;
 								}
 
@@ -135,7 +135,7 @@
 								}
 								let display_name = leaderboard[ player ]['name'];
 						%>
-						<%- count; %>. &lt;@<%- leaderboard[ player ]['discord_id']; %>&gt; <%= leaderboard[player]['name']; %><br>
+						<%- count; %>. &lt;@<%- leaderboard[ player ]['discord_id']; %>&gt;<br>
 						<%
 							if ( count === 6 ) {
 						%>

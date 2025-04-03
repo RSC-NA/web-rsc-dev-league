@@ -11,12 +11,25 @@
 %>
 
 <%
+	let total = 0;
+	let pct = 0;
+	let wins = 0;
+	let losses = 0;
+	if ( user && user.combines.active ) {
+		wins = user.combines.wins;
+		losses = user.combines.losses;
+		total = wins + losses;
+		if ( total ) {
+			pct = ((wins / total) * 100).toFixed(1);
+		}
+	}
 	if ( status === 'ready' ) {
 		/*
 				hx-get="/combine/dashboard?status=Game%- league_url; %"
 				hx-trigger="load delay:2m"
 				hx-swap="outerHTML"
 		*/
+
 %>
 
 			<div 
@@ -24,8 +37,17 @@
 			>
 				<h2>Your Lobby is Ready!</h2>
 				<p class="lead">
-					Time to show your metal. Your lobby is ready to go.
+					Time to show your metal. Your lobby is ready to go. 
 				</p>
+
+				<% if ( combines.public_numbers ) { %>
+				<p class="lead">
+					Your current MMR is <strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>"><%- user.combines.current_mmr; %></strong> and you 
+					have a record of <strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
+					[<%- total ? pct : 0; %>%]
+				</p>
+				<% } %>
+
 				<a
 					class="btn btn-lg btn-success"
 					href="/combine/<%- user.combines.match.id; %>/<%- league_id; %>"
@@ -62,6 +84,15 @@
 					Lobbies are generated every 15-20 minutes. Stay at your computer and ready, as the lobbies could be 
 					created at any time.
 				</p>
+
+				<% if ( combines.public_numbers ) { %>
+				<p class="lead">
+					Your current MMR is <strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>"><%- user.combines.current_mmr; %></strong> and you 
+					have a record of <strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
+					[<%- total ? pct : 0; %>%]
+				</p>
+				<% } %>
+
 				<a
 					class="btn btn-lg btn-danger"
 					href="/combine/check_out/<%= user.rsc_id; %>/<%- league_id; %>"
@@ -108,6 +139,15 @@
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
 			>
+
+				<% if ( combines.public_numbers ) { %>
+				<p class="lead">
+					Your current MMR is <strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>"><%- user.combines.current_mmr; %></strong> and you 
+					have a record of <strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
+					[<%- total ? pct : 0; %>%]
+				</p>
+				<% } %>
+
 				<a
 					class="btn btn-lg btn-primary"
 					href="javascript:void(0);"

@@ -339,6 +339,7 @@ CREATE TABLE combine_settings (
 	`league` INT UNSIGNED NOT NULL DEFAULT 3,
 	`active` TINYINT NOT NULL DEFAULT 1,
 	`live` TINYINT NOT NULL DEFAULT 1,
+	`public_numbers` TINYINT NOT NULL DEFAULT 0,
 	`tiermaker_url` VARCHAR(255) NOT NULL, 
 	`k_factor` INT UNSIGNED NOT NULL DEFAULT 32,
 	`min_series` INT UNSIGNED NOT NULL,

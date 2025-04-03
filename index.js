@@ -429,6 +429,7 @@ app.use((req, res, next) => {
 		live: false,
 		combine_day: false,
 		combine_live: false,
+		public_numbers: true,
 		tiermaker_url: '',
 		k_factor: 32,
 		min_series: 10,
@@ -438,7 +439,7 @@ app.use((req, res, next) => {
 
 	const query = `
 		SELECT 
-			season, active, live, tiermaker_url, k_factor, min_series
+			season, active, live, public_numbers, tiermaker_url, k_factor, min_series
 		FROM combine_settings 
 		WHERE league = 3
 		ORDER BY id DESC LIMIT 1
@@ -776,6 +777,7 @@ app.get('/', (req, res) => {
 		res.render('combines_dashboard', {
 			combineDays: combineDays,
 			league: res.locals.combines.active ? '3s' : '2s',
+			getTierFromMMR: getTierFromMMR,
 		});
 	} else {
 		res.render('dashboard', { match_days: matchDays });

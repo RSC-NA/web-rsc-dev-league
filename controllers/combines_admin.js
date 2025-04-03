@@ -2010,7 +2010,7 @@ router.get('/manage', (req, res) => {
 
 		const settings_query = `
 		SELECT 
-			id,season,active,live,tiermaker_url,
+			id,season,active,live,public_numbers,tiermaker_url,
 			k_factor,min_series
 		FROM 
 			combine_settings 
@@ -2076,7 +2076,7 @@ router.get('/manage_2s', (req, res) => {
 
 		const settings_query = `
 		SELECT 
-			id,season,active,live,tiermaker_url,
+			id,season,active,live,public_numbers,tiermaker_url,
 			k_factor,min_series
 		FROM 
 			combine_settings 
@@ -2111,18 +2111,19 @@ router.post('/manage', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	const active = "active" in req.body ? 1 : 0;
-	const live   = "live" in req.body ? 1 : 0;
+	const active         = "active" in req.body ? 1 : 0;
+	const live           = "live" in req.body ? 1 : 0;
+	const public_numbers = "public_numbers" in req.body ? 1 : 0;
 
 	const settings_query = `
 	INSERT INTO combine_settings
-		(season, league, active, live, tiermaker_url, k_factor, min_series)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
+		(season, league, active, live, public_numbers, tiermaker_url, k_factor, min_series)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`;
 	req.db.query(
 		settings_query,
 		[
-			req.body.season, 3, active, live, req.body.tiermaker_url, 
+			req.body.season, 3, active, live, public_numbers, req.body.tiermaker_url, 
 			req.body.k_factor, req.body.min_series
 		],
 		(err) => {
@@ -2137,18 +2138,19 @@ router.post('/manage_2s', (req, res) => {
 		return res.redirect('/');
 	} 
 
-	const active = "active" in req.body ? 1 : 0;
-	const live   = "live" in req.body ? 1 : 0;
+	const active         = "active" in req.body ? 1 : 0;
+	const live           = "live" in req.body ? 1 : 0;
+	const public_numbers = "public_numbers" in req.body ? 1 : 0;
 
 	const settings_query = `
 	INSERT INTO combine_settings
-		(season, league, active, live, tiermaker_url, k_factor, min_series)
-	VALUES (?, ?, ?, ?, ?, ?, ?)
+		(season, league, active, live, public_numbers, tiermaker_url, k_factor, min_series)
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 	`;
 	req.db.query(
 		settings_query,
 		[
-			req.body.season, 2, active, live, req.body.tiermaker_url, 
+			req.body.season, 2, active, live, public_numbers, req.body.tiermaker_url, 
 			req.body.k_factor, req.body.min_series
 		],
 		(err) => {

@@ -162,6 +162,21 @@
 			</div>
 			<hr class="mb-4">
 			
+			<h5>Public Numbers?</h5>
+			<p>
+				When checked, Numbers information will be shown to all users. Nothing will be hidden, 
+				and they'll know exactly where they stand and will be able to track their record and progress.
+			</p>
+			<div class="custom-control custom-checkbox">
+				<input 
+					type="checkbox" 
+					class="custom-control-input" 
+					name="public_numbers" id="public_numbers" 
+					<%- combines.public_numbers ? 'checked="checked"' : '' %>>
+				<label class="custom-control-label" for="public_numbers">Show Numbers/MMRs to all players?</label>
+			</div>
+			<hr class="mb-4">
+			
 			<button class="btn btn-primary btn-lg btn-block" type="submit">Update Combine Settings</button>
 			
 			</form>

@@ -110,7 +110,7 @@
 										<td class="text-end">Username:</td>	
 										<td>
 											<strong><code class="h4">
-												<%- match.lobby_user; %>
+												<%- user.rsc_id ? match.lobby_user : '<em>not shown</em>'; %>
 											</code></strong>
 										</td>	
 									</tr>
@@ -118,7 +118,7 @@
 										<td class="text-end">Password:</td>	
 										<td>
 											<strong><code class="h4">
-												<%- match.lobby_pass; %>
+												<%- user.rsc_id ? match.lobby_pass : '<em>not shown</em>'; %>
 											</code></strong>
 										</td>	
 									</tr>
@@ -384,11 +384,12 @@
 		%>
 
 		<%
-			if ( ! match.cancelled && user.rsc_id ) {
+			if ( ! match.cancelled ) {
 		%>
 
 
 		<div class="row mb-4">
+			<% if ( user.rsc_id ) { %>
 			<div class="col-md-6">
 				<h4>Upload Replays</h4>
 				<script type="text/javascript">
@@ -411,9 +412,16 @@
 						}
 					};
 				</script>
-				<form action="/combine/<%- match.id; %>/upload" method="post" style="background-color: #000f1e;border:1px solid #021e3a;" class="dropzone fw-bolder text-white" id="replay-dropzone"> </form>
+				<form
+					action="/combine/<%- match.id; %>/upload"
+					method="post"
+					style="background-color: #000f1e;border:1px solid #021e3a;"
+					class="dropzone fw-bolder text-white"
+					id="replay-dropzone"
+				> </form>
 
 			</div>
+			<% } %>
 
 			<div class="col-md-6">
 				<%
@@ -442,12 +450,15 @@
 		<div class="row">
 			<div class="col-12">
 				<div class="">
+					
+			<% if ( user.rsc_id ) { %>
 					<form action="/combine/<%- match.id %>/<%- match.league; %>" method="post">
 						<input type="hidden" name="reporter_team" value="<%- combine_player.team; %>">
+			<% } %>
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-primary text-white rounded p-2">
-								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team
+								<%= CAN_ADMIN || combines.public_numbers ? '[' + teamOneMmr + '] ' : '' %>Home Team
 							</h3>
 							<%
 								let homeClass = 'bg-info';
@@ -540,7 +551,7 @@
 
 										</td>
 										<% 
-											if ( CAN_ADMIN ) {
+											if ( CAN_ADMIN || combines.public_numbers ) {
 										%>
 										<td class="text-end">
 											<%- p.start_mmr; %>
@@ -564,7 +575,7 @@
 
 						<div class="col-md-6">
 							<h3 class="bg-warning rounded p-2">
-								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team
+								<%= CAN_ADMIN || combines.public_numbers ? '[' + teamTwoMmr + '] ' : '' %>Away Team
 							</h3>
 							<%
 								if ( has_scored ) {
@@ -691,7 +702,7 @@
 
 										</td>
 										<% 
-											if ( CAN_ADMIN ) {
+											if ( CAN_ADMIN || combines.public_numbers ) {
 										%>
 										<td class="text-end">
 											<%- p.start_mmr; %>
@@ -714,7 +725,9 @@
 
 						</div>
 					</div>
+			<% if ( user.rsc_id ) { %>
 					</form>
+			<% } %>
 						
 				</div>
 			</div>

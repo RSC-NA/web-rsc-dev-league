@@ -217,6 +217,7 @@ router.get('/combine/dashboard', (req, res) => {
 		user: user,
 		league: '3s',
 		match_id: user?.combines?.match?.id ?? null,
+		getTierFromMMR: getTierFromMMR,
 	});
 
 });

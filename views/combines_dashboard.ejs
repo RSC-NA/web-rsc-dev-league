@@ -49,7 +49,6 @@
 		<div class="bg-dark p-3 rounded">
 			<div class="row">
 				<div class="col-md-8">
-
 			<% if ( user.name ) { %>
 					<h1>Welcome to the RSC Combines, <%= user.name %></h1>
 			<% } else { %>
@@ -154,7 +153,7 @@
 				if ( combines.active ) {
 			%>
 			<div class="col-12 col-md-6">
-				<h2>RSC 3s Combines</h2>
+				<h2 class="<%- combines.public_numbers ? getTierFromMMR(user.combines.current_mmr) : ''; %>">RSC 3s Combines</h2>
 
 				<%
 					if ( nickname && user && user.combines.match && user.combines.match.id ) { 
@@ -165,6 +164,7 @@
 							user: user, 
 							league: '3s', 
 							match_id: user.combines.match.id, 
+							combines: combines,
 					}); %>
 
 
@@ -178,6 +178,7 @@
 							user: user, 
 							league: '3s', 
 							match_id: null, 
+							combines: combines,
 					}); %>
 
 				<%
@@ -209,6 +210,7 @@
 						user: user, 
 						league: '3s', 
 						match_id: null, 
+						combines: combines,
 				}); %>
 
 			<% 
@@ -253,6 +255,7 @@
 							user: user, 
 							league: '2s', 
 							match_id: user.combines_2s.match.id, 
+							combines: combines,
 					}); %>
 
 				<% 
@@ -266,6 +269,7 @@
 							user: user, 
 							league: '2s', 
 							match_id: null, 
+							combines: combines,
 					}); %>
 
 				<%
@@ -293,10 +297,11 @@
 			%>
 
 				<%- include('partials/combines/dashboard.ejs', { 
-					status: 'waiting', 
-					user: user,
-					league: '2s',
-					match_id: null,
+						status: 'waiting', 
+						user: user,
+						league: '2s',
+						match_id: null,
+						combines: combines,
 				}); %>
 
 			<% 
