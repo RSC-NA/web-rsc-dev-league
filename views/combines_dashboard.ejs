@@ -113,18 +113,20 @@
 					<ul class="dates">
 						<%
 							for ( let match_date in match_days ) {
+								let match_str = `Combine Day: <strong>${match_days[match_date]}</strong>`;
+								if ( match_days[match_date] === 'holiday' ) {
+									match_str = '<strong>Holiday - No Games</strong>';	
+								} else if ( match_days[match_date] === 'draft' ) {
+									match_str = '<strong>DRAFT Night</strong>';	
+								}
 						%>
 
 						<li class="
 							<%- match_date == today ? 'today' : '' %> 
-							<%- match_date == today && combine_day == 'holiday' ? 'holiday' : '' %>
+							<%- match_date == today && (combine_day == 'holiday' || combine_day === 'draft') ? 'holiday' : '' %>
 						">
 							<%- match_date %> - 
-							<%- 
-								match_days[ match_date ] == 'holiday' ? 
-									'<strong>Holiday - No Games</strong>' : 
-									'Combine Day: <strong>' + match_days[match_date] + '</strong>' 
-							%>
+							<%- match_str %>
 						</li>
 
 						<%
@@ -153,7 +155,7 @@
 				if ( combines.active ) {
 			%>
 			<div class="col-12 col-md-6">
-				<h2 class="<%- combines.public_numbers ? getTierFromMMR(user.combines.current_mmr) : ''; %>">RSC 3s Combines</h2>
+				<h2 class="<%- combines.public_numbers && nickname && user ? getTierFromMMR(user.combines.current_mmr) : ''; %>">RSC 3s Combines</h2>
 
 				<%
 					if ( nickname && user && user.combines.match && user.combines.match.id ) { 

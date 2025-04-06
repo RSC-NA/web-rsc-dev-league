@@ -7,41 +7,43 @@
 // the contracts sheet
 const mmrRange_3s = {
 	'Premier': { 
-		'max': 3010,
-		'min': 1805,
+		'max': 2200,
+		'min': 1820,
 	},
 	'Master': { 
-		'max': 1800,
-		'min': 1680,
+		'max': 1815,
+		'min': 1710,
 	},
 	'Elite': { 
-		'max': 1675,
-		'min': 1540,
+		'max': 1705,
+		'min': 1550,
 	},
 	'Veteran': { 
-		'max': 1535,
-		'min': 1410,
+		'max': 1545,
+		'min': 1415,
 	},
 	'Rival': { 
-		'max': 1405,
-		'min': 1260,
+		'max': 1410,
+		'min': 1270,
 	},
 	'Challenger': { 
-		'max': 1255,
-		'min': 1125,
+		'max': 1265,
+		'min': 1100,
 	},
 	'Prospect': { 
-		'max': 1120,
-		'min': 1030,
+		'max': 1095,
+		'min': 980,
 	},
+	'Amateur': { 
+		'max': 975,
+		'min': 0,
+	},
+	/*
 	'Contender': { 
 		'max': 1025,
 		'min': 900,
 	},
-	'Amateur': { 
-		'max': 895,
-		'min': 0,
-	},
+	*/
 };
 
 const mmrRange_2s = {

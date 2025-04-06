@@ -60,7 +60,7 @@
 
 <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
-<main class="container bg-dark mt-2 p-2">
+<main class="container-fluid bg-dark mt-2 p-2">
 	<div class="bg-dark p-2 rounded">
 		<h1>
 		Combine Match Info
@@ -508,10 +508,18 @@
 										<th class="text-end">Start MMR</th>
 										<th class="text-end">MMR &Delta;</th>
 										<th class="text-end">End MMR</th>
+										<%
+											if ( user.rsc_id ) {
+										%>
+										<th class="text-center">Report</th>
+										<%
+											}
+										%>
 									</tr>
 								</thead>
 								<tbody>
 								<%
+									const report_url = `https://docs.google.com/forms/d/e/1FAIpQLSd3QFpiVp5rJmkgH7GtKpm2XecmYZERhEnuAqiWBz9_EdaVhg/viewform?entry.838391094=${user.nickname}&entry.794058674=https://devleague.rscna.com/combine/${match.id}&`;
 									for ( let i = 0; i < match.players.home.length; ++i ) {
 										const p = match.players.home[i];
 										const mmr_delta = p.end_mmr ? 
@@ -519,6 +527,7 @@
 										const mmr_class = p.end_mmr ? 
 											mmr_delta > 0 ? 'text-success fw-bold text-lg' : 'text-danger' :
 											'text-muted';
+										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${p.start_mmr}`;
 								%>
 									<tr class="fs-5">
 										<td>
@@ -565,6 +574,22 @@
 										<% } else if ( combines.active ){ %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
 										<% } %>
+										<%
+											if ( user.rsc_id ) {
+										%>
+										<td class="text-center">
+											<a
+												href="<%- report_url + player_params; %>"
+												class="btn btn-primary btn-sm"
+												title="Submit a Numbers Committee report on this player."
+												target="_blank"
+											>
+												report
+											</a>
+										</td>
+										<%
+											}
+										%>
 									</tr>
 								<%
 									}
@@ -660,6 +685,13 @@
 										<th class="text-end">Start MMR</th>
 										<th class="text-end">MMR &Delta;</th>
 										<th class="text-end">End MMR</th>
+										<%
+											if ( user.rsc_id ) {
+										%>
+										<th class="text-center">Report</th>
+										<%
+											} 
+										%>
 									</tr>
 								</thead>
 								<tbody>
@@ -671,6 +703,7 @@
 										const mmr_class = p.end_mmr ? 
 											mmr_delta > 0 ? 'text-success fw-bold text-lg' : 'text-danger' :
 											'text-muted';
+										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${p.start_mmr}`;
 								%>
 									<tr class="fs-5">
 										<td>
@@ -716,6 +749,22 @@
 										<% } else if ( combines.active ){ %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
 										<% } %>
+										<%
+											if ( user.rsc_id ) {
+										%>
+										<td class="text-center">
+											<a
+												href="<%- report_url + player_params; %>"
+												class="btn btn-primary btn-sm"
+												title="Submit a Numbers Committee report on this player."
+												target="_blank"
+											>
+												report
+											</a>
+										</td>
+										<%
+											}
+										%>
 									</tr>
 								<%
 									}

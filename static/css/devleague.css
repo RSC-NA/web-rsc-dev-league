@@ -117,12 +117,12 @@ li.today.holiday {
 .bg-Premier { background-color: #d600d6 !important; font-weight: bold; }
 .bg-Master { background-color: #9b59b6 !important; font-weight: bold; }
 .bg-Elite { background-color: #3498db !important; font-weight: bold; }
-.bg-Veteran { background-color: #33ffda !important; font-weight: bold; }
-.bg-Rival { background-color: #2ecc71 !important; font-weight: bold; }
-.bg-Challenger { background-color: #ceb337 !important; font-weight: bold; }
+.bg-Veteran { background-color: #33ffda !important; color: #000; font-weight: bold; }
+.bg-Rival { background-color: #2ecc71 !important; color:#000; font-weight: bold; }
+.bg-Challenger { background-color: #ceb337 !important; color:#000; font-weight: bold; }
 .bg-Prospect { background-color: #e67e22 !important; font-weight: bold; }
 .bg-Contender { background-color: #d64694 !important; font-weight: bold; }
-.bg-Amateur { background-color: #f3a9a9 !important; font-weight: bold; }
+.bg-Amateur { background-color: #f3a9a9 !important; color:#000; font-weight: bold; }
 
 .Premier { color: #d600d6 !important; }
 .Master { color: #9b59b6 !important; }
