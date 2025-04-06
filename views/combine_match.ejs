@@ -509,7 +509,7 @@
 										<th class="text-end">MMR &Delta;</th>
 										<th class="text-end">End MMR</th>
 										<%
-											if ( user.rsc_id ) {
+											if ( user.rsc_id && season === match.season ) {
 										%>
 										<th class="text-center">Report</th>
 										<%
@@ -575,7 +575,7 @@
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
 										<% } %>
 										<%
-											if ( user.rsc_id ) {
+											if ( user.rsc_id && season === match.season ) {
 										%>
 										<td class="text-center">
 											<a
@@ -686,7 +686,7 @@
 										<th class="text-end">MMR &Delta;</th>
 										<th class="text-end">End MMR</th>
 										<%
-											if ( user.rsc_id ) {
+											if ( user.rsc_id && season === match.season ) {
 										%>
 										<th class="text-center">Report</th>
 										<%
@@ -750,7 +750,7 @@
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
 										<% } %>
 										<%
-											if ( user.rsc_id ) {
+											if ( user.rsc_id && season === match.season ) {
 										%>
 										<td class="text-center">
 											<a

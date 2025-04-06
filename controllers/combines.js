@@ -806,6 +806,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 						match: match,
 						error: req.query.error,
 						success: success,
+						season: SEASON,
 					});
 				});
 			});
