@@ -34,6 +34,11 @@
 			if ( i === 0 ) {
 				p.special = 'Makes Lobby';
 			}
+			if ( p.player_id in stats ) {
+				p.stats = stats[p.player_id];
+			} else {
+				p.stats = { wins: 0, losses: 0 };
+			}
 			lobby.home[p.rsc_id] = p;
 			lobby_players[p.rsc_id] = p;
 
@@ -44,6 +49,11 @@
 			p.special = '';
 			if ( i === 3 ) {
 				p.special = 'Uploads Replays';
+			}
+			if ( p.player_id in stats ) {
+				p.stats = stats[p.player_id];
+			} else {
+				p.stats = { wins: 0, losses: 0 };
 			}
 			lobby.away[p.rsc_id] = p;
 			lobby_players[p.rsc_id] = p;
@@ -679,6 +689,13 @@
 
 	<% if ( is_admin ) { %>
 	<hr class="mb-4">
+	<pre>
+## <%- lobby.tier; %> Home 
+<% for ( const rsc_id in lobby.home ) { %>- &lt;@<%- lobby.home[rsc_id].discord_id; %>&gt; - <%- lobby.home[rsc_id].stats.wins; %>/<%- lobby.home[rsc_id].stats.losses + "\n"; %><% } %>
+## <%- lobby.tier; %> Away 
+<% for ( const rsc_id in lobby.away ) { %>- &lt;@<%- lobby.away[rsc_id].discord_id; %>&gt; - <%- lobby.away[rsc_id].stats.wins; %>/<%- lobby.away[rsc_id].stats.losses + "\n"; %><% } %>
+
+	</pre>
 	<pre><%- JSON.stringify(lobby, undefined, 4); %></pre>
 	<% } %>
 

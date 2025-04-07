@@ -465,40 +465,81 @@ router.get('/match/:match_id', (req, res) => {
 			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
 		}
 		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
-		
+	
+		const season = results[0].season;
+		const player_ids = [];
+		for ( let i = 0; i < results.length; ++i ) {
+			player_ids.push(results[i].player_id);
+		}
+		const placeholders = '?, '.repeat(player_ids.length - 1) + '?';
 
-		const match = { 
-			season: results[0].season, 
-			match_id: match_id,
-			cancelled: results[0].cancelled,
-			active: ( ! scored && ! results[0].cancelled ),
-			tier: tier,
-			match_day: results[0].match_day, 
-			lobby_user: results[0].lobby_user, 
-			lobby_pass: results[0].lobby_pass, 
-			home_wins: results[0].home_wins,
-			away_wins: results[0].away_wins,
-			reported_rsc_id: results[0].reported_rsc_id,
-			has_scored: scored,
-			players: results,
-			replays: {},
-			error: null,
-		};
-
-		const replayQuery = `
+		const stats_q = `
 			SELECT 
-				r.id,r.match_id,r.season,r.match_day,r.rsc_id,r.replay,r.created_dtg,
-				p.nickname,
-				CONCAT("/devleague_replays/s", r.season, "/md", r.match_day, "/", r.replay) AS path
-
-			FROM match_replays AS r 
-			LEFT JOIN players AS p ON r.rsc_id = p.rsc_id
-			WHERE r.match_id = ?
+				tp.player_id,tp.team_id,m.season,m.match_day,m.home_team_id,m.away_team_id,m.home_wins,m.away_wins 
+			FROM team_players AS tp 
+			LEFT JOIN matches AS m ON 
+				(tp.team_id = m.home_team_id OR tp.team_id = m.away_team_id) 
+			WHERE tp.player_id IN (${placeholders}) and season = ${season} and m.cancelled = 0;
 		`;
-		req.db.query(replayQuery, [req.params.match_id], (err, results) => {
-			match.replays = results;	
+		req.db.query(stats_q, player_ids, (err, statsresults) => {
+			if ( err ) { throw err; }
 
-			res.render('match', match);
+			const playerRecords = {};
+			if ( statsresults ) {
+				for ( let i = 0; i < statsresults; ++i ) {
+					const stat = statsresults[i];
+				
+					if ( ! (stat.player_id in playerRecords) ) {
+						playerRecords[stat.player_id] = {
+							'wins': 0,
+							'losses': 0,
+						};
+					}
+
+					if ( stat.team_id === stat.home_team_id ) {
+						playerRecords[stat.player_id]['wins'] += stat.home_wins;
+						playerRecords[stat.player_id]['losses'] += stat.away_wins;
+					} else {
+						playerRecords[stat.player_id]['wins'] += stat.away_wins;
+						playerRecords[stat.player_id]['losses'] += stat.home_wins;
+					}
+				}
+			}
+
+			const match = { 
+				season: results[0].season, 
+				match_id: match_id,
+				cancelled: results[0].cancelled,
+				active: ( ! scored && ! results[0].cancelled ),
+				tier: tier,
+				match_day: results[0].match_day, 
+				lobby_user: results[0].lobby_user, 
+				lobby_pass: results[0].lobby_pass, 
+				home_wins: results[0].home_wins,
+				away_wins: results[0].away_wins,
+				reported_rsc_id: results[0].reported_rsc_id,
+				has_scored: scored,
+				players: results,
+				stats: playerRecords,
+				replays: {},
+				error: null,
+			};
+
+			const replayQuery = `
+				SELECT 
+					r.id,r.match_id,r.season,r.match_day,r.rsc_id,r.replay,r.created_dtg,
+					p.nickname,
+					CONCAT("/devleague_replays/s", r.season, "/md", r.match_day, "/", r.replay) AS path
+
+				FROM match_replays AS r 
+				LEFT JOIN players AS p ON r.rsc_id = p.rsc_id
+				WHERE r.match_id = ?
+			`;
+			req.db.query(replayQuery, [req.params.match_id], (err, results) => {
+				match.replays = results;	
+
+				res.render('match', match);
+			});
 		});
 	});
 });

@@ -22,4 +22,32 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		timeago.render(timeEls);
 	}
+
+	const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+	const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+	const copyBtns = document.querySelectorAll('.copy-to-clipboard');
+	if ( copyBtns ) {
+		for ( let i = 0; i < copyBtns.length; ++i ) {
+			copyBtns[i].addEventListener('click', copyToClipboard);
+		}
+	}
 });
+
+async function copyToClipboard(ev) {
+	const el = ev.target;
+
+	el.classList.add('bg-Veteran', 'text-black');
+	if ( 'copy' in el.dataset ) {
+		try {
+			await navigator.clipboard.writeText(el.dataset.copy);
+			if ( 'copySuccess' in el.dataset ) {
+				const success_msg = document.getElementById(el.dataset.copySuccess);
+				success_msg.classList.remove('hidden');
+				setTimeout(() => { success_msg.classList.add('hidden'); el.classList.remove('bg-Veteran', 'text-black'); }, 2000);
+			}
+		} catch(e) {
+			console.error('Could not copy text to clipboard', el, e);
+		}
+	}
+}

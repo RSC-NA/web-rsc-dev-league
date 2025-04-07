@@ -122,6 +122,35 @@
 											</code></strong>
 										</td>	
 									</tr>
+									<tr>
+										<td class="text-start">URL:</td>	
+										<td>
+											<button
+												class="btn btn-outline-light copy-to-clipboard"
+												type="button"
+												id="copy_url_to_clipboard"
+												data-copy="https://devleague.rscna.com/combine/<%- match.id; %>"
+												title="<h6>Copy URL to Clipboard</h6>"
+												data-copy-success="copy-msg"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
+											>
+												<i class="fas fa-copy"></i>
+												<span id="copy-msg" class="ms-2 hidden text-black">Copied!</span>
+											</button>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="2">
+											<strong><code
+												class="h6 copy-to-clipboard"
+												data-copy="https://devleague.rscna.com/combine/<%- match.id; %>"
+												data-copy-success="copy-msg-2"
+											>
+												https://devleague.rscna.com/combine/<%- match.id; %> <span id="copy-msg-2" class="ms-2 hidden Elite">Copied!</span>
+											</code></strong>
+										</td>	
+									</tr>
 								</tbody>
 							</table>
 						</div>
@@ -130,7 +159,7 @@
 
 								const prediction = [];
 								let win_prediction = homeDelta > 0 ? 'Home' : 'Away';
-								let win_class = homeDelta > 0 ? 'bg-info bg-opacity-50' : 'bg-warning bg-opacity-50';
+								let win_class = homeDelta > 0 ? 'bg-Elite' : 'bg-Prospect';
 
 								let magnitude = '';
 								if ( homeDeltaAbs >= 5 && homeDeltaAbs < 10 ) {
@@ -457,17 +486,17 @@
 			<% } %>
 					<div class="row">
 						<div class="col-md-6">
-							<h3 class="bg-primary text-white rounded p-2">
+							<h3 class="bg-Elite text-white rounded p-2">
 								<%= CAN_ADMIN || combines.public_numbers ? '[' + teamOneMmr + '] ' : '' %>Home Team
 							</h3>
 							<%
 								let homeClass = 'bg-info';
 								let awayClass = 'bg-info';
 								if ( has_scored ) {
-									if ( match.home_wins > 2 ) {
-										homeClass = 'bg-success';
+									if ( match.home_wins >= 2 ) {
+										homeClass = 'bg-Rival';
 									} else if ( match.home_wins < 2 ) {
-										homeClass = 'bg-danger';
+										homeClass = 'bg-Amateur';
 									}
 							%>
 							<h3 class="text-center m-4">
@@ -504,7 +533,6 @@
 								<thead>
 									<tr>
 										<th>Player</th>
-										<th>task</th>
 										<th class="text-end">Start MMR</th>
 										<th class="text-end">MMR &Delta;</th>
 										<th class="text-end">End MMR</th>
@@ -542,22 +570,33 @@
 												<a href="/combine/matches/<%= p.rsc_id; %>">
 													<%= p.name %></a>
 											</strong> 
-										</td>
-										<td>
-										<% 
-											if ( submitted_scores.home === p.rsc_id ) { 
-										%>
-											<strong class="text-success ms-1">reported</strong>
-										<%
-											} else { 
-												if ( i === 0 ) { 
-										%>
+											<% 
+												if ( submitted_scores.home === p.rsc_id ) { 
+											%>
+											<strong
+												class="Elite ms-1"
+												title="Submitted score"
+												data-bs-toggle="tooltip"
+											>
+												<i class="fas fa-check-to-slot fa-xl"></i>
+											</strong>
+											<% 
+												} else if ( submitted_scores.away === p.rsc_id ) {
+											%>
+											<strong
+												class="Elite ms-1"
+												title="Verified the score"
+												data-bs-toggle="tooltip"
+											>
+												<i class="fas fa-check-to-slot fa-xl"></i>
+											</strong>
+											<%
+												} else if ( i === 0 ) { 
+											%>
 											<span class="text-danger fw-bold">[Makes lobby]</span>
-										<% 
-												}
-											} 
-										%>
-
+											<% 
+												} 
+											%>
 										</td>
 										<% 
 											if ( CAN_ADMIN || combines.public_numbers ) {
@@ -580,8 +619,10 @@
 										<td class="text-center">
 											<a
 												href="<%- report_url + player_params; %>"
-												class="btn btn-primary btn-sm"
-												title="Submit a Numbers Committee report on this player."
+												class="btn btn-sm bg-Elite"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p.tier; %>'><%- p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
 												target="_blank"
 											>
 												report
@@ -599,15 +640,15 @@
 						</div>
 
 						<div class="col-md-6">
-							<h3 class="bg-warning rounded p-2">
+							<h3 class="bg-Prospect rounded p-2 text-black">
 								<%= CAN_ADMIN || combines.public_numbers ? '[' + teamTwoMmr + '] ' : '' %>Away Team
 							</h3>
 							<%
 								if ( has_scored ) {
-									if ( match.away_wins > 2 ) {
-										awayClass = 'bg-success';
+									if ( match.away_wins >= 2 ) {
+										awayClass = 'bg-Rival';
 									} else if ( match.away_wins < 2 ) {
-										awayClass = 'bg-danger';
+										awayClass = 'bg-Amatuer';
 									}
 							%>
 							<h3 class="text-center m-4">
@@ -681,7 +722,6 @@
 								<thead>
 									<tr>
 										<th>Player</th>
-										<th>task</th>
 										<th class="text-end">Start MMR</th>
 										<th class="text-end">MMR &Delta;</th>
 										<th class="text-end">End MMR</th>
@@ -717,22 +757,38 @@
 												<a href="/combine/matches/<%= p.rsc_id; %>"
 													><%= p.name %></a>
 											</strong> 
-										</td>
-										<td>
-										<% 
-											if ( submitted_scores.home === p.rsc_id ) { 
-										%>
-											<strong class="text-success ms-1">confirmed</strong>
-										<%
-											} else { 
-												if ( i === 0 ) { 
-										%>
-											<span class="text-danger fw-bold">[replays!]</span>
-										<% 
-												}
-											} 
-										%>
-
+											<% 
+												if ( submitted_scores.home === p.rsc_id ) { 
+											%>
+											<strong
+												class="Prospect ms-1"
+												title="Reported scores"
+												data-bs-toggle="tooltip"
+											>
+												<i class="fas fa-check-to-slot fa-xl"></i>
+											</strong>
+											<% 
+												} else if ( submitted_scores.away === p.rsc_id ) {
+											%>
+											<strong
+												class="Prospect ms-1"
+												title="Verified the score"
+												data-bs-toggle="tooltip"
+											>
+												<i class="fas fa-check-to-slot fa-xl"></i>
+											</strong>
+											<% 
+												} else if ( i === 0 ) { 
+											%>
+											<span
+												class="text-danger fw-bold"
+												title="You have been selected as the person responsible for uploading replays.<br><br><strong>IF YOU ARE ON CONSOLE</strong> it is <strong>YOUR</strong> responsibility to make sure someone on your team can upload for you."
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
+											>[replays!]</span>
+											<% 
+												} 
+											%>
 										</td>
 										<% 
 											if ( CAN_ADMIN || combines.public_numbers ) {
@@ -755,8 +811,10 @@
 										<td class="text-center">
 											<a
 												href="<%- report_url + player_params; %>"
-												class="btn btn-primary btn-sm"
-												title="Submit a Numbers Committee report on this player."
+												class="btn btn-sm bg-Prospect"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p.tier;%>'><%- p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
 												target="_blank"
 											>
 												report
@@ -788,6 +846,7 @@
 
 	<% if ( is_admin ) { %>
 	<hr class="mb-4">
+	<pre><%- JSON.stringify(submitted_scores, undefined, 4); %></pre>
 	<pre><%- JSON.stringify(match, undefined, 4); %></pre>
 	<% } %>
 

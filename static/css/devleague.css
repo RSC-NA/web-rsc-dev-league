@@ -1,3 +1,7 @@
+.tooltip-inner div {
+	text-align: left !important;
+}
+
 /*
 <html lang="en" data-bs-theme="dark" style="scrollbar-color: #021e3a #000f1e;">
 */
@@ -112,6 +116,10 @@ li.today.holiday {
 .dark li.today.holiday {
 	list-style-type: '🏖️';
 	background-color: #930a0a;
+}
+
+.hidden {
+	display: none !important;
 }
 
 .bg-Premier { background-color: #d600d6 !important; font-weight: bold; }
