@@ -218,7 +218,7 @@
 
 			<% 
 				} else if ( nickname && user && ! user.combines.active ) { 
-					if ( today in match_days && match_days[today] === 1 ) {
+					if ( today in combineDays['3s'] && combineDays['3s'][today] === 1 ) {
 			%>
 
 				<h2>The Rolling Tier List is Not Public Yet..., <%- nickname; %></h2>
