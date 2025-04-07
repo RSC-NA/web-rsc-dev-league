@@ -122,15 +122,28 @@ li.today.holiday {
 	display: none !important;
 }
 
-.bg-Premier { background-color: #d600d6 !important; font-weight: bold; }
-.bg-Master { background-color: #9b59b6 !important; font-weight: bold; }
-.bg-Elite { background-color: #3498db !important; font-weight: bold; }
-.bg-Veteran { background-color: #33ffda !important; color: #000; font-weight: bold; }
-.bg-Rival { background-color: #2ecc71 !important; color:#000; font-weight: bold; }
-.bg-Challenger { background-color: #ceb337 !important; color:#000; font-weight: bold; }
-.bg-Prospect { background-color: #e67e22 !important; font-weight: bold; }
-.bg-Contender { background-color: #d64694 !important; font-weight: bold; }
-.bg-Amateur { background-color: #f3a9a9 !important; color:#000; font-weight: bold; }
+:root {
+	--premier: 214, 0, 214;
+	--master: 155, 89, 182;
+	--elite: 52, 152, 219;
+	--veteran: 51, 255, 219;
+	--rival: 46, 204, 114;
+	--challenger: 206, 179, 55;
+	--prospect: 230, 126, 34;
+	--contender: 214, 70, 148;
+	--amateur: 243, 169, 169;
+}
+
+
+.bg-Premier { background-color: rgba(var(--premier), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-Master { background-color: rgba(var(--master), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-Elite { background-color: rgba(var(--elite), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-Veteran { background-color: rgba(var(--veteran), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
+.bg-Rival { background-color: rgba(var(--rival), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
+.bg-Challenger { background-color: rgba(var(--challenger), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
+.bg-Prospect { background-color: rgba(var(--prospect), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-Contender { background-color: rgba(var(--contender), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-Amateur { background-color: rgba(var(--amateur), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
 
 .Premier { color: #d600d6 !important; }
 .Master { color: #9b59b6 !important; }
