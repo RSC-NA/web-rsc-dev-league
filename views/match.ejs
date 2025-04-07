@@ -509,7 +509,6 @@
 										<% } %>
 										<th>Player</th>
 										<th class="text-center">MMR</th>
-										<th></th>
 										<th class="text-center">W</th>
 										<th class="text-center">L</th>
 										<th class="text-center">%</th>
@@ -540,24 +539,29 @@
 												<a href="/player/<%= p.rsc_id; %>">
 													<%= p.name %></a>
 											</strong> 
-										</td>
-										<td class="text-center">
-											<%- p.mmr; %>
-										</td>
-										<td>
 										<% 
 											if ( reported_rsc_id === p.rsc_id ) { 
 										%>
-											<strong class="text-success ms-1">reported</strong>
+											<strong
+												class="Elite ms-1"
+												title="Submitted score"
+												data-bs-toggle="tooltip"
+											>
+												<i class="fas fa-check-to-slot fa-xl"></i>
+											</strong>
 										<%
 											}
+										%>
+										<%
 											if ( p.special ) { 
 										%>
 											<span class="text-danger fw-bold">[<%- p.special; %>]</span>
 										<% 
-											}
+											} 
 										%>
-
+										</td>
+										<td class="text-center">
+											<%- p.mmr; %>
 										</td>
 										<td class="text-center"><%- p.stats.wins; %></td>
 										<td class="text-center"><%- p.stats.losses; %></td>
@@ -627,7 +631,6 @@
 										<% } %>
 										<th>Player</th>
 										<th class="text-center">MMR</th>
-										<th></th>
 										<th class="text-center">W</th>
 										<th class="text-center">L</th>
 										<th class="text-center">%</th>
@@ -657,24 +660,29 @@
 												<a href="/player/<%= p.rsc_id; %>" class="text-warning"
 													><%= p.name %></a>
 											</strong> 
-										</td>
-										<td class="text-center">
-											<%- p.mmr; %>
-										</td>
-										<td>
 										<% 
 											if ( reported_rsc_id === p.rsc_id ) { 
 										%>
-											<strong class="text-success ms-1">confirmed</strong>
+											<strong
+												class="Prospect ms-1"
+												title="Submitted score"
+												data-bs-toggle="tooltip"
+											>
+												<i class="fas fa-check-to-slot fa-xl"></i>
+											</strong>
 										<%
-											} 
+											}
+										%>
+										<%
 											if ( p.special ) { 
 										%>
 											<span class="text-danger fw-bold">[<%- p.special; %>]</span>
 										<% 
 											} 
 										%>
-
+										</td>
+										<td class="text-center">
+											<%- p.mmr; %>
 										</td>
 										<td class="text-center"><%- p.stats.wins; %></td>
 										<td class="text-center"><%- p.stats.losses; %></td>
