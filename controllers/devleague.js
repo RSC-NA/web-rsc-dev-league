@@ -507,7 +507,7 @@ router.get('/match/:match_id', (req, res) => {
 				}
 			}
 
-			console.log(statsresults);
+			console.log(playerRecords);
 
 			const match = { 
 				season: results[0].season, 
