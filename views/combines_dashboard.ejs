@@ -92,6 +92,7 @@
 				<div class="col-md-4 matchDates dark">
 					<%
 
+						let current_day = null;
 						for ( let league in combineDays ) {
 							const match_days = combineDays[league];
 							let combine_season = '';
@@ -217,6 +218,22 @@
 
 			<% 
 				} else if ( nickname && user && ! user.combines.active ) { 
+					if ( today in match_days && match_days[today] === 1 ) {
+			%>
+
+				<h2>The Rolling Tier List is Not Public Yet..., <%- nickname; %></h2>
+				<p>
+					You don't currently have an entry in the Rolling Tier List.  Because this 
+					is the first night of Combines, this is probably because you either <strong>just signed up</strong>
+					OR the Rolling Tier List <strong>hasn't been released yet</strong>.
+				</p>
+				<p>
+					If you think this is an error, please reach out to the RSC Team by sending a DM to 
+					the bot <code>.MainModmail</code> on the RSC Discord server.
+				</p>
+
+			<%
+					} else {
 			%>
 				<h2>You Aren't In the Rolling Tier List, <%- nickname; %></h2>
 				<p>
@@ -229,6 +246,7 @@
 					the bot <code>.MainModmail</code> on the RSC Discord server.
 				</p>
 			<% 
+					}
 				} else { 
 			%>
 				<a class="btn btn-lg btn-primary" href="/login_with_discord" role="button">Log In with Discord</a>
