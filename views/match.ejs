@@ -510,6 +510,9 @@
 										<th>Player</th>
 										<th class="text-center">MMR</th>
 										<th></th>
+										<th class="text-center">W</th>
+										<th class="text-center">L</th>
+										<th class="text-center">%</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -556,6 +559,9 @@
 										%>
 
 										</td>
+										<td class="text-center"><%- p.stats.wins; %></td>
+										<td class="text-center"><%- p.stats.losses; %></td>
+										<td class="text-center"><%- (p.stats.wins + p.stats.losses) ? Math.round((p.stats.wins / (p.stats.losses + p.stats.wins)) * 100,1) : 0; %>%</td>
 									</tr>
 								<%
 									}
@@ -622,6 +628,9 @@
 										<th>Player</th>
 										<th class="text-center">MMR</th>
 										<th></th>
+										<th class="text-center">W</th>
+										<th class="text-center">L</th>
+										<th class="text-center">%</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -667,6 +676,9 @@
 										%>
 
 										</td>
+										<td class="text-center"><%- p.stats.wins; %></td>
+										<td class="text-center"><%- p.stats.losses; %></td>
+										<td class="text-center"><%- (p.stats.wins + p.stats.losses) ? Math.round((p.stats.wins / (p.stats.losses + p.stats.wins)) * 100,1) : 0; %>%</td>
 
 									</tr>
 								<%
