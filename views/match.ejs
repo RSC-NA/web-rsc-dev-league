@@ -690,12 +690,13 @@
 	<% if ( is_admin ) { %>
 	<hr class="mb-4">
 	<pre>
-## <%- lobby.tier; %> Home 
+## <%- tier; %> Home 
 <% for ( const rsc_id in lobby.home ) { %>- &lt;@<%- lobby.home[rsc_id].discord_id; %>&gt; - <%- lobby.home[rsc_id].stats.wins; %>/<%- lobby.home[rsc_id].stats.losses + "\n"; %><% } %>
-## <%- lobby.tier; %> Away 
+## <%- tier; %> Away 
 <% for ( const rsc_id in lobby.away ) { %>- &lt;@<%- lobby.away[rsc_id].discord_id; %>&gt; - <%- lobby.away[rsc_id].stats.wins; %>/<%- lobby.away[rsc_id].stats.losses + "\n"; %><% } %>
 
 	</pre>
+	<pre><%- JSON.stringify(stats, undefined, 4); %></pre>
 	<pre><%- JSON.stringify(lobby, undefined, 4); %></pre>
 	<% } %>
 

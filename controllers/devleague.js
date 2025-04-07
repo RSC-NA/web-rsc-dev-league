@@ -481,6 +481,7 @@ router.get('/match/:match_id', (req, res) => {
 				(tp.team_id = m.home_team_id OR tp.team_id = m.away_team_id) 
 			WHERE tp.player_id IN (${placeholders}) and season = ${season} and m.cancelled = 0;
 		`;
+		console.log(stats_q);
 		req.db.query(stats_q, player_ids, (err, statsresults) => {
 			if ( err ) { throw err; }
 
@@ -505,6 +506,8 @@ router.get('/match/:match_id', (req, res) => {
 					}
 				}
 			}
+
+			console.log(statsresults);
 
 			const match = { 
 				season: results[0].season, 
