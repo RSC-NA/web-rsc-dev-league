@@ -69,6 +69,7 @@ const API_HOST = 'api.rscna.com';
 const matchDays = require('./matchDays');
 const combineDays = require('./combineDays');
 const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('./mmrs');
+const { roles } = require('./roles');
 
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
@@ -774,10 +775,14 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
 	// TODO(load template)
 	if ( res.locals.combines.active || res.locals.combines_2s.active ) {
+		user_roles = req.session.user_roles;
 		res.render('combines_dashboard', {
 			combineDays: combineDays,
 			league: res.locals.combines.active ? '3s' : '2s',
 			getTierFromMMR: getTierFromMMR,
+			roles: roles,
+			user_roles: req.session.user_roles,
+
 		});
 	} else {
 		res.render('dashboard', { match_days: matchDays });

@@ -1,0 +1,32 @@
+exports.roles = {
+	"913984373542514689":  {css:"bg-dark text-light",    "text":"I Own You All"},
+	"1092924915281313792": {css:"bg-danger",  "text":"Head Admin"},
+	"1352652906850947092": {css:"bg-info text-dark",    "text":"Assistant to the Admins"},
+	"400096325678530580":  {css:"bg-danger",  "text":"Admin"},
+	"1142653413780361226": {css:"bg-primary", "text":"Committee Head/Mod"},
+	"961462500463886386":  {css:"bg-info text-dark", "text":"GM Mod"},
+	"400097903277899776":  {css:"bg-success", "text":"Mod Committee"},
+	"400097056875741185":  {css:"bg-info text-dark", "text":"Committee Head"},
+	"400096791242080256":  {css:"bg-info text-dark", "text":"Staff"},
+	"400097901352714261":  {css:"bg-info text-dark", "text":"General Manager"},
+	"1100217807649636362": {css:"bg-info text-dark", "text":"Events Head"},
+	'607719471196536843': {css: 'bg-dark text-info', text: 'Numbers Committee'},
+	"400097026651455489":  {css:"bg-warning", "text":"Transactions Committee"},
+	"400096994552578055":  {css:"bg-success", "text":"Stats Committee"},
+	"978652848067846214":  {css:"bg-info text-dark", "text":"Development Committee"},
+	"607719471196536843":  {css:"bg-info text-dark", "text":"Rules Committee"},
+	"400097117684760597":  {css:"bg-success", "text":"Events Committee"},
+	"400098106307248129":  {css:"bg-success", "text":"Assistant GM"},
+	"1155946438652604517": {css:"bg-success", "text":"Dev League Team"},
+	"1182124823103680542": {css:"bg-warning", "text":"Dev League Champion"},
+};
+
+exports.admin_roles = {
+	"913984373542514689":  'admin',
+	"1092924915281313792": 'admin',
+	"1352652906850947092": 'admin',
+	"400096325678530580":  'admin',
+	"400096791242080256":  'staff',
+	"1155946438652604517": 'devleague',
+	'607719471196536843': 'numbers',
+};

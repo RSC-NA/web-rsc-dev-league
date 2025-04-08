@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 
+const { roles, admin_roles } = require('../roles');
+
 router.use(bodyParser.text());
 
 router.get('/login_with_discord', (req, res) => {
@@ -9,7 +11,7 @@ router.get('/login_with_discord', (req, res) => {
 	if ( referrer ) {
 		req.session.login_return_url = referrer;
 	}
-	const discord_url = `https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=${res.locals.callbackUrl}&response_type=code&scope=identify`;
+	const discord_url = `https://discord.com/api/oauth2/authorize?client_id=1006600605265055876&redirect_uri=${res.locals.callbackUrl}&response_type=code&scope=identify+guilds.members.read+guilds`;
 	res.redirect(discord_url);
 });
 
@@ -63,6 +65,9 @@ router.get('/oauth2', async (req, res) => {
 		const token_type = data.token_type;
 		const token = data.access_token;
 
+		req.session.discord_token_type = data.token_type;
+		req.session.discord_token = data.access_token;
+
 		const user = await fetch('https://discord.com/api/users/@me', {
 			headers: {
 				Authorization: `${token_type} ${token}`,
@@ -76,6 +81,35 @@ router.get('/oauth2', async (req, res) => {
 			const nickname = user_obj.username;
 
 			console.log('User Found', user_obj, discord_id, nickname);
+		
+			const roles = await fetch('https://discord.com/api/users/@me/guilds/395806681994493964/member', {
+				headers: {
+					Authorization: `${token_type} ${token}`,
+				},
+			});
+			const roles_obj = await roles.json();
+
+			let admin_role     = false;
+			let numbers_role   = false;
+			let staff_role     = false;
+			let devleague_role = false;
+			if ( 'roles' in roles_obj && roles_obj.roles ) {
+				req.session.user_roles = roles_obj.roles;
+
+				for ( const role_id in admin_roles ) {
+					if ( roles_obj.roles.includes(role_id) ) {
+						if ( admin_roles[role_id] === 'admin' ) {
+							admin_role = true;
+						} else if ( admin_roles[role_id] === 'numbers' ) {
+							numbers_role = true;
+						} else if ( admin_roles[role_id] === 'staff' ) {
+							staff_role = true;
+						} else if ( admin_roles[role_id] === 'devleague' ) {
+							devleague_role = true;
+						}
+					}
+				}
+			}
 
 			const query = `
 				SELECT 
@@ -131,21 +165,23 @@ router.get('/oauth2', async (req, res) => {
 							},
 							active_3s: results[0].active_3s,
 							active_2s: results[0].active_2s,
-							is_admin: results[0].admin ? true: false,
+							is_admin: admin_role ? true : (results[0].admin ? true : false),
 							is_tourney_admin: results[0].tourney_admin ? true: false,
 							is_devleague_admin: results[0].devleague_admin ? true: false,
 							is_stats_admin: results[0].stats_admin ? true: false,
-							is_combines_admin: results[0].combines_admin ? true: false,
+							is_staff:  (admin_role || staff_role) ? true : false,
+							is_combines_admin: numbers_role ? true : (results[0].combines_admin ? true: false),
 							is_combines_admin_2s: results[0].combines_admin_2s ? true: false,
 						};
 						
 						req.session.user = user;
 
-						req.session.is_admin = results[0].admin ? true : false;
+						req.session.is_admin = admin_role ? true : (results[0].admin ? true : false);
 						req.session.is_tourney_admin = results[0].tourney_admin ? true: false;
-						req.session.is_devleague_admin = results[0].devleague_admin ? true: false;
+						req.session.is_devleague_admin = devleague_role ? true : (results[0].devleague_admin ? true: false);
 						req.session.is_stats_admin = results[0].stats_admin ? true: false;
-						req.session.is_combines_admin = results[0].combines_admin ? true: false;
+						req.session.is_staff = (admin_role || staff_role) ? true : false;
+						req.session.is_combines_admin = numbers_role ? true : (results[0].combines_admin ? true: false);
 						req.session.is_combines_admin_2s = results[0].combines_admin_2s ? true: false;
 
 						const ip_query = `
@@ -216,19 +252,20 @@ router.get('/oauth2', async (req, res) => {
 										},
 										active_3s: results[0].active_3s ? true : false,
 										active_2s: results[0].active_2s ? true : false,
-										is_admin: false,
+										is_admin: admin_role,
 										is_tourney_admin: false,
 										is_devleague_admin: false,
 										is_stats_admin: false,
-										is_combines_admin: false,
+										is_combines_admin: numbers_role,
 									};
 					
 									req.session.user = user;
-									req.session.is_admin = false;
+									req.session.is_admin = admin_role;
 									req.session.is_tourney_admin = false;
 									req.session.is_devleague_admin = false;
 									req.session.is_stats_admin = false;
-									req.session.is_combines_admin = false;
+									req.session.is_staff = (admin_role || staff_role) ? true : false;
+									req.session.is_combines_admin = numbers_role;
 									const ip_query = `
 									insert into player_ips (rsc_id, nickname, discord_id, ip) 
 									values (?, ?, ?, ?)`;

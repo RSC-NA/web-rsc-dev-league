@@ -2,6 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
+const { roles } = require('../roles');
 const upload = require('./upload');
 
 const fs = require('fs');
@@ -211,13 +212,15 @@ router.get('/combine/dashboard', (req, res) => {
 	if ( user?.combines?.match?.id ) {
 		status = 'ready';
 	}
-	
+
 	res.render('partials/combines/dashboard', {
 		status: status,
 		user: user,
 		league: '3s',
 		match_id: user?.combines?.match?.id ?? null,
 		getTierFromMMR: getTierFromMMR,
+		roles: roles,
+		user_roles: req.session?.user_roles ?? null,
 	});
 
 });
