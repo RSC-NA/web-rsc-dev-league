@@ -109,11 +109,16 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-list-ol"></i></div>
 								3s S<%- combines.season %> Combines
 							</a>
+						<%
+								if ( combines.public_numbers ) {
+						%>
 							<a class="nav-link <%- menu['/combines/history'] %>" href="/combines/history">
 								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
 								Tiermaker
 							</a>
 						<%
+								}
+
 							}
 
 							if ( combines_2s.active ) { 
