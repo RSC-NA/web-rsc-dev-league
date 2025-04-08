@@ -1363,7 +1363,9 @@ router.get(['/history', '/history/:league'], (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
 	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
-		return res.redirect('/');
+		if ( ! res.locals.combines.public_numbers ) {
+			return res.redirect('/');
+		}
 	} 
 	const season = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
