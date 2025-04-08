@@ -1277,6 +1277,88 @@ router.all(['/deactivate/:rsc_id', '/deactivate/:rsc_id/:league'], (req, res) =>
 	}
 });
 
+router.post('/history/:rsc_id', (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	} 
+
+	const rsc_id = req.params.rsc_id;
+	const season = res.locals.combines.season;
+	const league = 3;
+
+	const id            = req.body.id;
+	const num           = req.body.num;
+	const tier          = req.body.tier;
+	const base_mmr      = req.body.base_mmr;
+	const effective_mmr = req.body.effective_mmr;
+	const current_mmr   = req.body.current_mmr;
+
+	const query = `
+		UPDATE tiermaker SET 
+			tier = ?, base_mmr = ?, effective_mmr = ?, current_mmr = ?
+		WHERE id = ?
+	`;
+
+	req.db.query(query, [tier, base_mmr, effective_mmr, current_mmr, id], (err, results) => {
+		if ( err ) { throw err; }
+
+		const signin_query = `
+			UPDATE combine_signups 
+			SET current_mmr = ? 
+			WHERE season = ? AND rsc_id = ? AND rostered = 0`;
+		req.db.query(signin_query, [ current_mmr, season, rsc_id ], (err, results) => {
+			if ( err ) { throw err; }
+
+			const active_game_query = `
+				UPDATE combine_match_players 
+				SET start_mmr = ? 
+				WHERE rsc_id = ? AND end_mmr IS null
+			`;
+
+			req.db.query(active_game_query, [rsc_id, current_mmr ], (err, results) => {
+				if ( err ) { throw err; }
+
+				const tiermaker_query = `
+					SELECT 
+						t.id, t.rsc_id, t.name, t.tier, t.base_mmr, t.effective_mmr, t.current_mmr, 
+						t.count, t.keeper, t.wins, t.losses
+					FROM tiermaker AS t 
+					WHERE t.id = ?
+				`;
+				req.db.query(tiermaker_query, [id], (err, results) => {
+					if ( err ) { throw err; }
+
+					const p = results[0];
+
+					const total_games = p.wins + p.losses;
+					const player = {
+						'tm_id': p.id,
+						'num': num,
+						'rsc_id': p.rsc_id,
+						'name': p.name, 
+						'tier': p.tier,
+						'base_mmr': p.base_mmr,
+						'effective_mmr': p.effective_mmr,
+						'current_mmr': p.current_mmr,
+						'mmr_delta': p.current_mmr - p.effective_mmr,
+						'combines_tier': getTierFromMMR(p.current_mmr, league),
+						'count': p.count,
+						'keeper': p.keeper,
+						'wins': p.wins,
+						'losses': p.losses,
+						'win_percentage': total_games > 0 ? parseFloat((p.wins / total_games) * 100).toFixed(1) : 0,
+						'games': total_games,
+					};
+
+					res.render('partials/combines/tiermaker-player-row', {
+						p: player,	
+					});
+				});
+			});
+		});
+	});
+});
+
 router.get(['/history', '/history/:league'], (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
@@ -1376,6 +1458,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 				
 				const total_games = p.wins + p.losses;
 				players[p.rsc_id] = {
+					'tm_id': p.id,
 					'num': i + 1,
 					'rsc_id': p.rsc_id,
 					'name': p.name, 

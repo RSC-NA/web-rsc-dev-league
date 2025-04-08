@@ -1,0 +1,140 @@
+<%
+const stat_colors = {
+	'great': 'text-success',
+	'ok': 'text-info',
+	'neutral': 'text-warning',
+	'bad': 'text-danger',
+	'none': 'text-muted',
+};
+let analysis = 'none';
+if ( p.win_percentage > 60 ) {
+	analysis = 'great';
+} else if ( p.win_percentage > 52 ) {
+	analysis = 'ok';
+} else if ( p.win_percentage > 45 ) {
+	analysis = 'neutral';
+} else if ( p.win_percentage > 20 ) {
+	analysis = 'bad';
+} else {
+	analysis = 'none';
+}
+
+%>
+
+<tr id="<%- p.rsc_id; %>">
+	<td class="text-muted">
+		<%- p.num; %>
+	</td>
+	<td class="text-left">
+		<a href="/player/<%= p.rsc_id; %>">
+			<%- p.rsc_id %>
+		</a>
+	</td>
+	<td class="fw-bolder">
+		<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
+		<a href="/combine/matches/<%= p.rsc_id; %>"><%= p.name; %></a>
+	</td>
+	<td class="text-start bg-<%- p.tier; %>">
+		<span class="view-player-<%- p.rsc_id; %>">
+			<%- p.tier; %>
+		</span>
+		<span class="hidden edit-player-<%- p.rsc_id; %>">
+			<select name="tier" class="form-control">
+				<option value="<%- p.tier; %>" selected><%- p.tier; %></option>
+				<optgroup label="Tiers">
+					<option value="Premier" class="bg-Premier">Premier</option>
+					<option value="Master" class="bg-Master">Master</option>
+					<option value="Elite" class="bg-Elite">Elite</option>
+					<option value="Veteran" class="bg-Veteran">Veteran</option>
+					<option value="Rival" class="bg-Rival">Rival</option>
+					<option value="Challenger" class="bg-Challenger">Challenger</option>
+					<option value="Prospect" class="bg-Prospect">Prospect</option>
+					<option value="Amateur" class="bg-Amateur">Amateur</option>
+				</optgroup>
+			</select>
+		</span>
+	</td>
+	<td class="text-end">
+		<span class="view-player-<%- p.rsc_id; %>">
+			<%- p.base_mmr; %>
+		</span>
+		<span class="hidden edit-player-<%- p.rsc_id; %>">
+			<input name="id" value="<%- p.tm_id; %>" type="hidden">
+			<input name="num" value="<%- p.num; %>" type="hidden">
+			<input name="base_mmr" value="<%- p.base_mmr; %>" class="form-control">
+		</span>
+	</td>
+	<td class="text-end">
+		<span class="view-player-<%- p.rsc_id; %>">
+			<%- p.effective_mmr; %>
+		</span>
+		<span class="hidden edit-player-<%- p.rsc_id; %>">
+			<input name="effective_mmr" value="<%- p.effective_mmr; %>" class="form-control">
+		</span>
+	</td>
+	<td class="text-center">
+		<span 
+			class="fw-bold <%- 
+				p.mmr_delta > 0 ? 
+					'text-success' : 
+					p.mmr_delta === 0 ? 
+						'text-muted' : 'text-danger'; 
+			%>"
+			title="<%= p.effective_mmr; %>"
+			>
+			<%= p.mmr_delta; %>
+		</span>
+	</td>
+	<td class="text-center">
+		<span 
+			class="view-player-<%- p.rsc_id; %> fw-bold <%- 
+				p.mmr_delta > 0 ? 
+					'text-success' : 
+					p.mmr_delta === 0 ? 
+						'text-muted' : 'text-danger'; 
+			%>"
+			title="<%= p.current_mmr; %>"
+			>
+			<%= p.current_mmr; %>
+		</span>
+		<span class="hidden edit-player-<%- p.rsc_id; %>">
+			<input name="current_mmr" value="<%- p.current_mmr; %>" class="form-control">
+		</span>
+	</td>
+	<% if (is_admin || is_combines_admin) { %>
+	<th>
+		<button
+			class="btn btn-outline-primary btn-sm edit-player-button view-player-<%- p.rsc_id; %>"
+			type="button"
+			data-rsc-id="<%- p.rsc_id; %>"
+		>
+			<i class="fas fa-edit"></i>
+		</button>
+		<button
+			type="submit"
+			class="btn btn-outline-success btn-sm form-control hidden edit-player-<%- p.rsc_id; %>"
+			hx-post="/combines/history/<%- p.rsc_id; %>"
+			hx-target="#<%- p.rsc_id; %>"
+			hx-include="[id='<%- p.rsc_id; %>']"
+			hx-swap="outerHTML"
+		>
+			<i class="fas fa-save"></i>
+		</button>
+	</th>
+	<% } %>
+	<td class="text-end">
+		<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
+	</td>
+	<td class="text-start bg-<%- p.combines_tier; %>">
+		<%- p.combines_tier; %>
+	</td>
+	<td class="text-right">
+		<span class="text-success fw-bold"><%= p.wins; %></span> /
+		<span class="text-danger fw-bold"><%= p.losses; %></span>
+	</td>
+	<td class="text-center">
+		<span class="<%- stat_colors[analysis]; %> fw-bold">
+			<%= p.win_percentage; %>%
+		</span>
+	</td>
+</tr>

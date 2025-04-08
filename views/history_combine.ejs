@@ -248,6 +248,26 @@
 					</a>
 				</div>
 			</div>
+			<script type="text/javascript">
+				document.addEventListener('DOMContentLoaded', () => {
+					const els = document.querySelectorAll('.editable-tbody');
+					if ( els ) {
+						for ( let i = 0; i < els.length; ++i ) {
+							const btn = els[i];
+
+							btn.addEventListener('click', (ev) => {
+								console.log(ev.target, ev.currentTarget);
+								if ( ev.target.closest('button') && ev.target.closest('button').classList.contains('edit-player-button') ) {
+									const btn = ev.target.closest('button');
+									const rsc_id = btn.dataset.rscId;
+									document.querySelectorAll(`.view-player-${rsc_id}`).forEach(el => el.classList.add('hidden'));
+									document.querySelectorAll(`.edit-player-${rsc_id}`).forEach(el => el.classList.remove('hidden'));
+								}
+							});
+						}
+					}
+				});
+			</script>
 			<div class="mb-3">
 				<table class="table table-hover table-dark">
 					<thead>
@@ -316,6 +336,11 @@
 								Combines MMR
 								<%- arrows['current_mmr']; %>
 							</th>
+							<% if (is_admin || is_combines_admin) { %>
+							<th class="text-center">
+								<i class="fas fa-edit"></i>
+							</th>
+							<% } %>
 							<th class="text-center" colspan="2">
 								Combine Tier
 							</th>
@@ -340,7 +365,7 @@
 							<th></th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody class="editable-tbody">
 
 					<% 
 						const stat_colors = {
@@ -367,13 +392,13 @@
 								}
 
 					%>
-						<tr>
+						<tr id="<%- p.rsc_id; %>">
 							<td class="text-muted">
 								<%- p.num; %>
 							</td>
 							<td class="text-left">
-								<a href="/player/<%= rsc_id; %>">
-									<%- rsc_id %>
+								<a href="/player/<%= p.rsc_id; %>">
+									<%- p.rsc_id %>
 								</a>
 							</td>
 							<td class="fw-bolder">
@@ -381,13 +406,52 @@
 								<a href="/combine/matches/<%= rsc_id; %>"><%= p.name; %></a>
 							</td>
 							<td class="text-start bg-<%- p.tier; %>">
-								<%- p.tier; %>
+								<span class="view-player-<%- p.rsc_id; %>">
+									<%- p.tier; %>
+								</span>
+								<span class="hidden edit-player-<%- p.rsc_id; %>">
+									<select name="tier" class="form-control">
+										<option value="<%- p.tier; %>" selected><%- p.tier; %></option>
+										<optgroup label="Tiers">
+											<option value="Premier" class="bg-Premier">Premier</option>
+											<option value="Master" class="bg-Master">Master</option>
+											<option value="Elite" class="bg-Elite">Elite</option>
+											<option value="Veteran" class="bg-Veteran">Veteran</option>
+											<option value="Rival" class="bg-Rival">Rival</option>
+											<option value="Challenger" class="bg-Challenger">Challenger</option>
+											<option value="Prospect" class="bg-Prospect">Prospect</option>
+											<option value="Amateur" class="bg-Amateur">Amateur</option>
+										</optgroup>
+									</select>
+								</span>
 							</td>
 							<td class="text-end">
-								<%- p.base_mmr; %>
+								<span class="view-player-<%- p.rsc_id; %>">
+									<%- p.base_mmr; %>
+								</span>
+								<span class="hidden edit-player-<%- p.rsc_id; %>">
+									<input name="id" value="<%- p.tm_id; %>" type="hidden">
+									<input name="num" value="<%- p.num; %>" type="hidden">
+									<input
+										name="base_mmr"
+										value="<%- p.base_mmr; %>"
+										class="form-control"
+										type="number" min="100" max="2200" step="5"
+									>
+								</span>
 							</td>
 							<td class="text-end">
-								<%- p.effective_mmr; %>
+								<span class="view-player-<%- p.rsc_id; %>">
+									<%- p.effective_mmr; %>
+								</span>
+								<span class="hidden edit-player-<%- p.rsc_id; %>">
+									<input
+										name="effective_mmr"
+										value="<%- p.effective_mmr; %>"
+										class="form-control"
+										type="number" min="100" max="2200" step="5"
+									>
+								</span>
 							</td>
 							<td class="text-center">
 								<span 
@@ -397,24 +461,53 @@
 											p.mmr_delta === 0 ? 
 												'text-muted' : 'text-danger'; 
 									%>"
-									title="<%= p.effective_mmr; %>"
+									title="<%= p.mmr_delta; %>"
 									>
 									<%= p.mmr_delta; %>
 								</span>
 							</td>
 							<td class="text-center">
 								<span 
-									class="fw-bold <%- 
+									class="view-player-<%- p.rsc_id; %> fw-bold <%- 
 										p.mmr_delta > 0 ? 
 											'text-success' : 
 											p.mmr_delta === 0 ? 
 												'text-muted' : 'text-danger'; 
 									%>"
-									title="<%= p.effective_mmr; %>"
+									title="<%= p.current_mmr; %>"
 									>
 									<%= p.current_mmr; %>
 								</span>
+								<span class="hidden edit-player-<%- p.rsc_id; %>">
+									<input
+										name="current_mmr"
+										value="<%- p.current_mmr; %>"
+										class="form-control"
+										type="number" min="100" max="2200" step="5"
+									>
+								</span>
 							</td>
+							<% if (is_admin || is_combines_admin) { %>
+							<th>
+								<button
+									class="btn btn-outline-primary btn-sm edit-player-button view-player-<%- p.rsc_id; %>"
+									type="button"
+									data-rsc-id="<%- p.rsc_id; %>"
+								>
+									<i class="fas fa-edit"></i>
+								</button>
+								<button
+									type="submit"
+									class="btn btn-outline-success btn-sm form-control hidden edit-player-<%- p.rsc_id; %>"
+									hx-include="[id='<%- p.rsc_id; %>']"
+									hx-post="/combines/history/<%- p.rsc_id; %>"
+									hx-target="#<%- p.rsc_id; %>"
+									hx-swap="outerHTML"
+								>
+									<i class="fas fa-save"></i>
+								</button>
+							</th>
+							<% } %>
 							<td class="text-end">
 								<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
 							</td>
