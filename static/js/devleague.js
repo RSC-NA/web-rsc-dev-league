@@ -1,7 +1,7 @@
 const DevLeague = {
 	in_game: false,
 	do_ping: true,
-	threshold: 6,
+	threshold: 8,
 	playReady: function() {
 		var audio = new Audio('/sounds/match_ready.mp3');
 		audio.play();
