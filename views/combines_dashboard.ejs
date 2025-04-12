@@ -53,10 +53,6 @@
 					<h1>Welcome to the RSC Combines, <%= user.name %></h1>
 					<div class="roles text-sm">
 					<%
-						console.log('test');
-
-						console.log(user_roles);
-
 						if ( user_roles ) {
 							for ( const role_id in roles ) {
 								if ( user_roles.includes(role_id) ) {

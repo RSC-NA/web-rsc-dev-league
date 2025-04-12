@@ -47,6 +47,7 @@ const combines_admin_controller = require('./controllers/combines_admin');
 const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 const player_controller = require('./controllers/player');
+const election_controller = require('./controllers/election');
 
 /* tournament controllers */
 const tournaments_controller = require('./controllers/tournaments');
@@ -845,6 +846,7 @@ app.use(stats_api_admin_controller);
 
 // player routes controlled by /controllers/players.js
 app.use(player_controller);
+app.use('/elections', election_controller);
 
 // tournaments
 app.use(tournaments_controller);

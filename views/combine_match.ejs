@@ -617,9 +617,9 @@
 										%>
 										<td class="text-center">
 											<a
-												href="<%- report_url + player_params; %>"
+												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Elite"
-												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p.tier; %>'><%- p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p.tier; %>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
@@ -807,9 +807,9 @@
 										%>
 										<td class="text-center">
 											<a
-												href="<%- report_url + player_params; %>"
+												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Prospect"
-												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p.tier;%>'><%- p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
