@@ -938,7 +938,7 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 	
 	console.log(output);
 
-	return res.redirect(`${returnUrl}?new=${output.new}&updated=${output.updated}&skipped=${output.skipped}`);
+	return res.redirect(`${returnUrl}?added=${output.new}&updated=${output.updated}&skipped=${output.skipped}&import_type=master`);
 });
 
 router.get('/import_contracts/:contract_sheet_id', async (req, res) => {

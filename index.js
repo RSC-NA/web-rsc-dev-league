@@ -110,6 +110,11 @@ app.use((req, res, next) => {
 	next();
 });
 
+/* This will intentionally delay the request, useful for development debugging. */
+// app.use(async(req,res,next) => {
+// 	await new Promise((resolve) => setTimeout(next, 1000));
+// });
+
 // correct server URL middleware
 // TODO(erh): Once I shut down heroku, we can turn this off
 app.use((req, res, next) => {

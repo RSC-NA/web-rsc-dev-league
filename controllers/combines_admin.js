@@ -2062,6 +2062,14 @@ router.get('/manage', (req, res) => {
 		return res.redirect('/');
 	} 
 
+	const import_results = {
+		import_type: req.query.import_type ? req.query.import_type : null,
+		updated: req.query.updated ? req.query.updated : null,
+		added:   req.query.added ? req.query.added : null,
+		skipped: req.query.skipped ? req.query.skipped : null,
+		missing: req.query.missing ? req.query.missing : null,
+	};
+
 	res.locals.title = `Manage Combines - ${res.locals.title}`;
 
 	const counts_query = `
@@ -2111,12 +2119,14 @@ router.get('/manage', (req, res) => {
 					tiers: tiers,
 					combines: results[0],
 					tiermaker_sheet_id: tiermaker_sheet_id,
+					import_results: import_results,
 				});
 			} else { 
 				res.render('manage_combines', {
 					tiers: tiers,
 					combines: res.locals.combines,
 					tiermaker_sheet_id: '',
+					import_results: import_results,
 				});
 			}
 		});
@@ -2410,6 +2420,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 	const tiermaker_query = `SELECT id,rsc_id,name FROM tiermaker WHERE season = ? AND league = 3`;
 	let skipped = 0;
 	const updates = {};
+	const missing = {};
 	const [results] = await db.query(tiermaker_query, [ season ]);
 	if ( results.length ) {
 		for ( let i = 0; i < results.length; ++i ) {
@@ -2421,6 +2432,9 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 				}
 				delete(players[row['rsc_id']]);
 				skipped++;
+			} else {
+				missing[row['rsc_id']] = row;
+				delete(players[row['rsc_id']]);
 			}
 		}
 	}
@@ -2433,8 +2447,8 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 			p.effective_mmr, p.current_mmr
 		]);
 	}
-	
-	const re_url = `/combines/manage?added=${new_players.length}&skipped=${skipped}&updated=${Object.keys(updates).length}`;
+
+	const re_url = `/combines/manage?added=${new_players.length}&skipped=${skipped}&updated=${Object.keys(updates).length}&missing=${Object.keys(missing).length}&import_type=tiermaker`;
 	if ( Object.keys(updates).length ) {
 		const update_query = `
 			UPDATE tiermaker 
@@ -2460,6 +2474,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		console.log(`	Imported: ${new_players.length}`);
 		console.log(`	Updated: ${Object.keys(updates).length}`);
 		console.log(`	Skipped: ${skipped}`);
+		console.log(`	Missing: ${Object.keys(missing).length}`);
 		console.log(updates);
 		console.log(" -------- Tiermaker Import Complete --------- ");
 
