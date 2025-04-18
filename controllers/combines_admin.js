@@ -2417,7 +2417,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 
 	console.log(`    Found ${Object.keys(players).length} players in tier maker.`);
 
-	const tiermaker_query = `SELECT id,rsc_id,name FROM tiermaker WHERE season = ? AND league = 3`;
+	const tiermaker_query = `SELECT id,rsc_id,discord_id,name FROM tiermaker WHERE season = ? AND league = 3`;
 	let skipped = 0;
 	const updates = {};
 	const missing = {};
@@ -2432,7 +2432,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 				}
 				delete(players[row['rsc_id']]);
 				skipped++;
-			} else {
+			} else if ( ! (row['rsc_id'] in discord_ids) ) {
 				missing[row['rsc_id']] = row;
 				delete(players[row['rsc_id']]);
 			}
@@ -2475,13 +2475,23 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		console.log(`	Updated: ${Object.keys(updates).length}`);
 		console.log(`	Skipped: ${skipped}`);
 		console.log(`	Missing: ${Object.keys(missing).length}`);
-		console.log(updates);
+		// console.log(updates);
+		console.log(missing);
 		console.log(" -------- Tiermaker Import Complete --------- ");
 
 		await db.end();
 
 		res.redirect(re_url);
 	} else {
+
+		console.log(" -------- Tiermaker Import Complete --------- ");
+		console.log(`	Imported: 0`);
+		console.log(`	Updated: ${Object.keys(updates).length}`);
+		console.log(`	Skipped: ${skipped}`);
+		console.log(`	Missing: ${Object.keys(missing).length}`);
+		//console.log(updates);
+		console.log(missing);
+		console.log(" -------- Tiermaker Import Complete --------- ");
 
 		await db.end();
 		res.redirect(re_url);
