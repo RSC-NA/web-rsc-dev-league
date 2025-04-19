@@ -36,6 +36,10 @@
 					if ( DevLeague.threshold < <%- team_avail; %> ) {
 						setTimeout(DevLeague.playReady, 100);
 					}
+
+					if ( <%- include_games %> && <%- game_count === 0; %> ) {
+						setTimeout(DevLeague.playBoop, 100);
+					}
 					// <%- include_games ?? 'not passed'; %>, <%- game_count ?? 'not passed'; %> 
 				</script>
 				<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">

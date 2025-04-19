@@ -2,6 +2,11 @@ const DevLeague = {
 	in_game: false,
 	do_ping: true,
 	threshold: 8,
+	playBoop: function() {
+		var audio = new Audio('/sounds/check_in_ready.mp3');
+		audio.play();
+		DevLeague.threshold += 1;
+	},
 	playReady: function() {
 		var audio = new Audio('/sounds/match_ready.mp3');
 		audio.play();
