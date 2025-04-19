@@ -1,4 +1,5 @@
 const DevLeague = {
+	game_count: 0,
 	in_game: false,
 	do_ping: true,
 	threshold: 8,
