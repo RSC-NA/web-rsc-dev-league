@@ -43,7 +43,7 @@
 							setTimeout(DevLeague.playBoop, 100);
 						}
 					} else if ( <%- game_count; %> && DevLeague.game_count !== <%- game_count; %> ) {
-						DevLeague.game_count = game_count;
+						DevLeague.game_count = <%- game_count; %>;
 					}
 					// <%- include_games ?? 'not passed'; %>, <%- game_count ?? 'not passed'; %> 
 				</script>
