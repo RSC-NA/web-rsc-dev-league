@@ -1921,79 +1921,95 @@ router.get(['/process/waiting', '/process/waiting/:league'], (req, res) => {
 		return res.redirect('/');
 	} 
 
-	const players_query = `
+	const games_query = `
 		SELECT 
-			t.id, t.rsc_id, t.name, t.tier, t.effective_mmr, t.current_mmr, 
-			t.count, t.keeper, t.wins, t.losses
-		FROM tiermaker AS t 
-		WHERE t.season = ? AND t.league = ?
-	`;
-	const players = {};
-	req.db.query(players_query, [ res.locals.combines.season, league ], (err, results) => {
+			id,lobby_user,lobby_pass,home_mmr 
+		FROM combine_matches 
+		WHERE completed = 0 AND cancelled = 0 AND league = 3`;
+	req.db.query(games_query, (err, results) => {
 		if ( err ) { throw err; }
 
+		let game_count = 0;
 		if ( results.length ) {
-			for ( let i = 0; i < results.length; ++i ) {
-				const p = results[i];
-
-				players[p.rsc_id] = {
-					'rsc_id': p.rsc_id,
-					'name': p.name, 
-					'tier': p.tier,
-					'effective_mmr': p.effective_mmr,
-					'current_mmr': p.current_mmr,
-					'count': p.count,
-					'keeper': p.keeper,
-					'wins': p.wins,
-					'losses': p.losses,
-					'games': p.wins + p.losses,
-				};
-			}
+			game_count = results.length;
 		}
-	
-		const signups_query = `
+
+		const players_query = `
 			SELECT 
-				s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
-				s.current_mmr, s.active, s.rostered
-			FROM combine_signups AS s 
-			WHERE 
-				s.league = ? AND
-				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
-				s.rostered = 0 AND active = 0
-			ORDER BY s.current_mmr DESC
+				t.id, t.rsc_id, t.name, t.tier, t.effective_mmr, t.current_mmr, 
+				t.count, t.keeper, t.wins, t.losses
+			FROM tiermaker AS t 
+			WHERE t.season = ? AND t.league = ?
 		`;
-		const signups = {
-			'games': [],
-			'active': {},
-			'waiting': {},
-		};
-		req.db.query(signups_query, [ league ], (err, results) => {
+		const players = {};
+		req.db.query(players_query, [ res.locals.combines.season, league ], (err, results) => {
 			if ( err ) { throw err; }
 
 			if ( results.length ) {
 				for ( let i = 0; i < results.length; ++i ) {
-					const s = results[i];
-					const p = players[s.rsc_id];
-					//console.log(s,p);
-					p.signup_dtg = s.signup_dtg;
-					p.win_percentage = p.games ? 
-						parseFloat(((p.wins / p.games) * 100).toFixed(1)) : 
-						0;
-					p.mmr_delta = s.current_mmr - p.effective_mmr;
+					const p = results[i];
 
-					if ( s.active ) {
-						signups.active[s.rsc_id] = p;
-					} else {
-						signups.waiting[s.rsc_id] = p;
-					}
+					players[p.rsc_id] = {
+						'rsc_id': p.rsc_id,
+						'name': p.name, 
+						'tier': p.tier,
+						'effective_mmr': p.effective_mmr,
+						'current_mmr': p.current_mmr,
+						'count': p.count,
+						'keeper': p.keeper,
+						'wins': p.wins,
+						'losses': p.losses,
+						'games': p.wins + p.losses,
+					};
 				}
 			}
-			console.log(Object.keys(signups.waiting).length)
-			res.render('partials/combines/waiting', {
-				league: league,
-				waiting_room: signups.waiting,
-				getTierFromMMR: getTierFromMMR,
-				delay: last != Object.keys(signups.waiting).length ? 10 : delay + 20, 
+		
+			const signups_query = `
+				SELECT 
+					s.id, s.rsc_id, s.discord_id, s.signup_dtg, 
+					s.current_mmr, s.active, s.rostered
+				FROM combine_signups AS s 
+				WHERE 
+					s.league = ? AND
+					s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+					s.rostered = 0 AND active = 0
+				ORDER BY s.current_mmr DESC
+			`;
+			const signups = {
+				'games': [],
+				'active': {},
+				'waiting': {},
+			};
+			req.db.query(signups_query, [ league ], (err, results) => {
+				if ( err ) { throw err; }
+
+				if ( results.length ) {
+					for ( let i = 0; i < results.length; ++i ) {
+						const s = results[i];
+						const p = players[s.rsc_id];
+						//console.log(s,p);
+						p.signup_dtg = s.signup_dtg;
+						p.win_percentage = p.games ? 
+							parseFloat(((p.wins / p.games) * 100).toFixed(1)) : 
+							0;
+						p.mmr_delta = s.current_mmr - p.effective_mmr;
+
+						if ( s.active ) {
+							signups.active[s.rsc_id] = p;
+						} else {
+							signups.waiting[s.rsc_id] = p;
+						}
+					}
+				}
+				console.log(Object.keys(signups.waiting).length)
+				res.render('partials/combines/waiting', {
+					league: league,
+					waiting_room: signups.waiting,
+					getTierFromMMR: getTierFromMMR,
+					delay: last != Object.keys(signups.waiting).length ? 10 : delay + 20, 
+					include_games: true,
+					game_count: game_count,
+				});
 			});
 		});
 	});

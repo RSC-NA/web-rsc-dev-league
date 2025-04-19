@@ -13,6 +13,18 @@
 	} else if (load_delay > 200) { 
 		load_delay = 180;
 	}
+
+	const show_include = include_games ?? false;
+%>
+
+<%
+	if ( show_include ) {
+%>
+	<h4 id="active_games_count" hx-swap-oob="true">Active Games: <%- game_count; %>
+		<button class="btn btn-primary btn-sm float-end">Show Active Games</button>
+	</h4>
+<%
+	}
 %>
 			<div
 				id="waiting_room_div"
