@@ -306,7 +306,7 @@ router.get('/bans', (req, res) => {
 			b.note
 		FROM player_bans AS b 
 		LEFT JOIN players AS pp ON b.banned_by = pp.id 
-		LEFT JOIN players AS p ON b.rsc_id = p.rsc_id
+		LEFT JOIN players AS p ON b.discord_id = p.discord_id
 		ORDER BY b.expires_dtg ASC, b.created_dtg
 	`;
 
