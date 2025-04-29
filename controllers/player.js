@@ -50,22 +50,23 @@ router.get('/player/:rsc_id', (req, res) => {
 
 	const query = `
 SELECT
-	c.rsc_id, c.name, c.tier, c.status, c.mmr, c.active_3s, c.active_2s
+	c.rsc_id, c.discord_id, c.name, c.tier, c.status, c.mmr, c.active_3s, c.active_2s
 FROM contracts AS c
 WHERE c.rsc_id = ?
 `;
 
 	const player = {
-		rsc_id: '',
-		name:   '',
-		tier:   '',
-		status: '',
-		mmr:     0,
-		trackers: {},
-		pulls:    [],
-		combines: false,
-		active_3s: false,
-		active_2s: false,
+		rsc_id    : '',
+		discord_id: '',
+		name      :   '',
+		tier      :   '',
+		status    : '',
+		mmr       :     0,
+		trackers  : {},
+		pulls     :    [],
+		combines  : false,
+		active_3s : false,
+		active_2s : false,
 	};
 
 	console.log(`RSC_ID: ${req.params.rsc_id}`);
@@ -81,13 +82,14 @@ WHERE c.rsc_id = ?
 			});
 		}
 
-		player.rsc_id = req.params.rsc_id;
-		player.name   = results[0].name;
-		player.tier   = results[0].tier;
-		player.mmr    = results[0].mmr;
-		player.status = results[0].status;
-		player.active_3s = results[0].active_3s;
-		player.active_2s = results[0].active_2s;
+		player.rsc_id     = req.params.rsc_id;
+		player.discord_id = results[0].discord_id;
+		player.name       = results[0].name;
+		player.tier       = results[0].tier;
+		player.mmr        = results[0].mmr;
+		player.status     = results[0].status;
+		player.active_3s  = results[0].active_3s;
+		player.active_2s  = results[0].active_2s;
 		
 		res.locals.title = `${player.rsc_id}: ${player.name} [${player.tier}]`;
 		res.locals.description = `${player.name} in ${player.tier} @ ${player.mmr}MMR`;

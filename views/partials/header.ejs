@@ -139,7 +139,22 @@
 								<div class="sb-nav-link-icon"><i class="fas fa-gamepad text-primary"></i></div>
 								Match Info
 							</a>
-						<% } %>
+						<% 
+							} 
+
+							const mod_role_id = '400097903277899776';
+							//if ( is_admin || (user_roles && user_roles.includes(mod_role_id) )  ) {
+							if ( user_roles && user_roles.includes(mod_role_id) ) {
+						%>
+
+							<a class="nav-link" href="/bans">
+								<div class="sb-nav-link-icon"><i class="fas fa-gavel text-danger"></i></div>
+								BANS
+							</a>
+
+						<% 
+							} // end of ban page
+						%>
 
 						<%
 							if ( is_admin || is_stats_admin || is_combines_admin || is_devleague_admin ) {

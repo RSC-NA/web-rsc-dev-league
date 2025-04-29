@@ -249,7 +249,36 @@ router.get('/championship', (req, res) => {
 	});
 });
 
+router.post('/ban/:player_id/:rsc_id/:discord_id', (req, res) => {
+	const u_roles = res.locals.user_roles;
+	const mod_role_id = '400097903277899776';
+	if ( ! req.session.is_admin ) {
+		if ( ! u_roles || ! u_roles.includes(mod_role_id) ) {
+			return res.redirect('/');
+		}
+	}
+
+	const query = `
+		INSERT INTO player_bans (banned_by, rsc_id, discord_id, note) VALUES (?, ?, ?, ?)
+	`;
+	req.db.query( query, [
+		req.params.player_id, req.params.rsc_id, req.params.discord_id, req.body.note ?? ''
+	], 
+		(err, results) => {
+			if ( err ) { throw err; }
+
+			return res.redirect('/bans');
+	})
+});
 router.get('/ban/:ban_id/expire', (req, res) => {
+	const u_roles = res.locals.user_roles;
+	const mod_role_id = '400097903277899776';
+	if ( ! req.session.is_admin ) {
+		if ( ! u_roles || ! u_roles.includes(mod_role_id) ) {
+			return res.redirect('/');
+		}
+	}
+
 	const query = `
 		UPDATE player_bans SET expires_dtg = now() where id = ?
 	`;
@@ -261,7 +290,14 @@ router.get('/ban/:ban_id/expire', (req, res) => {
 });
 
 router.get('/bans', (req, res) => {
-	console.log('here');
+	const u_roles = res.locals.user_roles;
+	const mod_role_id = '400097903277899776';
+	if ( ! req.session.is_admin ) {
+		if ( ! u_roles || ! u_roles.includes(mod_role_id) ) {
+			return res.redirect('/');
+		}
+	}
+
 	const query = `
 		SELECT 
 			b.id,b.banned_by,pp.nickname AS banned_by_nickname,
@@ -271,8 +307,8 @@ router.get('/bans', (req, res) => {
 		FROM player_bans AS b 
 		LEFT JOIN players AS pp ON b.banned_by = pp.id 
 		LEFT JOIN players AS p ON b.rsc_id = p.rsc_id
-		ORDER BY b.created_dtg
-		`;
+		ORDER BY b.expires_dtg ASC, b.created_dtg
+	`;
 
 	req.db.query(query, (err, results) => {
 		if ( err ) { throw err; }

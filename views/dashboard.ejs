@@ -12,6 +12,20 @@
 
 			<% if ( user.name ) { %>
 					<h1>Welcome to the RSC Development League, <%= user.name %></h1>
+					<div class="roles text-sm">
+					<%
+						if ( user_roles ) {
+							for ( const role_id in roles ) {
+								if ( user_roles.includes(role_id) ) {
+					%>
+					<span class="badge badge-sm rounded-pill <%- roles[role_id]['css']; %>"><%- roles[role_id]['text']; %></span>
+					<%
+								
+								}
+							}
+						}
+					%>
+					</div>
 			<% } else { %>
 					<h1>Welcome to the RSC Development League</h1>
 			<% } %>

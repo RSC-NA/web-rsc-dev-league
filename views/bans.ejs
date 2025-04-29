@@ -1,6 +1,7 @@
 
 <%- include('partials/header.ejs'); %>
 
+
 <main class="container-xl">
 	<div class="py-0 mt-2">
 		<h2>Dev League Software Bans</h2>
@@ -26,15 +27,23 @@
 						const e_time = ban.expires_dtg ? ban.expires_dtg.getTime() : null;
 						let ban_status = 'active';
 
-						if ( e_time && e_time < (new Date()).getTime() ) {
+						if ( e_time && e_time > 0 && e_time < (new Date()).getTime() + (60 * 60 * 1000 * 5)) {
 							ban_status = 'expired';
 						}
 
 			%>
-				<li class="list-group-item dark d-flex flex-row justify-content-between 1h-condensed matchDates">
+				<li
+					class="list-group-item dark d-flex flex-row justify-content-between 1h-condensed matchDates mt-2"
+					style="<%- ban_status === 'expired' ? 'background-color:#000f1e;' : ''; %>"
+				>
 					<div class="my-0  w-50 align-middle">
 						<h5 class="my-0">
-							<%- ban.nickname; %> <%- ban_status; %> <%- e_time %> <%- new Date().getTime(); %> <%- e_time < (new Date).getTime(); %>
+							<%- ban.nickname; %> 
+							- <%- 
+								ban_status === 'expired' ? 
+									'<span class="text-warning">Expired</span>' 
+									: '<span class="Veteran">' + ban_status + '</span>'; 
+							%> 
 						</h5>
 						<span>
 						From: <strong><%- b_date; %></strong>
@@ -69,9 +78,15 @@
 						</h5>
 					</div>
 					<div class="text-end">
+						<% 
+							if ( ban_status === 'active' ) {
+						%>
 						<a href="/ban/<%- ban.id; %>/expire" class="btn btn-sm btn-outline-info">
 							Expire Ban
 						</a>
+						<%
+							}
+						%>
 					</div>
 				</li>
 			<%				

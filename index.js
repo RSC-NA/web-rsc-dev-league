@@ -599,6 +599,8 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
 	res.locals.checked_in    = false;
 	res.locals.checked_in_2s = false;
+
+	res.locals.user_roles = req.session.user_roles ?? [];
 	
 	const date = new Date(new Date().setHours(4)).toISOString().split('T')[0];
 	res.locals.today = date;
@@ -791,9 +793,44 @@ app.get('/', (req, res) => {
 
 		});
 	} else {
-		res.render('dashboard', { match_days: matchDays });
+		res.render('dashboard', { 
+			match_days: matchDays,
+			roles: roles,
+			user_roles: req.session?.user_roles ?? null,
+		});
 	}
 });
+
+/*
+app.get('/bans', (req, res) => {
+	const u_roles = res.locals.user_roles;
+	const mod_role_id = '400097903277899776';
+	if ( ! req.session.is_admin ) {
+		if ( ! u_roles || ! u_roles.includes(mod_role_id) ) {
+			return res.redirect('/');
+		}
+	}
+
+
+	const query = `
+		SELECT 
+			b.banned_by,b.rsc_id,b.discord_id,b.note,b.created_dtg,b.expires_dtg,
+			p.nickname,
+			banner.nickname
+		FROM player_bans AS b 
+		LEFT JOIN players AS p ON b.discord_id = p.discord_id 
+		LEFT JOIN players AS banner ON b.banned_by = banner.id
+		ORDER BY b.id DESC
+	`;
+	connection.query(query, (err, results) => {
+		if ( err ) { console.error('Error fetching bans:', err); throw err; }
+	
+		return res.render('bans', {
+			results,
+		});
+	});
+});
+*/
 
 app.get('/devleague-replays', (req, res) => {
 	const replays_path = `./static/devleague_replays/s${res.locals.settings.season}`;
