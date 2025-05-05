@@ -147,52 +147,47 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 					return res.json(player);
 				}
 
-				console.log(res.locals.combines);
-				if ( res.locals.combines.active ) {
-					const combines_query = `
-						SELECT 
-							c.id,c.home_wins,c.away_wins,c.home_mmr,c.away_mmr,p.team,
-							p.start_mmr,p.end_mmr
-						FROM 
-							combine_matches AS c 
-						LEFT JOIN combine_match_players AS p 
-						ON c.id = p.match_id 
-						WHERE 
-							c.season = ? AND c.league = 3 AND c.completed = 1 AND p.rsc_id = ? 
-					`;
+				const combines_query = `
+					SELECT 
+						c.id,c.home_wins,c.away_wins,c.home_mmr,c.away_mmr,p.team,
+						p.start_mmr,p.end_mmr
+					FROM 
+						combine_matches AS c 
+					LEFT JOIN combine_match_players AS p 
+					ON c.id = p.match_id 
+					WHERE 
+						c.season = ? AND c.league = 3 AND c.completed = 1 AND p.rsc_id = ? 
+				`;
+
+				req.db.query(combines_query, 
+					[ res.locals.combines.season, req.params.rsc_id ], 
+					(err, results) => {
 					
-					req.db.query(combines_query, 
-						[ res.locals.combines.season, req.params.rsc_id ], 
-						(err, results) => {
-						
-						const record = { wins: 0, losses: 0 };
+					const record = { wins: 0, losses: 0 };
 
-						if ( err ) { throw err; } 
-						
-						for ( let i = 0; i < results.length; ++i ) {
-							const r = results[i];
-							results[i].tier = getTierFromMMR(r.home_mmr / 3, 3);
-							if ( r.team === 'home' ) {
-								record.wins += r.home_wins;
-								record.losses += r.away_wins;
-								results[i].wins = r.home_wins;
-								results[i].losses = r.away_wins;
-							} else {
-								record.wins += r.away_wins;
-								record.losses += r.home_wins;
-								results[i].wins = r.away_wins;
-								results[i].losses = r.home_wins;
-							}
+					if ( err ) { throw err; } 
+					
+					for ( let i = 0; i < results.length; ++i ) {
+						const r = results[i];
+						results[i].tier = getTierFromMMR(r.home_mmr / 3, 3);
+						if ( r.team === 'home' ) {
+							record.wins += r.home_wins;
+							record.losses += r.away_wins;
+							results[i].wins = r.home_wins;
+							results[i].losses = r.away_wins;
+						} else {
+							record.wins += r.away_wins;
+							record.losses += r.home_wins;
+							results[i].wins = r.away_wins;
+							results[i].losses = r.home_wins;
 						}
+					}
 
-						player.combines = results;
-						//console.log('combines',results);
-						console.log('USING THE COMBINES ROUTE!');
-						return res.render('player', { player: player });
-					});
-				} else {
-					player.combines = [];
-				}
+					player.combines = results;
+					//console.log('combines',results);
+					console.log('USING THE COMBINES ROUTE!');
+					return res.render('player', { player: player });
+				});
 
 				return res.render('player', { player: player });
 			});

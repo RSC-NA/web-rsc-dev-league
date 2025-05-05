@@ -516,6 +516,41 @@ app.use((req, res, next) => {
 		next();
 	});
 });
+
+app.use((req, res, next) => {
+	const regular_season = res.locals.settings.season;
+	const combine_season = res.locals.combines.season;
+	
+	let day_type = 'devleague';
+	let season = regular_season;
+	if ( res.locals.combines.active ) {
+		day_type = 'combines';
+		season = combine_season;
+	}
+
+	const query = `
+		SELECT id,season,type,match_day,match_date,holiday 
+		FROM league_dates 
+		WHERE type = ? AND season = ?
+		ORDER BY match_date ASC
+	`;
+	const match_days = {};
+	connection.query(query, [day_type, season], (err, results) => {
+		if ( err ) { throw err; }
+		if ( results ) {
+			for ( let i = 0; i < results.length; ++i ) {
+				const row = results[i];
+				const nice_date = row.match_date.toISOString().split('T')[0];
+				match_days[nice_date] = row.holiday ? 'holiday' : row.match_day;
+			}
+
+		}
+
+		res.locals.match_days = match_days;
+		next();
+	});
+});
+
 // tournaments middleware
 /*
 app.use((req, res, next) => {
@@ -613,10 +648,10 @@ app.use((req, res, next) => {
 	res.locals.combine_2s_live = res.locals.combines_2s.live;
 
 	if ( date in matchDays ) {
-		res.locals.match_day = matchDays[date];
+		res.locals.match_day = matchDays[date]; //res.locals.match_days[date]; //matchDays[date];
 	}
 	if ( date in combineDays['3s'] || res.locals.combine_live ) {
-		res.locals.combine_day = combineDays['3s'][date];
+		res.locals.combine_day = combineDays['3s'][date]; //res.locals.match_days[date]; //combineDays['3s'][date];
 	}
 	if ( date in combineDays['2s'] || res.locals.combine_2s_live ) {
 		res.locals.combine_2s_day = combineDays['2s'][date];
@@ -794,7 +829,7 @@ app.get('/', (req, res) => {
 		});
 	} else {
 		res.render('dashboard', { 
-			match_days: matchDays,
+			match_days: matchDays, //res.locals.match_days,
 			roles: roles,
 			user_roles: req.session?.user_roles ?? null,
 		});
@@ -864,7 +899,7 @@ app.get('/devleague-replays', (req, res) => {
 });
 
 app.get('/dev_dashboard', (req, res) => {
-	res.render('dashboard', { match_days: matchDays });
+	res.render('dashboard', { match_days: res.locals.match_days });
 });
 
 // Authentication handled by /controllers/authentication.js

@@ -194,6 +194,17 @@ CREATE TABLE league_settings (
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE league_dates (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`type` VARCHAR(15) NOT NULL DEFAULT 'devleague', 
+	`match_day` INT UNSIGNED NOT NULL, 
+	`match_date` DATE NOT NULL,
+	`holiday` TINYINT NOT NULL DEFAULT 0,
+	PRIMARY KEY(`id`),
+	INDEX season_type_idx (`season`, `type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE contracts (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`discord_id` VARCHAR(20) NOT NULL,
