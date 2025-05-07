@@ -104,7 +104,7 @@
 		</div>
 
 		<div class="bg-dark p-3 rounded">
-		<% if ( match_day && match_day != 'holiday' ) { %>
+		<% if ( match_day !== false && match_day != 'holiday' ) { %>
 
 			<% if ( nickname && ! checked_in && user && user['active_3s'] && settings[ user.tier.toLowerCase() ] != 0 ) { %>
 

@@ -656,7 +656,7 @@ app.use((req, res, next) => {
 	if ( date in combineDays['2s'] || res.locals.combine_2s_live ) {
 		res.locals.combine_2s_day = combineDays['2s'][date];
 	}
-	if ( res.locals.match_day && req.session.user_id && ! res.locals.combine_live ) {
+	if ( res.locals.match_day !== false && req.session.user_id && ! res.locals.combine_live ) {
 		const query = `
 			SELECT id,active,rostered 
 			FROM signups 
