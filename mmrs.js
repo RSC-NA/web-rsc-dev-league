@@ -12,30 +12,30 @@ const mmrRange_3s = {
 	},
 	'Master': { 
 		'max': 1815,
-		'min': 1710,
+		'min': 1715,
 	},
 	'Elite': { 
-		'max': 1705,
-		'min': 1550,
+		'max': 1710,
+		'min': 1535,
 	},
 	'Veteran': { 
-		'max': 1545,
-		'min': 1415,
+		'max': 1530,
+		'min': 1390,
 	},
 	'Rival': { 
-		'max': 1410,
-		'min': 1270,
+		'max': 1385,
+		'min': 1245,
 	},
 	'Challenger': { 
-		'max': 1265,
-		'min': 1100,
+		'max': 1240,
+		'min': 1075,
 	},
 	'Prospect': { 
-		'max': 1095,
-		'min': 980,
+		'max': 1070,
+		'min': 955,
 	},
 	'Amateur': { 
-		'max': 975,
+		'max': 950,
 		'min': 0,
 	},
 	/*
