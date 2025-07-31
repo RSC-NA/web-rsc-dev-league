@@ -10,7 +10,7 @@ exports.roles = {
 	"400096791242080256":  {css:"bg-info text-dark", "text":"Staff"},
 	"400097901352714261":  {css:"bg-info text-dark", "text":"General Manager"},
 	"1100217807649636362": {css:"bg-info text-dark", "text":"Events Head"},
-	'607719471196536843': {css: 'bg-dark text-info', text: 'Numbers Committee'},
+	'607719471196536843':  {css: 'bg-dark text-info', text: 'Numbers Committee'},
 	"400097026651455489":  {css:"bg-warning", "text":"Transactions Committee"},
 	"400096994552578055":  {css:"bg-success", "text":"Stats Committee"},
 	"978652848067846214":  {css:"bg-info text-dark", "text":"Development Committee"},
@@ -28,5 +28,5 @@ exports.admin_roles = {
 	"400096325678530580":  'admin',
 	"400096791242080256":  'staff',
 	"1155946438652604517": 'devleague',
-	'607719471196536843': 'numbers',
+	'607719471196536843':  'numbers',
 };
