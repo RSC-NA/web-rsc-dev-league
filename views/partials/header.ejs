@@ -110,11 +110,18 @@
 								3s S<%- combines.season %> Combines
 							</a>
 						<%
-								if ( combines.public_numbers ) {
+								if ( combines.public_numbers && user.combines.view_mmr.all ) {
 						%>
 							<a class="nav-link <%- menu['/combines/history'] %>" href="/combines/history">
 								<div class="sb-nav-link-icon"><i class="fas fa-table text-danger"></i></div>
 								Tiermaker
+							</a>
+						<%
+								} else {
+						%>
+							<a class="nav-link <%- menu['/combines/history'] %>" href="/combines/history">
+								<div class="sb-nav-link-icon"><i class="fas fa-lock text-danger"></i></div>
+								Tiermaker (Locked)
 							</a>
 						<%
 								}

@@ -165,7 +165,7 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 					
 					const record = { wins: 0, losses: 0 };
 
-					if ( err ) { throw err; } 
+					if ( err ) { console.log(err); throw err; } 
 					
 					for ( let i = 0; i < results.length; ++i ) {
 						const r = results[i];
@@ -185,11 +185,10 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 
 					player.combines = results;
 					//console.log('combines',results);
-					console.log('USING THE COMBINES ROUTE!');
 					return res.render('player', { player: player });
 				});
 
-				return res.render('player', { player: player });
+				//return res.render('player', { player: player });
 			});
 		});
 	});

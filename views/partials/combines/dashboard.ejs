@@ -1,5 +1,4 @@
 <%
-
 	let league_url = '_3s';
 	let league_id = 3;
 
@@ -8,6 +7,7 @@
 		league_id = 2;
 	}
 
+	console.log(user.combines);
 %>
 
 <%
@@ -39,11 +39,50 @@
 				<p class="lead">
 					Time to show your metal. Your lobby is ready to go. 
 				</p>
+				
+				<h5>MMR Milestones</h5>
+				<ul>
+					<li>
+						Unlock Your MMR: 
+						<% if ( ! user.combines.view_mmr.self ) { %>
+						<strong class="fs-4 text-warning"><%- user.combines.view_mmr.self_remaining; %></strong> 
+						series
+						<% } else { %>
+						<strong class="fs-4 text-success">unlocked</strong> 
+						<% } %>
+					</li>
+					<li>
+						Unlock All MMRs: 
+						<% if ( ! user.combines.view_mmr.all ) { %>
+						<strong class="fs-4 text-warning"><%- user.combines.view_mmr.all_remaining; %></strong> 
+						series
+						<% } else { %>
+						<strong class="fs-4 text-success">unlocked</strong> 
+						<% } %>
+					</li>
+				</ul>
 
-				<% if ( combines.public_numbers ) { %>
+				<% 
+					if ( 
+						(combines.public_numbers && user.combines.view_mmr.self) || 
+						is_admin || is_combines_admin
+					) { 
+				%>
 				<p class="lead">
 					Your current MMR is <strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>"><%- user.combines.current_mmr; %></strong> and you 
 					have a record of <strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
+					[<%- total ? pct : 0; %>%]
+				</p>
+				<% 
+					} else {
+				%> 
+				<p class="lead">
+					Your current MMR is 
+					<strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>">CLASSIFIED</strong>.
+				</p>
+				<p class="lead">
+					You currently have a record of 
+					<strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
 					[<%- total ? pct : 0; %>%]
 				</p>
 				<% } %>
@@ -85,13 +124,53 @@
 					created at any time.
 				</p>
 
-				<% if ( combines.public_numbers ) { %>
+				<h5>MMR Milestones</h5>
+				<ul>
+					<li>
+						Unlock Your MMR: 
+						<% if ( ! user.combines.view_mmr.self ) { %>
+						<strong class="fs-4 text-warning"><%- user.combines.view_mmr.self_remaining; %></strong> 
+						series
+						<% } else { %>
+						<strong class="fs-4 text-success">unlocked</strong> 
+						<% } %>
+					</li>
+					<li>
+						Unlock All MMRs: 
+						<% if ( ! user.combines.view_mmr.all ) { %>
+						<strong class="fs-4 text-warning"><%- user.combines.view_mmr.all_remaining; %></strong> 
+						series
+						<% } else { %>
+						<strong class="fs-4 text-success">unlocked</strong> 
+						<% } %>
+					</li>
+				</ul>
+				<% 
+					if ( 
+						(combines.public_numbers && user.combines.view_mmr.self) || 
+						is_admin || is_combines_admin
+					) { 
+				%>
 				<p class="lead">
 					Your current MMR is <strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>"><%- user.combines.current_mmr; %></strong> and you 
 					have a record of <strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
 					[<%- total ? pct : 0; %>%]
 				</p>
-				<% } %>
+				<% 
+					} else {
+				%> 
+				<p class="lead">
+					Your current MMR is 
+					<strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>">CLASSIFIED</strong>.
+				</p>
+				<p class="lead">
+					You currently have a record of 
+					<strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
+					[<%- total ? pct : 0; %>%]
+				</p>
+				<%
+					}
+				%>
 
 				<a
 					class="btn btn-lg btn-danger"
@@ -139,11 +218,49 @@
 			<div 
 				id="combines_checkin_actions<%- league_url; %>" 
 			>
+				<h5>MMR Milestones</h5>
+				<ul>
+					<li>
+						Unlock Your MMR: 
+						<% if ( ! user.combines.view_mmr.self ) { %>
+						<strong class="fs-4 text-warning"><%- user.combines.view_mmr.self_remaining; %></strong> 
+						series
+						<% } else { %>
+						<strong class="fs-4 text-success">unlocked</strong> 
+						<% } %>
+					</li>
+					<li>
+						Unlock All MMRs: 
+						<% if ( ! user.combines.view_mmr.all ) { %>
+						<strong class="fs-4 text-warning"><%- user.combines.view_mmr.all_remaining; %></strong> 
+						series
+						<% } else { %>
+						<strong class="fs-4 text-success">unlocked</strong> 
+						<% } %>
+					</li>
+				</ul>
 
-				<% if ( combines.public_numbers ) { %>
+				<% 
+					if ( 
+						(combines.public_numbers && user.combines.view_mmr.self) || 
+						is_admin || is_combines_admin
+					) { 
+				%>
 				<p class="lead">
 					Your current MMR is <strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>"><%- user.combines.current_mmr; %></strong> and you 
 					have a record of <strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
+					[<%- total ? pct : 0; %>%]
+				</p>
+				<% 
+					} else {
+				%> 
+				<p class="lead">
+					Your current MMR is 
+					<strong class="fs-2 <%- getTierFromMMR(user.combines.current_mmr); %>">CLASSIFIED</strong>.
+				</p>
+				<p class="lead">
+					You currently have a record of 
+					<strong class="text-success"><%- wins; %></strong>/<strong class="text-danger"><%- losses; %></strong> 
 					[<%- total ? pct : 0; %>%]
 				</p>
 				<% } %>

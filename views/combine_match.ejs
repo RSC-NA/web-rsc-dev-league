@@ -47,6 +47,23 @@
 	const teamTwoMmr = match.away_mmr;
 	const homeDelta  = teamOneMmr - teamTwoMmr;
 	const homeDeltaAbs = Math.abs(homeDelta);
+
+	let CAN_VIEW_SELF = false;
+	let CAN_VIEW_ALL  = false;
+
+	if ( combines.public_numbers ) {
+		if ( user.combines.view_mmr.self ) {
+			CAN_VIEW_SELF = true;
+		}
+		if ( user.combines.view_mmr.all ) {
+			CAN_VIEW_ALL = true;
+		}
+	}
+
+	if ( CAN_ADMIN ) {
+		CAN_VIEW_SELF = true;
+		CAN_VIEW_ALL = true;
+	}
 %>
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -488,7 +505,7 @@
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-Elite text-white rounded p-2">
-								<%= CAN_ADMIN || combines.public_numbers ? '[' + teamOneMmr + '] ' : '' %>Home Team
+								<%= CAN_VIEW_ALL ? '[' + teamOneMmr + '] ' : '' %>Home Team
 							</h3>
 							<%
 								let homeClass = 'bg-info';
@@ -555,7 +572,12 @@
 										const mmr_class = p.end_mmr ? 
 											mmr_delta > 0 ? 'text-success fw-bold text-lg' : 'text-danger' :
 											'text-muted';
-										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${p.start_mmr}`;
+										let report_mmr = p.start_mmr;
+										if ( ! CAN_VIEW_ALL ) {
+											report_mmr = 'hidden';
+										}
+
+										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${report_mmr}`;
 								%>
 									<tr class="fs-5">
 										<td>
@@ -599,7 +621,7 @@
 											%>
 										</td>
 										<% 
-											if ( CAN_ADMIN || combines.public_numbers ) {
+											if ( CAN_VIEW_ALL || (p.rsc_id === user.rsc_id && CAN_VIEW_SELF) ) {
 										%>
 										<td class="text-end">
 											<%- p.start_mmr; %>
@@ -620,7 +642,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Elite"
-												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p.tier; %>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p.tier; %>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
@@ -641,7 +663,7 @@
 
 						<div class="col-md-6">
 							<h3 class="bg-Prospect rounded p-2 text-black">
-								<%= CAN_ADMIN || combines.public_numbers ? '[' + teamTwoMmr + '] ' : '' %>Away Team
+								<%= CAN_VIEW_ALL ? '[' + teamTwoMmr + '] ' : '' %>Away Team
 							</h3>
 							<%
 								if ( has_scored ) {
@@ -741,7 +763,11 @@
 										const mmr_class = p.end_mmr ? 
 											mmr_delta > 0 ? 'text-success fw-bold text-lg' : 'text-danger' :
 											'text-muted';
-										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${p.start_mmr}`;
+										let report_mmr = p.start_mmr;
+										if ( ! CAN_VIEW_ALL ) {
+											report_mmr = 'hidden';
+										}
+										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${report_mmr}`;
 								%>
 									<tr class="fs-5">
 										<td>
@@ -789,7 +815,7 @@
 											%>
 										</td>
 										<% 
-											if ( CAN_ADMIN || combines.public_numbers ) {
+											if ( CAN_VIEW_ALL || (p.rsc_id === user.rsc_id && CAN_VIEW_SELF)) {
 										%>
 										<td class="text-end">
 											<%- p.start_mmr; %>
@@ -810,7 +836,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Prospect"
-												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- p.start_mmr; %></strong></div>"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"

@@ -1367,6 +1367,14 @@ router.get(['/history', '/history/:league'], (req, res) => {
 			return res.redirect('/');
 		}
 	} 
+
+	let CAN_VIEW_SELF = res.locals.user.combines.view_mmr.self;
+	let CAN_VIEW_ALL = res.locals.user.combines.view_mmr.all;
+	if ( req.session.is_admin || COMBINES_ADMIN ) {
+		CAN_VIEW_SELF = true;
+		CAN_VIEW_ALL = true;
+	}
+
 	const season = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 
 	let csv = false;
@@ -1458,6 +1466,20 @@ router.get(['/history', '/history/:league'], (req, res) => {
 			for ( let i = 0; i < results.length; ++i ) {
 				const p = results[i];
 				
+				const is_player = p.rsc_id === res.locals.user.rsc_id;
+				let mmr_delta = p.current_mmr - p.effective_mmr;
+				if ( ! CAN_VIEW_ALL ) {
+					if ( is_player && CAN_VIEW_SELF ) {
+						// don't mess with the player if they can 
+						// view themselves
+					} else {
+						p.base_mmr = 'hidden';
+						p.effective_mmr = 'hidden';
+						p.current_mmr = 'hidden';
+						mmr_delta = '-';
+					}
+				}
+
 				const total_games = p.wins + p.losses;
 				players[p.rsc_id] = {
 					'tm_id': p.id,
@@ -1475,8 +1497,9 @@ router.get(['/history', '/history/:league'], (req, res) => {
 					'losses': p.losses,
 					'win_percentage': total_games > 0 ? parseFloat((p.wins / total_games) * 100).toFixed(1) : 0,
 					'games': total_games,
+					'mmr_delta': mmr_delta,
 				};
-				players[p.rsc_id].mmr_delta = p.current_mmr - p.effective_mmr;
+				// players[p.rsc_id].mmr_delta = p.current_mmr - p.effective_mmr;
 			}
 		}
 	

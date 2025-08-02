@@ -202,6 +202,7 @@ async function get_user(user_id, ip) {
 
 	if ( results && results.length ) {
 		const p = results[0];
+		const series = (p.wins + p.losses) / 3;
 		const user = {
 			user_id: p.id,
 			nickname: p.nickname,
@@ -227,6 +228,13 @@ async function get_user(user_id, ip) {
 				current_mmr: p.current_mmr,
 				losses: p.losses,
 				wins: p.wins,
+				series: series,
+				view_mmr: {
+					self: false,	
+					self_remaining: 5,
+					all: false,	
+					all_remaining: 10,
+				},
 				tier: p.assigned_tier,
 				count: p.count,
 				keeper: p.keeper,
@@ -241,6 +249,13 @@ async function get_user(user_id, ip) {
 				current_mmr: p.current_mmr_2s,
 				losses: p.losses_2s,
 				wins: p.wins_2s,
+				series: (p.losses + p.wins) / 3,
+				view_mmr: {
+					self: false,
+					self_remaining: 5,
+					all: false,	
+					all_remaining: 10,
+				},
 				tier: p.assigned_tier_2s,
 				count: p.count_2s,
 				keeper: p.keeper_2s,
@@ -256,6 +271,19 @@ async function get_user(user_id, ip) {
 			is_combines_admin: p.combines_admin ? true: false,
 			is_combines_admin_2s: p.combines_admin_2s ? true: false,
 		};
+
+		if ( user.combines.series >= 5 ) {
+			user.combines.view_mmr.self = true;
+			user.combines.view_mmr.self_remaining = 0;
+		} else {
+			user.combines.view_mmr.self_remaining = 5 - series;
+		}
+		if ( user.combines.series >= 10 ) {
+			user.combines.view_mmr.all = true;
+			user.combines.view_mmr.all_remaining = 0;
+		} else {
+			user.combines.view_mmr.all_remaining = 10 - series;
+		}
 
 		if ( ip && user.rsc_id && user.discord_id ) {
 			const check_ip_query = `
@@ -2057,7 +2085,6 @@ app.post('/save_mmr', (req, res) => {
 /********************************************************
  ****************** /TRACKER/MMR TOOL ********************
  *******************************************************/
-
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
   res.status(statusCode);

@@ -370,9 +370,11 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 });
 
 router.get('/combine/check_out/:discord_id/:league', async (req, res) => {
+console.log('check_out', res.locals.checked_in, res.locals.checked_in_2s);
 	if ( ! res.locals.checked_in && ! res.locals.checked_in_2s ) {
 		return res.redirect('/?error=YouAreNotCheckedIn');
 	}
+
 
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	
@@ -398,7 +400,6 @@ router.get('/combine/check_out/:discord_id/:league', async (req, res) => {
 			league = ? AND
 			rsc_id = ? AND 
 			discord_id = ? AND 
-			current_mmr = ? AND
 			rostered = 0
 	`;
 	const [inserted] = await db.query(query, [
@@ -406,8 +407,8 @@ router.get('/combine/check_out/:discord_id/:league', async (req, res) => {
 		league,
 		user.rsc_id,
 		user.discord_id,
-		ucombines.current_mmr
 	]);
+	//ucombines.current_mmr
 
 	await db.end();
 	const actor = {

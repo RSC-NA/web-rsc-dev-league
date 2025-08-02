@@ -109,6 +109,8 @@ router.get('/oauth2', async (req, res) => {
 						}
 					}
 				}
+
+				console.log(admin_roles, admin_role, numbers_role, staff_role);
 			}
 
 			const query = `
@@ -142,6 +144,7 @@ router.get('/oauth2', async (req, res) => {
 						req.session.discord_id = discord_id;
 						req.session.user_id = results[0].id;
 
+						const series = (results[0].wins + results[0].losses) / 3;
 						const user = {
 							user_id: results[0].id,
 							nickname: nickname,
@@ -159,6 +162,13 @@ router.get('/oauth2', async (req, res) => {
 								current_mmr: results[0].current_mmr,
 								losses: results[0].losses,
 								wins: results[0].wins,
+								series: series,
+								view_mmr: {
+									self: false,	
+									self_remaining: 5,
+									all: false,	
+									all_remaining: 10,
+								},
 								tier: results[0].assigned_tier,
 								count: results[0].count,
 								keeper: results[0].keeper,
@@ -173,6 +183,21 @@ router.get('/oauth2', async (req, res) => {
 							is_combines_admin: numbers_role ? true : (results[0].combines_admin ? true: false),
 							is_combines_admin_2s: results[0].combines_admin_2s ? true: false,
 						};
+
+						if ( user.combines.series >= 5 ) {
+							user.combines.view_mmr.self = true;
+							user.combines.view_mmr.self_remaining = 0;
+						} else {
+							user.combines.view_mmr.self_remaining = 5 - series;
+						}
+						if ( user.combines.series >= 10 ) {
+							user.combines.view_mmr.all = true;
+							user.combines.view_mmr.all_remaining = 0;
+						} else {
+							user.combines.view_mmr.all_remaining = 10 - series;
+						}
+
+						console.log('did we make him admin?', user.is_combines_admin, numbers_role);
 						
 						req.session.user = user;
 
@@ -228,7 +253,7 @@ router.get('/oauth2', async (req, res) => {
 									ON p.discord_id = t.discord_id
 									WHERE p.discord_id = ?`;
 								req.db.query(player_lookup_query, [discord_id], (err, results) => {
-
+									const series = (results[0].wins + results[0].losses) / 3;
 									const user = {
 										user_id: results[0].id,
 										nickname: nickname,
@@ -246,6 +271,13 @@ router.get('/oauth2', async (req, res) => {
 											current_mmr: results[0].current_mmr,
 											losses: results[0].losses,
 											wins: results[0].wins,
+											series: series,
+											view_mmr: {
+												self: false,	
+												self_remaining: 5,
+												all: false,	
+												all_remaining: 10,
+											},
 											tier: results[0].assigned_tier,
 											count: results[0].count,
 											keeper: results[0].keeper,
@@ -258,6 +290,18 @@ router.get('/oauth2', async (req, res) => {
 										is_stats_admin: false,
 										is_combines_admin: numbers_role,
 									};
+									if ( user.combines.series >= 5 ) {
+										user.combines.view_mmr.self = true;
+										user.combines.view_mmr.self_remaining = 0;
+									} else {
+										user.combines.view_mmr.self_remaining = 5 - series;
+									}
+									if ( user.combines.series >= 10 ) {
+										user.combines.view_mmr.all = true;
+										user.combines.view_mmr.all_remaining = 0;
+									} else {
+										user.combines.view_mmr.all_remaining = 10 - series;
+									}
 					
 									req.session.user = user;
 									req.session.is_admin = admin_role;
