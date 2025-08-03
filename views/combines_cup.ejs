@@ -35,10 +35,10 @@
 								<strong class="<%- my_rank['current_tier']; %>"><%- my_rank['current_tier']; %></strong>)
 						</h3>
 						<h4 class="">
-							<%- my_rank['points']; %> total points 
+							<%- my_rank['nice_points']; %> total points 
 						</h4>
 						<h5>
-							(<%- my_rank['wins']; %> wins, <%- my_rank['games']; %> total games)
+							(<%- my_rank['wins']; %> wins, <%- my_rank['series']; %> total series)
 						</h5>
 					</div>
 					<% } %>
@@ -81,7 +81,7 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - <code><%- leaderboard[ rsc_id ]['points']; %></code>
+							<%- display_name %> - <code><%- leaderboard[ rsc_id ]['nice_points']; %></code>
 						</li>
 
 						<%
@@ -91,7 +91,7 @@
 						%>
 
 						<li class="today" value="<%- myPosition %>">
-							<%- user.name %> - <code><%- leaderboard[ user.rsc_id ]['points']; %></code>
+							<%- user.name %> - <code><%- leaderboard[ user.rsc_id ]['nice_points']; %></code>
 						</li>
 
 						<%

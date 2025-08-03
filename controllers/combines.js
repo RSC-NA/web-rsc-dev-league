@@ -829,8 +829,10 @@ router.get('/combines/cup', (req, res) => {
 		SELECT 
 			t.discord_id,t.rsc_id,t.name,t.tier,null AS current_tier, 
 			t.base_mmr, t.effective_mmr, t.current_mmr, t.wins, t.losses, 
-			(t.wins+t.losses) as games, format((t.wins+t.losses) / 3,1) AS series,
-			format(((t.wins+t.losses)/3)+(t.wins*0.5),1) as points
+			(t.wins+t.losses) as games, format(((t.wins+t.losses) / 3),0) AS series,
+			(t.wins*0.5) AS win_points, ((t.wins+t.losses)/3) as series_points,
+			((t.wins*0.5) + ((t.wins+t.losses)/3)) as points,
+			format(((t.wins*0.5) + ((t.wins+t.losses)/3)),1) as nice_points
 		FROM tiermaker AS t 
 		WHERE t.season = ?
 		ORDER BY points DESC
