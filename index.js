@@ -355,6 +355,7 @@ app.use(async (req, res, next) => {
 		'devleague': '',
 		'/combines/process': '',
 		'/combines/process_2s': '',
+		'/combines/cup': '',
 		'tournaments': '',
 		'tracker': '',
 		'championship': '',
@@ -372,9 +373,9 @@ app.use(async (req, res, next) => {
 	if ( current_view == '' ) { current_view = 'dashboard'; }
 
 	if ( current_view in res.locals.menu ) {
-		res.locals.menu[ current_view ] = 'active';
+		res.locals.menu[ current_view ] = 'active fw-bolder';
 	} else if ( req.originalUrl in res.locals.menu ) {
-		res.locals.menu[req.originalUrl] = 'active';
+		res.locals.menu[req.originalUrl] = 'active fw-bolder';
 	}
 
 	const httpPre = req.headers.host.includes('localhost') ? 'http' : 'https';

@@ -1,0 +1,164 @@
+
+<%- include('partials/header.ejs'); %>
+
+	<main class="container">
+		<div class="p-3 rounded">
+			<div class="row">
+				<div class="col-md-7">
+
+					<h1>RSC Combines Cup - Season <%= settings.season; %></h1>
+
+					<p class="lead">
+						Show off your Combines domination with a unique role earned through 
+						fierce competition during the preseason. Play games, win, and earn 
+						your spot in the history book with your oppressive gameplay as 
+						you dismantle one team after another.
+					</p>
+
+					<h3>Eligibility and Invitations</h3>
+					<p class="lead">
+						This Cup is open to <strong>ALL</strong> active RSC players competing 
+						in Combines for the upcoming season. Every Combines match you play in 
+						will earn points for the Combines Cup leaderboard.
+					</p>
+					<ul>
+						<li><strong>1 Point</strong> is earned for each Combines match you play in.</li>
+						<li><strong>0.5 Points</strong> for every <strong>game win</strong>.</li>
+					</ul>
+					<% if ( my_rank ) { %>
+					<h5>Your Position</h5>
+
+					<div class="p-4 border rounded bg-opacity-10 bg-<%- my_rank['tier']; %> text-white">
+						<h3 class="<%- my_rank['tier']; %>">
+							<%- my_rank['place']; %>. <%- my_rank['tier']; %> 
+							(current tier: 
+								<strong class="<%- my_rank['current_tier']; %>"><%- my_rank['current_tier']; %></strong>)
+						</h3>
+						<h4 class="">
+							<%- my_rank['points']; %> total points 
+						</h4>
+						<h5>
+							(<%- my_rank['wins']; %> wins, <%- my_rank['games']; %> total games)
+						</h5>
+					</div>
+					<% } %>
+
+				</div>
+				<div class="col-md-4 matchDates dark">
+					<h3>S<%= settings.season; %> Leaderboard</h3>
+					<%
+						for ( const tier in leaderboards ) {
+							const leaderboard = leaderboards[ tier ];
+							if ( leaderboard === null ) {
+								continue;
+							}
+					%>
+					<h4><%= tier; %></h4>
+					<ol class="dates">
+						<%
+							let count = 0;
+							let myPosition = null;
+							if ( leaderboard && user.rsc_id && user.rsc_id in leaderboard ) {
+								myPosition = Object.keys(leaderboard).indexOf(user.name);
+							}
+							for ( let rsc_id in leaderboard ) {
+								count++;
+
+								if ( count > 10 ) {
+									break;
+								}
+
+								if ( count === 1 ) {
+									top_class = 'fs-5 font-weight-bold';
+								} else if ( count === 2 ) {
+									top_class = 'fs-6 font-weight-bold';
+								}
+								let player_class = '';
+								if ( rsc_id === user.rsc_id ) {
+									player_class = 'today';
+								}
+								let display_name = leaderboard[ rsc_id ]['name'];
+						%>
+
+						<li class="<%- player_class  %> <%- top_class %>">
+							<%- display_name %> - <code><%- leaderboard[ rsc_id ]['points']; %></code>
+						</li>
+
+						<%
+							}
+
+							if ( myPosition && myPosition > 10 ) {
+						%>
+
+						<li class="today" value="<%- myPosition %>">
+							<%- user.name %> - <code><%- leaderboard[ user.rsc_id ]['points']; %></code>
+						</li>
+
+						<%
+							}
+						%>
+
+					</ol>
+					<%
+						}
+					%>
+
+
+				</div>
+			</div>
+
+			<%
+				if ( is_admin ) {
+			%>
+
+			<div class="row">
+				<div class="col-12">
+					<h4>Invites</h4>
+					<%
+						for ( const tier in leaderboards ) {
+							const leaderboard = leaderboards[ tier ];
+							if ( leaderboard === null ) {
+								continue;
+							}
+					%>
+					<h4>## <%= tier; %></h4>
+						<%
+							let count = 0;
+							for ( let rsc_id in leaderboard ) {
+								count++;
+
+								if ( count > 18 ) {
+									break;
+								}
+
+								let player_class = '';
+								if ( rsc_id === user.rsc_id ) {
+									player_class = 'today';
+								}
+								let display_name = leaderboard[ rsc_id ]['name'];
+						%>
+						<%- count; %>. &lt;@<%- leaderboard[ rsc_id ]['discord_id']; %>&gt;<br>
+						<%
+							if ( count === 6 ) {
+						%>
+						### <%- tier; %> Alternates<br>
+						<%
+							}
+						%>
+					<%
+							}
+						}
+					%>
+
+				</div>
+			</div>
+
+			<%
+				}
+			%>
+
+		</div>
+	
+	</main>
+
+<%- include('partials/footer.ejs'); %>

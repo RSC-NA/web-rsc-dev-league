@@ -818,4 +818,52 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 	});
 });
 
+router.get('/combines/cup', (req, res) => {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
+	const season = SEASON;
+
+	console.log('here', season);
+
+	const query = `
+		SELECT 
+			t.discord_id,t.rsc_id,t.name,t.tier,null AS current_tier, 
+			t.base_mmr, t.effective_mmr, t.current_mmr, t.wins, t.losses, 
+			(t.wins+t.losses) as games, ((t.wins+t.losses) / 3) AS series,
+			((t.wins+t.losses)+(t.wins*0.5)) as points
+		FROM tiermaker AS t 
+		WHERE t.season = ?
+		ORDER BY points DESC
+	`;
+
+	const leaderboards = {
+		'Premier': [],
+		'Master': [],
+		'Elite': [],
+		'Veteran': [],
+		'Rival': [],
+		'Challenger': [],
+		'Prospect': [],
+		'Amateur': [],
+	};
+	let my_rank = {};
+	const players = {};
+	req.db.query(query, [season], (err, results) => {
+		if ( err ) { throw err; }
+
+		for ( let i = 0; i < results.length; ++i ) {
+			const p = results[i];
+			p.current_tier = getTierFromMMR(p.current_mmr);
+			leaderboards[p.tier][p.rsc_id] = p;
+
+			if ( req.session.discord_id && p.discord_id === req.session.discord_id ) {
+				p.place = Object.keys(leaderboards[p.tier]).length;
+				my_rank = p;
+			}
+		}
+
+		res.render('combines_cup', { leaderboards: leaderboards, my_rank: my_rank });
+	});
+});
+
 module.exports = router;
