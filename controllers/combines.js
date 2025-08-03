@@ -830,7 +830,7 @@ router.get('/combines/cup', (req, res) => {
 			t.discord_id,t.rsc_id,t.name,t.tier,null AS current_tier, 
 			t.base_mmr, t.effective_mmr, t.current_mmr, t.wins, t.losses, 
 			(t.wins+t.losses) as games, ((t.wins+t.losses) / 3) AS series,
-			((t.wins+t.losses)+(t.wins*0.5)) as points
+			(((t.wins+t.losses)/3)+(t.wins*0.5)) as points
 		FROM tiermaker AS t 
 		WHERE t.season = ?
 		ORDER BY points DESC
