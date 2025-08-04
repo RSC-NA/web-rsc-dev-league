@@ -1456,7 +1456,12 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 		if (  typeof data !== 'string' ) {
 			//console.log(data);
 			if ( tracker_id !== 'from_api' ) {
-				console.log('SAVE Tracker:', tracker_data[0].tracker_link.link, 'Auto:', SEND_TO_API_SERVER, 'TrackerId:', tracker_id, 'Pulled:', pulled_by);
+				console.log(
+					'SAVE Tracker:', tracker_data[0].tracker_link.link,
+					'Auto:', SEND_TO_API_SERVER,
+					'TrackerId:', tracker_id,
+					'Pulled:', pulled_by
+				);
 				connection.query('UPDATE tracker_data SET sent_to_api = 1 WHERE id = ?', [ tracker_id ], (err, results) => {
 					if ( err ) { console.error('Error updating trackers to "complete"', err); throw err; }
 					//res.json(data);
