@@ -37,6 +37,7 @@
 		window.location.href = `${window.location.pathname}?${search}`;
 	}
 	function set_sort_order(el) {
+		return false;
 		if ( ! el ) { return; }
 
 		const search = new URLSearchParams(window.location.search);
