@@ -7,7 +7,7 @@
 // the contracts sheet
 const mmrRange_3s = {
 	'Premier': { 
-		'max': 2200,
+		'max': 2000,
 		'min': 1820,
 	},
 	'Master': { 

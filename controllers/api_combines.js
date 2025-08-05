@@ -193,7 +193,7 @@ router.use(async (req, res, next) => {
 					
 				FROM tiermaker AS t 
 				LEFT JOIN player_bans AS b 
-					ON t.discord_id = b.discord_id
+					ON t.discord_id = b.discord_id AND b.expires_dtg IS null
 				WHERE t.discord_id = ? AND t.season = ? AND t.league = ?
 			`
 			const [tm_results] = await res.locals.adb.query(
