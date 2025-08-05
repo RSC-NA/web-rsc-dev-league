@@ -919,7 +919,7 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 			new_players++;
 		} else {
 			const e = existing[discord_id];
-			if ( e.nickname != p.name || ! e.rsc_id ) {
+			if ( e.nickname != p.name || ! e.rsc_id || e.rsc_id !== p.rsc_id ) {
 				await db.query(update_query, [p.rsc_id,p.name,p.discord_id]);
 				updated_players++;
 			} else {
