@@ -1415,7 +1415,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 			}
 		}
 	}
-	order 't.id';
+	order = 't.id';
 
 	let limit = 100;
 	if ( req.query.limit ) {
