@@ -2,7 +2,6 @@
 <%- include('partials/header.ejs'); %>
 
 <%
-
 	let CAN_ADMIN = false;
 	if ( is_admin ) {
 		CAN_ADMIN = true;
@@ -52,10 +51,10 @@
 	let CAN_VIEW_ALL  = false;
 
 	if ( combines.public_numbers ) {
-		if ( user.combines.view_mmr.self ) {
+		if ( user && user?.combines?.view_mmr?.self ) {
 			CAN_VIEW_SELF = true;
 		}
-		if ( user.combines.view_mmr.all ) {
+		if ( user && user?.combines?.view_mmr?.all ) {
 			CAN_VIEW_ALL = true;
 		}
 	}
@@ -596,11 +595,11 @@
 									<tr class="fs-5">
 										<td>
 											<img
-												src="/icons/<%- p.tier.toLowerCase(); %>.png"
-												title="<%- p.tier; %>"
+												src="/icons/<%- p?.tier?.toLowerCase(); %>.png"
+												title="<%- p?.tier; %>"
 												style=""
 												height="16"
-												alt="<%- p.tier; %> icon"
+												alt="<%- p?.tier; %> icon"
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>">
@@ -656,7 +655,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Elite"
-												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p.tier; %>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- report_mmr; %></strong></div>"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p?.tier; %>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier; %>'><%- report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
@@ -786,10 +785,10 @@
 									<tr class="fs-5">
 										<td>
 											<img
-												src="/icons/<%- p.tier.toLowerCase(); %>.png"
-												title="<%- p.tier; %>"
+												src="/icons/<%- p?.tier?.toLowerCase(); %>.png"
+												title="<%- p?.tier; %>"
 												height="16"
-												alt="<%- p.tier; %> icon"
+												alt="<%- p?.tier; %> icon"
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>"
@@ -850,7 +849,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Prospect"
-												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p.tier; %>'><%- report_mmr; %></strong></div>"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p?.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier; %>'><%- report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
