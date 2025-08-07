@@ -237,7 +237,7 @@
 											<strong>
 												<a href="/combine/matches/<%- match.reported_rsc_id; %>">
 													<%- match.reported_rsc_id in lobby ? 
-														lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
+														lobby[match.reported_rsc_id].name : match.nickname; %>
 												</a>
 											</strong>
 										</td>	
@@ -248,7 +248,7 @@
 											<strong>
 												<a href="/combine/matches/<%- match.confirmed_rsc_id; %>">
 													<%- match.confirmed_rsc_id in lobby ? 
-														lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
+														lobby[match.confirmed_rsc_id].name : match.nickname; %>
 												</a>
 											</strong>
 										</td>	
@@ -595,15 +595,15 @@
 									<tr class="fs-5">
 										<td>
 											<img
-												src="/icons/<%- p?.tier?.toLowerCase(); %>.png"
-												title="<%- p?.tier; %>"
+												src="/icons/<%- p?.tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
+												title="<%- p?.tier ?? match.tier; %>"
 												style=""
 												height="16"
-												alt="<%- p?.tier; %> icon"
+												alt="<%- p?.tier ?? match.tier; %> icon"
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>">
-													<%= p.name %></a>
+													<%= p.name ?? p.nickname %></a>
 											</strong> 
 											<% 
 												if ( submitted_scores.home === p.rsc_id ) { 
@@ -655,7 +655,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Elite"
-												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p?.tier; %>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier; %>'><%- report_mmr; %></strong></div>"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p?.tier ?? match.tier; %>'><%= p.name ?? p.nickname; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
@@ -785,14 +785,14 @@
 									<tr class="fs-5">
 										<td>
 											<img
-												src="/icons/<%- p?.tier?.toLowerCase(); %>.png"
-												title="<%- p?.tier; %>"
+												src="/icons/<%- p?.tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
+												title="<%- p?.tier ?? match.tier; %>"
 												height="16"
-												alt="<%- p?.tier; %> icon"
+												alt="<%- p?.tier ?? match.tier; %> icon"
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>"
-													><%= p.name %></a>
+													><%= p.name ?? p.nickname %></a>
 											</strong> 
 											<% 
 												if ( submitted_scores.home === p.rsc_id ) { 
@@ -849,7 +849,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-sm bg-Prospect"
-												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p?.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier; %>'><%- report_mmr; %></strong></div>"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p?.tier ?? match.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
