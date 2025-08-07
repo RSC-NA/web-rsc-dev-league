@@ -1450,9 +1450,6 @@ function send_tracker_data_to_server(tracker_id, tracker_data, pulled_by) {
 		}
 	})
 	.then(data => {
-		//console.log(data);
-		// update the records to 1
-		//res.json(data);
 		if (  typeof data !== 'string' ) {
 			//console.log(data);
 			if ( tracker_id !== 'from_api' ) {
