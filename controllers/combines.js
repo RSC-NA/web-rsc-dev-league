@@ -780,7 +780,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 					pu.nickname
 				FROM combine_match_players AS p
 				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ? AND t.league = ?
-				LEFT JOIN players AS pu ON pu.rsc_id = p.rsc_id
+				LEFT JOIN players AS pu ON pu.rsc_id = p.rsc_id AND pu.discord_id = t.discord_id
 				WHERE p.match_id = ?
 			`;
 
