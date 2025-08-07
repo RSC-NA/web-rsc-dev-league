@@ -80,7 +80,7 @@ router.get('/oauth2', async (req, res) => {
 			const discord_id = user_obj.id;
 			const nickname = user_obj.username;
 
-			console.log('User Found', user_obj, discord_id, nickname);
+			// console.log('User Found', user_obj, discord_id, nickname);
 		
 			const roles = await fetch('https://discord.com/api/users/@me/guilds/395806681994493964/member', {
 				headers: {
@@ -110,7 +110,7 @@ router.get('/oauth2', async (req, res) => {
 					}
 				}
 
-				console.log(admin_roles, admin_role, numbers_role, staff_role);
+				//console.log(admin_roles, admin_role, numbers_role, staff_role);
 			}
 
 			const query = `
