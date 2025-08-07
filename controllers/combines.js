@@ -795,6 +795,8 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 				let success = false;
 				if ('reported' in req.query ) {
 					success = 'reported';
+				} else if ( 'finished' in req.query ) {
+					success = 'finished';
 				}
 
 				const replay_query = `
