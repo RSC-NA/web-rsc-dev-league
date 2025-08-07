@@ -74,106 +74,108 @@
 					</a>
 				</h4>
 
-				<table class="table table-hover table-dark">
-					<thead>
-						<tr class="border border-primary">
-							<th></th>
-							<th class="text-center">MMR</th>
-							<th class="text-center">&Delta;</th>
-							<th>Player</th>
-							<th class="text-center">Record</th>
-							<th class="text-center">W%</th>
-						</tr>
-					</thead>
-					<tbody>
+				<div class="table-responsive">
+					<table class="table table-hover table-dark">
+						<thead>
+							<tr class="border border-primary">
+								<th></th>
+								<th class="text-center">MMR</th>
+								<th class="text-center">&Delta;</th>
+								<th>Player</th>
+								<th class="text-center">Record</th>
+								<th class="text-center">W%</th>
+							</tr>
+						</thead>
+						<tbody>
 
-					<% 
-						const stat_colors = {
-							'great': 'text-success',
-							'ok': 'text-info',
-							'neutral': 'text-warning',
-							'bad': 'text-danger',
-							'none': 'text-muted',
-						};
-						let analysis = 'none';
-						let n = 0;
-						let table_class = "table-success";
-						if ( Object.keys(waiting_room).length ) {
-							for ( const rsc_id in waiting_room ) {
-								n++
-								if ( n > 6 ) {
-									table_class = table_class === 'table-info' ? 'table-success' : 'table-info';
-									n = 1;
-								}
+						<% 
+							const stat_colors = {
+								'great': 'text-success',
+								'ok': 'text-info',
+								'neutral': 'text-warning',
+								'bad': 'text-danger',
+								'none': 'text-muted',
+							};
+							let analysis = 'none';
+							let n = 0;
+							let table_class = "table-success";
+							if ( Object.keys(waiting_room).length ) {
+								for ( const rsc_id in waiting_room ) {
+									n++
+									if ( n > 6 ) {
+										table_class = table_class === 'table-info' ? 'table-success' : 'table-info';
+										n = 1;
+									}
 
-								const p = waiting_room[rsc_id];
-								if ( p.win_percentage > 60 ) {
-									analysis = 'great';
-								} else if ( p.win_percentage > 52 ) {
-									analysis = 'ok';
-								} else if ( p.win_percentage > 45 ) {
-									analysis = 'neutral';
-								} else if ( p.win_percentage > 20 ) {
-									analysis = 'bad';
-								} else {
-									analysis = 'none';
-								}
+									const p = waiting_room[rsc_id];
+									if ( p.win_percentage > 60 ) {
+										analysis = 'great';
+									} else if ( p.win_percentage > 52 ) {
+										analysis = 'ok';
+									} else if ( p.win_percentage > 45 ) {
+										analysis = 'neutral';
+									} else if ( p.win_percentage > 20 ) {
+										analysis = 'bad';
+									} else {
+										analysis = 'none';
+									}
 
-					%>
-						<tr class="<%- table_class; %>">
-							<td class="p-0 text-center">
-								<a href="/combines/activate/<%- rsc_id; %>/<%- league; %>" 
-									class="move-arrow h4 p-0 px-2 mb-0" style=""
-									title="Move player to ready room.">
-									<span class="d-none d-xl-inline">&#10094;</span>
-									<span class="d-inline d-xl-none">&#9786;</span>
-									<!-- &#9754; -->
-								</a>
-							</td>
-							<td class="text-center">
-								<span class="text-primary fw-bold">
-									<%= p.current_mmr; %>
-								</span>
-							</td>
-							<td class="text-center">
-								<span 
-									class="fw-bold <%- 
-										p.mmr_delta > 0 ? 
-											'text-success' : 
-											p.mmr_delta === 0 ? 
-												'text-muted' : 'text-danger'; 
-									%>"
-									title="<%= p.effective_mmr; %>"
-									>
-									<%= p.mmr_delta; %>
-								</span>
-							</td>
-							<td class="fw-bolder">
-								<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
-							</td>
-							<td class="text-center">
-								<span class="text-success fw-bold"><%= p.wins; %></span> /
-								<span class="text-red fw-bold"><%= p.losses; %></span>
-							</td>
-							<td class="text-center">
-								<span class="<%- stat_colors[analysis]; %> fw-bold">
-									<%= p.win_percentage; %>%
-								</span>
-							</td>
-						</tr>
+						%>
+							<tr class="<%- table_class; %>">
+								<td class="p-0 text-center">
+									<a href="/combines/activate/<%- rsc_id; %>/<%- league; %>" 
+										class="move-arrow h4 p-0 px-2 mb-0" style=""
+										title="Move player to ready room.">
+										<span class="d-none d-xl-inline">&#10094;</span>
+										<span class="d-inline d-xl-none">&#9786;</span>
+										<!-- &#9754; -->
+									</a>
+								</td>
+								<td class="text-center">
+									<span class="text-primary fw-bold">
+										<%= p.current_mmr; %>
+									</span>
+								</td>
+								<td class="text-center">
+									<span 
+										class="fw-bold <%- 
+											p.mmr_delta > 0 ? 
+												'text-success' : 
+												p.mmr_delta === 0 ? 
+													'text-muted' : 'text-danger'; 
+										%>"
+										title="<%= p.effective_mmr; %>"
+										>
+										<%= p.mmr_delta; %>
+									</span>
+								</td>
+								<td class="fw-bolder">
+									<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
+								</td>
+								<td class="text-center">
+									<span class="text-success fw-bold"><%= p.wins; %></span> /
+									<span class="text-red fw-bold"><%= p.losses; %></span>
+								</td>
+								<td class="text-center">
+									<span class="<%- stat_colors[analysis]; %> fw-bold">
+										<%= p.win_percentage; %>%
+									</span>
+								</td>
+							</tr>
 
-					<% 
-							} // end of loop
-						} else {
-					%>
+						<% 
+								} // end of loop
+							} else {
+						%>
 
-						<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
+							<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
 
-					<%
-						}
-					%>
+						<%
+							}
+						%>
 
-					</tbody>
-				</table>
+						</tbody>
+					</table>
+				</div>
 			</div>
 
