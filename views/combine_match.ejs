@@ -237,7 +237,7 @@
 											<strong>
 												<a href="/combine/matches/<%- match.reported_rsc_id; %>">
 													<%- match.reported_rsc_id in lobby ? 
-														lobby[match.reported_rsc_id].name : match.nickname; %>
+														lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
 												</a>
 											</strong>
 										</td>	
@@ -248,7 +248,7 @@
 											<strong>
 												<a href="/combine/matches/<%- match.confirmed_rsc_id; %>">
 													<%- match.confirmed_rsc_id in lobby ? 
-														lobby[match.confirmed_rsc_id].name : match.nickname; %>
+														lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
 												</a>
 											</strong>
 										</td>	
