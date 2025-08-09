@@ -2467,8 +2467,11 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 			const row = results[i];
 
 			if ( row['rsc_id'] in players ) {
-				if ( players[row['rsc_id']].name !== row['name'] ) {
-					updates[row['rsc_id']] = players[row['rsc_id']].name;
+				if ( players[row['rsc_id']].name !== row['name'] || players[row['rsc_id']].discord_id !== row['discord_id'] ) {
+					updates[row['rsc_id']] = { 
+						name: players[row['rsc_id']].name, 
+						discord_id: players[row['rsc_id']].discord_id 
+					};
 				}
 				delete(players[row['rsc_id']]);
 				skipped++;
@@ -2493,11 +2496,16 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 		const update_query = `
 			UPDATE tiermaker 
 			SET 
-				name = ?
+				name = ?, discord_id = ?
 			WHERE rsc_id = ? AND season = ? AND league = 3
 		`;
 		for ( const rsc_id in updates ) {
-			await db.query(update_query, [updates[rsc_id], rsc_id, season]);
+			await db.query(update_query, [
+				updates[rsc_id].name,
+				updates[rsc_id].discord_id,
+				rsc_id,
+				season,
+			]);
 		}
 	}
 
