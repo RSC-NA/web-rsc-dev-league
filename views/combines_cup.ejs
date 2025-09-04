@@ -25,7 +25,7 @@
 						<li><strong>1 Point</strong> is earned for each Combines series you play in.</li>
 						<li><strong>0.5 Points</strong> for every <strong>game win</strong>.</li>
 					</ul>
-					<% if ( my_rank ) { %>
+					<% if ( user && my_rank ) { %>
 					<h5>Your Position</h5>
 
 					<div class="p-4 border rounded bg-opacity-10 bg-<%- my_rank['tier']; %> text-white">
