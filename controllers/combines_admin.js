@@ -1370,6 +1370,14 @@ router.get(['/history', '/history/:league'], (req, res) => {
 		}
 	} 
 
+	if ( ! req.session.user.user_id ) {
+		if ( req.query.json ) {
+			return res.json({ 'error': 'Missing or invalid API Key' });
+		} else {
+			return res.send('Error: Not logged in.');
+		}
+	}
+
 	let CAN_VIEW_SELF = req.session.user?.combines?.view_mmr?.self ?? false;
 	let CAN_VIEW_ALL = req.session.user?.combines?.view_mmr?.all ?? false;
 	if ( req.session.is_admin || COMBINES_ADMIN ) {

@@ -138,7 +138,7 @@ app.use((req, res, next) => {
 // for templates, etc. 
 
 async function get_user(user_id, ip, api_key=null) {
-	console.log(`get_user(${user_id}, ${api_key})`);
+	//console.log(`get_user(${user_id}, ${api_key})`);
 	if ( ! user_id && ! api_key ) { 
 		return {}; 
 	}
