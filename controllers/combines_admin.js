@@ -1364,7 +1364,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 	const COMBINES_ADMIN = league === 3 ? 
 		req.session.user.is_combines_admin : 
 		req.session.user.is_combines_admin_2s;
-	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
+	if ( ! req.session.user.is_admin && ! COMBINES_ADMIN ) {
 		if ( ! res.locals.combines.public_numbers ) {
 			return res.redirect('/');
 		}
@@ -1380,7 +1380,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 
 	let CAN_VIEW_SELF = req.session.user?.combines?.view_mmr?.self ?? false;
 	let CAN_VIEW_ALL = req.session.user?.combines?.view_mmr?.all ?? false;
-	if ( req.session.is_admin || COMBINES_ADMIN ) {
+	if ( req.session.user.is_admin || COMBINES_ADMIN ) {
 		CAN_VIEW_SELF = true;
 		CAN_VIEW_ALL = true;
 	}
