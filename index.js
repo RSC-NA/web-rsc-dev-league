@@ -137,8 +137,9 @@ app.use((req, res, next) => {
 // primary middleware -- check user session, set up local vars
 // for templates, etc. 
 
-async function get_user(user_id, ip) {
-	if ( ! user_id ) { 
+async function get_user(user_id, ip, api_key=null) {
+	console.log(`get_user(${user_id}, ${api_key})`);
+	if ( ! user_id && ! api_key ) { 
 		return {}; 
 	}
 
@@ -165,10 +166,18 @@ async function get_user(user_id, ip) {
 		season_3s = seasons[0].season_3s;
 		season_2s = seasons[0].season_2s;
 	}
+	
+	let where_id = user_id;
+	let p_where = 'p.id';
+	if ( ! user_id && api_key ) {
+		p_where = 'p.api_key';
+		where_id = api_key;
+	}
 
 	const query = `
 		SELECT 
-			p.id,p.nickname,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
+			p.id,p.api_key,p.nickname,
+			p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
 			p.combines_admin,p.combines_admin_2s,
 			c.name,c.mmr,c.tier,c.status,p.rsc_id,p.discord_id,
 			c.active_3s,c.active_2s,
@@ -196,15 +205,17 @@ async function get_user(user_id, ip) {
 			ON p.discord_id = ban.discord_id AND ban.expires_dtg is null
 		LEFT JOIN players AS ban_user 
 			ON ban.banned_by = ban_user.id
-		WHERE p.id = ?
+		WHERE ${p_where} = ?
 	`;
-	const [results] = await db.query(query, [ season_3s, season_2s, user_id ]);
+
+	const [results] = await db.query(query, [ season_3s, season_2s, where_id ]);
 
 	if ( results && results.length ) {
 		const p = results[0];
 		const series = (p.wins + p.losses) / 3;
 		const user = {
 			user_id: p.id,
+			api_key: p.api_key,
 			nickname: p.nickname,
 			name: p.name,
 			mmr: p.mmr,
@@ -392,6 +403,8 @@ app.use(async (req, res, next) => {
 	res.locals.is_combines_admin_2s = req.session.is_combines_admin_2s;
 	res.locals.rostered = req.session.rostered;
 
+	res.locals.api_key = req.headers['api-key'] ?? null;
+
 	let nick = 'none'.fg('red').clearAll();
 	if ( req?.body?.pulled_by ) {
 		nick = req.body.pulled_by.fg('yellow', 'bright').clearAll();
@@ -404,7 +417,9 @@ app.use(async (req, res, next) => {
 	console.log(`[${log_date[0]} ${log_date[1]}] url: ${req.headers.host}${req.originalUrl.fg('blue').clearAll()} - [${nick}] ip:${ip}`);
 
 	//res.locals.user = req.session.user || {};
-	res.locals.user = await get_user(req.session.user_id, ip);
+	const user = await get_user(req.session.user_id, ip, res.locals.api_key);
+	res.locals.user = user;
+	req.session.user = user;
 
 	res.locals.SEND_TO_API_SERVER = SEND_TO_API_SERVER;
 	

@@ -1361,15 +1361,17 @@ router.post('/history/:rsc_id', (req, res) => {
 
 router.get(['/history', '/history/:league'], (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
-	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	const COMBINES_ADMIN = league === 3 ? 
+		req.session.user.is_combines_admin : 
+		req.session.user.is_combines_admin_2s;
 	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		if ( ! res.locals.combines.public_numbers ) {
 			return res.redirect('/');
 		}
 	} 
 
-	let CAN_VIEW_SELF = res.locals.user.combines.view_mmr.self;
-	let CAN_VIEW_ALL = res.locals.user.combines.view_mmr.all;
+	let CAN_VIEW_SELF = req.session.user?.combines?.view_mmr?.self ?? false;
+	let CAN_VIEW_ALL = req.session.user?.combines?.view_mmr?.all ?? false;
 	if ( req.session.is_admin || COMBINES_ADMIN ) {
 		CAN_VIEW_SELF = true;
 		CAN_VIEW_ALL = true;
@@ -1380,6 +1382,10 @@ router.get(['/history', '/history/:league'], (req, res) => {
 	let csv = false;
 	if ( req.query.csv ) {
 		csv = true;
+	}
+	let json = false;
+	if ( req.query.json ) {
+		json = true;
 	}
 
 	const cols = {
@@ -1428,7 +1434,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 	}
 	let page_offset = (page - 1) * limit;
 
-	if ( csv ) { 
+	if ( csv || json ) { 
 		limit = 2000;
 		page = 1;
 		page_offset = 0;
@@ -1538,6 +1544,9 @@ router.get(['/history', '/history/:league'], (req, res) => {
 							]);
 						}
 						stringifier.end();
+					} else if ( json ) {
+						/* CSV Output if ?csv=true is sent */
+						res.json(players);
 					} else {
 
 					res.render('history_combine', {

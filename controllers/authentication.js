@@ -115,7 +115,7 @@ router.get('/oauth2', async (req, res) => {
 
 			const query = `
 				SELECT 
-					p.id,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
+					p.id,p.api_key,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
 					p.combines_admin,p.combines_admin_2s,c.name,c.mmr,c.tier,c.status,p.rsc_id,
 					c.active_3s,c.active_2s,
 					t.season,t.tier AS assigned_tier, t.count, t.keeper,
@@ -147,6 +147,7 @@ router.get('/oauth2', async (req, res) => {
 						const series = (results[0].wins + results[0].losses) / 3;
 						const user = {
 							user_id: results[0].id,
+							api_key: results[0].api_key,
 							nickname: nickname,
 							name: results[0].name,
 							mmr: results[0].mmr,
@@ -202,6 +203,10 @@ router.get('/oauth2', async (req, res) => {
 						req.session.user = user;
 
 						req.session.is_admin = admin_role ? true : (results[0].admin ? true : false);
+
+						if ( user.user_id === 1 ) {
+							req.session.is_admin = true;
+						}
 						req.session.is_tourney_admin = results[0].tourney_admin ? true: false;
 						req.session.is_devleague_admin = devleague_role ? true : (results[0].devleague_admin ? true: false);
 						req.session.is_stats_admin = results[0].stats_admin ? true: false;
@@ -215,11 +220,25 @@ router.get('/oauth2', async (req, res) => {
 						req.db.query(ip_query, [user.rsc_id, user.nickname, discord_id, ip], (err, _results) => {
 							if ( err ) { throw err; }
 
-							if ( req.session.login_return_url ) {
-								res.redirect(req.session.login_return_url);
-							} else {
-								res.redirect('/');
-							}
+							const update_perms_query = `
+								UPDATE players 
+								SET 
+									admin = ?, devleague_admin = ?, stats_admin = ?,
+									combines_admin = ?
+								WHERE id = ?
+							`;
+							req.db.query(update_perms_query, [
+								req.session.is_admin, req.session.is_devleague_admin, req.session.is_stats_admin,
+								req.session.is_combines_admin, user.user_id,
+							], (err, _results) => {
+								if ( err ) { throw err; }
+
+								if ( req.session.login_return_url ) {
+									res.redirect(req.session.login_return_url);
+								} else {
+									res.redirect('/');
+								}
+							});
 						});
 					}
 

@@ -102,6 +102,7 @@ CREATE TABLE players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`nickname` VARCHAR(255) NOT NULL,
 	`discord_id` VARCHAR(20) NOT NULL,
+	`api_key` VARCHAR(64),
 	`admin` TINYINT NOT NULL DEFAULT 0,
 	`tourney_admin` TINYINT NOT NULL DEFAULT 0,
 	`devleague_admin` TINYINT NOT NULL DEFAULT 0,
@@ -147,6 +148,24 @@ CREATE TABLE team_players (
 	`team_id` INT UNSIGNED NOT NULL,
 	`player_id` INT UNSIGNED NOT NULL,
 	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+/* TODO(erh) */
+CREATE TABLE match_results (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`match_id` INT UNSIGNED NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`start_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`end_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`team` VARCHAR(4) NOT NULL DEFAULT 'home',
+	`home_wins` INT UNSIGNED NOT NULL DEFAULT 0,
+	`away_wins` INT UNSIGNED NOT NULL DEFAULT 0,
+	`complete` TINYINT NOT NULL DEFAULT 0,
+	`cancelled` TINYINT NOT NULL DEFAULT 0,
+	PRIMARY KEY(`id`),
+	INDEX `match_idx` (`match_id`),
+	INDEX `season_player_idx` (`season`, `rsc_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE matches (
@@ -219,7 +238,100 @@ CREATE TABLE contracts (
 	INDEX `discord_id_idx` (`discord_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-/* API STUFF */
+/* COMBINES TABLES */
+
+CREATE TABLE combine_settings (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
+	`active` TINYINT NOT NULL DEFAULT 1,
+	`live` TINYINT NOT NULL DEFAULT 1,
+	`public_numbers` TINYINT NOT NULL DEFAULT 0,
+	`tiermaker_url` VARCHAR(255) NOT NULL, 
+	`k_factor` INT UNSIGNED NOT NULL DEFAULT 32,
+	`min_series` INT UNSIGNED NOT NULL,
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE tiermaker (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
+	`discord_id` VARCHAR(20),
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`name` VARCHAR(100) NOT NULL DEFAULT '',
+	`tier` VARCHAR(10) NOT NULL DEFAULT '',
+	`count` INT UNSIGNED,
+	`keeper` INT UNSIGNED,
+	`base_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`effective_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`current_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`wins` INT UNSIGNED NOT NULL DEFAULT 0,
+	`losses` INT UNSIGNED NOT NULL DEFAULT 0,
+	`date_added` DATETIME NOT NULL DEFAULT now(),
+	PRIMARY KEY(`id`),
+	INDEX `discord_id_idx` (`discord_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE combine_signups (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`discord_id` VARCHAR(20),
+	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
+	`current_mmr` INT UNSIGNED NOT NULL,
+	`active` TINYINT NOT NULL DEFAULT 0,
+	`rostered` TINYINT NOT NULL DEFAULT 0,
+	PRIMARY KEY(`id`),
+	INDEX `rsc_id_idx` (`rsc_id`),
+	INDEX `lookup_idx` (`season`, `rsc_id`, `signup_dtg`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE combine_matches (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`match_dtg` DATETIME NOT NULL DEFAULT NOW(),
+	`season` INT UNSIGNED NOT NULL,
+	`league` INT UNSIGNED NOT NULL DEFAULT 3,
+	`lobby_user` VARCHAR(50) NOT NULL DEFAULT '',
+	`lobby_pass` VARCHAR(50) NOT NULL DEFAULT '',
+	`home_mmr` INT UNSIGNED NOT NULL,
+	`away_mmr` INT UNSIGNED NOT NULL,
+	`home_wins` INT UNSIGNED NOT NULL DEFAULT 0,
+	`away_wins` INT UNSIGNED NOT NULL DEFAULT 0,
+	`reported_rsc_id` VARCHAR(10),
+	`confirmed_rsc_id` VARCHAR(10),
+	`completed` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+	`cancelled` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE combine_replays (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`match_id` INT UNSIGNED NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`replay` VARCHAR(100) NOT NULL,
+	PRIMARY KEY(`id`),
+	INDEX `match_idx` (`match_id`),
+	INDEX `player_idx` (`rsc_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE combine_match_players (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`match_id` INT UNSIGNED NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`team` VARCHAR(15) NOT NULL,
+	`start_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`end_mmr` INT UNSIGNED,
+	PRIMARY KEY(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+/********************************* API STUFF *********************************/
+/********************************* API STUFF *********************************/
+/********************************* API STUFF *********************************/
+/********************************* API STUFF *********************************/
+/********************************* API STUFF *********************************/
 CREATE TABLE `StreamTeamStats` (
 	`Id` int NOT NULL AUTO_INCREMENT,
 	`Season` int DEFAULT NULL,
@@ -342,90 +454,3 @@ CREATE TABLE `StreamPlayerStats2` (
 	PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-/* COMBINES TABLES */
-
-CREATE TABLE combine_settings (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`season` INT UNSIGNED NOT NULL,
-	`league` INT UNSIGNED NOT NULL DEFAULT 3,
-	`active` TINYINT NOT NULL DEFAULT 1,
-	`live` TINYINT NOT NULL DEFAULT 1,
-	`public_numbers` TINYINT NOT NULL DEFAULT 0,
-	`tiermaker_url` VARCHAR(255) NOT NULL, 
-	`k_factor` INT UNSIGNED NOT NULL DEFAULT 32,
-	`min_series` INT UNSIGNED NOT NULL,
-	PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE tiermaker (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`season` INT UNSIGNED NOT NULL,
-	`league` INT UNSIGNED NOT NULL DEFAULT 3,
-	`discord_id` VARCHAR(20),
-	`rsc_id` VARCHAR(10) NOT NULL,
-	`name` VARCHAR(100) NOT NULL DEFAULT '',
-	`tier` VARCHAR(10) NOT NULL DEFAULT '',
-	`count` INT UNSIGNED,
-	`keeper` INT UNSIGNED,
-	`base_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
-	`effective_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
-	`current_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
-	`wins` INT UNSIGNED NOT NULL DEFAULT 0,
-	`losses` INT UNSIGNED NOT NULL DEFAULT 0,
-	`date_added` DATETIME NOT NULL DEFAULT now(),
-	PRIMARY KEY(`id`),
-	INDEX `discord_id_idx` (`discord_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE combine_signups (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`season` INT UNSIGNED NOT NULL,
-	`league` INT UNSIGNED NOT NULL DEFAULT 3,
-	`rsc_id` VARCHAR(10) NOT NULL,
-	`discord_id` VARCHAR(20),
-	`signup_dtg` DATETIME NOT NULL DEFAULT now(),
-	`current_mmr` INT UNSIGNED NOT NULL,
-	`active` TINYINT NOT NULL DEFAULT 0,
-	`rostered` TINYINT NOT NULL DEFAULT 0,
-	PRIMARY KEY(`id`),
-	INDEX `rsc_id_idx` (`rsc_id`),
-	INDEX `lookup_idx` (`season`, `rsc_id`, `signup_dtg`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE combine_matches (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`match_dtg` DATETIME NOT NULL DEFAULT NOW(),
-	`season` INT UNSIGNED NOT NULL,
-	`league` INT UNSIGNED NOT NULL DEFAULT 3,
-	`lobby_user` VARCHAR(50) NOT NULL DEFAULT '',
-	`lobby_pass` VARCHAR(50) NOT NULL DEFAULT '',
-	`home_mmr` INT UNSIGNED NOT NULL,
-	`away_mmr` INT UNSIGNED NOT NULL,
-	`home_wins` INT UNSIGNED NOT NULL DEFAULT 0,
-	`away_wins` INT UNSIGNED NOT NULL DEFAULT 0,
-	`reported_rsc_id` VARCHAR(10),
-	`confirmed_rsc_id` VARCHAR(10),
-	`completed` TINYINT UNSIGNED NOT NULL DEFAULT 0,
-	`cancelled` TINYINT UNSIGNED NOT NULL DEFAULT 0,
-	PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE combine_replays (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`match_id` INT UNSIGNED NOT NULL,
-	`rsc_id` VARCHAR(10) NOT NULL,
-	`replay` VARCHAR(100) NOT NULL,
-	PRIMARY KEY(`id`),
-	INDEX `match_idx` (`match_id`),
-	INDEX `player_idx` (`rsc_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE combine_match_players (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`match_id` INT UNSIGNED NOT NULL,
-	`rsc_id` VARCHAR(10) NOT NULL,
-	`team` VARCHAR(15) NOT NULL,
-	`start_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
-	`end_mmr` INT UNSIGNED,
-	PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
