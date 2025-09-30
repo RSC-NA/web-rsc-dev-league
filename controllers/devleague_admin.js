@@ -977,7 +977,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		SELECT id,rsc_id,nickname,discord_id
 		FROM players 
 		WHERE rsc_id IS NOT null
-		ORDER BY rsc_id ASC
+		ORDER BY id ASC
 	`;
 
 	const [player_rows] = await db.execute(players_query);
