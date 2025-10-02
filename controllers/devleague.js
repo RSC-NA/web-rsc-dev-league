@@ -414,7 +414,7 @@ router.get('/match', (req, res) => {
 	req.db.query(matchQuery, [ player_id, player_id ], (err, results) => {
 		if ( err ) { throw err; }
 
-		if ( results[0].id ) {
+		if ( ! results || results[0].id ) {
 			return res.redirect(`/match/${results[0].id}`);
 		}
 
