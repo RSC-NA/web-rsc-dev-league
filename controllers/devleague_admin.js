@@ -1043,18 +1043,18 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// always add "tehblister" to the list in case he isn't playing
 	// Added for development in S17 so that I could test things 
 	// while non-playing.
-	// let tehblister_id = 'RSC000302';
-	// let tehblister_discord_id = '207266416355835904';
-	// if ( ! (tehblister_id in players) ) {
-	// 	players[tehblister_id] = {
-	// 		'rsc_id': tehblister_id,
-	// 		'name': 'tehblister',
-	// 		'discord_id': tehblister_discord_id,
-	// 		'mmr': 1450,
-	// 		'tier': 'Elite',
-	// 		'status': 'Free Agent',
-	// 	};
-	// }
+	let tehblister_id = 'RSC000302';
+	let tehblister_discord_id = '207266416355835904';
+	if ( ! (tehblister_id in players) ) {
+		players[tehblister_id] = {
+			'rsc_id': tehblister_id,
+			'name': 'tehblister',
+			'discord_id': tehblister_discord_id,
+			'mmr': 1450,
+			'tier': 'Elite',
+			'status': 'Free Agent',
+		};
+	}
 
 	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }
