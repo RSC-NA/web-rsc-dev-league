@@ -492,6 +492,10 @@ router.get('/match/:match_id', (req, res) => {
 	req.db.query(matchQuery, [ req.params.match_id ], (err, results) => {
 		if ( err ) { throw err; }
 
+		if ( ! results ) {
+			return res.redirect('/');
+		}
+		
 		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
 		const tier = results[0].tier;	
 		const home_team = results[0].lobby_user;
