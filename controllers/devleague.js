@@ -492,7 +492,7 @@ router.get('/match/:match_id', (req, res) => {
 	req.db.query(matchQuery, [ req.params.match_id ], (err, results) => {
 		if ( err ) { throw err; }
 
-		if ( ! results ) {
+		if ( ! results || results.length === 0 ) {
 			return res.redirect('/');
 		}
 		
