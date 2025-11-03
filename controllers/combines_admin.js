@@ -1362,6 +1362,9 @@ router.post('/history/:rsc_id', (req, res) => {
 router.get(['/history', '/history/:league', '/history/:league/:season'], (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const combine_season = req.params.season ? parseInt(req.params.season) : null;
+
+	console.log('combines route', req.params.season, combine_season);
+
 	const COMBINES_ADMIN = league === 3 ? 
 		req.session.user.is_combines_admin : 
 		req.session.user.is_combines_admin_2s;
