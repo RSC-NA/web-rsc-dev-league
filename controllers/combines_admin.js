@@ -1359,8 +1359,9 @@ router.post('/history/:rsc_id', (req, res) => {
 	});
 });
 
-router.get(['/history', '/history/:league'], (req, res) => {
+router.get(['/history', '/history/:league', '/history/:league/:season'], (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const combine_season = req.params.season ? parseInt(req.params.season) : null;
 	const COMBINES_ADMIN = league === 3 ? 
 		req.session.user.is_combines_admin : 
 		req.session.user.is_combines_admin_2s;
@@ -1385,7 +1386,7 @@ router.get(['/history', '/history/:league'], (req, res) => {
 		CAN_VIEW_ALL = true;
 	}
 
-	const season = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
+	const season = combine_season ? combine_season : res.locals.combines.season;
 
 	let csv = false;
 	if ( req.query.csv ) {
