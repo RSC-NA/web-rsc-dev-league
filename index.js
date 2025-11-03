@@ -2011,7 +2011,7 @@ app.post('/save_mmr', (req, res) => {
 
 	if ( d.psyonix_season === null ) {
 		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
-			if ( SEND_TO_API_SERVER ) {
+			if ( SEND_TO_API_SERVER && results && results?.insertId ) {
 				send_bad_tracker_to_server(results.insertId, d.tracker_link.link); 
 			}
 			return res.json({ success: false, error: 'This tracker contained no data.' });
