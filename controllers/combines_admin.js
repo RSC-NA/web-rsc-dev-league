@@ -1562,6 +1562,7 @@ router.get(['/history', '/history/:league', '/history/:league/:season'], (req, r
 					} else {
 
 					res.render('history_combine', {
+						com_season: season,
 						order: req.query.order ? req.query.order : 'current_mmr',
 						dir: dir,
 						players: players,
