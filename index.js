@@ -1889,8 +1889,8 @@ app.get('/import_trackers', async (req, res) => {
 		if ( i === 0 ) {
 			tracker_chunks.push([]);
 		}
-		if ( i % 300 == 0 ) { 
-			console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ 
+		if ( i % 500 == 0 ) { 
+			// console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ 
 			chunk++;
 			tracker_chunks.push([]);
 		} 
@@ -1917,7 +1917,7 @@ app.get('/import_trackers', async (req, res) => {
 			const trackers = tracker_chunks[i];
 			console.log(`	Inserting ${trackers.length}. Chunk ${i} of ${chunk}`);
 
-			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers]);
+			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', trackers);
 		}
 	}
 	
