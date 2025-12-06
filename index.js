@@ -1918,7 +1918,7 @@ app.get('/import_trackers', async (req, res) => {
 			if ( ! trackers.length ) { continue; }
 			console.log(`	Inserting ${trackers.length}. Chunk ${i} of ${chunk}`);
 
-			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', trackers);
+			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers]);
 		}
 	}
 	
