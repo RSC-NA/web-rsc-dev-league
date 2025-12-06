@@ -1889,11 +1889,6 @@ app.get('/import_trackers', async (req, res) => {
 		if ( i === 0 ) {
 			tracker_chunks.push([]);
 		}
-		if ( i % 500 == 0 ) { 
-			// console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ 
-			chunk++;
-			tracker_chunks.push([]);
-		} 
 		const rsc_id = trackerRows[i]._rawData[0];
 		const player_name = trackerRows[i]._rawData[1];
 		const tracker = trackerRows[i]._rawData[2];
@@ -1904,9 +1899,14 @@ app.get('/import_trackers', async (req, res) => {
 
 		tracker_chunks[chunk].push([ rsc_id, player_name, tracker ]);
 		total_trackers++;
+		
+		if ( i % 500 === 0 ) { 
+			// console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ 
+			chunk++;
+			tracker_chunks.push([]);
+		} 
 	}
 
-	
 	await db.query('TRUNCATE trackers');
 	// const [seasons] = await db.query(season_query);
 
@@ -1915,6 +1915,7 @@ app.get('/import_trackers', async (req, res) => {
 
 		for ( let i = 0; i < tracker_chunks.length; ++i ) {
 			const trackers = tracker_chunks[i];
+			if ( ! trackers.length ) { continue; }
 			console.log(`	Inserting ${trackers.length}. Chunk ${i} of ${chunk}`);
 
 			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', trackers);
