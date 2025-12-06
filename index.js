@@ -1885,6 +1885,7 @@ app.get('/import_trackers', async (req, res) => {
 	const tracker_chunks = [];
 	let chunk = 0;
 	let total_trackers = 0;
+	const bad_trackers = [];
 	for ( let i = 0; i < trackerRows.length; i++ ) {
 		if ( i === 0 ) {
 			tracker_chunks.push([]);
@@ -1893,9 +1894,15 @@ app.get('/import_trackers', async (req, res) => {
 		const player_name = trackerRows[i]._rawData[1];
 		const tracker = trackerRows[i]._rawData[2];
 
+		if ( tracker.length > 255 ) {
+			bad_trackers.push([rsc_id, player_name, tracker]);
+			continue;
+		}
+
 		if ( ! (rsc_id in active_players) ) {
 			continue;
 		}
+
 
 		tracker_chunks[chunk].push([ rsc_id, player_name, tracker ]);
 		total_trackers++;
