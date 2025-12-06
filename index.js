@@ -1821,7 +1821,17 @@ app.get('/import_trackers', async (req, res) => {
 		return res.redirect('/');
 	} 
 
-	console.log('Starting tracker import...');
+	console.log('Starting tracker import... [WITH ASYNC DATABASE]');
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
 
 	// fetch all active players from contracts
 	const active_players = {};
@@ -1871,10 +1881,19 @@ app.get('/import_trackers', async (req, res) => {
 
 	const trackerSheet = trackerDoc.sheetsByTitle["Link List"];
 	const trackerRows = await trackerSheet.getRows();
-	const trackers = [];
 	console.log('Getting ready to start loop', trackerRows.length);
+	const tracker_chunks = [];
+	let chunk = 0;
+	let total_trackers = 0;
 	for ( let i = 0; i < trackerRows.length; i++ ) {
-		if ( i % 100 == 0 ) { console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ } // make sure we keep our connection through heroku alive
+		if ( i === 0 ) {
+			tracker_chunks.push([]);
+		}
+		if ( i % 300 == 0 ) { 
+			console.log(`Tracker Keepalive ping ${i}`); /*res.write(' ');*/ 
+			chunk++;
+			tracker_chunks.push([]);
+		} 
 		const rsc_id = trackerRows[i]._rawData[0];
 		const player_name = trackerRows[i]._rawData[1];
 		const tracker = trackerRows[i]._rawData[2];
@@ -1883,9 +1902,27 @@ app.get('/import_trackers', async (req, res) => {
 			continue;
 		}
 
-		trackers.push([ rsc_id, player_name, tracker ]);
+		tracker_chunks[chunk].push([ rsc_id, player_name, tracker ]);
+		total_trackers++;
 	}
 
+	
+	await db.query('TRUNCATE trackers');
+	// const [seasons] = await db.query(season_query);
+
+	if ( total_trackers ) {
+		console.log(`Inserting ${total_trackers} in ${chunk} chunks`);
+
+		for ( let i = 0; i < tracker_chunks.length; ++i ) {
+			const trackers = tracker_chunks[i];
+			console.log(`	Inserting ${trackers.length}. Chunk ${i} of ${chunk}`);
+
+			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers]);
+		}
+	}
+	
+		
+	/*
 	connection.query('TRUNCATE trackers', (err, results) => {
 		if ( err ) { throw err; }
 
@@ -1897,6 +1934,10 @@ app.get('/import_trackers', async (req, res) => {
 			res.redirect('/');
 		});
 	});
+	*/
+	db.end();
+
+	res.redirect('/');
 
 });
 
