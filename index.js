@@ -1928,6 +1928,8 @@ app.get('/import_trackers', async (req, res) => {
 			const [results] = await db.query('INSERT INTO trackers (rsc_id, name, tracker_link) VALUES ?', [trackers]);
 		}
 	}
+
+	console.log(`Bad Trackers:`, bad_trackers);
 	
 		
 	/*
