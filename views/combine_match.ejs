@@ -577,7 +577,10 @@
 								</thead>
 								<tbody>
 								<%
+									const report_url = `https://docs.google.com/forms/d/1eYmQBs1msB8rkSWEZr1UOYBW9Jx3cVZF0moc_lFJ8sY/viewform?entry.838391094=${user.nickname}&entry.794058674=https://devleague.rscna.com/combine/${match.id}&`;
+									/*	
 									const report_url = `https://docs.google.com/forms/d/e/1FAIpQLSd3QFpiVp5rJmkgH7GtKpm2XecmYZERhEnuAqiWBz9_EdaVhg/viewform?entry.838391094=${user.nickname}&entry.794058674=https://devleague.rscna.com/combine/${match.id}&`;
+									*/
 									for ( let i = 0; i < match.players.home.length; ++i ) {
 										const p = match.players.home[i];
 										const mmr_delta = p.end_mmr ? 
