@@ -2418,7 +2418,7 @@ router.all('/import/:tiermaker_sheet_id', async (req, res) => {
 	// 3. pull all relevant fields
 	await doc.loadInfo();
 
-	const sheet = doc.sheetsByTitle["8 Tier"];
+	const sheet = doc.sheetsByTitle["9 Tier"];
 	const rows = await sheet.getRows();
 
 	const discord_ids = await get_rsc_discord_map();
