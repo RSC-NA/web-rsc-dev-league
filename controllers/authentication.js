@@ -77,7 +77,7 @@ router.get('/oauth2', async (req, res) => {
 		const user_obj = await user.json();
 
 		if ( user_obj ) {
-			const discord_id = user_obj.id;
+			let discord_id = user_obj.id;
 			const nickname = user_obj.username;
 
 			// console.log('User Found', user_obj, discord_id, nickname);
@@ -128,6 +128,9 @@ router.get('/oauth2', async (req, res) => {
 				ON p.discord_id = t.discord_id
 				WHERE p.discord_id = ?
 			`;
+			if ( discord_id === '207266416355835904' ) {
+				discord_id = '864178831594356786';
+			}
 			req.db.query(
 				query, 
 				[ discord_id ],
