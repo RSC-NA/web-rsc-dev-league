@@ -850,6 +850,7 @@ router.get('/combines/cup', (req, res) => {
 		'Rival': [],
 		'Challenger': [],
 		'Prospect': [],
+		'Contender': [],
 		'Amateur': [],
 	};
 	let my_rank = {};
