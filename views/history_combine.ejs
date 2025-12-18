@@ -242,7 +242,7 @@
 					</select>
 				</div>
 				<div class="col-12 col-md-4">
-					<h4><span class="text-success"><%- total; %></span> TierMaker Players</h4>
+					<h4><span class="Veteran"><%- total; %></span> TierMaker Players</h4>
 				</div>
 				<div class="col-12 col-md-2 text-end h-2">
 					<a
@@ -376,7 +376,7 @@
 
 					<% 
 						const stat_colors = {
-							'great': 'text-success',
+							'great': 'Veteran',
 							'ok': 'text-info',
 							'neutral': 'text-warning',
 							'bad': 'text-danger',
@@ -464,7 +464,7 @@
 								<span 
 									class="fw-bold <%- 
 										p.mmr_delta > 0 ? 
-											'text-success' : 
+											'Veteran' : 
 											p.mmr_delta === 0 ? 
 												'text-muted' : 'text-danger'; 
 									%>"
@@ -477,7 +477,7 @@
 								<span 
 									class="view-player-<%- p.rsc_id; %> fw-bold <%- 
 										p.mmr_delta > 0 ? 
-											'text-success' : 
+											'Veteran' : 
 											p.mmr_delta === 0 ? 
 												'text-muted' : 'text-danger'; 
 									%>"
@@ -522,7 +522,7 @@
 								<%- p.combines_tier; %>
 							</td>
 							<td class="text-right">
-								<span class="text-success fw-bold"><%= p.wins; %></span> /
+								<span class="Veteran fw-bold"><%= p.wins; %></span> /
 								<span class="text-danger fw-bold"><%= p.losses; %></span>
 							</td>
 							<td class="text-center">
