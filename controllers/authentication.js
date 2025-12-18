@@ -128,10 +128,9 @@ router.get('/oauth2', async (req, res) => {
 				ON p.discord_id = t.discord_id
 				WHERE p.discord_id = ?
 			`;
-			if ( discord_id === '207266416355835904' ) {
-				// discord_id = '864178831594356786';
-				discord_id = '444636429369212969';
-			}
+			// if ( discord_id === '207266416355835904' ) {
+				// discord_id = '444636429369212969'; // gama
+			// }
 			req.db.query(
 				query, 
 				[ discord_id ],
