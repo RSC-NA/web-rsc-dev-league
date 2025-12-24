@@ -89,7 +89,7 @@ router.get('/oauth2', async (req, res) => {
 			});
 			const roles_obj = await roles.json();
 
-			let admin_role     = false;
+			// let admin_role     = false;
 			let numbers_role   = false;
 			let staff_role     = false;
 			let devleague_role = false;
@@ -99,7 +99,7 @@ router.get('/oauth2', async (req, res) => {
 				for ( const role_id in admin_roles ) {
 					if ( roles_obj.roles.includes(role_id) ) {
 						if ( admin_roles[role_id] === 'admin' ) {
-							admin_role = true;
+							// admin_role = true;
 						} else if ( admin_roles[role_id] === 'numbers' ) {
 							numbers_role = true;
 						} else if ( admin_roles[role_id] === 'staff' ) {
@@ -179,13 +179,13 @@ router.get('/oauth2', async (req, res) => {
 							},
 							active_3s: results[0].active_3s,
 							active_2s: results[0].active_2s,
-							is_admin: admin_role ? false : (results[0].admin ? true : false),
-							is_tourney_admin: results[0].tourney_admin ? false : false,
+							is_admin: results[0].admin ? true : false,
+							is_tourney_admin: results[0].tourney_admin ? true : false,
 							is_devleague_admin: results[0].devleague_admin ? true: false,
-							is_stats_admin: results[0].stats_admin ? false : false,
-							is_staff:  (admin_role || staff_role) ? false : false,
-							is_combines_admin: numbers_role ? false : (results[0].combines_admin ? false : false),
-							is_combines_admin_2s: results[0].combines_admin_2s ? false : false,
+							is_stats_admin: results[0].stats_admin ? true : false,
+							is_staff:  staff_role ? true : false,
+							is_combines_admin: numbers_role ? true : (results[0].combines_admin ? true : false),
+							is_combines_admin_2s: results[0].combines_admin_2s ? true : false,
 							/*
 							is_admin: admin_role ? true : (results[0].admin ? true : false),
 							is_tourney_admin: results[0].tourney_admin ? true: false,
@@ -214,17 +214,14 @@ router.get('/oauth2', async (req, res) => {
 						
 						req.session.user = user;
 
-						req.session.is_admin = admin_role ? false : (results[0].admin ? true : false);
+						req.session.is_admin = results[0].admin ? true : false;
 
-						if ( user.user_id === 1 ) {
-							req.session.is_admin = true;
-						}
-						req.session.is_tourney_admin = results[0].tourney_admin ? false : false;
-						req.session.is_devleague_admin = devleague_role ? false : (results[0].devleague_admin ? true: false);
-						req.session.is_stats_admin = results[0].stats_admin ? false : false;
-						req.session.is_staff = (admin_role || staff_role) ? false : false;
-						req.session.is_combines_admin = numbers_role ? false : (results[0].combines_admin ? true : false);
-						req.session.is_combines_admin_2s = results[0].combines_admin_2s ? false : false;
+						req.session.is_tourney_admin = results[0].tourney_admin ? true : false;
+						req.session.is_devleague_admin = results[0].devleague_admin ? true: false;
+						req.session.is_stats_admin = results[0].stats_admin ? true : false;
+						req.session.is_staff = staff_role ? true : false;
+						req.session.is_combines_admin = results[0].combines_admin ? true : false;
+						req.session.is_combines_admin_2s = results[0].combines_admin_2s ? true : false;
 						/*
 						req.session.is_tourney_admin = results[0].tourney_admin ? true : false;
 						req.session.is_devleague_admin = devleague_role ? true : (results[0].devleague_admin ? true: false);
