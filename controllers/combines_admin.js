@@ -1164,6 +1164,7 @@ router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
 
 	const ident = req.params.rsc_id === 'ALL' ? 'ALL' : req.params.rsc_id;
 	const where = ident === 'ALL' ? '' : 'rsc_id = ? AND';
+	const params = ident === 'ALL' ? [league] : [ident, league];
 	
 	const query = `
 		DELETE FROM combine_signups  
@@ -1175,8 +1176,9 @@ router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
 			rostered = 0
 	`;
 	const htmx_request = 'hx-request' in req.headers;
+	
 
-	req.db.query(query, [ ident, league ], (err,results) => {
+	req.db.query(query, params, (err,results) => {
 		if ( err ) { throw err; }
 
 		if ( htmx_request ) {
