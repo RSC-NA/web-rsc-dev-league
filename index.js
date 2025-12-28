@@ -696,6 +696,12 @@ app.use((req, res, next) => {
 	}
 	if ( date in combineDays['3s'] || res.locals.combine_live ) {
 		res.locals.combine_day = combineDays['3s'][date]; //res.locals.match_days[date]; //combineDays['3s'][date];
+		if ( ! res.locals.combine_day ) {
+			const backup_date = new Date(new Date().setHours(-10)).toISOString().split('T')[0];
+			if ( backup_date in combineDays['3s'] ) {
+				res.locals.combine_day = combineDays['3s'][backup_date]; //res.locals.match_days[date]; //combineDays['3s'][date];
+			}
+		}
 	}
 	if ( date in combineDays['2s'] || res.locals.combine_2s_live ) {
 		res.locals.combine_2s_day = combineDays['2s'][date];
@@ -758,6 +764,7 @@ app.use((req, res, next) => {
 						}
 
 					}
+					console.log('checked_in:', res.locals);
 					next();
 				} else {
 					next();
