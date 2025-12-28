@@ -1161,11 +1161,14 @@ router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
 	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
 		return res.redirect('/');
 	} 
+
+	const ident = req.params.rsc_id === 'ALL' ? 'ALL' : req.params.rsc_id;
+	const where = ident === 'ALL' ? '' : 'rsc_id = ? AND';
 	
 	const query = `
 		DELETE FROM combine_signups  
 		WHERE 
-			rsc_id = ? AND
+			${where}
 			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
 			league = ? AND
 			active = 0 AND
@@ -1173,11 +1176,15 @@ router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
 	`;
 	const htmx_request = 'hx-request' in req.headers;
 
-	req.db.query(query, [ req.params.rsc_id, league ], (err,results) => {
+	req.db.query(query, [ ident, league ], (err,results) => {
 		if ( err ) { throw err; }
 
 		if ( htmx_request ) {
-			return res.send('deleted');
+			if ( ident === 'ALL' ) {
+				return res.redirect('/combines/process');
+			} else {
+				return res.send('deleted');
+			}
 		} else {
 			if ( league === 2 ) {
 				return res.redirect('/combines/process_2s');

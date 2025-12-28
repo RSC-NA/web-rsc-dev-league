@@ -88,7 +88,18 @@
 								<th class="text-center">Record</th>
 								<th class="text-center">W%</th>
 								<th class="text-center">
-									<i class="fas fa-trash text-danger"></i>	
+									<a
+										class="btn btn-danger btn-sm btn-icon"
+										href="/combines/dequeue/ALL/<%- league; %>"
+										hx-get="/combines/dequeue/ALL/<%- league; %>"
+										hx-swap="delete"
+										hx-confirm="Are you sure you want to remove EVERYONE?"
+										title="Remove <strong>EVERYONE</strong> from the queue"
+										data-bs-toggle="tooltip"
+										data-bs-html="true"
+									>
+										<i class="fas fa-trash"></i>	
+									</a>
 								</th>
 							</tr>
 						</thead>
