@@ -1155,6 +1155,40 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 	}
 });
 
+router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;
+	if ( ! req.session.is_admin && ! COMBINES_ADMIN ) {
+		return res.redirect('/');
+	} 
+	
+	const query = `
+		DELETE FROM combine_signups  
+		WHERE 
+			rsc_id = ? AND
+			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			league = ? AND
+			active = 0 AND
+			rostered = 0
+	`;
+	const htmx_request = 'hx-request' in req.headers;
+
+	req.db.query(query, [ req.params.rsc_id, league ], (err,results) => {
+		if ( err ) { throw err; }
+
+		if ( htmx_request ) {
+			return res.send('deleted');
+		} else {
+			if ( league === 2 ) {
+				return res.redirect('/combines/process_2s');
+			} else {
+				return res.redirect('/combines/process');
+			}
+		}
+	});
+
+});
+
 router.all(['/activate/:rsc_id', '/activate/:rsc_id/:league'], (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const COMBINES_ADMIN = league === 3 ? req.session.is_combines_admin : req.session.is_combines_admin_2s;

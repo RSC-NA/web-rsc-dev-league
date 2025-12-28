@@ -84,6 +84,9 @@
 								<th>Player</th>
 								<th class="text-center">Record</th>
 								<th class="text-center">W%</th>
+								<th class="text-center">
+									<i class="fas fa-trash text-danger"></i>	
+								</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -121,7 +124,7 @@
 									}
 
 						%>
-							<tr class="<%- table_class; %>">
+							<tr class="<%- table_class; %>" id="player_ready_<%- rsc_id; %>">
 								<td class="p-0 text-center">
 									<a href="/combines/activate/<%- rsc_id; %>/<%- league; %>" 
 										class="move-arrow h4 p-0 px-2 mb-0" style=""
@@ -160,6 +163,21 @@
 									<span class="<%- stat_colors[analysis]; %> fw-bold">
 										<%= p.win_percentage; %>%
 									</span>
+								</td>
+								<td class="text-center">
+									<a
+										class="btn btn-danger btn-sm btn-icon"
+										href="/combines/dequeue/<%= rsc_id; %>/<%- league; %>"
+										hx-get="/combines/dequeue/<%- rsc_id; %>/<%- league; %>"
+										hx-target="#player_ready_<%- rsc_id; %>"
+										hx-swap="delete"
+										hx-confirm="Are you sure you want to remove this player?"
+										title="Remove <strong><%= p.name; %></strong> from the queue"
+										data-bs-toggle="tooltip"
+										data-bs-html="true"
+									>
+										<i class="fas fa-trash"></i>	
+									</a>
 								</td>
 							</tr>
 
