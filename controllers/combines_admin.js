@@ -1183,7 +1183,7 @@ router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
 
 		if ( htmx_request ) {
 			if ( ident === 'ALL' ) {
-				return res.redirect('/combines/process');
+				return res.send('deleted. <script>setTimeout(window.location.reload, 1000);</script>');
 			} else {
 				return res.send('deleted');
 			}
