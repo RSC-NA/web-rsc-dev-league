@@ -15,7 +15,9 @@ const DevLeague = {
 	},
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', initialize_devleague); 
+
+function initialize_devleague(_ev) {
 	const timeEls = document.querySelectorAll('.timeago');
 	if ( timeEls && timeEls.length ) {
 		for ( let i = 0; i < timeEls.length; ++i ) {
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			copyBtns[i].addEventListener('click', copyToClipboard);
 		}
 	}
-});
+}
 
 async function copyToClipboard(ev) {
 	const el = ev.target;

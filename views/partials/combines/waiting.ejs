@@ -46,6 +46,9 @@
 						DevLeague.game_count = <%- game_count; %>;
 					}
 					// <%- include_games ?? 'not passed'; %>, <%- game_count ?? 'not passed'; %> 
+
+					// run our init script to handle library initialization for any content returned
+					setTimeout(initialize_devleague, 10);
 				</script>
 				<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
 					<span class="text-muted">Waiting Room</span>
