@@ -4,6 +4,8 @@ const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
+const { roles } = require('../roles');
+
 router.get(['/search','/search/:needle'], (req,res) => {
 	const needle = req.params.needle ? req.params.needle : req.query.find;
 	const needle_f = `%${needle}%`;
@@ -43,17 +45,59 @@ router.get(['/search','/search/:needle'], (req,res) => {
 	}
 });
 
+router.get('/player/:rsc_id/promote/:role', (req, res) => {
+	const rsc_id = req.params.rsc_id;
+	if ( ! req.session.is_admin ) {
+		return res.redirect(`/player/${rsc_id}`);
+	} 
+	
+	const queries = {
+		'admin': 'UPDATE players SET admin = 1 WHERE rsc_id = ?',
+		'devleague-admin': 'UPDATE players SET devleague_admin = 1 WHERE rsc_id = ?',
+		'combines-admin': 'UPDATE players SET combines_admin = 1 WHERE rsc_id = ?',
+		'stats-admin': 'UPDATE players SET stats_admin = 1 WHERE rsc_id = ?',
+	};
+	req.db.query(queries[req.params.role], [rsc_id], (err,results) => {
+		if ( err ) { throw err; }
+
+		return res.redirect(`/player/${rsc_id}`);
+	});
+});
+
+router.get('/player/:rsc_id/demote/:role', (req, res) => {
+	const rsc_id = req.params.rsc_id;
+
+	if ( ! req.session.is_admin ) {
+		return res.redirect(`/player/${rsc_id}`);
+	}
+
+	const queries = {
+		'admin': 'UPDATE players SET admin = 0 WHERE rsc_id = ?',
+		'devleague-admin': 'UPDATE players SET devleague_admin = 0 WHERE rsc_id = ?',
+		'combines-admin': 'UPDATE players SET combines_admin = 0 WHERE rsc_id = ?',
+		'stats-admin': 'UPDATE players SET stats_admin = 0 WHERE rsc_id = ?',
+	};
+
+	req.db.query(queries[req.params.role], [rsc_id], (err,results) => {
+		if ( err ) { throw err; }
+		return res.redirect(`/player/${rsc_id}`);
+	});
+});
+
 router.get('/player/:rsc_id', (req, res) => {
 	if ( ! req.session.discord_id ) {
 		//return res.redirect('/login');
 	}
 
 	const query = `
-SELECT
-	c.rsc_id, c.discord_id, c.name, c.tier, c.status, c.mmr, c.active_3s, c.active_2s
-FROM contracts AS c
-WHERE c.rsc_id = ?
-`;
+		SELECT
+			c.rsc_id, c.discord_id, c.name, c.tier, c.status, c.mmr, c.active_3s, c.active_2s,
+			p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,p.combines_admin
+		FROM contracts AS c
+		LEFT JOIN players AS p 
+			ON c.rsc_id = p.rsc_id
+		WHERE c.rsc_id = ?
+	`;
 
 	const player = {
 		rsc_id    : '',
@@ -67,18 +111,28 @@ WHERE c.rsc_id = ?
 		combines  : false,
 		active_3s : false,
 		active_2s : false,
+		user_roles : [],
+	};
+
+	const role_map = {
+		'admin': '400096325678530580',
+		'tourney_admin' : '400097117684760597',
+		'devleague_admin': '1155946438652604517',
+		'stats_admin': '400096994552578055',
+		'combines_admin': '607719471196536843',
 	};
 
 	console.log(`RSC_ID: ${req.params.rsc_id}`);
 	req.db.query(query, [ req.params.rsc_id ], (err, results) => {
 		if ( err ) { return res.send(`Error: ${err}`); }
 		
-		console.log(`results:`, results);
+		// console.log(`results:`, results);
 
 		if ( ! results || results.length === 0 ) {
 			return res.render('404_player', {
 				rsc_id: req.params.rsc_id,
 				name: '',
+				user_roles: [],
 			});
 		}
 
@@ -90,6 +144,28 @@ WHERE c.rsc_id = ?
 		player.status     = results[0].status;
 		player.active_3s  = results[0].active_3s;
 		player.active_2s  = results[0].active_2s;
+
+		player.admin           = results[0].admin;
+		player.tourney_admin   = results[0].tourney_admin;
+		player.devleague_admin = results[0].devleague_admin;
+		player.stats_admin     = results[0].stats_admin;
+		player.combines_admin  = results[0].combines_admin;
+
+		if ( results[0].admin ) {
+			player.user_roles.push(role_map['admin']);
+		}
+		if ( results[0].tourney_admin ) {
+			player.user_roles.push(role_map['tourney_admin']);
+		}
+		if ( results[0].devleague_admin ) {
+			player.user_roles.push(role_map['devleague_admin']);
+		}
+		if ( results[0].stats_admin ) {
+			player.user_roles.push(role_map['stats_admin']);
+		}
+		if ( results[0].combines_admin ) {
+			player.user_roles.push(role_map['combines_admin']);
+		}
 		
 		res.locals.title = `${player.rsc_id}: ${player.name} [${player.tier}]`;
 		res.locals.description = `${player.name} in ${player.tier} @ ${player.mmr}MMR`;
@@ -106,15 +182,15 @@ WHERE c.rsc_id = ?
 			}
 			
 			const data_query = `
-SELECT
-	psyonix_season AS season, tracker_link, date_pulled,
-	threes_games_played as gp_3s, threes_rating as mmr_3s, threes_season_peak as peak_3s,
-	twos_games_played as gp_2s, twos_rating as mmr_2s, twos_season_peak as peak_2s,
-	ones_games_played as gp_1s, ones_rating as mmr_1s, ones_season_peak as peak_1s
-FROM
-	tracker_data 
-WHERE rsc_id = ?
-ORDER BY psyonix_season DESC, date_pulled DESC
+				SELECT
+					psyonix_season AS season, tracker_link, date_pulled,
+					threes_games_played as gp_3s, threes_rating as mmr_3s, threes_season_peak as peak_3s,
+					twos_games_played as gp_2s, twos_rating as mmr_2s, twos_season_peak as peak_2s,
+					ones_games_played as gp_1s, ones_rating as mmr_1s, ones_season_peak as peak_1s
+				FROM
+					tracker_data 
+				WHERE rsc_id = ?
+				ORDER BY psyonix_season DESC, date_pulled DESC
 			`;
 			
 			req.db.query(data_query, [ req.params.rsc_id ], (err, results) => {
@@ -185,7 +261,12 @@ ORDER BY psyonix_season DESC, date_pulled DESC
 
 					player.combines = results;
 					//console.log('combines',results);
-					return res.render('player', { player: player });
+					console.log(player.user_roles);
+					return res.render('player', {
+						player: player,
+						roles: roles,
+						user_roles: player.user_roles,
+					});
 				});
 
 				//return res.render('player', { player: player });

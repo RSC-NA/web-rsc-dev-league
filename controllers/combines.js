@@ -244,12 +244,15 @@ router.get('/combine/matches/:rsc_id', async(req,res) => {
 			m.id, m.match_dtg, m.season, m.lobby_user, m.lobby_pass, m.home_mmr, m.away_mmr,
 			m.home_wins, m.away_wins, m.reported_rsc_id, m.confirmed_rsc_id, 
 			m.completed, m.cancelled,
-			t.name
+			t.name,
+			p.id AS player_id, p.nickname AS player_nickname, mp.rsc_id AS player_rsc_id, p.discord_id AS player_discord_id
 		FROM combine_matches AS m 
 		LEFT JOIN combine_match_players AS mp 
-		ON m.id = mp.match_id
+			ON m.id = mp.match_id
 		LEFT JOIN tiermaker AS t 
-		ON mp.rsc_id = t.rsc_id AND m.season = t.season 
+			ON mp.rsc_id = t.rsc_id AND m.season = t.season 
+		LEFT JOIN players AS p 
+			ON t.rsc_id = p.rsc_id
 		WHERE m.season = ? AND m.league = 3 AND mp.rsc_id = ?
 		ORDER BY id DESC
 	`;

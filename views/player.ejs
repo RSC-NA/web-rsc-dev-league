@@ -103,7 +103,9 @@
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">Current Tier </h6>
 					<span class="ms-2 w-50 fw-bolder <%- player.tier; %>">
+						<% if ( player.tier !== 'NONE' ) { %>
 						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
+						<% } %>
 						<%= player.tier; %>
 					</span>
 				</li>
@@ -125,8 +127,118 @@
 					</div>
 					<span class="ms-2 text-muted w-50"><%- player.pulls.length; %></span>
 				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Roles</h6>
+					</div>
+					<span class="ms-2 w-50">
+					</span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item">
+					<div class="roles text-sm">
+					<%
+						if ( user_roles ) {
+							for ( const role_id in roles ) {
+								if ( user_roles.includes(role_id) ) {
+					%>
+					<span class="badge badge-sm rounded-pill <%- roles[role_id]['css']; %>"><%- roles[role_id]['text']; %></span>
+					<%
+								
+								}
+							}
+						}
+					%>
+					</div>
+				</li>
 			</ul>
+
+			<% if ( is_admin ) { %> 
+			<h6 class="text-warning"><i class="fas fa-lock me-2"></i> Devleague Software Permissions</h6>
+			<ul style="background-color:#000f1e;" class="list-group mb-3 text-light">
+				<% if ( ! player.admin ) { %> 
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Full Admin</h6>
+					</div>
+					<span class="ms-2 text-muted w-50 Veteran">
+						<a
+							href="/player/<%= player.rsc_id; %>/promote/admin"
+							class="Veteran"
+						>Promote</a>
+					</span>
+				</li>
+				<% } else { %> 
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Full Admin</h6>
+					</div>
+					<span class="ms-2 text-muted w-50 text-danger">
+						<a
+							href="/player/<%= player.rsc_id; %>/demote/admin"
+							class="text-danger"
+						>Remove Admin</a>
+					</span>
+				</li>
+				<% } %> 
+			
+				<% if ( ! player.admin ) { %>
+					<% if ( ! player.combines_admin ) { %> 
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Combines Admin</h6>
+					</div>
+					<span class="ms-2 text-muted w-50 Rival">
+						<a
+							href="/player/<%= player.rsc_id; %>/promote/combines-admin"
+							class="Rival"
+						>Promote</a>
+					</span>
+				</li>
+						<% } else { %> 
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Combines Admin</h6>
+					</div>
+					<span class="ms-2 text-muted w-50 text-danger">
+						<a
+							href="/player/<%= player.rsc_id; %>/demote/combines-admin"
+							class="text-danger"
+						>Remove Combines Admin</a>
+					</span>
+				</li>
+					<% } %> 
+
+					<% if ( ! player.stats_admin ) { %> 
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Stats Admin</h6>
+					</div>
+					<span class="ms-2 text-muted w-50 Challenger">
+						<a
+							href="/player/<%= player.rsc_id; %>/promote/stats-admin"
+							class="Veteran"
+						>Promote to Stats Admin</a>
+					</span>
+				</li>
+					<% } else { %> 
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Stats Admin</h6>
+					</div>
+					<span class="ms-2 text-muted w-50 text-danger">
+						<a
+							href="/player/<%= player.rsc_id; %>/demote/stats-admin"
+							class="text-danger"
+						>Remove as Stats Admin</a>
+					</span>
+				</li>
+					<% } %> 
+				<% } %>
+			</ul>
+			<% } %> 
+
 		</div>
+
 
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">Trackers</h4>

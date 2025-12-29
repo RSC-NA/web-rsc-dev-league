@@ -1,5 +1,50 @@
 
+<%
+	let is_mod = false;
+	const mod_role_id = '400097903277899776';
+	if ( user_roles && user_roles.includes(mod_role_id) ) {
+		is_mod = true;
+	}
+	if ( is_admin ) { is_mod = true; }
+%>
+
 <%- include('partials/header.ejs'); %>
+
+<% 
+	if ( is_mod ) {
+%>
+<div class="modal fade" id="ban_user_modal" tabindex="-1" aria-labelledby="ban_user_label" aria-hidden="true">
+	<form
+		action="/ban/<%- matches[0].player_id; %>/<%- matches[0].player_rsc_id; %>/<%- matches[0].player_discord_id; %>"
+		method="post"
+	>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5
+						class="modal-title text-dark"
+						id="ban_user_label"
+					>Ban User <%= matches[0].player_nickname; %></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body text-dark">
+					<label for="note">
+						Ban Note:
+					</label>
+					<textarea name="note" id="note" rows="3" class="form-control"></textarea>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary">Ban User</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<%
+	}
+%>
+
 
 <main class="container">
 	<div class="py-0 mt-2">
@@ -8,6 +53,22 @@
 			Below is a list of all matches and outcomes for RSC 3s Season <%= combines.season %>
 			for <a href="/player/<%= rsc_id; %>"><%= name; %></a>.
 		</p>
+		<%
+			if ( is_mod ) {
+		%>
+		<button
+			id="ban_user_button"
+			type="button"
+			class="btn btn-danger mb-3"
+			data-bs-toggle="modal"
+			data-bs-target="#ban_user_modal"
+		>
+			<i class="fas fa-gavel me-1"></i>
+			Ban User
+		</button>
+		<%
+			}
+		%>
 	</div>
 	<div class="row">
 		<!-- <div class="col-md-4 order-md-2 mb-4">
