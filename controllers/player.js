@@ -261,7 +261,7 @@ router.get('/player/:rsc_id', (req, res) => {
 
 					player.combines = results;
 					//console.log('combines',results);
-					console.log(player.user_roles);
+					// console.log(player.user_roles);
 					return res.render('player', {
 						player: player,
 						roles: roles,
