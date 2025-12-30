@@ -6,7 +6,7 @@
 			<div class="row">
 				<div class="col-md-7">
 
-					<h1>RSC Combines Cup - Season <%= settings.season; %></h1>
+					<h1>RSC Combines Cup - Season <%= combines.season; %></h1>
 
 					<p class="lead">
 						Show off your Combines domination with a unique role earned through 
@@ -45,7 +45,7 @@
 
 				</div>
 				<div class="col-md-4 matchDates dark">
-					<h3>S<%= settings.season; %> Leaderboard</h3>
+					<h3>S<%= combines.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {
 							const leaderboard = leaderboards[ tier ];
