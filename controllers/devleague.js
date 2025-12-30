@@ -25,7 +25,7 @@ router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'
 		return res.json({'success': false});
 	}
 
-	console.log(req.file.originalname);
+	// console.log(req.file.originalname);
 	const file_name = req.file.originalname;
 
 	try { 

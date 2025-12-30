@@ -764,7 +764,7 @@ app.use((req, res, next) => {
 						}
 
 					}
-					console.log('checked_in:', res.locals);
+					// console.log('checked_in:', res.locals);
 					next();
 				} else {
 					next();

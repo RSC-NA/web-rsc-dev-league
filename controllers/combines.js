@@ -830,7 +830,7 @@ router.get('/combines/cup', (req, res) => {
 	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
 	const season = SEASON;
 
-	console.log('here', season);
+	// console.log('here', season);
 
 	const query = `
 		SELECT 

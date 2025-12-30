@@ -263,7 +263,7 @@
 							const btn = els[i];
 
 							btn.addEventListener('click', (ev) => {
-								console.log(ev.target, ev.currentTarget);
+								// console.log(ev.target, ev.currentTarget);
 								if ( ev.target.closest('button') && ev.target.closest('button').classList.contains('edit-player-button') ) {
 									const btn = ev.target.closest('button');
 									const rsc_id = btn.dataset.rscId;
