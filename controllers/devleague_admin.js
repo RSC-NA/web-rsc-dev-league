@@ -744,7 +744,7 @@ router.get('/process_gameday', (req, res) => {
 			if ( results[i]['tier'] === 'Master' ) {
 				results[i]['tier'] = 'Premier';
 			} else if ( results[i]['tier'] === 'Amateur' ) {
-				results[i]['tier'] = 'Contender';
+				// results[i]['tier'] = 'Contender';
 			}
 
 			if ( ! ( results[i]['tier'] in signups ) ) {
