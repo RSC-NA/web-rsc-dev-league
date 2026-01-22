@@ -22,7 +22,9 @@ router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'
 	console.log('WE ARE HERE');
 
 	if ( ! season && ! match_day && ! match_id ) {
-		return res.json({'success': false});
+		if ( match_day !== 0 ) {
+			return res.json({'success': false});
+		}
 	}
 
 	// console.log(req.file.originalname);
