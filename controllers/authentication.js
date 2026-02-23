@@ -89,7 +89,7 @@ router.get('/oauth2', async (req, res) => {
 			});
 			const roles_obj = await roles.json();
 
-			// let admin_role     = false;
+			let admin_role     = false;
 			let numbers_role   = false;
 			let staff_role     = false;
 			let devleague_role = false;
