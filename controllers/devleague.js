@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('./upload_devleague');
+const mysqlP = require('mysql2/promise');
 
 // router.post('/score/:match_id', (req, res) => {
 // 	const home_wins = req.body.home_wins;
@@ -385,7 +386,8 @@ router.get('/match', (req, res) => {
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, 
 			t.tier,
 			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id,
-			m.home_wins, m.away_wins
+			m.home_wins, m.away_wins,
+			p.mmr AS season_mmr, tp.start_mmr, tp.end_mmr
 		FROM
 			matches AS m
 		LEFT JOIN teams AS t 
@@ -449,21 +451,168 @@ router.get('/match', (req, res) => {
 	});
 });
 
-router.post('/score/:match_id', (req, res) => {
-	console.log('here', req.body.home_wins, req.body.away_wins, res.locals.user.rsc_id);
-	const home_wins = req.body.home_wins;
-	const away_wins = req.body.away_wins;
+
+function dev_rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
+	home_mmr = home_mmr / 3;
+	away_mmr = away_mmr / 3;
+	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
+	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
+
+	const home_result = scores.home / 4;
+	const away_result = scores.away / 4;
+
+	const home_delta = Math.round(k_factor * (home_result - home_win_chance));
+	const away_delta = Math.round(k_factor * (away_result - away_win_chance));
+
+	const results = { 
+		home: {
+			start: parseInt(home_mmr),
+			delta: home_delta,
+			end: parseInt(home_mmr) + home_delta,
+		},
+		away: {
+			start: parseInt(away_mmr),
+			delta: away_delta,
+			end: parseInt(away_mmr) + away_delta,
+		},
+	};
+
+	return results;
+}
+
+async function dev_update_mmrs(db, match, k_factor=48) {
+	const scores = { home: match.home.wins, away: match.away.wins };
+
+	const delta = dev_rating_delta_series(match.home.start_mmr, match.away.start_mmr, scores, k_factor);
+
+	console.log(match);
+	console.log(delta);
+
+	const player_query = `
+		UPDATE players SET mmr = ? WHERE rsc_id = ?
+	`;
+	const match_players_query = `
+		UPDATE team_players 
+		SET end_mmr = ?
+		WHERE team_id = ? AND player_id = ?
+	`;
+
+	for ( const rsc_id in match.players ) {
+		const p = match.players[rsc_id];
+		const new_mmr = p.start_mmr + delta[p.team].delta;
+		console.log('Updating...',rsc_id, p.start_mmr, new_mmr);
+		match.players[rsc_id].new_mmr = new_mmr;
+
+		await db.execute(player_query, [new_mmr, rsc_id]);
+		await db.execute(match_players_query, [new_mmr, p.team_id, p.id]);
+	}
+
+	match.delta = delta;
+
+	return match;
+}
+
+
+router.post('/score/:match_id', async (req, res) => {
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const home_wins = parseInt(req.body.home_wins);
+	const away_wins = parseInt(req.body.away_wins);
 	const rsc_id = res.locals.user.rsc_id;
 	const match_id = req.params.match_id;
-	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ?, reported_rsc_id = ? WHERE id = ? AND cancelled = 0';
-	console.log('here', home_wins, away_wins, rsc_id, match_id);
 
-	console.log(scoreQuery);
-	req.db.query(scoreQuery, [ home_wins, away_wins, rsc_id, match_id ], (err, _results) => {
+	const match_query = `
+		SELECT 
+			id,match_dtg,season,match_day,home_team_id,away_team_id,
+			lobby_user,lobby_pass,reported_rsc_id,home_wins,away_wins,cancelled 
+		FROM matches 
+		WHERE id = ?
+	`;
+	const [match_results] = await db.execute(match_query, [match_id]);
+	let match = null;
+	if ( match_results && match_results.length ) {
+		match = match_results[0];
+	}
+
+	const players_query = ` 
+		SELECT 
+			p.id,p.rsc_id,p.discord_id,p.nickname,p.mmr AS season_mmr,
+			tp.team_id,tp.start_mmr, tp.end_mmr 
+		FROM players AS p 
+		LEFT JOIN team_players AS tp 
+			ON p.id = tp.player_id 
+		WHERE tp.team_id = ? OR tp.team_id = ?
+	`;
+	const [players] = await db.execute(players_query, [match.home_team_id, match.away_team_id]);
+
+
+	const scoreQuery = `
+		UPDATE matches 
+		SET home_wins = ?, away_wins = ?, reported_rsc_id = ? 
+		WHERE id = ? AND cancelled = 0
+	`;
+	await db.execute(scoreQuery, [home_wins, away_wins, rsc_id, match_id]);
+	
+	// console.log(match, players);
+	const match_details = {
+		players: [],
+		home: {
+			id: match.home_team_id,
+			wins: home_wins,
+			losses: away_wins,
+			start_mmr: 0,
+			end_mmr: 0,
+		},
+		away: {
+			id: match.away_team_id,
+			wins: away_wins,
+			losses: home_wins,
+			start_mmr: 0,
+			end_mmr: 0,
+		},
+	};
+	if ( players && players.length ) {
+		for ( let i = 0; i < players.length; ++i ) {
+			const p = players[i];
+			if ( p.team_id === match.home_team_id ) {
+				match_details.home.start_mmr += p.start_mmr;
+				p.team = 'home';
+				p.wins = home_wins;
+				p.losses = away_wins;
+				match_details.players[p.rsc_id] = p;	
+			} else {
+				match_details.away.start_mmr += p.start_mmr;
+				p.team = 'away';
+				p.wins = away_wins;
+				p.losses = home_wins;
+				match_details.players[p.rsc_id] = p;	
+			}
+		}
+	}
+
+	console.log(match_details);
+	const k_factor = 48;
+	const deltas = await dev_update_mmrs(db, match_details, k_factor);
+
+	await db.end();
+		
+	res.redirect(`/match/${match_id}`);
+/*
+	req.db.query(scoreQuery, [ home_wins, away_wins, rsc_id, match_id ], async (err, _results) => {
 		if ( err ) { console.error(err); }
 
 		res.redirect(`/match/${match_id}`);
 	});
+	*/
 });
 
 router.get('/match/:match_id', (req, res) => {
@@ -472,7 +621,8 @@ router.get('/match/:match_id', (req, res) => {
 			m.id, m.season, m.match_day, m.lobby_user, m.lobby_pass, m.reported_rsc_id, m.cancelled,
 			t.tier,
 			tp.team_id, tp.player_id, c.name, c.mmr, c.rsc_id, c.discord_id,
-			m.home_wins, m.away_wins
+			m.home_wins, m.away_wins,
+			p.mmr AS season_mmr, tp.start_mmr, tp.end_mmr
 		FROM
 			matches AS m
 		LEFT JOIN teams AS t 

@@ -115,7 +115,8 @@ router.get('/oauth2', async (req, res) => {
 
 			const query = `
 				SELECT 
-					p.id,p.api_key,p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
+					p.id,p.api_key,p.admin,p.mmr AS main_mmr,
+					p.tourney_admin,p.devleague_admin,p.stats_admin,
 					p.combines_admin,p.combines_admin_2s,c.name,c.mmr,c.tier,c.status,p.rsc_id,
 					c.active_3s,c.active_2s,
 					t.season,t.tier AS assigned_tier, t.count, t.keeper,
@@ -148,11 +149,16 @@ router.get('/oauth2', async (req, res) => {
 						req.session.user_id = results[0].id;
 
 						const series = (results[0].wins + results[0].losses) / 3;
+						let season_mmr = results[0].season_mmr ? results[0].season_mmr : null;
+						if ( ! season_mmr && results[0].current_mmr ) {
+							season_mmr = results[0].current_mmr;
+						}
 						const user = {
 							user_id: results[0].id,
 							api_key: results[0].api_key,
 							nickname: nickname,
 							name: results[0].name,
+							season_mmr: season_mmr,
 							mmr: results[0].mmr,
 							tier: results[0].tier,
 							status: results[0].status,
@@ -277,7 +283,8 @@ router.get('/oauth2', async (req, res) => {
 								
 								const player_lookup_query =	`
 									SELECT 
-										p.id,c.name,c.mmr,c.tier,c.status,c.rsc_id,
+										p.id,p.mmr AS main_mmr, 
+										c.name,c.mmr,c.tier,c.status,c.rsc_id,
 										c.active_3s,c.active_2s,
 										t.season,t.tier AS assigned_tier, t.count, t.keeper,
 										t.base_mmr, t.effective_mmr,t.current_mmr, 
@@ -290,10 +297,15 @@ router.get('/oauth2', async (req, res) => {
 									WHERE p.discord_id = ?`;
 								req.db.query(player_lookup_query, [discord_id], (err, results) => {
 									const series = (results[0].wins + results[0].losses) / 3;
+									let season_mmr = results[0].season_mmr ? results[0].season_mmr : null;
+									if ( ! season_mmr && results[0].current_mmr ) {
+										season_mmr = results[0].current_mmr;
+									}
 									const user = {
 										user_id: results[0].id,
 										nickname: nickname,
 										name: results[0].name,
+										season_mmr: season_mmr,
 										mmr: results[0].mmr,
 										tier: results[0].tier,
 										status: results[0].status,

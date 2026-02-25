@@ -75,22 +75,26 @@ async function make_lobby_devleague(db, lobby) {
 
 	const match_id = match_res.insertId;
 
-	const tp_query = `INSERT INTO team_players (team_id, player_id) VALUES (?, ?)`;
+	const tp_query = `INSERT INTO team_players (team_id, player_id, start_mmr) VALUES (?, ?, ?)`;
 	const home_players = lobby.home.players;
 	const away_players = lobby.away.players;
 
 	const in_lobby = [];
 
 	for ( let i = 0; i < home_players.length; ++i ) {
-		await db.execute(tp_query, [home_team_id, home_players[i].id]);
+		const p = home_players[i];
+		const start_mmr = p.season_mmr ? p.season_mmr : p.mmr;
+		await db.execute(tp_query, [home_team_id, home_players[i].id, start_mmr]);
 		in_lobby.push(home_players[i].id);
 	}
 	for ( let i = 0; i < away_players.length; ++i ) {
-		await db.execute(tp_query, [away_team_id, away_players[i].id]);
+		const p = away_players[i];
+		const start_mmr = p.season_mmr ? p.season_mmr : p.mmr;
+		await db.execute(tp_query, [away_team_id, away_players[i].id, start_mmr]);
 		in_lobby.push(away_players[i].id);
 	}
 
-	console.log(in_lobby);
+	const placeholders = '?,'.repeat(in_lobby.length - 1) + '?';
 	// set their signup status to "rostered"
 	const rostered_query = `
 		UPDATE signups 
@@ -98,11 +102,11 @@ async function make_lobby_devleague(db, lobby) {
 		WHERE 
 			season = ? AND 
 			match_day = ? AND 
-			player_id in (?)
+			player_id in (${placeholders})
 	`;
-	await db.query(rostered_query, [lobby.season, lobby.match_day, in_lobby]);
+	await db.query(rostered_query, [lobby.season, lobby.match_day, ...in_lobby]);
 
-	console.log('Everyone updated!');
+	console.log('Everyone updated!', lobby.season, lobby.match_day, ...in_lobby);
 
 	return true;
 
@@ -151,13 +155,28 @@ router.get('/setup/devleague', async (req, res) => {
 	});
 
 
-	const db_query = "SELECT p.id,c.status FROM players AS p LEFT JOIN contracts AS c ON p.discord_id = c.discord_id WHERE c.active_3s = 1 ORDER BY rand() LIMIT 100";
+	const db_query = `
+		SELECT p.id,c.status,p.mmr 
+		FROM players AS p 
+		LEFT JOIN contracts AS c 
+			ON p.discord_id = c.discord_id 
+		WHERE c.active_3s = 1 AND p.id IN (SELECT player_id FROM team_players) AND p.id NOT in (select player_id FROM signups WHERE active = 0 and rostered = 0)
+		ORDER BY rand() 
+		LIMIT 100
+	`;
 
 	const [ results ] = await db.execute(db_query);
 	if ( results && results.length ) {
-		const ins_query = 'INSERT INTO signups (player_id,season,match_day,status) VALUES (?, ?, ?, ?)';
+		const ins_query = `
+			INSERT INTO signups 
+				(player_id,season,match_day,status) 
+			VALUES (?, ?, ?, ?)
+		`;
 		for ( let i = 0; i < results.length; ++i ) {
-			await db.execute(ins_query, [ results[i].id, 19, 18, results[i].status ]);
+			await db.execute(ins_query, [ 
+				results[i].id, res.locals.settings.season, 
+				res.locals.match_day, results[i].status,
+			]);
 		}
 	}
 
@@ -187,7 +206,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 
 	let playersQuery = `
 		SELECT 
-			p.id,c.name,c.mmr,c.tier,c.rsc_id
+			p.id,p.mmr AS season_mmr,c.name,c.mmr,c.tier,c.rsc_id
 		FROM signups AS s
 		LEFT JOIN players AS p 
 		ON p.id = s.player_id
@@ -198,14 +217,14 @@ router.all('/generate_team/:tier', async (req, res) => {
 			s.active = 1 AND 
 			s.rostered = 0 AND
 			c.tier = ? 
-		ORDER BY c.mmr DESC
+		ORDER BY p.mmr DESC
 	`;
 	let tier_params = [tier];
 	if ( tier === 'Premier' || tier === 'Contender' ) {
 		console.log("OVERRIDE TIER!", tier);
 		playersQuery = `
 			SELECT 
-				p.id,c.name,c.mmr,c.tier,c.rsc_id
+				p.id,p.mmr AS season_mmr,c.name,c.mmr,c.tier,c.rsc_id
 			FROM signups AS s
 			LEFT JOIN players AS p 
 			ON p.id = s.player_id
@@ -216,7 +235,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				s.active = 1 AND 
 				s.rostered = 0 AND
 				(c.tier = ? OR c.tier = ?)
-			ORDER BY c.mmr DESC
+			ORDER BY p.mmr DESC
 		`;
 		if ( tier === 'Premier' ) {
 			tier_params = ['Premier', 'Master'];
@@ -226,7 +245,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 	} else if ( tier === 'all' ) {
 		playersQuery = `
 			SELECT
-				p.id,c.name,c.mmr,c.tier,c.rsc_id
+				p.id,p.mmr AS season_mmr,c.name,c.mmr,c.tier,c.rsc_id
 			FROM signups AS s
 			LEFT JOIN players AS p 
 				ON p.id = s.player_id
@@ -236,7 +255,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
 				s.active = 1 AND 
 				s.rostered = 0
-			ORDER BY c.mmr DESC
+			ORDER BY p.mmr DESC
 		`;
 		tier_params = null;
 	}
@@ -302,20 +321,161 @@ router.get('/match/:match_id/resume', (req, res) => {
 	}
 });
 
-router.post('/admin-score/:match_id', (req, res) => {
+function admin_dev_rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
+	home_mmr = home_mmr / 3;
+	away_mmr = away_mmr / 3;
+	const home_win_chance = 1 / ( 1 + Math.pow(10, (away_mmr - home_mmr) / 400));
+	const away_win_chance = 1 / ( 1 + Math.pow(10, (home_mmr - away_mmr) / 400));
+
+	const home_result = scores.home / 4;
+	const away_result = scores.away / 4;
+
+	const home_delta = Math.round(k_factor * (home_result - home_win_chance));
+	const away_delta = Math.round(k_factor * (away_result - away_win_chance));
+
+	const results = { 
+		home: {
+			start: parseInt(home_mmr),
+			delta: home_delta,
+			end: parseInt(home_mmr) + home_delta,
+		},
+		away: {
+			start: parseInt(away_mmr),
+			delta: away_delta,
+			end: parseInt(away_mmr) + away_delta,
+		},
+	};
+
+	return results;
+}
+
+async function admin_dev_update_mmrs(db, match, k_factor=48) {
+	const scores = { home: match.home.wins, away: match.away.wins };
+
+	const delta = admin_dev_rating_delta_series(match.home.start_mmr, match.away.start_mmr, scores, k_factor);
+
+	const player_query = `
+		UPDATE players SET mmr = ? WHERE rsc_id = ?
+	`;
+	const match_players_query = `
+		UPDATE team_players 
+		SET end_mmr = ?
+		WHERE team_id = ? AND player_id = ?
+	`;
+
+	for ( const rsc_id in match.players ) {
+		const p = match.players[rsc_id];
+		const new_mmr = p.start_mmr + delta[p.team].delta;
+		console.log('Updating...',rsc_id, p.start_mmr, new_mmr);
+		match.players[rsc_id].new_mmr = new_mmr;
+
+		await db.execute(player_query, [new_mmr, rsc_id]);
+		await db.execute(match_players_query, [new_mmr, p.team_id, p.id]);
+	}
+
+	match.delta = delta;
+
+	return match;
+}
+
+router.post('/admin-score/:match_id', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect(`/match/${req.params.match_id}`);
 	}
-
-	const home_wins = req.body.home_wins;
-	const away_wins = req.body.away_wins;
-	const scoreQuery = 'UPDATE matches SET home_wins = ?, away_wins = ?, reported_rsc_id = ? WHERE id = ?';
-
-	req.db.query(scoreQuery, [ home_wins, away_wins, res.locals.user.rsc_id, req.params.match_id ], (err, _results) => {
-		if ( err ) { throw err; }
-
-		return res.redirect(`/match/${req.params.match_id}`);
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
 	});
+
+	const home_wins = parseInt(req.body.home_wins);
+	const away_wins = parseInt(req.body.away_wins);
+	const rsc_id = res.locals.user.rsc_id;
+	const match_id = req.params.match_id;
+
+	const match_query = `
+		SELECT 
+			id,match_dtg,season,match_day,home_team_id,away_team_id,
+			lobby_user,lobby_pass,reported_rsc_id,home_wins,away_wins,cancelled 
+		FROM matches 
+		WHERE id = ?
+	`;
+	const [match_results] = await db.execute(match_query, [match_id]);
+	let match = null;
+	if ( match_results && match_results.length ) {
+		match = match_results[0];
+	}
+
+	const players_query = ` 
+		SELECT 
+			p.id,p.rsc_id,p.discord_id,p.nickname,p.mmr AS season_mmr,
+			tp.team_id,tp.start_mmr, tp.end_mmr 
+		FROM players AS p 
+		LEFT JOIN team_players AS tp 
+			ON p.id = tp.player_id 
+		WHERE tp.team_id = ? OR tp.team_id = ?
+	`;
+	const [players] = await db.execute(players_query, [match.home_team_id, match.away_team_id]);
+
+	const scoreQuery = `
+		UPDATE matches 
+		SET home_wins = ?, away_wins = ?, reported_rsc_id = ? 
+		WHERE id = ?
+	`;
+
+	await db.execute(scoreQuery, [
+		home_wins, away_wins, res.locals.user.rsc_id, req.params.match_id,
+	]);
+
+	const match_details = {
+		players: [],
+		home: {
+			id: match.home_team_id,
+			wins: home_wins,
+			losses: away_wins,
+			start_mmr: 0,
+			end_mmr: 0,
+		},
+		away: {
+			id: match.away_team_id,
+			wins: away_wins,
+			losses: home_wins,
+			start_mmr: 0,
+			end_mmr: 0,
+		},
+	};
+	if ( players && players.length ) {
+		for ( let i = 0; i < players.length; ++i ) {
+			const p = players[i];
+			if ( p.team_id === match.home_team_id ) {
+				match_details.home.start_mmr += p.start_mmr;
+				p.team = 'home';
+				p.wins = home_wins;
+				p.losses = away_wins;
+				match_details.players[p.rsc_id] = p;	
+			} else {
+				match_details.away.start_mmr += p.start_mmr;
+				p.team = 'away';
+				p.wins = away_wins;
+				p.losses = home_wins;
+				match_details.players[p.rsc_id] = p;	
+			}
+		}
+	}
+
+	console.log(match_details);
+	const k_factor = 48;
+	const deltas = await admin_dev_update_mmrs(db, match_details, k_factor);
+
+	await db.end();
+
+	return res.redirect(`/match/${req.params.match_id}`);
 });
 
 router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id', (req, res) => {
@@ -631,7 +791,7 @@ router.get('/devleague', async (req, res) => {
 	const signups_query = `
 	SELECT 
 		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
-		s.signup_dtg,c.mmr,
+		s.signup_dtg,c.mmr,p.mmr AS season_mmr,
 		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
 	FROM 
 		signups AS s
@@ -645,7 +805,7 @@ router.get('/devleague', async (req, res) => {
 		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
 	) AND
 	rostered = 0
-	ORDER BY c.mmr DESC
+	ORDER BY p.mmr DESC
 	`; 
 
 	const signups = {
@@ -721,7 +881,7 @@ router.get('/process_gameday', (req, res) => {
 	const signups_query = `
 	SELECT 
 		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
-		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
+		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status,p.mmr AS season_mmr
 	FROM 
 		signups AS s
 	LEFT JOIN players AS p 
@@ -732,7 +892,7 @@ router.get('/process_gameday', (req, res) => {
 		DATE(signup_dtg) = CURDATE() OR 
 		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
 	)
-	ORDER BY c.mmr DESC 
+	ORDER BY p.mmr DESC 
 	`; 
 
 	req.db.query(signups_query, (err, results) => {
@@ -974,7 +1134,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	console.log('Importing Players from Players Table...');
 
 	const players_query = `
-		SELECT id,rsc_id,nickname,discord_id
+		SELECT id,rsc_id,nickname,discord_id,mmr
 		FROM players 
 		WHERE rsc_id IS NOT null
 		ORDER BY id ASC
@@ -989,6 +1149,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 				'rsc_id': p.rsc_id,
 				'name': p.nickname,
 				'discord_id': p.discord_id,
+				'cur_mmr': p.mmr,
 				'active_2s': false,
 				'active_3s': false,
 				'status': 'Non-playing',
@@ -1001,18 +1162,25 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	const mmrSheet = doc.sheetsByTitle["Count/Keeper"];
 	const mmrRows = await mmrSheet.getRows();
 
+	const mmr_list = {};
+
 	for ( let i = 0; i < mmrRows.length; i++ ) {
 		if ( ! mmrRows[i]['active_3s'] ) {
 			//console.log(mmrRows[i]);
-			console.log('active_3s null', i, mmrRows[i]['RSC ID'] );
+			// console.log('active_3s null', i, mmrRows[i]['RSC ID'] );
 			delete(mmrRows[i]);
 			continue;
 		}
 
 		if ( mmrRows[i]['RSC ID'] in players ) {
+			const r_id = mmrRows[i]['RSC ID'];
 			//console.log('found', mmrRows[i]['RSC ID'], mmrRows[i]['Effective MMR'], mmrRows[i]['Tier']);
-			players[ mmrRows[i]['RSC ID'] ]['mmr'] = mmrRows[i]['Effective MMR'];
-			players[ mmrRows[i]['RSC ID'] ]['tier'] = mmrRows[i]['Tier'];
+			players[ r_id ]['mmr'] = mmrRows[i]['Effective MMR'];
+			players[ r_id ]['tier'] = mmrRows[i]['Tier'];
+
+			if ( ! players[r_id]['cur_mmr'] ) {
+				mmr_list[r_id] = players[r_id]['mmr'];
+			}
 		} else {
 			// console.log('skipped', mmrRiws[i]['RSC ID']);
 		}
@@ -1025,17 +1193,20 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	for ( let i = 0; i < contractRows.length; i++ ) {
 		if ( contractRows[i]['RSC ID'] in players ) {
+			const r_id = contractRows[i]['RSC ID'];
 
 			// perm FAs don't show up in Count/Keeper sheet. We need to 
 			// calc their tier from MMR.
-			if ( ! ('tier' in players[ contractRows[i]['RSC ID'] ]) ) {
-				players[contractRows[i]['RSC ID']]['mmr'] = contractRows[i]['Current MMR'];
-				players[contractRows[i]['RSC ID']]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']), 3);
+			if ( ! ('tier' in players[ r_id ]) ) {
+				players[r_id]['mmr'] = contractRows[i]['Current MMR'];
+				players[r_id]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']), 3);
+				if ( ! players[r_id]['cur_mmr'] ) {
+					mmr_list[r_id] = players[r_id]['mmr'];
+				}
 			}
 
-			players[ contractRows[i]['RSC ID'] ]['status'] = contractRows[i]['Contract Status'];
-			players[ contractRows[i]['RSC ID'] ]['active_3s'] = contractRows[i]['Active'] === 'TRUE' ? true : false;
-
+			players[ r_id ]['status'] = contractRows[i]['Contract Status'];
+			players[ r_id ]['active_3s'] = contractRows[i]['Active'] === 'TRUE' ? true : false;
 		}
 	}
 	
@@ -1050,11 +1221,29 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'rsc_id': tehblister_id,
 			'name': 'tehblister',
 			'discord_id': tehblister_discord_id,
+			'cur_mmr': 1450,
 			'mmr': 1450,
 			'tier': 'Elite',
 			'status': 'Free Agent',
 		};
 	}
+				
+	if ( Object.keys(mmr_list).length > 0 ) {
+		const update_players_query = `
+			UPDATE players 
+			SET mmr = ? 
+			WHERE rsc_id = ? AND mmr IS null
+		`;
+		for ( const r_id in mmr_list ) {
+			// console.log(`setting RSC_ID:${r_id} to ${mmr_list[r_id]}`);
+			const [updated] = await db.execute(update_players_query, [
+				mmr_list[r_id],
+				r_id,
+			]);
+		}
+	}
+
+	await db.end();
 
 	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }
@@ -1094,6 +1283,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			(err, results) => {
 				if (err) { /*throw err;*/ writeError(err.toString()); console.log('error!', err); }
 				console.log(`Inserting records`, results);
+
 				res.redirect('/manage_league');
 		});
 	});
@@ -1169,7 +1359,6 @@ router.get('/manage_league', (req, res) => {
 				});
 			}
 		});
-
 	});
 
 });
@@ -1205,7 +1394,20 @@ router.post('/manage_league', (req, res) => {
 		],
 		(err) => {
 			if ( err ) { throw err; }
-			res.redirect('/manage_league');
+
+			const int_season = parseInt(req.body.season);
+			if ( int_season && (int_season - 1) === res.locals.settings.season ) {
+				console.log('INCREMENTING THE SEASON');
+
+				const clear_mmr_query = 'UPDATE players SET mmr = null';
+				req.db.query(clear_mmr_query, (err) => {
+					if ( err ) { throw err; }
+
+					res.redirect('/manage_league');
+				});
+			} else {
+				res.redirect('/manage_league');
+			}
 		}
 	);
 });

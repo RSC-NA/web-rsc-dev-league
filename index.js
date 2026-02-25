@@ -176,7 +176,7 @@ async function get_user(user_id, ip, api_key=null) {
 
 	const query = `
 		SELECT 
-			p.id,p.api_key,p.nickname,
+			p.id,p.api_key,p.nickname,p.mmr AS season_mmr,
 			p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,
 			p.combines_admin,p.combines_admin_2s,
 			c.name,c.mmr,c.tier,c.status,p.rsc_id,p.discord_id,
@@ -218,6 +218,7 @@ async function get_user(user_id, ip, api_key=null) {
 			api_key: p.api_key,
 			nickname: p.nickname,
 			name: p.name,
+			season_mmr: p.season_mmr,
 			mmr: p.mmr,
 			tier: p.tier,
 			status: p.status,

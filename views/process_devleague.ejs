@@ -269,6 +269,14 @@
 							} else {
 								analysis = 'none';
 							}
+							
+							const mmr_delta = p.mmr - p.season_mmr;
+							let delta_change = 'text-muted';
+							if ( mmr_delta > 0 ) {
+								delta_change = 'text-success fw-bolder';
+							} else {
+								delta_change = 'text-danger fw-bolder';
+							}
 
 				%>
 					<tr class="<%- table_class; %>">
@@ -284,7 +292,8 @@
 						<td class="text-center">
 							<span class="text-primary fw-bold">
 								<%= p.mmr; %>
-							</span>
+							</span> 
+							(<span class="<%- delta_change; %>"><%= mmr_delta; %></span>)
 						</td>
 						<td class="text-center ">
 							<img

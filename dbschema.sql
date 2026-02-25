@@ -102,6 +102,7 @@ CREATE TABLE players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`nickname` VARCHAR(255) NOT NULL,
 	`discord_id` VARCHAR(20) NOT NULL,
+	`mmr` int unsigned NULL,
 	`api_key` VARCHAR(64),
 	`admin` TINYINT NOT NULL DEFAULT 0,
 	`tourney_admin` TINYINT NOT NULL DEFAULT 0,
@@ -147,6 +148,8 @@ CREATE TABLE team_players (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`team_id` INT UNSIGNED NOT NULL,
 	`player_id` INT UNSIGNED NOT NULL,
+	`start_mmr` INT UNSIGNED NULL,
+	`end_mmr` INT UNSIGNED NULL,
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

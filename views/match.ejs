@@ -518,6 +518,18 @@
 								<%
 									for ( const rsc_id in lobby.home ) {
 										const p = lobby.home[rsc_id];
+										const first_delta = p.start_mmr - p.mmr;
+										const full_delta = p.end_mmr - p.mmr;
+										const mmr_delta = p.end_mmr - p.start_mmr;
+										const cur_delta = p.end_mmr ? full_delta : first_delta;
+										const delta = p.end_mmr ? full_delta : first_delta;
+
+										let delta_change = 'text-muted';
+										if ( delta > 0 ) {
+											delta_change = 'text-success fw-bolder';
+										} else if ( delta < 0 ) {
+											delta_change = 'text-danger fw-bolder';
+										}
 								%>
 									<tr class="fs-5">
 										<% if ( CAN_ADMIN ) { %>
@@ -561,7 +573,15 @@
 										%>
 										</td>
 										<td class="text-center">
-											<%- p.mmr; %>
+											<%- p.end_mmr ? p.end_mmr : p.start_mmr; %> 
+											(<span
+												title="Starting Season MMR: <b><%- p.mmr; %></b><br> Match MMR Delta: <b><%- mmr_delta; %></b>"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
+												class="<%- delta_change; %>"
+											>
+													<%- delta > 0 ? '+' : ''; %><%- delta; %>
+											</span>)
 										</td>
 										<td class="text-center"><%- p.stats.wins; %></td>
 										<td class="text-center"><%- p.stats.losses; %></td>
@@ -640,6 +660,18 @@
 								<%
 									for ( const rsc_id in lobby.away ) {
 										const p = lobby.away[rsc_id];
+										const first_delta = p.start_mmr - p.mmr;
+										const full_delta = p.end_mmr - p.mmr;
+										const mmr_delta = p.end_mmr - p.start_mmr;
+										const cur_delta = p.end_mmr ? full_delta : first_delta;
+										const delta = p.end_mmr ? full_delta : first_delta;
+
+										let delta_change = 'text-muted';
+										if ( delta > 0 ) {
+											delta_change = 'text-success fw-bolder';
+										} else if ( delta < 0 ) {
+											delta_change = 'text-danger fw-bolder';
+										}
 								%>
 									<tr class="fs-5">
 										<% if ( CAN_ADMIN ) { %>
@@ -682,7 +714,15 @@
 										%>
 										</td>
 										<td class="text-center">
-											<%- p.mmr; %>
+											<%- p.end_mmr ? p.end_mmr : p.start_mmr; %>
+											(<span
+												title="Starting Season MMR: <b><%- p.mmr; %></b><br> Match MMR Delta: <b><%- mmr_delta; %></b>"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
+												class="<%- delta_change; %>"
+											>
+													<%- delta > 0 ? '+' : ''; %><%- delta; %>
+											</span>)
 										</td>
 										<td class="text-center"><%- p.stats.wins; %></td>
 										<td class="text-center"><%- p.stats.losses; %></td>
