@@ -453,6 +453,9 @@ router.post('/admin-score/:match_id', async (req, res) => {
 	if ( players && players.length ) {
 		for ( let i = 0; i < players.length; ++i ) {
 			const p = players[i];
+			if ( ! p.start_mmr ) {
+				p.start_mmr = p.season_mmr;
+			}
 			if ( p.team_id === match.home_team_id ) {
 				match_details.home.start_mmr += p.start_mmr;
 				p.team = 'home';
