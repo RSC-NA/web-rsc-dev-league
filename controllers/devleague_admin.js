@@ -35,7 +35,9 @@ function calculate_mmrs_devleague(team) {
 	if ( ! team.length ) { return 0; }
 	let mmr = 0;
 	for ( let i = 0; i < team.length; ++i ) {
-		if ( "mmr" in team[i] ) {
+		if ( 'season_mmr' in team[i] && team[i].season_mmr ) {
+			mmr += team[i].season_mmr;
+		} else if ( "mmr" in team[i] && team[i].mmr ) {
 			mmr += team[i].mmr;
 		}
 	}
