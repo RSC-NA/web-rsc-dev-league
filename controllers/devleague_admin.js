@@ -311,16 +311,137 @@ router.all('/generate_team/:tier', async (req, res) => {
 
 });
 
-router.get('/match/:match_id/cancel', (req, res) => {
+router.get('/match/:match_id/cancel', async (req, res) => {
+	console.log('here cancelling', req.session.is_admin, req.session.is_devleague_admin);
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect(`/match/${req.params.match_id}`);
 	}
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	const home_wins = 0;
+	const away_wins = 0;
+	const rsc_id = res.locals.user.rsc_id;
+	const match_id = req.params.match_id;
+
+	const match_query = `
+		SELECT 
+			id,match_dtg,season,match_day,home_team_id,away_team_id,
+			lobby_user,lobby_pass,reported_rsc_id,home_wins,away_wins,cancelled 
+		FROM matches 
+		WHERE id = ?
+	`;
+	const [match_results] = await db.execute(match_query, [match_id]);
+	let match = null;
+	if ( match_results && match_results.length ) {
+		match = match_results[0];
+	}
+
+	const players_query = ` 
+		SELECT 
+			p.id,p.rsc_id,p.discord_id,p.nickname,p.mmr AS season_mmr,
+			tp.team_id,tp.start_mmr, tp.end_mmr 
+		FROM players AS p 
+		LEFT JOIN team_players AS tp 
+			ON p.id = tp.player_id 
+		WHERE tp.team_id = ? OR tp.team_id = ?
+	`;
+	const [players] = await db.execute(players_query, [match.home_team_id, match.away_team_id]);
+
+	const scoreQuery = `
+		UPDATE matches 
+		SET cancelled = 1, home_wins = ?, away_wins = ?, reported_rsc_id = ? 
+		WHERE id = ?
+	`;
+
+	await db.execute(scoreQuery, [
+		home_wins, away_wins, res.locals.user.rsc_id, req.params.match_id,
+	]);
+
+	const match_details = {
+		players: [],
+		home: {
+			id: match.home_team_id,
+			wins: home_wins,
+			losses: away_wins,
+			start_mmr: 0,
+			end_mmr: 0,
+		},
+		away: {
+			id: match.away_team_id,
+			wins: away_wins,
+			losses: home_wins,
+			start_mmr: 0,
+			end_mmr: 0,
+		},
+	};
+	if ( players && players.length ) {
+		for ( let i = 0; i < players.length; ++i ) {
+			const p = players[i];
+			if ( ! p.start_mmr ) {
+				p.start_mmr = p.season_mmr;
+			}
+			if ( p.team_id === match.home_team_id ) {
+				match_details.home.start_mmr += p.start_mmr;
+				p.team = 'home';
+				p.wins = home_wins;
+				p.losses = away_wins;
+				match_details.players[p.rsc_id] = p;	
+			} else {
+				match_details.away.start_mmr += p.start_mmr;
+				p.team = 'away';
+				p.wins = away_wins;
+				p.losses = home_wins;
+				match_details.players[p.rsc_id] = p;	
+			}
+		}
+	}
+
+	const deltas = await admin_dev_reset_mmrs(db, match_details);
+
+	await db.end();
+
+	return res.redirect(`/match/${req.params.match_id}`);
 });
 
-router.get('/match/:match_id/resume', (req, res) => {
+router.get('/match/:match_id/resume', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect(`/match/${req.params.match_id}`);
 	}
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+	
+	const scoreQuery = `
+		UPDATE matches 
+		SET cancelled = 0, home_wins = 0, away_wins = 0, reported_rsc_id = null 
+		WHERE id = ?
+	`;
+
+	await db.execute(scoreQuery, [
+		req.params.match_id,
+	]);
+
+	await db.end();
+	
+	return res.redirect(`/match/${req.params.match_id}`);
 });
 
 function admin_dev_rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) {
@@ -349,6 +470,32 @@ function admin_dev_rating_delta_series(home_mmr, away_mmr, scores, k_factor=48) 
 	};
 
 	return results;
+}
+
+async function admin_dev_reset_mmrs(db, match) {
+	const scores = { home: match.home.wins, away: match.away.wins };
+
+	const player_query = `
+		UPDATE players SET mmr = ? WHERE rsc_id = ?
+	`;
+	const match_players_query = `
+		UPDATE team_players 
+		SET end_mmr = null 
+		WHERE team_id = ? AND player_id = ?
+	`;
+
+	for ( const rsc_id in match.players ) {
+		const p = match.players[rsc_id];
+		const set_season_mmr = p.end_mmr ? p.start_mmr : p.season_mmr;
+		const set_start_mmr = set_season_mmr;
+		const set_end_mmr = null;
+		match.players[rsc_id].season_mmr = set_season_mmr;
+
+		await db.execute(player_query, [set_season_mmr, rsc_id]);
+		await db.execute(match_players_query, [p.team_id, p.id]);
+	}
+
+	return match;
 }
 
 async function admin_dev_update_mmrs(db, match, k_factor=48) {
