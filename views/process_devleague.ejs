@@ -270,7 +270,7 @@
 								analysis = 'none';
 							}
 							
-							const mmr_delta = p.mmr - p.season_mmr;
+							const mmr_delta = p.season_mmr - p.mmr;
 							let delta_change = 'text-muted';
 							if ( mmr_delta > 0 ) {
 								delta_change = 'text-success fw-bolder';
@@ -291,7 +291,7 @@
 						</td>
 						<td class="text-center">
 							<span class="text-primary fw-bold">
-								<%= p.mmr; %>
+								<%= p.season_mmr ? p.season_mmr : p.mmr; %>
 							</span> 
 							(<span class="<%- delta_change; %>"><%= mmr_delta; %></span>)
 						</td>
