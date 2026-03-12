@@ -1331,9 +1331,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			players[ r_id ]['tier'] = mmrRows[i]['Tier'];
 
 			if ( ! players[r_id]['cur_mmr'] ) {
-				if ( players[r_id]['mmr'] === 600 ) {
-					continue;
-				}
 				mmr_list[r_id] = players[r_id]['mmr'];
 			}
 		} else {
@@ -1390,6 +1387,10 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			WHERE rsc_id = ? AND mmr IS null
 		`;
 		for ( const r_id in mmr_list ) {
+			if ( mmr_list[r_id] == 600 ) {
+				console.log('skipping', mmr_list[r_id]);
+				continue;
+			}
 			// console.log(`setting RSC_ID:${r_id} to ${mmr_list[r_id]}`);
 			const [updated] = await db.execute(update_players_query, [
 				mmr_list[r_id],
