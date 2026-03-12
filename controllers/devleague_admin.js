@@ -1332,7 +1332,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			if ( ! players[r_id]['cur_mmr'] ) {
 				if ( players[r_id]['mmr'] === 600 ) {
-					console.log(players[r_id]);
+					continue;
 				}
 				mmr_list[r_id] = players[r_id]['mmr'];
 			}
