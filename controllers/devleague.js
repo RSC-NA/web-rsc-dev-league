@@ -31,20 +31,27 @@ router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'
 	// console.log(req.file.originalname);
 	const file_name = req.file.originalname;
 
-	try { 
+	if ( ! user ) {
+		return res.json({'success': false, 'error': 'No user.' });
+	} else if ( ! ('rsc_id' in user) ) {
+		return res.json({'success': false, 'error': 'No rsc_id in user.' });
+	} else if ( ! user.rsc_id ) {
+		return res.json({'success': false, 'error': 'Empty rsc_id in user.' });
+	} else {
+		try { 
+			const query = `INSERT INTO match_replays (match_id,season,match_day,rsc_id,replay) VALUES (?, ?, ?, ?, ?)`;
+			req.db.query(query, [match_id, season, match_day, user.rsc_id, file_name], (err, results) => {
+				if ( err ) { throw err; }
 
-	const query = `INSERT INTO match_replays (match_id,season,match_day,rsc_id,replay) VALUES (?, ?, ?, ?, ?)`;
-	req.db.query(query, [match_id, season, match_day, user.rsc_id, file_name], (err, results) => {
-		if ( err ) { throw err; }
+				res.json({'success': true });
+			});
+		} catch(e) { 
+			console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
+			console.log(` Match ID: ${match_id}`);
+			console.log(`    Match: https://devleague.rscna.com/match/${match_id}`);
 
-		res.json({'success': true });
-	});
-	} catch(e) { 
-		console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
-		console.log(` Match ID: ${match_id}`);
-		console.log(`    Match: https://devleague.rscna.com/match/${match_id}`);
-
-		res.json({'success': false });
+			res.json({'success': false });
+		}
 	}
 });
 
