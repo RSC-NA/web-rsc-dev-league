@@ -163,8 +163,8 @@ router.get('/championship', (req, res) => {
 		SELECT
 			m.id AS m_id, m.home_team_id, m.home_wins,
 			m.away_team_id, m.away_wins
-		FROM matches AS m
-		WHERE season = ?
+		FROM matches AS m 
+		WHERE season = ? AND date(match_dtg) != '2026-03-25'
 	`;
 	const leaderboards = {
 		'PreMaster': null,
