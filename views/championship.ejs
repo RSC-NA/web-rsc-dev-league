@@ -41,6 +41,7 @@
 				<div class="col-md-4 matchDates dark">
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
+						console.log(leaderboards);
 						for ( const tier in leaderboards ) {
 							const leaderboard = leaderboards[ tier ];
 							if ( leaderboard === null ) {
