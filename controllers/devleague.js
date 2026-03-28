@@ -219,16 +219,15 @@ router.get('/championship', (req, res) => {
 				} else if ( cur_tier === 'Contender' || cur_tier === 'Amateur' ) {
 					player.cur_tier = 'ContAmmy';
 				}
-
+						
+				player.save_tier = player.tier;
 				switch ( player.tier ) {
 					case 'Premier':
 					case 'Master':
-						player.save_tier = player.tier;
 						player.tier = 'PreMaster';
 						break;
 					case 'Contender':
 					case 'Amateur':
-						player.save_tier = player.tier;
 						player.tier = 'ContAmmy';
 						break;
 				}
