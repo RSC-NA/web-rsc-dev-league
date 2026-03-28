@@ -79,10 +79,24 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>:<%- p.mmr; %>,
-							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>:<%- p.cur_mmr; %> :: 
-							<span class="<%- delta_class; %>"><%- p.cur_mmr - p.mmr; %></span>] 
-							<code><%- leaderboard[ player ]['points']; %></code>
+							<%- display_name %> - [
+							<span
+								title="Original Tier: <b><%- p.save_tier; %></b><br>Original RSC MMR: <b><%- p.mmr; %></b>"
+								data-bs-toggle="tooltip" data-bs-html="true"
+							>
+								<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>
+							</span> :
+							<span
+								title="Current Tier: <b><%- p.cur_save_tier; %></b><br>Current MMR: <b><%- p.cur_mmr; %></b>"
+								data-bs-toggle="tooltip" data-bs-html="true"
+							>
+								<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> 
+							</span>
+							:: 
+							<span class="<%- delta_class; %>" title="MMR Change" data-bs-toggle="tooltip"><%- p.cur_mmr - p.mmr; %></span>] 
+							<code class="Veteran text-lg" title="<%- leaderboard[user.name]['points']; %> total points" data-bs-toggle="tooltip">
+								+<%- leaderboard[ player ]['points']; %>
+							</code>
 						</li>
 
 						<%
@@ -92,10 +106,24 @@
 						%>
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
-							<%- user.name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>:
-							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> :: 
-							<span class="<%- delta_class; %>"><%- p.cur_mmr - p.mmr; %></span>] 
-							<code><%- leaderboard[ user.name ]['points']; %></code>
+							<%- user.name %> - [
+							<span
+								title="Original Tier: <b><%- p.save_tier; %></b><br>Original RSC MMR: <b><%- p.mmr; %></b>"
+								data-bs-toggle="tooltip" data-bs-html="true"
+							>
+								<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>
+							</span> :
+							<span
+								title="Current Tier: <b><%- p.cur_save_tier; %></b><br>Current MMR: <b><%- p.cur_mmr; %></b>"
+								data-bs-toggle="tooltip" data-bs-html="true"
+							>
+								<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> 
+							</span>
+							:: 
+							<span class="<%- delta_class; %>" title="MMR Change" data-bs-toggle="tooltip"><%- p.cur_mmr - p.mmr; %></span>] 
+							<code class="Veteran text-lg" title="<%- leaderboard[user.name]['points']; %> total points" data-bs-toggle="tooltip">
+								+<%- leaderboard[ user.name ]['points']; %>
+							</code>
 						</li>
 
 						<%
