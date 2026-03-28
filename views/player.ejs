@@ -130,8 +130,8 @@
 					</div>
 					<span class="ms-2 text-light w-50 text-lg">
 						<%- player.cur_mmr; %> 
-						<span class="<%- player.mmr_delta > 0 ? 'Veteran' : 'text-danger'; %>"><%- player.mmr_delta > 0 ? '+' : ''; %>
-							<%- player.mmr_delta; %>
+						<span class="<%- player.mmr_delta > 0 ? 'Veteran' : 'text-danger'; %>">
+							<%- player.mmr_delta > 0 ? '+' : ''; %><%- player.mmr_delta; %>
 						</span>
 					</span>
 				</li>
