@@ -75,7 +75,9 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - <code><%- leaderboard[ player ]['points']; %></code>
+							<%- display_name %> - [<span class="<%- player.tier; %>"><%- player.tier; %></span>, 
+							<%- player.mmr; %>:<%- player.cur_mmr; %>::<%- player.cur_mmr - player.mmr; %>] 
+							<code><%- leaderboard[ player ]['points']; %></code>
 						</li>
 
 						<%
@@ -83,9 +85,11 @@
 
 							if ( myPosition && myPosition > 10 ) {
 						%>
-
-						<li class="today" value="<%- myPosition %>">
-							<%- user.name %> - <code><%- leaderboard[ user.name ]['points']; %></code>
+						
+						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
+							<%- user.name %> - [<span class="<%- player.tier; %>"><%- player.tier; %></span>, 
+							<%- player.mmr; %>:<%- player.cur_mmr; %>::<%- player.cur_mmr - player.mmr; %>] 
+							<code><%- leaderboard[ user.name ]['points']; %></code>
 						</li>
 
 						<%

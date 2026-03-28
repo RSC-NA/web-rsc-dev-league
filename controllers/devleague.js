@@ -3,6 +3,8 @@ const router = express.Router();
 const upload = require('./upload_devleague');
 const mysqlP = require('mysql2/promise');
 
+const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
+
 // router.post('/score/:match_id', (req, res) => {
 // 	const home_wins = req.body.home_wins;
 // 	const away_wins = req.body.away_wins;
@@ -194,7 +196,8 @@ router.get('/championship', (req, res) => {
 		const playerQuery = `
 			SELECT
 				c.name,c.rsc_id,c.discord_id,c.tier,c.status,c.mmr,
-				tp.player_id,tp.team_id, p.nickname
+				tp.player_id,tp.team_id, p.nickname, 
+				p.mmr AS cur_mmr, NULL as cur_tier
 			FROM team_players AS tp
 			LEFT JOIN players AS p ON tp.player_id = p.id
 			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
@@ -205,6 +208,15 @@ router.get('/championship', (req, res) => {
 
 			for ( let i = 0; i < results.length; ++i ) {
 				const player = results[i];
+			
+				const cur_tier = getTierFromMMR(player.cur_mmr)
+				player.cur_tier = cur_tier;
+
+				if ( cur_tier === 'Premier' || cur_tier === 'Master' ) {
+					player.cur_tier = 'PreMaster';
+				} else if ( cur_tier === 'Contender' || cur_tier === 'Amateur' ) {
+					player.cur_tier = 'ContAmmy';
+				}
 
 				switch ( player.tier ) {
 					case 'Premier':
@@ -224,6 +236,9 @@ router.get('/championship', (req, res) => {
 						discord_id: player.discord_id,
 						tier: player.tier,
 						status: player.status,
+						mmr: player.mmr,
+						cur_tier: player.cur_tier,
+						cur_mmr: player.cur_mmr,
 						points: 0,
 						series: 0,
 						wins: 0,
@@ -245,13 +260,13 @@ router.get('/championship', (req, res) => {
 			while ( sorted_players.length ) {
 				const p_id = sorted_players.pop();
 				const player = players[ p_id ];
-				if ( leaderboards[player.tier] === null ) {
-					leaderboards[player.tier] = [];
+				if ( leaderboards[player.cur_tier] === null ) {
+					leaderboards[player.cur_tier] = [];
 				}
-				if ( player.tier in leaderboards ) {
-					leaderboards[player.tier].push(player);
+				if ( player.cur_tier in leaderboards ) {
+					leaderboards[player.cur_tier].push(player);
 				} else {
-					console.log('wtf?', player.tier);
+					console.log('wtf?', player.cur_tier);
 				}
 			}
 			res.render('championship', { leaderboards: leaderboards });
