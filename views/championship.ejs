@@ -77,8 +77,8 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - [<span class="<%- p.save_cur_tier; %>"><%- p.cur_tier; %></span>, 
-							<%- p.mmr; %>:<%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
+							<%- display_name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>:
+							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
 							<code><%- leaderboard[ player ]['points']; %></code>
 						</li>
 
@@ -89,8 +89,8 @@
 						%>
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
-							<%- user.name %> - [<span class="<%- p.save_cur_tier; %>"><%- p.cur_tier; %></span>, 
-							<%- p.mmr; %>:<%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
+							<%- user.name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>:
+							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
 							<code><%- leaderboard[ user.name ]['points']; %></code>
 						</li>
 

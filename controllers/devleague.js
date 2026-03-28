@@ -266,11 +266,11 @@ router.get('/championship', (req, res) => {
 			while ( sorted_players.length ) {
 				const p_id = sorted_players.pop();
 				const player = players[ p_id ];
-				if ( leaderboards[player.tier] === null ) {
-					leaderboards[player.tier] = [];
+				if ( leaderboards[player.cur_tier] === null ) {
+					leaderboards[player.cur_tier] = [];
 				}
-				if ( player.tier in leaderboards ) {
-					leaderboards[player.tier].push(player);
+				if ( player.cur_tier in leaderboards ) {
+					leaderboards[player.cur_tier].push(player);
 				} else {
 					console.log('wtf?', player.cur_tier);
 				}
