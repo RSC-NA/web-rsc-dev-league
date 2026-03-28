@@ -64,6 +64,8 @@
 
 								if ( count <= 6 ) {
 									top_class = 'fw-bold';
+								} else {
+									top_class = '';
 								}
 
 								if ( count === 1 ) {
@@ -85,7 +87,7 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - <%- count; %>
+							<%- display_name %> - 
 							<code class="text-warning h4" title="<%- leaderboard[player]['points']; %> total points" data-bs-toggle="tooltip">
 								+<%- leaderboard[ player ]['points']; %>
 							</code> 
@@ -164,7 +166,7 @@
 							if ( leaderboard === null ) {
 								continue;
 							}
-					%>
+					%> 
 					<h4>## <%= tier; %></h4>
 						<%
 							let count = 0;
