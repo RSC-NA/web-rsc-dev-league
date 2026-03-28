@@ -101,7 +101,7 @@
 					}
 				%>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
-					<h6 class="my-0 text-light text-end">Current Tier </h6>
+					<h6 class="my-0 text-light text-end">RSC Tier </h6>
 					<span class="ms-2 w-50 fw-bolder <%- player.tier; %>">
 						<% if ( player.tier !== 'NONE' ) { %>
 						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
@@ -111,15 +111,30 @@
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
-						<h6 class="my-0 text-light text-end">Contract Status</h6>
+						<h6 class="my-0 text-light text-end">RSC MMR</h6>
 					</div>
-					<span class="ms-2 text-muted w-50"><%= player.status; %></span>
+					<span class="ms-2 text-muted w-50"><%- player.mmr; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<h6 class="my-0 text-light text-end">Dev League Tier </h6>
+					<span class="ms-2 w-50 fw-bolder <%- player.cur_tier; %>">
+						<% if ( player.tier !== 'NONE' ) { %>
+						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
+						<% } %>
+						<%= player.cur_tier; %>
+					</span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
-						<h6 class="my-0 text-light text-end">Current RSC MMR</h6>
+						<h6 class="my-0 text-light text-end">Dev League MMR</h6>
 					</div>
-					<span class="ms-2 text-muted w-50"><%- player.mmr; %></span>
+					<span class="ms-2 text-muted w-50"><%- player.cur_mmr; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Contract Status</h6>
+					</div>
+					<span class="ms-2 text-muted w-50"><%= player.status; %></span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
