@@ -102,7 +102,7 @@
 				%>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">RSC Tier </h6>
-					<span class="ms-2 w-50 fw-bolder <%- player.tier; %>">
+					<span class="ms-2 w-50 fw-bolder <%- player.tier; %> text-lg">
 						<% if ( player.tier !== 'NONE' ) { %>
 						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
 						<% } %>
@@ -113,11 +113,11 @@
 					<div>
 						<h6 class="my-0 text-light text-end">RSC MMR</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.mmr; %></span>
+					<span class="ms-2 text-light w-50 text-lg"><%- player.mmr; %></span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">Dev League Tier </h6>
-					<span class="ms-2 w-50 fw-bolder <%- player.cur_tier; %>">
+					<span class="ms-2 w-50 fw-bolder <%- player.cur_tier; %> text-lg">
 						<% if ( player.tier !== 'NONE' ) { %>
 						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
 						<% } %>
@@ -128,7 +128,12 @@
 					<div>
 						<h6 class="my-0 text-light text-end">Dev League MMR</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.cur_mmr; %></span>
+					<span class="ms-2 text-light w-50 text-lg">
+						<%- player.cur_mmr; %> 
+						<span class="<%- player.mmr_delta > 0 ? 'Veteran' : 'text-danger'; %>"><%- player.mmr_delta > 0 ? '+' : ''; %>
+							<%- player.mmr_delta; %>
+						</span>
+					</span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
