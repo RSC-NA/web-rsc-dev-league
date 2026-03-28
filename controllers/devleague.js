@@ -210,6 +210,7 @@ router.get('/championship', (req, res) => {
 				const player = results[i];
 			
 				const cur_tier = getTierFromMMR(player.cur_mmr)
+				player.save_cur_tier = 'PreMaster';
 				player.cur_tier = cur_tier;
 
 				if ( cur_tier === 'Premier' || cur_tier === 'Master' ) {
@@ -221,10 +222,12 @@ router.get('/championship', (req, res) => {
 				switch ( player.tier ) {
 					case 'Premier':
 					case 'Master':
+						player.save_tier = player.tier;
 						player.tier = 'PreMaster';
 						break;
 					case 'Contender':
 					case 'Amateur':
+						player.save_tier = player.tier;
 						player.tier = 'ContAmmy';
 						break;
 				}
