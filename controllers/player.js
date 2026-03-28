@@ -1,5 +1,6 @@
 const express = require('express');
 const router  = express.Router();
+const mysqlP = require('mysql2/promise');
 const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -84,15 +85,25 @@ router.get('/player/:rsc_id/demote/:role', (req, res) => {
 	});
 });
 
-router.get('/player/:rsc_id', (req, res) => {
-	if ( ! req.session.discord_id ) {
-		//return res.redirect('/login');
-	}
+router.get('/player/:rsc_id', async (req, res) => {
+	/*
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+	*/
 
 	const query = `
 		SELECT
 			c.rsc_id, c.discord_id, c.name, c.tier, c.status, c.mmr, c.active_3s, c.active_2s,
-			p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,p.combines_admin
+			p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,p.combines_admin,
+			p.mmr AS cur_mmr, NULL as cur_tier
 		FROM contracts AS c
 		LEFT JOIN players AS p 
 			ON c.rsc_id = p.rsc_id
@@ -100,18 +111,21 @@ router.get('/player/:rsc_id', (req, res) => {
 	`;
 
 	const player = {
-		rsc_id    : '',
-		discord_id: '',
-		name      :   '',
-		tier      :   '',
-		status    : '',
-		mmr       :     0,
-		trackers  : {},
-		pulls     :    [],
-		combines  : false,
-		active_3s : false,
-		active_2s : false,
+		rsc_id     : '',
+		discord_id : '',
+		name       : '',
+		tier       : '',
+		cur_tier   : '',
+		status     : '',
+		mmr        :  0,
+		cur_mmr    :  0,
+		trackers   : {},
+		pulls      : [],
+		combines   : false,
+		active_3s  : false,
+		active_2s  : false,
 		user_roles : [],
+		devleague  : [],
 	};
 
 	const role_map = {
@@ -140,7 +154,10 @@ router.get('/player/:rsc_id', (req, res) => {
 		player.discord_id = results[0].discord_id;
 		player.name       = results[0].name;
 		player.tier       = results[0].tier;
+		player.cur_tier   = results[0].cur_mmr ? getTierFromMMR(results[0].cur_mmr) : results[0].tier;
 		player.mmr        = results[0].mmr;
+		player.cur_mmr    = results[0].cur_mmr;
+		player.mmr_delta  = results[0].cur_mmr - results[0].mmr;
 		player.status     = results[0].status;
 		player.active_3s  = results[0].active_3s;
 		player.active_2s  = results[0].active_2s;
