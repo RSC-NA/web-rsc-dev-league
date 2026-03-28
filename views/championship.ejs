@@ -74,11 +74,14 @@
 								let display_name = leaderboard[ player ]['name'];
 
 								const p = leaderboard[player];
+
+								const delta_class = p.cur_mmr - p.mmr > 0 ? 'text-success fw-bolder' : 'text-danger fw-bolder';
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>:
-							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
+							<%- display_name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>:<%- p.mmr; %>,
+							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>:<%- p.cur_mmr; %> :: 
+							<span class="<%- delta_class; %>"><%- p.cur_mmr - p.mmr; %></span>] 
 							<code><%- leaderboard[ player ]['points']; %></code>
 						</li>
 
@@ -90,7 +93,8 @@
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
 							<%- user.name %> - [<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>:
-							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
+							<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> :: 
+							<span class="<%- delta_class; %>"><%- p.cur_mmr - p.mmr; %></span>] 
 							<code><%- leaderboard[ user.name ]['points']; %></code>
 						</li>
 
