@@ -197,7 +197,8 @@ router.get('/championship', (req, res) => {
 			SELECT
 				c.name,c.rsc_id,c.discord_id,c.tier,c.status,c.mmr,
 				tp.player_id,tp.team_id, p.nickname, 
-				p.mmr AS cur_mmr, NULL as cur_tier
+				p.mmr AS cur_mmr, NULL as cur_tier,
+				NULL as save_tier, NULL as save_cur_tier
 			FROM team_players AS tp
 			LEFT JOIN players AS p ON tp.player_id = p.id
 			LEFT JOIN contracts AS c ON p.discord_id = c.discord_id
@@ -210,7 +211,7 @@ router.get('/championship', (req, res) => {
 				const player = results[i];
 			
 				const cur_tier = getTierFromMMR(player.cur_mmr)
-				player.save_cur_tier = 'PreMaster';
+				player.save_cur_tier = cur_tier;
 				player.cur_tier = cur_tier;
 
 				if ( cur_tier === 'Premier' || cur_tier === 'Master' ) {
@@ -237,9 +238,11 @@ router.get('/championship', (req, res) => {
 						name: player.name,
 						rsc_id: player.rsc_id,
 						discord_id: player.discord_id,
+						save_tier: player.save_tier,
 						tier: player.tier,
 						status: player.status,
 						mmr: player.mmr,
+						save_cur_tier: player.save_cur_tier,
 						cur_tier: player.cur_tier,
 						cur_mmr: player.cur_mmr,
 						points: 0,
