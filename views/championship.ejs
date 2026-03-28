@@ -62,11 +62,17 @@
 									break;
 								}
 
-								if ( count === 1 ) {
-									top_class = 'fs-5 fw-bolder';
-								} else if ( count === 2 ) {
-									top_class = '';
+								if ( count <= 6 ) {
+									top_class = 'fw-bold';
 								}
+
+								if ( count === 1 ) {
+									top_class += ' fs-5 fw-bolder';
+								} else if ( count === 2 ) {
+									top_class += ' fs-6';
+								}
+
+
 								let player_class = '';
 								if ( player === user.name ) {
 									player_class = 'today';
