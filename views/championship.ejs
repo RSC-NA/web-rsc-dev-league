@@ -90,7 +90,7 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - 
+							<a href="/player/<%- p.rsc_id; %>" class="text-light"><%- display_name; %></a> - 
 							<code class="text-warning h4" title="<%- leaderboard[player]['points']; %> total points" data-bs-toggle="tooltip">
 								+<%- leaderboard[ player ]['points']; %>
 							</code> 
@@ -123,7 +123,7 @@
 						%>
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
-							<%- user.name %> - 
+							<a href="/player/<%- p.rsc_id; %>" class="text-light"><%- user.name %></a> - 
 							<code
 								class="text-warning h4"
 								title="<%- leaderboard[user.name]['points']; %> total points"
