@@ -79,7 +79,11 @@
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - [
+							<%- display_name %> - 
+							<code class="text-warning h4" title="<%- leaderboard[player]['points']; %> total points" data-bs-toggle="tooltip">
+								+<%- leaderboard[ player ]['points']; %>
+							</code> 
+							[
 							<span
 								title="Original Tier: <b><%- p.save_tier; %></b><br>Original RSC MMR: <b><%- p.mmr; %></b>"
 								data-bs-toggle="tooltip" data-bs-html="true"
@@ -94,9 +98,6 @@
 							</span>
 							:: 
 							<span class="<%- delta_class; %>" title="MMR Change" data-bs-toggle="tooltip"><%- p.cur_mmr - p.mmr; %></span>] 
-							<code class="Veteran text-lg" title="<%- leaderboard[player]['points']; %> total points" data-bs-toggle="tooltip">
-								+<%- leaderboard[ player ]['points']; %>
-							</code>
 						</li>
 
 						<%
@@ -106,7 +107,11 @@
 						%>
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
-							<%- user.name %> - [
+							<%- user.name %> - 
+							<code class="text-warning h4" title="<%- leaderboard[user.name]['points']; %> total points" data-bs-toggle="tooltip">
+								+<%- leaderboard[ user.name ]['points']; %>
+							</code> 
+							[
 							<span
 								title="Original Tier: <b><%- p.save_tier; %></b><br>Original RSC MMR: <b><%- p.mmr; %></b>"
 								data-bs-toggle="tooltip" data-bs-html="true"
@@ -121,9 +126,6 @@
 							</span>
 							:: 
 							<span class="<%- delta_class; %>" title="MMR Change" data-bs-toggle="tooltip"><%- p.cur_mmr - p.mmr; %></span>] 
-							<code class="Veteran text-lg" title="<%- leaderboard[user.name]['points']; %> total points" data-bs-toggle="tooltip">
-								+<%- leaderboard[ user.name ]['points']; %>
-							</code>
 						</li>
 
 						<%
