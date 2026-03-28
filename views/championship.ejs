@@ -41,7 +41,6 @@
 				<div class="col-md-4 matchDates dark">
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
-						console.log(leaderboards);
 						for ( const tier in leaderboards ) {
 							const leaderboard = leaderboards[ tier ];
 							if ( leaderboard === null ) {
@@ -73,11 +72,13 @@
 									player_class = 'today';
 								}
 								let display_name = leaderboard[ player ]['name'];
+
+								const p = leaderboard[player]];
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
-							<%- display_name %> - [<span class="<%- player.tier; %>"><%- player.tier; %></span>, 
-							<%- player.mmr; %>:<%- player.cur_mmr; %>::<%- player.cur_mmr - player.mmr; %>] 
+							<%- display_name %> - [<span class="<%- p.cur_tier; %>"><%- p.cur_tier; %></span>, 
+							<%- p.mmr; %>:<%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
 							<code><%- leaderboard[ player ]['points']; %></code>
 						</li>
 
@@ -88,8 +89,8 @@
 						%>
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
-							<%- user.name %> - [<span class="<%- player.tier; %>"><%- player.tier; %></span>, 
-							<%- player.mmr; %>:<%- player.cur_mmr; %>::<%- player.cur_mmr - player.mmr; %>] 
+							<%- user.name %> - [<span class="<%- p.tier; %>"><%- p.tier; %></span>, 
+							<%- p.mmr; %>:<%- p.cur_mmr; %>::<%- p.cur_mmr - p.mmr; %>] 
 							<code><%- leaderboard[ user.name ]['points']; %></code>
 						</li>
 
