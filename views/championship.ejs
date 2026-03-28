@@ -63,9 +63,9 @@
 								}
 
 								if ( count === 1 ) {
-									top_class = 'fs-5 font-weight-bold';
+									top_class = 'fs-4 fw-bolder';
 								} else if ( count === 2 ) {
-									top_class = 'fs-6 font-weight-bold';
+									top_class = 'fs-6 fw-bold';
 								}
 								let player_class = '';
 								if ( player === user.name ) {
@@ -108,7 +108,11 @@
 						
 						<li class="today <%- player_class  %> <%- top_class %>" value="<%- myPosition %>">
 							<%- user.name %> - 
-							<code class="text-warning h4" title="<%- leaderboard[user.name]['points']; %> total points" data-bs-toggle="tooltip">
+							<code
+								class="text-warning h4"
+								title="<%- leaderboard[user.name]['points']; %> total points"
+								data-bs-toggle="tooltip"
+							>
 								+<%- leaderboard[ user.name ]['points']; %>
 							</code> 
 							[
