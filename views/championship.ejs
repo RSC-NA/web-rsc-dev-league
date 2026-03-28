@@ -85,7 +85,8 @@
 
 								const p = leaderboard[player];
 
-								const delta_class = p.cur_mmr - p.mmr > 0 ? 'Veteran text-lg fw-bolder' : 'text-danger text-lg fw-bolder';
+								const mmr_delta = p.cur_mmr - p.mmr;
+								const delta_class = mmr_delta > 0 ? 'Veteran text-lg fw-bolder' : 'text-danger text-lg fw-bolder';
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
@@ -107,7 +108,12 @@
 								<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> 
 							</span>
 							:: 
-							<span class="<%- delta_class; %>" title="MMR Change" data-bs-toggle="tooltip"><%- p.cur_mmr - p.mmr; %></span>] 
+							<span
+								class="<%- delta_class; %>"
+								title="MMR Change: <b><%- mmr_delta > 0 ? '+' : ''; %><%- mmr_delta; %></b><br>across <b><%- p.series; %></b> series"
+								data-bs-toggle="tooltip"
+								data-bs-html="true"
+							><%- mmr_delta > 0 ? '+' : ''; %><%- mmr_delta; %></span>] 
 						</li>
 
 						<%
@@ -139,7 +145,12 @@
 								<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> 
 							</span>
 							:: 
-							<span class="<%- delta_class; %>" title="MMR Change" data-bs-toggle="tooltip"><%- p.cur_mmr - p.mmr; %></span>] 
+							<span
+								class="<%- delta_class; %>"
+								title="MMR Change: <b><%- mmr_delta > 0 ? '+' : ''; %><%- mmr_delta; %></b><br>across <b><%- p.series; %></b> series"
+								data-bs-toggle="tooltip"
+								data-bs-html="true"
+							><%- mmr_delta > 0 ? '+' : ''; %><%- mmr_delta; %></span>] 
 						</li>
 
 						<%
