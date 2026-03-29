@@ -665,7 +665,7 @@ router.get('/match/:match_id', (req, res) => {
 			ON p.discord_id = c.discord_id
 		WHERE 
 			m.id = ?
-		ORDER BY tp.team_id ASC, c.mmr DESC
+		ORDER BY tp.team_id ASC, p.mmr DESC
 	`;
 	const match_id = req.params.match_id;
 	req.db.query(matchQuery, [ req.params.match_id ], (err, results) => {
