@@ -219,7 +219,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 			s.active = 1 AND 
 			s.rostered = 0 AND
 			c.tier = ? 
-		ORDER BY p.mmr DESC
+		ORDER BY p.season_mmr DESC
 	`;
 	let tier_params = [tier];
 	if ( tier === 'Premier' || tier === 'Contender' ) {
@@ -237,7 +237,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				s.active = 1 AND 
 				s.rostered = 0 AND
 				(c.tier = ? OR c.tier = ?)
-			ORDER BY p.mmr DESC
+			ORDER BY p.season_mmr DESC
 		`;
 		if ( tier === 'Premier' ) {
 			tier_params = ['Premier', 'Master'];
@@ -257,7 +257,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
 				s.active = 1 AND 
 				s.rostered = 0
-			ORDER BY p.mmr DESC
+			ORDER BY p.season_mmr DESC
 		`;
 		tier_params = null;
 	}
