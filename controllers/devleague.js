@@ -530,7 +530,7 @@ async function dev_update_mmrs(db, match, k_factor=48) {
 		console.log('Updating...',rsc_id, p.start_mmr, new_mmr);
 		match.players[rsc_id].new_mmr = new_mmr;
 
-		await db.execute(player_query, [new_mmr, rsc_id]);
+		// await db.execute(player_query, [new_mmr, rsc_id]);
 		await db.execute(match_players_query, [new_mmr, p.team_id, p.id]);
 	}
 
