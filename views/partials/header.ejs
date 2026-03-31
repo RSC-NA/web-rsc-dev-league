@@ -315,6 +315,23 @@
 		
 						<%
 								}
+								
+								if ( false ) {
+									if ( (is_admin || is_combines_admin_2s) ) {
+										const combines_lock = combines_2s.active ? 
+											'fa-lock-open text-primary' : 'fa-lock text-muted';
+						%>
+							<div class="sb-sidenav-menu-heading">
+								<i class="fas fa-calculator me-1"></i> 
+								MMR/Elo Playground
+							</div>
+							<a class="nav-link <%- menu['/elo/settings'] %>" href="/elo/settings">
+								<div class="sb-nav-link-icon"><i class="fas fa-calculator text-info"></i></div>
+								MMR Settings/Import
+							</a>
+						<%
+									}
+								}
 
 								if ( is_admin || is_stats_admin || is_combines_admin || is_combines_admin_2s ) {
 									if ( is_admin || is_combines_admin || is_combines_admin_2s ) {

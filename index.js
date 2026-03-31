@@ -48,6 +48,7 @@ const stats_api_controller = require('./controllers/api');
 const stats_api_admin_controller = require('./controllers/api_admin');
 const player_controller = require('./controllers/player');
 const election_controller = require('./controllers/election');
+const elo_controller = require('./controllers/elo_admin');
 
 /* tournament controllers */
 const tournaments_controller = require('./controllers/tournaments');
@@ -379,6 +380,8 @@ app.use(async (req, res, next) => {
 		'/combines/history': '',
 		'/combines/manage_2s': '',
 		'/combines/history_2s': '',
+		'/elo/settings': '',
+		'/elo/player': '',
 	};
 
 	let current_view = req.originalUrl.split('/')[1];
@@ -451,7 +454,14 @@ app.use(async (req, res, next) => {
 
 	res.locals.settings = settings;
 
-	let tiersQuery = 'SELECT season,amateur,contender,prospect,challenger,rival,veteran,elite,master,premier FROM league_settings ORDER BY id DESC LIMIT 1';
+	let tiersQuery = `
+		SELECT 
+			season,amateur,contender,prospect,challenger,rival,veteran,elite,
+			master,premier 
+		FROM league_settings 
+		ORDER BY id DESC 
+		LIMIT 1
+	`;
 	connection.query(tiersQuery, (err, results) => {
 		if ( err ) { throw err; }
 
@@ -714,10 +724,13 @@ app.use((req, res, next) => {
 			WHERE 
 				player_id = ? AND 
 				( 
-					DATE(signup_dtg) = CURDATE() OR 
-					DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+					DATE(signup_dtg) = CURDATE() 
 				)
 		`;
+		/*
+					OR 
+					DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+		*/
 		connection.query(
 			query,
 			[ req.session.user_id ],
@@ -976,6 +989,7 @@ app.use(stats_api_admin_controller);
 // player routes controlled by /controllers/players.js
 app.use(player_controller);
 app.use('/elections', election_controller);
+app.use('/elo', elo_controller);
 
 // tournaments
 app.use(tournaments_controller);

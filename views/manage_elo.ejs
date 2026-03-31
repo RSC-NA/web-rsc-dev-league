@@ -1,0 +1,131 @@
+
+<%- include('partials/header.ejs'); %>
+
+<main class="container">
+	<div class="py-5">
+		<h2>RSC Elo/MMR Analaysis and Management</h2>
+		<p class="lead">
+			These controls allow you to perform a statistical analysis and full season 
+			calculation of Elo outcomes directly from Stats Team game data.
+		</p>
+		<p class="lead">
+			Generating MMRs will import and recalculate game-by-game Elo MMR changes 
+			for every participating player all season long. These MMR calculations are 
+			stored <strong>by season</strong> AND by <strong>by k_factor</strong>. Generating 
+			new MMRs using a new k_factor will preseve all other calculations for that season.
+		</p>
+		<p class="lead">
+			Selecting an existing season and an existing k_factor will wipe out that data 
+			and fully recalculate.
+		</p>
+		
+	</div>
+
+	<div class="row">
+		<div class="col-md-4 order-md-2 mb-4">
+			<h4 class="d-flex justify-content-between align-items-center mb-3">
+				<span class="text-muted">Active Leagues</span>
+				<span class="badge badge-secondary badge-pill">3</span>
+			</h4>
+
+			<div class="text-end mb-3">
+				<a
+					href="/import_players/?return=manage_league"
+					class="btn btn-outline-success form-control text-start"
+				>
+					<i class="fas fa-table"></i>
+					Step #1 - Import Master Member Sheet
+				</a>
+			</div>
+			<div class="text-end mb-3">
+				<a
+					href="/import_contracts/?return=manage_league"
+					class="btn btn-outline-primary form-control text-start"
+				>
+					<i class="fas fa-table"></i>
+					Step #2 - Load Contracts
+				</a>
+			</div>
+
+			
+		</div>
+
+		<div class="col-md-8 order-md-1">
+			<h4 class="mb-3">Elo Import Settings</h4>
+			
+			<form class="needs-validation" novalidate action="/elo/generate" method="post">
+
+			<div class="row">
+				<div class="col-12 col-md-6">
+					<div class="mb-3">
+						<label for="season">Historical Season</label>
+						<div class="input-group">
+							<input
+								type="text"
+								class="form-control text-white"
+								name="season"
+								id="season"
+								placeholder="season"
+								value="<%= settings.season %>"
+								style="background-color:#000f1e;"
+								required
+							>
+							<div class="invalid-feedback" style="width: 100%;">
+								Season is required
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-md-6">
+					<div class="mb-3">
+						<label for="season">k_factor</label>
+						<div class="input-group">
+							<input
+								type="text"
+								class="form-control text-white"
+								name="k_factor"
+								id="k_factor"
+								placeholder="season"
+								value="12"
+								style="background-color:#000f1e;"
+								required
+							>
+							<div class="invalid-feedback" style="width: 100%;">
+								k_factor is required
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-3">
+				<label for="contract_url">Aggregated Stats Sheet</label>
+				<div class="input-group">
+					<input
+						type="text"
+						class="form-control text-white"
+						name="stats_sheet_url"
+						id="stats_sheet_url"
+						placeholder="https://docs.google.com/spreadsheets/d/17XHJcJ64gGVBaDfkJ7FvWgE8S8-v_dg9kzcxcmpBT3E/edit?gid=483192611#gid=483192611"
+						value="<%- stats_url; %>"
+						style="background-color:#000f1e;"
+						required
+					>
+					<div class="invalid-feedback" style="width: 100%;">
+						Aggregate Stats sheet URL is required.
+					</div>
+				</div>
+			</div>
+			
+			<hr class="mb-4">
+			
+			<button class="btn btn-outline-primary btn-lg btn-block" type="submit">Calculate Season MMRs</button>
+			
+			</form>
+		</div>
+
+	</div>
+
+</main>
+
+<%- include('partials/footer.ejs'); %>
