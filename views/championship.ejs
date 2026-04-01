@@ -4,7 +4,7 @@
 	<main class="container">
 		<div class="p-3 rounded">
 			<div class="row">
-				<div class="col-5">
+				<div class="col-12 col-md-5">
 
 					<h1>RSC Development League Season <%= settings.season; %> Championship</h1>
 
@@ -38,7 +38,7 @@
 					</p>
 
 				</div>
-				<div class="col-7 matchDates dark">
+				<div class="col-12 order-first order-md-last col-md-7 matchDates dark">
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {
