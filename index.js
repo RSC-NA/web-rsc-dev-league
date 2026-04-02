@@ -2059,19 +2059,23 @@ app.post('/save_mmr', (req, res) => {
 
 	const decoded_user_id = decodeURIComponent(req.body.user_id);
 
+	d.threes_rating = d.threes_rating ? parseInt(d.threes_rating) : 0;
+	d.twos_rating = d.twos_rating ? parseInt(d.twos_rating) : 0;
+	d.ones_rating = d.ones_rating ? parseInt(d.ones_rating) : 0;
+
 	const tracker_data = {
 		psyonix_season: d.psyonix_season,
 		tracker_link: { link: d.tracker_link.link },
 		rsc_id: null,
 		date_pulled: new Date(),
 		threes_games_played: d.threes_games_played ?? 0,
-		threes_rating: d.threes_rating && d.threes_rating > 0 ? d.threes_rating : 0,
+		threes_rating: d.threes_rating > 0 ? d.threes_rating : 0,
 		threes_season_peak: 0,
 		twos_games_played: d.twos_games_played ?? 0,
-		twos_rating: d.twos_rating && d.twos_rating > 0 ? d.twos_rating : 0,
+		twos_rating: d.twos_rating > 0 ? d.twos_rating : 0,
 		twos_season_peak: 0,
 		ones_games_played: d.ones_games_played ?? 0,
-		ones_rating: d.ones_rating && d.ones_rating > 0 ? d.ones_rating : 0,
+		ones_rating: d.ones_rating > 0 ? d.ones_rating : 0,
 		ones_season_peak: 0,
 	};
 	tracker_data.threes_season_peak = d.threes_season_peak && d.threes_season_peak > 0 ? d.threes_season_peak : d.threes_rating;
