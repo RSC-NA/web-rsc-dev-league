@@ -2081,17 +2081,10 @@ app.post('/save_mmr', (req, res) => {
 	tracker_data.threes_season_peak = d.threes_season_peak && parseInt(d.threes_season_peak) > 0 ? 
 		parseInt(d.threes_season_peak) : d.threes_rating;
 	tracker_data.twos_season_peak = d.twos_season_peak && parseInt(d.twos_season_peak) > 0 ? 
-		d.twos_season_peak : d.twos_rating;
+		parseInt(d.twos_season_peak) : d.twos_rating;
 	tracker_data.ones_season_peak = d.ones_season_peak && parseInt(d.ones_season_peak) > 0 ? 
-		d.ones_season_peak : d.ones_rating;
+		parseInt(d.ones_season_peak) : d.ones_rating;
 	
-	for ( const field in tracker_data ) {
-		if ( field.includes('_peak') || field.includes('_rating') ) {
-			if ( ! tracker_data[ field ] ) {
-				tracker_data[ field ] = 0;
-			}
-		} 
-	}
 	// shorthand reference to tracker_data object
 	const st = tracker_data;
 
