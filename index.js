@@ -2066,14 +2066,17 @@ app.post('/save_mmr', (req, res) => {
 		date_pulled: new Date(),
 		threes_games_played: d.threes_games_played ?? 0,
 		threes_rating: d.threes_rating && d.threes_rating > 0 ? d.threes_rating : 0,
-		threes_season_peak: d.threes_season_peak ? d.threes_season_peak : d.threes_rating,
+		threes_season_peak: 0,
 		twos_games_played: d.twos_games_played ?? 0,
 		twos_rating: d.twos_rating && d.twos_rating > 0 ? d.twos_rating : 0,
-		twos_season_peak: d.twos_season_peak ? d.twos_season_peak : d.twos_rating,
+		twos_season_peak: 0,
 		ones_games_played: d.ones_games_played ?? 0,
 		ones_rating: d.ones_rating && d.ones_rating > 0 ? d.ones_rating : 0,
-		ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
+		ones_season_peak: 0,
 	};
+	tracker_data.threes_season_peak = d.threes_season_peak && d.threes_season_peak > 0 ? d.threes_season_peak : d.threes_rating;
+	tracker_data.twos_season_peak = d.twos_season_peak && d.twos_season_peak > 0 ? d.twos_season_peak : d.twos_rating;
+	tracker_data.ones_season_peak = d.ones_season_peak && d.ones_season_peak > 0 ? d.ones_season_peak : d.ones_rating;
 	
 	for ( const field in tracker_data ) {
 		if ( field.includes('_peak') || field.includes('_rating') ) {
