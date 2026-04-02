@@ -2074,6 +2074,7 @@ app.post('/save_mmr', (req, res) => {
 		ones_rating: d.ones_rating && d.ones_rating > 0 ? d.ones_rating : 0,
 		ones_season_peak: d.ones_season_peak ? d.ones_season_peak : d.ones_rating,
 	};
+	
 	for ( const field in tracker_data ) {
 		if ( field.includes('_peak') || field.includes('_rating') ) {
 			if ( ! tracker_data[ field ] ) {
@@ -2081,6 +2082,8 @@ app.post('/save_mmr', (req, res) => {
 			}
 		} 
 	}
+	// shorthand reference to tracker_data object
+	const st = tracker_data;
 
 	if ( d.psyonix_season === null ) {
 		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
@@ -2093,7 +2096,10 @@ app.post('/save_mmr', (req, res) => {
 		let recent_query = 'SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';	
 		if ( delete_today ) {
 			console.log('prepare for deleting... :)');
-			recent_query = 'DELETE FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';
+			recent_query = `
+				DELETE FROM tracker_data 
+				WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)
+			`;
 		}
 		connection.query(recent_query, [ d.tracker_link.link ], (err, results) => {
 			if ( err ) { console.error('Error!', err); throw err; }
@@ -2104,8 +2110,15 @@ app.post('/save_mmr', (req, res) => {
 				res.json({ success: false, recent: true, error: 'This new player tracker was recently pulled.' });
 			} else {
 				//console.log('Huh?', d.platform, d.user_id, `%${d.platform}/${d.user_id}%`);
-				connection.query('SELECT rsc_id,name FROM trackers WHERE tracker_link like ? OR tracker_link LIKE ? OR tracker_link LIKE ?', 
-					[ `%${d.platform}/${d.user_id}%`, `%${old_platforms[d.platform]}/${d.user_id}%`, `%${d.platform}/${decoded_user_id}%` ], (err, results) => {
+				connection.query(`
+					SELECT rsc_id,name 
+					FROM trackers 
+					WHERE tracker_link like ? OR tracker_link LIKE ? OR tracker_link LIKE ?
+				`, [ 
+					`%${d.platform}/${d.user_id}%`, 
+					`%${old_platforms[d.platform]}/${d.user_id}%`, 
+					`%${d.platform}/${decoded_user_id}%` 
+				], (err, results) => {
 					if ( err ) { console.error('ERROR', err); throw err; }
 
 					if ( (results && results.length) || force_insert === true ) {
@@ -2121,10 +2134,13 @@ app.post('/save_mmr', (req, res) => {
 						VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 						`;
 						connection.query(
-							query, 
-							[ d.psyonix_season, d.tracker_link.link, rsc_id, d.threes_games_played, d.threes_rating, d.threes_season_peak,
-							d.twos_games_played, d.twos_rating, d.twos_season_peak, d.ones_games_played, d.ones_rating, d.ones_season_peak, d.pulled_by ],
-							(err, results) => {
+							query, [ 
+								st.psyonix_season, st.tracker_link.link, rsc_id, 
+								st.threes_games_played, st.threes_rating, st.threes_season_peak,
+								st.twos_games_played, st.twos_rating, st.twos_season_peak, 
+								st.ones_games_played, st.ones_rating, st.ones_season_peak, 
+								st.pulled_by 
+							], (err, results) => {
 								if ( err ) { console.error('Insert error:', err); throw err; }
 
 								// send it to the server immediately
