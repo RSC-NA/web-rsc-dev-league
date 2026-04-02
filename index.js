@@ -2141,7 +2141,7 @@ app.post('/save_mmr', (req, res) => {
 								st.ones_games_played, st.ones_rating, st.ones_season_peak, 
 								st.pulled_by 
 							], (err, results) => {
-								if ( err ) { console.error('Insert error:', err); throw err; }
+								if ( err ) { console.error('Insert error:', err, st); throw err; }
 
 								// send it to the server immediately
 								tracker_data.rsc_id = rsc_id;
