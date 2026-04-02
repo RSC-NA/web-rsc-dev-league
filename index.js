@@ -2078,6 +2078,9 @@ app.post('/save_mmr', (req, res) => {
 		ones_rating: d.ones_rating > 0 ? d.ones_rating : 0,
 		ones_season_peak: 0,
 	};
+
+	console.log(d.twos_season_peak, parseInt(d.twos_season_peak), d.twos_season_peak > 0, parseInt(d.twos_season_peak) > 0);
+
 	tracker_data.threes_season_peak = d.threes_season_peak && parseInt(d.threes_season_peak) > 0 ? 
 		parseInt(d.threes_season_peak) : d.threes_rating;
 	tracker_data.twos_season_peak = d.twos_season_peak && parseInt(d.twos_season_peak) > 0 ? 
