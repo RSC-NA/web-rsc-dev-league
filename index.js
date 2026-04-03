@@ -2081,18 +2081,31 @@ app.post('/save_mmr', (req, res) => {
 
 	console.log(d.twos_season_peak, parseInt(d.twos_season_peak), d.twos_season_peak > 0, parseInt(d.twos_season_peak) > 0);
 
-	tracker_data.threes_season_peak = d.threes_season_peak && parseInt(d.threes_season_peak) > 0 ? 
-		parseInt(d.threes_season_peak) : d.threes_rating;
-	tracker_data.twos_season_peak = d.twos_season_peak && parseInt(d.twos_season_peak) > 0 ? 
-		parseInt(d.twos_season_peak) : d.twos_rating;
-	tracker_data.ones_season_peak = d.ones_season_peak && parseInt(d.ones_season_peak) > 0 ? 
-		parseInt(d.ones_season_peak) : d.ones_rating;
+	const threes_peak = parseInt(d.threes_season_peak);
+	const twos_peak   = parseInt(d.twos_season_peak);
+	const ones_peak   = parseInt(d.ones_season_peak);
+
+	tracker_data.threes_season_peak = threes_peak > 0 ? 
+		threes_peak : d.threes_rating;
+	tracker_data.twos_season_peak = twos_peak > 0 ? 
+		twos_peak : d.twos_rating;
+	tracker_data.ones_season_peak = ones_peak > 0 ? 
+		ones_peak : d.ones_rating;
 	
 	// shorthand reference to tracker_data object
 	const st = tracker_data;
 
+	if ( tracker_data.twos_season_peak < 0 ) {
+		console.log('THIS TRACKER IS DOGSHIT');
+		console.log(tracker_data);
+		return false;
+	}
+
 	if ( d.psyonix_season === null ) {
-		connection.query('INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', [ d.tracker_link.link, d.pulled_by ], (err, results) => {
+		connection.query(
+			'INSERT INTO bad_trackers (tracker_link,pulled_by) VALUES (?,?)', 
+			[ d.tracker_link.link, d.pulled_by ], 
+		(err, results) => {
 			if ( SEND_TO_API_SERVER && results && results?.insertId ) {
 				send_bad_tracker_to_server(results.insertId, d.tracker_link.link); 
 			}
