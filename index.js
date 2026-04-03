@@ -2099,7 +2099,11 @@ app.post('/save_mmr', (req, res) => {
 			return res.json({ success: false, error: 'This tracker contained no data.' });
 		});
 	} else {
-		let recent_query = 'SELECT id,tracker_link FROM tracker_data WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)';	
+		let recent_query = `
+			SELECT id,tracker_link 
+			FROM tracker_data 
+			WHERE tracker_link = ? AND date_pulled > date_sub(now(), INTERVAL 1 day)
+		`;	
 		if ( delete_today ) {
 			console.log('prepare for deleting... :)');
 			recent_query = `
