@@ -1205,6 +1205,7 @@ app.get('/mmr/:rsc_id', (req, res) => {
 				rsc_id: req.params.rsc_id,
 				player: results.length ? results[0] : null,
 				results: results,
+				cur_season: 36,
 			});
 		}
 		// return res.render('mmr', { pulls: results });
