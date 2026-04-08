@@ -1557,6 +1557,7 @@ function send_bad_tracker_to_server(bad_tracker_id, tracker_link) {
 			if ( 'count' in data && data.count === 0 ) {
 				console.log('fixing url?', tracker_link);
 				if ( tracker_link.includes('/overview') ) {
+
 					return send_bad_tracker_to_server(bad_tracker_id, tracker_link.replace('/overview', ''));
 				}
 			}
@@ -2186,6 +2187,7 @@ app.post('/save_mmr', (req, res) => {
 
 								// send it to the server immediately
 								tracker_data.rsc_id = rsc_id;
+								tracker_data.notes = 'devleague';
 								if ( SEND_TO_API_SERVER ) {
 									try {
 										send_tracker_data_to_server(results.insertId, [tracker_data], d.pulled_by);
@@ -2207,6 +2209,7 @@ app.post('/save_mmr', (req, res) => {
 							try {
 								// We are going to force the update to the API
 								// even though we don't have this record locally.
+								tracker_data.notes = 'devleague';
 								send_tracker_data_to_server('from_api', [tracker_data], d.pulled_by);
 							} catch(e) {
 								SEND_TO_API_SERVER = false;
