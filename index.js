@@ -1270,27 +1270,38 @@ ORDER BY td.rsc_id, td.psyonix_season
 		if ( err ) {
 			res.send(err);
 		}
-		res.header('Content-type', 'text/csv');
-		res.attachment(`MMR Pull for ${rsc_id}.csv`);
-		const columns = [
-			'RSC ID', 'Player Name', 'Tracker Link', 
-			'1s MMR', '1s Season Peak', '1s GP',
-			'2s MMR', '2s Season Peak', '2s GP',
-			'3s MMR', '3s Season Peak', '3s GP',
-			'Date Pulled', 'Psyonix Season'
-		];
-		const stringifier = stringify({ header: true, columns: columns });
-		stringifier.pipe(res);
-		for ( let i = 0; i < results.length; ++i ) {
-			results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
-			if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
-				results[i]['1s GP'] = 0;
-				results[i]['2s GP'] = 0;
-				results[i]['3s GP'] = 0;
+
+		if ( req.query?.csv ) {
+			res.header('Content-type', 'text/csv');
+			res.attachment(`MMR Pull for ${rsc_id}.csv`);
+			const columns = [
+				'RSC ID', 'Player Name', 'Tracker Link', 
+				'1s MMR', '1s Season Peak', '1s GP',
+				'2s MMR', '2s Season Peak', '2s GP',
+				'3s MMR', '3s Season Peak', '3s GP',
+				'Date Pulled', 'Psyonix Season'
+			];
+			const stringifier = stringify({ header: true, columns: columns });
+			stringifier.pipe(res);
+			for ( let i = 0; i < results.length; ++i ) {
+				results[i]["Date Pulled"] = new Date(results[i]['Date Pulled']).toString();
+				if ( parseInt(results[i]['Psyonix Season']) <= 23 ) {
+					results[i]['1s GP'] = 0;
+					results[i]['2s GP'] = 0;
+					results[i]['3s GP'] = 0;
+				}
+				stringifier.write(results[i]);
 			}
-			stringifier.write(results[i]);
+			stringifier.end();
+		} else if ( req.query?.json ) {
+			res.json(results);
+		} else {
+			res.render('numbers_by_player', {
+				rsc_id: rsc_id,
+				player: results.length ? results[0] : null,
+				results: results,
+			});
 		}
-		stringifier.end();
 	});
 });
 

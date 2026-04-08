@@ -1,0 +1,136 @@
+<%- include('partials/header.ejs'); %>
+
+<main class="container">
+	<div class="py-5">
+		<h2><%- rsc_id %>: <%= player['Player Name'] ?? 'Unknown Player' %></h2>
+		<p class="lead">
+			Please review the MMR information for <%= player['Player Name'] ?? 'Unknown Player'; %> below.
+		</p>
+
+	</div>
+
+	<div class="row">
+		<div class="col-md-4 order-md-2 mb-4">
+			<h4 class="d-flex justify-content-end align-items-center mb-3">
+				<span class="ms-2 text-light w-50">MMR Stats</span>
+			</h4>
+
+			<ul style="background-color:#000f1e;" class="list-group mb-3 text-light">
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Player Name</h6>
+					</div>
+					<span class="ms-2 text-light w-50"><%= player['Player Name'] ?? 'Unknown Player'; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">RSC ID</h6>
+					</div>
+					<span class="ms-2 text-light w-50"><%- rsc_id; %></span>
+				</li>
+			</ul>
+
+			<h6 class="text-warning"><i class="fas fa-lock me-2"></i> Devleague Software Permissions</h6>
+			<ul style="background-color:#000f1e;" class="list-group mb-3 text-light">
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">CSV</h6>
+					</div>
+					<span class="ms-2 text-light w-50 Veteran">
+						<a
+							href="/numbers_by_player/<%= rsc_id; %>?csv"
+							class="Veteran"
+						>Download CSV</a>
+					</span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">JSON</h6>
+					</div>
+					<span class="ms-2 text-light w-50 Veteran">
+						<a
+							href="/numbers_by_player/<%= rsc_id; %>?json"
+							class="Veteran"
+						>View JSON</a>
+					</span>
+				</li>
+			</ul>
+
+		</div>
+
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<h4 class="mb-3">MMR Pulls</h4>
+			<div class="mb-3">
+				<%
+				%>
+				<table class="table table-dark table-striped">
+					<thead>
+						<tr>
+							<th scope="col">RSC ID</th>
+							<th scope="col">Name</th>
+							<th scope="col">Season</th>
+							<th scope="col">Pull Date</th>
+							<th scope="col">1s MMR</th>
+							<th scope="col">1s Peak</th>
+							<th scope="col">1s GP</th>
+							<th scope="col">2s MMR</th>
+							<th scope="col">2s Peak</th>
+							<th scope="col">2s GP</th>
+							<th scope="col">3s MMR</th>
+							<th scope="col">3s Peak</th>
+							<th scope="col">3s GP</th>
+							<th scope="col">Tracker</th>
+						</tr>
+					</thead>
+					<tbody>
+					<%
+						if ( results.length ) {
+							let row_class = 'table-info';
+							for ( let i = 0; i < results.length; ++i ) {
+								const pull = results[i];
+								const short_link = pull['Tracker Link'].split('profile/')[1].replace('/overview', '');
+								if ( pull['Psyonix Season'] != cur_season ) {
+									if ( cur_season !== 0 ) {
+										row_class = 'table-primary';
+									}
+									cur_season = pull['Psyonix Season'];
+								} else {
+									row_class = '';
+								}
+					%>
+						<tr class="<%- row_class; %>">
+							<td><%= pull['RSC ID'] %></td>
+							<td><%= pull['Player Name'] %></td>
+							<td><%= pull['Psyonix Season'] %></td>
+							<td><%= pull['Date Pulled'].toLocaleString(); %></td>
+							<td><%- pull['1s MMR']; %></td>
+							<td><strong><%- pull['1s Season Peak']; %></strong></td>
+							<td><%- pull['2s GP']; %></td>
+							<td><%- pull['2s MMR']; %></td>
+							<td><strong><%- pull['2s Season Peak']; %></strong></td>
+							<td><%- pull['ss GP']; %></td>
+							<td><%- pull['3s MMR']; %></td>
+							<td><strong><%- pull['3s Season Peak']; %></strong></td>
+							<td><a href="<%- pull['Tracker Link']; %>"><%= short_link; %></a></td>
+						</tr>
+					<%
+							}
+						} else {
+					%> 
+						<tr>
+							<td colspan="13" scope="row"><em>No pulls for this player.</em></td>
+						</tr>
+					<%
+						}
+					%>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>
