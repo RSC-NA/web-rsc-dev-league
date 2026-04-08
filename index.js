@@ -1271,7 +1271,7 @@ ORDER BY td.psyonix_season DESC, td.id DESC
 			res.send(err);
 		}
 
-		if ( req.query?.csv ) {
+		if ( req.query?.view && req.query.view === 'csv' ) {
 			res.header('Content-type', 'text/csv');
 			res.attachment(`MMR Pull for ${rsc_id}.csv`);
 			const columns = [
@@ -1293,7 +1293,7 @@ ORDER BY td.psyonix_season DESC, td.id DESC
 				stringifier.write(results[i]);
 			}
 			stringifier.end();
-		} else if ( req.query?.json ) {
+		} else if ( req.query?.view && req.query.view === 'json' ) {
 			res.json(results);
 		} else {
 			res.render('numbers_by_player', {
