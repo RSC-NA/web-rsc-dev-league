@@ -1,0 +1,265 @@
+
+<%- include('partials/header.ejs'); %>
+
+<main class="container">
+	<div class="py-5">
+		<h2><%- player.rsc_id %>: <%= player.name %></h2>
+		<p class="lead">
+			Please review the Simulated MMR and Game information for <%= player.name %> below.
+			This simulation was calculated for Season <%- season; %> using a k_factor of <%- k_factor; %>.
+		</p>
+	</div>
+
+	<div class="row">
+		<div class="col-md-4 order-md-2 mb-4">
+			<h4 class="d-flex justify-content-end align-items-center mb-3">
+				<span class="ms-2 text-light w-50">MMR Stats</span>
+			</h4>
+
+			<ul style="background-color:#000f1e;" class="list-group mb-3 text-light">
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">Player Name</h6>
+					</div>
+					<span class="ms-2 text-light w-50 h5"><%= player.name; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">RSC ID</h6>
+					</div>
+					<span class="ms-2 text-light w-50 h5"><%- player.rsc_id; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<h6 class="my-0 text-light text-end">RSC Tier </h6>
+					<span class="ms-2 w-50 h5 fw-bolder <%- player.tier; %> text-lg">
+						<% if ( player.tier !== 'NONE' ) { %>
+						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
+						<% } %>
+						<%= player.tier; %>
+					</span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">RSC Starting MMR</h6>
+					</div>
+					<span class="ms-2 text-light w-50 h5 text-lg"><%- player.start_mmr; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">RSC Ending MMR</h6>
+					</div>
+					<span class="ms-2 Veteran w-50 h5 text-lg"><%- player.end_mmr; %></span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+					<div>
+						<h6 class="my-0 text-light text-end">MMR Change</h6>
+					</div>
+					<span class="ms-2 <%- player.end_mmr - player.start_mmr > 0 ? 'Veteran' : 'text-danger'; %> w-50 h5 text-lg">
+						<%- player.end_mmr - player.start_mmr; %>
+					</span>
+				</li>
+			</ul>
+
+		</div>
+
+
+		<div class="col-md-4 order-md-1">
+			<h4 class="mb-3">Season <%- season; %> Stats</h4>
+			<div class="mb-3">
+				<ul style="background-color:#000f1e;" class="list-group mb-3 text-light">
+					<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+						<div>
+							<h6 class="my-0 text-light text-end">Total Games in S<%- season; %></h6>
+						</div>
+						<span class="ms-2 text-light w-50 h5"><%- player.wins + player.losses; %></span>
+					</li>
+					<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+						<div>
+							<h6 class="my-0 text-light text-end">MVPs</h6>
+						</div>
+						<span class="ms-2 text-light w-50 h5"><%- player.mvps; %></span>
+					</li>
+					<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+						<div>
+							<h6 class="my-0 text-light text-end">Goals</h6>
+						</div>
+						<span class="ms-2 text-light w-50 h5"><%- player.goals; %></span>
+					</li>
+					<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+						<div>
+							<h6 class="my-0 text-light text-end">Assists</h6>
+						</div>
+						<span class="ms-2 text-light w-50 h5"><%- player.assists; %></span>
+					</li>
+					<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+						<div>
+							<h6 class="my-0 text-light text-end">Saves</h6>
+						</div>
+						<span class="ms-2 text-light w-50 h5"><%- player.saves; %></span>
+					</li>
+					<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
+						<div>
+							<h6 class="my-0 text-light text-end">Shots</h6>
+						</div>
+						<span class="ms-2 text-light w-50 h5"><%- player.shots; %></span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<h4 class="mb-3">Season <%- season; %> Games</h4>
+			<%
+				for ( const md in matches ) {
+					const m = matches[md];
+			%>
+			<div class="mb-5">
+				<h5 class="mt-5"><%- md; %>, <%- m.tier; %></h5>
+
+				<%
+					for ( const g_id in m.games ) {
+						const g = m.games[g_id];
+				%>
+				<h6 class="">Game <%- g.game; %></h6>
+				<table class="table table-dark table-striped mb-5">
+					<thead>
+						<tr class="table-Elite">
+							<th class="h5">
+								<%- g.home.team; %>
+								<%- g.winner === g.home.team ? '<i class="fas fa-check text-success fa-xl"></i>' : ''; %>
+							</th>
+							<th>Home</th>
+							<th colspan="3"><%- g.home.mmr; %></th>
+							<th class="h5 fw-bolder" colspan="4"><%- g.home.score; %></th>
+						</tr>
+						<tr>
+							<th scope="col">RSC_ID</th>
+							<th scope="col">Player</th>
+							<th scope="col">Start MMR</th>
+							<th scope="col">End MMR</th>
+							<th scope="col">MMR &Delta;</th>
+							<th scope="col">Goals</th>
+							<th scope="col">Assists</th>
+							<th scope="col">Saves</th>
+							<th scope="col">Shots</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%
+							for ( let i = 0; i < g.home.players.length; ++i ) {
+								const p = g.home.players[i];
+								const mmr_delta = p.end_mmr - p.start_mmr;
+								const sign = mmr_delta > 0 ? '+' : '';
+								let row_class = '';
+								let delta_class = mmr_delta > 0 ? 'Veteran' : 'text-danger';
+								if ( p.rsc_id === rsc_id ) {
+									row_class = 'table-success fw-bolder text-lg bg-opacity-50 fst-italic';
+									delta_class = mmr_delta > 0 ? 'text-success' : 'text-danger';
+								}
+						%>
+						<tr class="<%- row_class; %>">
+							<td><%- p.rsc_id; %></td>
+							<td>
+								<%= p.name; %>
+								<% 
+									if ( p.mvp ) {
+								%>
+								<span title="Game MVP" data-bs-toggle="tooltip">
+									<i class="fas fa-star text-warning"></i>
+								</span>
+								<%
+									}
+								%>
+							</td>
+							<td><%- p.start_mmr; %></td>
+							<td><%- p.end_mmr; %></td>
+							<td class="<%- delta_class; %> fw-bolder">
+								<%- `${sign}${mmr_delta}`; %>
+							</td>
+							<td><%- p.goals; %></td>
+							<td><%- p.assists; %></td>
+							<td><%- p.saves; %></td>
+							<td><%- p.shots; %></td>
+						</tr>
+						<%
+							}
+						%>
+					</tbody>
+					<thead>
+						<tr class="table-Prospect">
+							<th class="h5">
+								<%- g.away.team; %>
+								<%- g.winner === g.away.team ? '<i class="fas fa-check text-success fa-xl"></i>' : ''; %>
+							</th>
+							<th>Away</th>
+							<th colspan="3"><%- g.away.mmr; %></th>
+							<th class="h5 fw-bolder" colspan="4"><%- g.away.score; %></th>
+						</tr>
+						<tr>
+							<th scope="col">RSC_ID</th>
+							<th scope="col">Player</th>
+							<th scope="col">Start MMR</th>
+							<th scope="col">End MMR</th>
+							<th scope="col">MMR &Delta;</th>
+							<th scope="col">Goals</th>
+							<th scope="col">Assists</th>
+							<th scope="col">Saves</th>
+							<th scope="col">Shots</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%
+							for ( let i = 0; i < g.away.players.length; ++i ) {
+								const p = g.away.players[i];
+								const mmr_delta = p.end_mmr - p.start_mmr;
+								const sign = mmr_delta > 0 ? '+' : '';
+								let row_class = '';
+								let delta_class = mmr_delta > 0 ? 'Veteran' : 'text-danger';
+								if ( p.rsc_id === rsc_id ) {
+									row_class = 'table-success fw-bolder text-lg bg-opacity-50 fst-italic';
+									delta_class = mmr_delta > 0 ? 'text-success' : 'text-danger';
+								}
+						%>
+						<tr class="<%- row_class; %>">
+							<td><%- p.rsc_id; %></td>
+							<td>
+								<%= p.name; %>
+								<% 
+									if ( p.mvp ) {
+								%>
+								<span title="Game MVP" data-bs-toggle="tooltip">
+									<i class="fas fa-star text-warning"></i>
+								</span>
+								<%
+									}
+								%>
+							</td>
+							<td><%- p.start_mmr; %></td>
+							<td><%- p.end_mmr; %></td>
+							<td class="<%- delta_class; %> fw-bolder">
+								<%- `${sign}${mmr_delta}`; %>
+							</td>
+							<td><%- p.goals; %></td>
+							<td><%- p.assists; %></td>
+							<td><%- p.saves; %></td>
+							<td><%- p.shots; %></td>
+						</tr>
+						<%
+							}
+						%>
+					</tbody>
+				</table>
+				<%
+					}
+				%>
+			</div>
+			<%
+				}
+			%>
+		</div>
+	</div>
+</main>
+
+<%- include('partials/footer.ejs'); %>

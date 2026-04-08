@@ -1,0 +1,485 @@
+
+<%- include('partials/header.ejs'); %>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+	<symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+		<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+	</symbol>
+	<symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+		<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+	</symbol>
+</svg>
+
+<script type="text/javascript">
+	function set_page_size(el) {
+		if ( ! el ) { return; }
+
+		const search = new URLSearchParams(window.location.search);
+		if ( search.has('limit') ) {
+			search.set('limit', el.value);
+		} else {
+			search.append('limit', el.value);
+		}
+	
+		window.location.href = `${window.location.pathname}?${search}`;
+	}
+
+	function set_sort_order(el) {
+		console.log('set_sort_order', el, el.dataset.order);
+		const search = new URLSearchParams(window.location.search);
+		console.log(search.get('order'));
+		const same_val = search.get('order') === el.dataset.order ? true : false;
+		if ( search.has('order') ) {
+			search.set('order', el.dataset.order);
+		} else {
+			search.append('order', el.dataset.order);
+		}
+
+		if ( search.has('dir') ) {
+			console.log('HAS dir', same_val, same_val ? 'desc' : 'asc');
+			search.set(
+				'dir', same_val ? 
+					search.get('dir') === 'DESC' ? 
+						'ASC' : 'DESC' 
+					: 'DESC'
+			);
+		} else {
+			console.log('NO dir', same_val, same_val ? 'asc' : 'desc');
+			search.append('dir', same_val ? 'ASC' : 'DESC');
+			search.set(
+				'dir', same_val ? 
+					search.get('dir') === 'DESC' ? 
+						'ASC' : 'DESC' 
+					: 'ASC'
+			);
+		}
+		
+		console.log(search.toString());
+		console.log(search);
+		const search_str = search.toString();
+		window.location.href = `${window.location.pathname}?${search_str}`;
+	}
+</script>
+
+<main class="container">
+	<div class="py-3 py-md-5 pb-md-2">
+		<h2>RSC 3s S<%- season; %> Simulated MMRs - <%- order; %></h2>
+		<p class="lead">
+			These are simulated MMR values.
+		</p>
+	</div>
+
+
+	<div class="row">
+		<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+			<%
+				const visibilities = {
+					'all': 'All Players',
+					'played': 'WITH Games',
+					'none': 'WITHOUT Games',
+				};
+
+				const limits = {
+					10: false,
+					50: false,
+					100: false,
+					250: false,
+					500: false,
+					1500: false,
+				};
+				if ( limit in limits ) {
+					limits[limit] = true;
+				}
+				const arrows = {
+					'rsc_id': '',
+					'name': '',
+					'tier': '',
+					'base_mmr': '',
+					'effective_mmr': '',
+					'current_mmr': '',
+					'mmr_delta': '',
+					'count': '',
+					'keeper': '',
+					'wins': '',
+					'losses': '',
+					'win_percentage': '',
+				};
+				if ( order in arrows && dir ) {
+					if ( dir === 'ASC' ) {
+						arrows[order] = '<i class="fas fa-arrow-down"></i>';
+					} else if ( dir === 'DESC' ) {
+						arrows[order] = '<i class="fas fa-arrow-up"></i>';
+					}
+				}
+
+				const pageQuery = new URLSearchParams({
+					limit: limit,
+					dir: dir === 'DESC' ? 'ASC' : 'DESC',
+					order: order,
+				});
+				const query = new URLSearchParams({
+					limit: limit,
+					dir: dir,
+					order: order,
+				});
+			%>
+			<div class="row">
+				<div class="col-12">
+					<div class="text-center">
+						<nav aria-label="" class="dark">
+							<ul class="pagination justify-content-end">
+								<% 
+									const pages = Math.floor(total / limit) + 1;
+									if ( page <= 1 ) {
+								%>
+								<li class="page-item disabled">
+									<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+								</li>
+								<%
+									} else {
+								%>
+								<li class="page-item">
+									<a class="page-link"
+										href="?<%- pageQuery.toString(); %>&page=<%- page-1; %>"
+									>Previous</a>
+								</li>
+								<%
+									}
+									for ( let i = 1; i <= pages; ++i ) {
+										if ( page === i ) {
+								%>
+								<li class="page-item active" aria-current="page">
+									<span class="page-link">
+									<%- i; %>
+									</span>
+								</li>
+								<%
+										} else { 
+								%>
+								<li class="page-item">
+									<a class="page-link" href="?<%- pageQuery.toString(); %>&page=<%- i; %>">
+									<%- i; %>
+									</a>
+								</li>
+								<%
+										}
+									}
+									if ( page >= pages ) {
+								%>
+								<li class="page-item disabled">
+									<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+								</li>
+								<%
+									} else {
+								%>
+								<li class="page-item">
+									<a class="page-link"
+										href="?<%- pageQuery.toString(); %>&page=<%- page+1; %>"
+									>Next</a>
+								</li>
+								<%
+									}
+								%>
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-12 col-md-3">
+					<label for="limit">Limit</label>
+					<select
+						name="limit"
+						id="limit"
+						onchange="set_page_size(this);"
+						class="text-white"
+						style="background-color:#000f1e;"
+					>
+						<% 
+							for ( let lim in limits ) {
+						%>
+						<option value="<%- lim %>" <%- limits[lim] ? 'selected' : ''; %>><%- lim; %> Players</option>
+						<%
+							}
+						%>
+					</select>
+				</div>
+				<div class="col-12 col-md-3">
+				</div>
+				<div class="col-12 col-md-4">
+					<h4><span class="Veteran"><%- total; %></span> TierMaker Players</h4>
+				</div>
+				<div class="col-12 col-md-2 text-end h-2">
+					<a
+						href="/elo/view/<%- season; %>/<%- k_factor; %>?<%- query.toString(); %>&csv=true"
+						class="btn btn-outline-warning fw-bold"
+						title="Download Combine Tiermaker"
+					>
+						<i class="fas fa-file-arrow-down me-1"></i>
+						Download
+					</a>
+				</div>
+			</div>
+			<script type="text/javascript">
+				document.addEventListener('DOMContentLoaded', () => {
+					const els = document.querySelectorAll('.editable-tbody');
+					if ( els ) {
+						for ( let i = 0; i < els.length; ++i ) {
+							const btn = els[i];
+
+							btn.addEventListener('click', (ev) => {
+								// console.log(ev.target, ev.currentTarget);
+								if ( ev.target.closest('button') && ev.target.closest('button').classList.contains('edit-player-button') ) {
+									const btn = ev.target.closest('button');
+									const rsc_id = btn.dataset.rscId;
+									document.querySelectorAll(`.view-player-${rsc_id}`).forEach(el => el.classList.add('hidden'));
+									document.querySelectorAll(`.edit-player-${rsc_id}`).forEach(el => el.classList.remove('hidden'));
+								}
+							});
+						}
+					}
+				});
+			</script>
+			<div class="mb-3">
+				<table class="table table-hover table-dark">
+					<thead>
+						<tr>
+							<th></th>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								role="button"
+								data-order="rsc_id"
+								data-dir="">
+								RSC ID
+								<%- arrows['rsc_id']; %>
+							</th>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								role="button"
+								data-order="name"
+								data-dir="">
+								Player Name
+								<%- arrows['name']; %>
+							</th>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								role="button"
+								data-order="tier"
+								data-dir="">
+								Tier
+								<%- arrows['tier']; %>
+							</th>
+							<th
+								class="text-center"
+								data-order="base_mmr"
+								data-dir="">
+								Start MMR
+								<%- arrows['base_mmr']; %>
+							</th>
+							<th
+								class="text-center"
+								data-order="effective_mmr"
+								data-dir="">
+								End MMR
+								<%- arrows['effective_mmr']; %>
+							</th>
+							<th
+								class="text-center"
+								data-order="mmr_delta"
+								data-dir="">
+								&Delta;
+								<%- arrows['mmr_delta']; %>
+							</th>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								role="button"
+								data-order="wins"
+								data-dir="">
+									Record
+								<%- arrows['wins']; %>
+							</th>
+							<th
+								class="text-center"
+								onclick="set_sort_order(this);"
+								role="button"
+								data-order="win_percentage"
+								data-dir="">
+									W%
+								<%- arrows['win_percentage']; %>
+							</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody class="editable-tbody">
+
+					<% 
+						const stat_colors = {
+							'great': 'Veteran',
+							'ok': 'text-info',
+							'neutral': 'text-warning',
+							'bad': 'text-danger',
+							'none': 'text-muted',
+						};
+						let analysis = 'none';
+						let i = 0;
+						if ( Object.keys(players).length ) {
+							for ( const rsc_id in players ) {
+								i++;
+								const p = players[rsc_id];
+								p.wins = parseInt(p.wins);
+								p.losses = parseInt(p.losses);
+
+								const wp = Math.floor((p.wins / (p.wins + p.losses)) * 100);
+								p.mmr_delta = p.end_mmr - p.start_mmr;
+
+								if ( wp > 60 ) {
+									analysis = 'great';
+								} else if ( wp > 52 ) {
+									analysis = 'ok';
+								} else if ( wp > 45 ) {
+									analysis = 'neutral';
+								} else if ( wp > 20 ) {
+									analysis = 'bad';
+								} else {
+									analysis = 'none';
+								}
+
+					%>
+						<tr id="<%- p.rsc_id; %>">
+							<td class="text-muted">
+								<%- i; %>
+							</td>
+							<td class="text-left">
+								<a href="/player/<%= p.rsc_id; %>">
+									<%- p.rsc_id %>
+								</a>
+							</td>
+							<td class="fw-bolder">
+								<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
+								<a href="/elo/player/<%- season; %>/<%- k_factor; %>/<%= rsc_id; %>"><%= p.name; %></a>
+							</td>
+							<td class="text-start bg-<%- p.tier; %>">
+								<span class="view-player-<%- p.rsc_id; %>">
+									<%- p.tier; %>
+								</span>
+							</td>
+							<td class="text-end">
+								<span class="view-player-<%- p.rsc_id; %>">
+									<%- p.start_mmr; %>
+								</span>
+							</td>
+							<td class="text-end">
+								<span class="view-player-<%- p.rsc_id; %>">
+									<%- p.end_mmr; %>
+								</span>
+							</td>
+							<td class="text-center">
+								<span 
+									class="fw-bold <%- 
+										p.mmr_delta > 0 ? 
+											'Veteran' : 
+											p.mmr_delta === 0 ? 
+												'text-muted' : 'text-danger'; 
+									%>"
+									title="<%= p.mmr_delta; %>"
+									>
+									<%= p.mmr_delta; %>
+								</span>
+							</td>
+							<td class="text-right">
+								<span class="Veteran fw-bold"><%= p.wins; %></span> /
+								<span class="text-danger fw-bold"><%= p.losses; %></span>
+							</td>
+							<td class="text-center">
+								<span class="<%- stat_colors[analysis]; %> fw-bold">
+									<%= wp; %>%
+								</span>
+							</td>
+						</tr>
+
+					<% 
+							} // end of loop
+						} else {
+					%>
+
+						<tr><td colspan="12"><em>No players?</em></td></tr>
+
+					<%
+						}
+					%>
+
+					</tbody>
+				</table>
+			
+				<div class="text-center">
+					<nav aria-label="" class="dark">
+						<ul class="pagination justify-content-center">
+							<% 
+								if ( page <= 1 ) {
+							%>
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+							</li>
+							<%
+								} else {
+							%>
+							<li class="page-item">
+								<a class="page-link"
+									href="?<%- pageQuery.toString(); %>&page=<%- page-1; %>"
+								>Previous</a>
+							</li>
+							<%
+								}
+								for ( let i = 1; i <= pages; ++i ) {
+									if ( page === i ) {
+							%>
+							<li class="page-item active" aria-current="page">
+								<span class="page-link">
+								<%- i; %>
+								</span>
+							</li>
+							<%
+									} else { 
+							%>
+							<li class="page-item">
+								<a class="page-link" href="?<%- pageQuery.toString(); %>&page=<%- i; %>">
+								<%- i; %>
+								</a>
+							</li>
+							<%
+									}
+								}
+								if ( page >= pages ) {
+							%>
+							<li class="page-item disabled">
+								<a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+							</li>
+							<%
+								} else {
+							%>
+							<li class="page-item">
+								<a class="page-link"
+									href="?<%- pageQuery.toString(); %>&page=<%- page+1; %>"
+								>Next</a>
+							</li>
+							<%
+								}
+							%>
+						</ul>
+					</nav>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</main>
+
+<%- include('partials/footer.ejs'); %>

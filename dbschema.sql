@@ -216,6 +216,60 @@ CREATE TABLE league_settings (
 	PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE elo_settings (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`k_factor` INT UNSIGNED NOT NULL,
+	`stats_url` VARCHAR(255) NOT NULL, 
+	`user_id` BIGINT NOT NULL, 
+	`created_on` DATETIME NOT NULL DEFAULT NOW(),
+	PRIMARY KEY(`id`),
+	INDEX `season_kfactor_idx` (`season`, `k_factor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE elo_games (
+	`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`season` INT UNSIGNED NOT NULL,
+	`k_factor` INT UNSIGNED NOT NULL,
+	`tier` VARCHAR(10) NOT NULL,
+	`match` INT UNSIGNED NOT NULL,
+	`game` INT UNSIGNED NOT NULL,
+	`home` VARCHAR(50) NOT NULL,
+	`away` VARCHAR(50) NOT NULL,
+	`home_score` INT UNSIGNED NOT NULL DEFAULT 0,
+	`away_score` INT UNSIGNED NOT NULL DEFAULT 0,
+	`home_mmr` INT UNSIGNED NOT NULL,
+	`away_mmr` INT UNSIGNED NOT NULL,
+	PRIMARY KEY(`id`),
+	INDEX `season_kfactor_idx` (`season`, `k_factor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE elo_players (
+	`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`game_id` BIGINT UNSIGNED NOT NULL,
+	`season` INT UNSIGNED NOT NULL,
+	`k_factor` INT UNSIGNED NOT NULL,
+	`tier` VARCHAR(10) NOT NULL,
+	`rsc_id` VARCHAR(10) NOT NULL,
+	`name` VARCHAR(100) NOT NULL DEFAULT '',
+	`team` VARCHAR(50) NOT NULL,
+	`win` TINYINT NOT NULL DEFAULT 0,
+	`loss` TINYINT NOT NULL DEFAULT 0,
+	`start_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`end_mmr` INT UNSIGNED NOT NULL DEFAULT 0,
+	`mvp` TINYINT NOT NULL DEFAULT 0,
+	`points` INT NOT NULL DEFAULT 0,
+	`goals` INT NOT NULL DEFAULT 0,
+	`assists` INT NOT NULL DEFAULT 0,
+	`saves` INT NOT NULL DEFAULT 0,
+	`shots` INT NOT NULL DEFAULT 0,
+	PRIMARY KEY(`id`),
+	INDEX `elo_game_idx` (`game_id`),
+	INDEX `season_kfactor_idx` (`season`, `k_factor`),
+	INDEX `player_idx` (`rsc_id`),
+	INDEX `team_idx` (`team`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE league_dates (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`season` INT UNSIGNED NOT NULL,
@@ -231,6 +285,7 @@ CREATE TABLE contracts (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`discord_id` VARCHAR(20) NOT NULL,
 	`rsc_id` VARCHAR(10) NOT NULL,
+	`season` INT UNSIGNED NOT NULL,
 	`name` VARCHAR(100) NOT NULL DEFAULT '',
 	`mmr` INT UNSIGNED NOT NULL DEFAULT 0,
 	`tier` VARCHAR(10) NOT NULL DEFAULT '',

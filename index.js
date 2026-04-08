@@ -2162,7 +2162,7 @@ app.post('/save_mmr', (req, res) => {
 								st.threes_games_played, st.threes_rating, st.threes_season_peak,
 								st.twos_games_played, st.twos_rating, st.twos_season_peak, 
 								st.ones_games_played, st.ones_rating, st.ones_season_peak, 
-								st.pulled_by 
+								d.pulled_by 
 							], (err, results) => {
 								if ( err ) { console.error('Insert error:', err, st); throw err; }
 

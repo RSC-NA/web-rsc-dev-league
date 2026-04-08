@@ -145,6 +145,29 @@ li.today.holiday {
 .bg-Contender { background-color: rgba(var(--contender), var(--bs-bg-opacity)) !important; font-weight: bold; }
 .bg-Amateur { background-color: rgba(var(--amateur), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
 
+.table-Elite {
+	--bs-table-bg: rgba(var(--elite), var(--bs-bg-opacity));
+	--bs-table-striped-bg: rgba(var(--elite), var(0.7));
+    --bs-table-striped-color: #000;
+	--bs-table-active-bg: rgba(var(--elite), var(0.9));
+    --bs-table-active-color: #000;
+	--bs-table-hover-bg: rgba(var(--elite), var(0.9));
+    --bs-table-hover-color: #000;
+    color: #000;
+    border-color: rgba(var(--elite), var(--bs-bg-opacity));
+}
+.table-Prospect {
+	--bs-table-bg: rgba(var(--prospect), var(--bs-bg-opacity));
+	--bs-table-striped-bg: rgba(var(--prospect), var(0.7));
+    --bs-table-striped-color: #000;
+	--bs-table-active-bg: rgba(var(--prospect), var(0.9));
+    --bs-table-active-color: #000;
+	--bs-table-hover-bg: rgba(var(--prospect), var(0.9));
+    --bs-table-hover-color: #000;
+    color: #000;
+    border-color: rgba(var(--prospect), var(--bs-bg-opacity));
+}
+
 .Premier { color: #d600d6 !important; }
 .Master { color: #9b59b6 !important; }
 .Elite { color: #3498db !important; }

@@ -47,6 +47,39 @@
 				</a>
 			</div>
 
+			<% 
+				if ( all ) {
+
+					const links = {};
+					for ( let i = 0; i < all.length; ++i ) {
+						const s = all[i];
+						const s_key = `S:${s.season}, K:${s.k_factor}`;
+						if ( ! ( s_key in links ) ) {
+							links[s_key] = {
+								'user': s.nickname,
+								'created_on': s.created_on,
+								'season': s.season,
+								'k_factor': s.k_factor,
+								'url': `/elo/view/${s.season}/${s.k_factor}`,
+							};
+						}
+					}
+
+			%>
+			<h5>Past Simulations</h5>
+			<ul>
+				<%
+					for ( const k in links ) {
+				%>
+				<li><a href="<%- links[k].url; %>"><%- k; %></a>, <%- links[k].user; %></li>
+				<%
+					}
+				%>
+			</ul>
+			<%
+				}
+			%>
+
 			
 		</div>
 
@@ -66,7 +99,7 @@
 								name="season"
 								id="season"
 								placeholder="season"
-								value="<%= settings.season %>"
+								value="<%= current.season %>"
 								style="background-color:#000f1e;"
 								required
 							>
@@ -86,7 +119,7 @@
 								name="k_factor"
 								id="k_factor"
 								placeholder="season"
-								value="12"
+								value="<%- current.k_factor; %>"
 								style="background-color:#000f1e;"
 								required
 							>
@@ -107,7 +140,7 @@
 						name="stats_sheet_url"
 						id="stats_sheet_url"
 						placeholder="https://docs.google.com/spreadsheets/d/17XHJcJ64gGVBaDfkJ7FvWgE8S8-v_dg9kzcxcmpBT3E/edit?gid=483192611#gid=483192611"
-						value="<%- stats_url; %>"
+						value="<%- current.stats_url; %>"
 						style="background-color:#000f1e;"
 						required
 					>
@@ -125,6 +158,16 @@
 		</div>
 
 	</div>
+
+	<%# 
+		if ( games && Object.keys(games).length > 0 ) {
+	%>
+	<div class="p-4">
+		<code><pre class="text-white h6"><%#- JSON.stringify(games, null, 4); %></pre></code>
+	</div>
+	<%#
+		}
+	%>
 
 </main>
 
