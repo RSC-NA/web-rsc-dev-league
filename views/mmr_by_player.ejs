@@ -2,9 +2,9 @@
 
 <main class="container">
 	<div class="py-5">
-		<h2><%- rsc_id %>: <%= player['Player Name'] ?? 'Unknown Player' %></h2>
+		<h2><%- rsc_id %> MMR Pulls</h2>
 		<p class="lead">
-			Please review the MMR information for <%= player['Player Name'] ?? 'Unknown Player'; %> below.
+			Please review the MMR information for <%= rsc_id; %> below.
 		</p>
 
 	</div>
@@ -16,12 +16,6 @@
 			</h4>
 
 			<ul style="background-color:#000f1e;" class="list-group mb-3 text-light">
-				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
-					<div>
-						<h6 class="my-0 text-light text-end">Player Name</h6>
-					</div>
-					<span class="ms-2 text-light w-50"><%= player['Player Name'] ?? 'Unknown Player'; %></span>
-				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
 						<h6 class="my-0 text-light text-end">RSC ID</h6>
@@ -38,7 +32,7 @@
 					</div>
 					<span class="ms-2 text-light w-50 Veteran">
 						<a
-							href="/numbers_by_player/<%= rsc_id; %>?csv"
+							href="/mmr/<%= rsc_id; %>?csv"
 							class="Veteran"
 						>Download CSV</a>
 					</span>
@@ -49,7 +43,7 @@
 					</div>
 					<span class="ms-2 text-light w-50 Veteran">
 						<a
-							href="/numbers_by_player/<%= rsc_id; %>?json"
+							href="/mmr/<%= rsc_id; %>?json"
 							class="Veteran"
 						>View JSON</a>
 					</span>
@@ -69,20 +63,20 @@
 				<table class="table table-dark table-striped">
 					<thead>
 						<tr>
-							<th scope="col">RSC ID</th>
-							<th scope="col">Name</th>
 							<th scope="col">Season</th>
-							<th scope="col">Pull Date</th>
-							<th scope="col">1s MMR</th>
-							<th scope="col">1s Peak</th>
-							<th scope="col">1s GP</th>
-							<th scope="col">2s MMR</th>
-							<th scope="col">2s Peak</th>
-							<th scope="col">2s GP</th>
+							<th scope="col">Tracker</th>
+							<th scope="col">RSC ID</th>
+							<th scope="col">3s GP</th>
 							<th scope="col">3s MMR</th>
 							<th scope="col">3s Peak</th>
-							<th scope="col">3s GP</th>
-							<th scope="col">Tracker</th>
+							<th scope="col">2s GP</th>
+							<th scope="col">2s MMR</th>
+							<th scope="col">2s Peak</th>
+							<th scope="col">1s GP</th>
+							<th scope="col">1s MMR</th>
+							<th scope="col">1s Peak</th>
+							<th scope="col">Pull Date</th>
+							<th scope="col">Pulled By</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -91,8 +85,8 @@
 							let row_class = 'table-info';
 							for ( let i = 0; i < results.length; ++i ) {
 								const pull = results[i];
-								const short_link = pull['Tracker Link'].split('profile/')[1].replace('/overview', '');
-								if ( pull['Psyonix Season'] != cur_season ) {
+								const short_link = pull.tracker_link.split('profile/')[1].replace('/overview', '');
+								if ( pull.psyonix_season != cur_season ) {
 									if ( cur_season !== 0 ) {
 										row_class = 'table-primary';
 									}
@@ -102,27 +96,27 @@
 								}
 					%>
 						<tr class="<%- row_class; %>">
-							<td><%= pull['RSC ID'] %></td>
-							<td><%= pull['Player Name'] %></td>
-							<td><%= pull['Psyonix Season'] %></td>
-							<td><%= pull['Date Pulled'].toLocaleString(); %></td>
-							<td><%- pull['1s MMR']; %></td>
-							<td><strong><%- pull['1s Season Peak']; %></strong></td>
-							<td><%- pull['1s GP']; %></td>
-							<td><%- pull['2s MMR']; %></td>
-							<td><strong><%- pull['2s Season Peak']; %></strong></td>
-							<td><%- pull['2s GP']; %></td>
-							<td><%- pull['3s MMR']; %></td>
-							<td><strong><%- pull['3s Season Peak']; %></strong></td>
-							<td><%- pull['3s GP']; %></td>
-							<td><a href="<%- pull['Tracker Link']; %>"><%= short_link; %></a></td>
+							<td><%= pull.psyonix_season; %></td>
+							<td><a href="<%- pull.tracker_link; %>"><%= short_link; %></a></td>
+							<td><%= pull.rsc_id; %></td>
+							<td><%= pull.gp_3s; %></td>
+							<td><%= pull.mmr_3s; %></td>
+							<td><%= pull.peak_3s; %></td>
+							<td><%= pull.gp_2s; %></td>
+							<td><%= pull.mmr_2s; %></td>
+							<td><%= pull.peak_2s; %></td>
+							<td><%= pull.gp_1s; %></td>
+							<td><%= pull.mmr_1s; %></td>
+							<td><%= pull.peak_1s; %></td>
+							<td><%= pull.date_pulled.toLocaleString(); %></td>
+							<td><%= pull.pulled_by; %></td>
 						</tr>
 					<%
 							}
 						} else {
 					%> 
 						<tr>
-							<td colspan="13" scope="row"><em>No pulls for this player.</em></td>
+							<td colspan="14" scope="row"><em>No pulls for this player.</em></td>
 						</tr>
 					<%
 						}

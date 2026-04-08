@@ -1168,22 +1168,22 @@ app.get('/test', (_req, res) => {
  */
 app.get('/mmr/:rsc_id', (req, res) => {
 	const query = `
-SELECT 
-	psyonix_season,tracker_link,rsc_id,
-	threes_games_played as gp_3s, threes_rating as mmr_3s, threes_season_peak as peak_3s,
-	twos_games_played as gp_2s, twos_rating as mmr_2s, twos_season_peak as peak_2s,
-	ones_games_played as gp_1s, ones_rating as mmr_1s, ones_season_peak as peak_1s,
-	date_pulled, pulled_by
-FROM tracker_data
-WHERE rsc_id = ?
-ORDER BY psyonix_season DESC
+		SELECT 
+			psyonix_season,tracker_link,rsc_id,
+			threes_games_played as gp_3s, threes_rating as mmr_3s, threes_season_peak as peak_3s,
+			twos_games_played as gp_2s, twos_rating as mmr_2s, twos_season_peak as peak_2s,
+			ones_games_played as gp_1s, ones_rating as mmr_1s, ones_season_peak as peak_1s,
+			date_pulled, pulled_by
+		FROM tracker_data
+		WHERE rsc_id = ?
+		ORDER BY psyonix_season DESC
 	`;
 	connection.query(query, [ req.params.rsc_id ], (err, results) => {
 		if ( err ) { return res.send(`Error: ${err}`); }
-			
+		
 		if ( 'json' in req.query ) {
 			return res.json(results);
-		} else {
+		} else if ( 'csv' in req.query ) {
 
 			res.header('Content-type', 'text/csv');
 			res.attachment(`Tracker Data for ${req.params.rsc_id}.csv`);
@@ -1200,6 +1200,12 @@ ORDER BY psyonix_season DESC
 				stringifier.write(results[i]);
 			}
 			stringifier.end();
+		} else {
+			res.render('mmr_by_player', {
+				rsc_id: req.params.rsc_id,
+				player: results.length ? results[0] : null,
+				results: results,
+			});
 		}
 		// return res.render('mmr', { pulls: results });
 	});
@@ -1271,7 +1277,7 @@ ORDER BY td.psyonix_season DESC, td.id DESC
 			res.send(err);
 		}
 
-		if ( req.query?.view && req.query.view === 'csv' ) {
+		if ( 'csv' in req.query ) {
 			res.header('Content-type', 'text/csv');
 			res.attachment(`MMR Pull for ${rsc_id}.csv`);
 			const columns = [
@@ -1293,7 +1299,7 @@ ORDER BY td.psyonix_season DESC, td.id DESC
 				stringifier.write(results[i]);
 			}
 			stringifier.end();
-		} else if ( req.query?.view && req.query.view === 'json' ) {
+		} else if ( 'json' in req.query ) {
 			res.json(results);
 		} else {
 			res.render('numbers_by_player', {
