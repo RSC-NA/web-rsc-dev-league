@@ -1300,6 +1300,7 @@ ORDER BY td.rsc_id, td.psyonix_season
 				rsc_id: rsc_id,
 				player: results.length ? results[0] : null,
 				results: results,
+				cur_season: 36,
 			});
 		}
 	});
