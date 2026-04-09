@@ -779,7 +779,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 			const players_query = `
 				SELECT 
 					p.id, p.rsc_id, t.discord_id, p.team, p.start_mmr, p.end_mmr,
-					t.name,t.effective_mmr,t.wins,t.losses,t.tier,
+					t.name,t.effective_mmr,t.wins,t.losses,t.tier,NULL as effective_tier,
 					pu.nickname
 				FROM combine_match_players AS p
 				LEFT JOIN tiermaker AS t ON p.rsc_id = t.rsc_id AND t.season = ? AND t.league = ?
@@ -793,6 +793,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 				if ( results && results.length ) {
 					for ( let i = 0; i < results.length; ++i ) {
 						const p = results[i];
+						p.effective_tier = getTierFromMMR(p.end_mmr ? p.end_mmr : p.start_mmr);
 						match.players[p.team].push(p);
 					}
 				}
