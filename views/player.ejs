@@ -1,9 +1,11 @@
 <%
 	let is_mod = false;
 	const mod_role_id = '400097903277899776';
-	if ( user_roles && user_roles.includes(mod_role_id) ) {
+	if ( my_roles && my_roles.includes(mod_role_id) ) {
 		is_mod = true;
 	}
+
+	console.log('ROLES', my_roles, my_roles.includes(mod_role_id));
 	if ( is_admin ) { is_mod = true; }
 %>
 

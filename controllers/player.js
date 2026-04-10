@@ -282,6 +282,7 @@ router.get('/player/:rsc_id', async (req, res) => {
 					return res.render('player', {
 						player: player,
 						roles: roles,
+						my_roles: req.session?.user_roles,
 						user_roles: player.user_roles,
 					});
 				});
