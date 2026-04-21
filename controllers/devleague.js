@@ -292,7 +292,7 @@ router.post('/ban/:player_id/:rsc_id/:discord_id', (req, res) => {
 		INSERT INTO player_bans (banned_by, rsc_id, discord_id, note) VALUES (?, ?, ?, ?)
 	`;
 	req.db.query( query, [
-		req.params.player_id, req.params.rsc_id, req.params.discord_id, req.body.note ?? ''
+		res.locals.user.user_id, req.params.rsc_id, req.params.discord_id, req.body.note ?? ''
 	], 
 		(err, results) => {
 			if ( err ) { throw err; }
