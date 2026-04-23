@@ -356,14 +356,21 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 	console.log(req.file.originalname);
 	const file_name = req.file.originalname;
 
+	if ( ! user || ! user.rsc_id ) {
+		console.log('THIS USER DOES NOT EXIST ANYMORE...', user);
+		console.log(match_id);
+
+		return res.json({'success': false, 'error': 'You are no longer logged in...'});
+	}
+
 	try { 
 
-	const query = `INSERT INTO combine_replays (match_id,rsc_id,replay) VALUES (?, ?, ?)`;
-	req.db.query(query, [combine_id, user.rsc_id, file_name], (err, results) => {
-		if ( err ) { throw err; }
+		const query = `INSERT INTO combine_replays (match_id,rsc_id,replay) VALUES (?, ?, ?)`;
+		req.db.query(query, [combine_id, user.rsc_id, file_name], (err, results) => {
+			if ( err ) { throw err; }
 
-		res.json({'success': true });
-	});
+			res.json({'success': true });
+		});
 	} catch(e) { 
 		console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
 		console.log(` Combine ID: ${combine_id}`);

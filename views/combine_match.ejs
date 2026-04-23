@@ -463,6 +463,9 @@
 					Dropzone.options.replayDropzone = {
 						paramName: 'replay',
 						withCredentials: true,
+						success: (file) => {
+							console.log('file onSuccess(): ', file);
+						},
 						accept: (file, done) => {
 							console.log('FILE IS BEING UPLOADED', file);
 							const fileSplit = file.name.split('.');
