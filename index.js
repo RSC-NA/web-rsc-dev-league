@@ -932,6 +932,37 @@ app.get('/bans', (req, res) => {
 });
 */
 
+app.get('/combine-replays', (req, res) => {
+	const replays_path = `./static/replays`;
+	const file_name = `Combine-s${res.locals.settings.season}-replays.zip`;
+	const output = fs.createWriteStream(file_name);
+	const archive = archiver('zip', {
+		zlib: { level: 9 },
+	});
+
+	console.log('trying to zip', replays_path);
+
+	output.on('close', () => {
+		console.log('stats download complete!');
+		res.download(file_name, file_name, (err) => {
+			if ( err ) {
+				console.error(err);
+			} else {
+				fs.unlinkSync(file_name);
+			}
+		});
+	});
+
+	archive.on('error', (err) => {
+		console.error(err);
+		res.status(500).send('could not create zip');
+	});
+
+	archive.pipe(output);
+	archive.directory(replays_path, false);
+	archive.finalize();
+});
+
 app.get('/devleague-replays', (req, res) => {
 	const replays_path = `./static/devleague_replays/s${res.locals.settings.season}`;
 	const file_name = `RSC-s${res.locals.settings.season}-replays.zip`;
