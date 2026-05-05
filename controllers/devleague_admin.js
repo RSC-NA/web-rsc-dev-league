@@ -1433,6 +1433,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 				(discord_id, rsc_id, name, mmr, tier, status, active_3s, active_2s) 
 			VALUES ?
 		`;
+		const add_count = Object.keys(mmr_list).length;
+		const update_count = Object.keys(players).length - add_count;
 		req.db.query(
 			insertQuery,
 			[ playersArray ],
@@ -1440,7 +1442,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 				if (err) { /*throw err;*/ writeError(err.toString()); console.log('error!', err); }
 				console.log(`Inserting records`, results);
 
-				res.redirect('/manage_league');
+				res.redirect(`/manage_league?import_type=contracts&added=${add_count}&updated=${update_count}`);
 		});
 	});
 });
@@ -1451,7 +1453,15 @@ router.get('/manage_league', (req, res) => {
 	} 
 
 	res.locals.title = `Manage League - ${res.locals.title}`;
-
+	
+	const import_results = {
+		import_type: req.query.import_type ? req.query.import_type : null,
+		updated: req.query.updated ? req.query.updated : null,
+		added:   req.query.added ? req.query.added : null,
+		skipped: req.query.skipped ? req.query.skipped : null,
+		missing: req.query.missing ? req.query.missing : null,
+	};
+	
 	const counts_query = `
 		SELECT 
 			count(*) AS count,tier,status 
@@ -1505,13 +1515,15 @@ router.get('/manage_league', (req, res) => {
 				res.render('manage', { 
 					tiers: tiers, 
 					settings: results[0], 
-					contract_sheet_id: contract_sheet_id 
+					contract_sheet_id: contract_sheet_id,
+					import_results: import_results,
 				});
 			} else {
 				res.render('manage', { 
 					tiers: tiers, 
 					settings: [], 
 					contract_sheet_id: '',
+					import_results: import_results,
 				});
 			}
 		});
