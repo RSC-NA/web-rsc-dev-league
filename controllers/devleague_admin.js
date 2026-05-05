@@ -1327,7 +1327,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		if ( mmrRows[i]['RSC ID'] in players ) {
 			const r_id = mmrRows[i]['RSC ID'];
 			//console.log('found', mmrRows[i]['RSC ID'], mmrRows[i]['Effective MMR'], mmrRows[i]['Tier']);
-			players[ r_id ]['mmr'] = mmrRows[i]['Current MMR'];
+			players[ r_id ]['mmr'] = parseInt(mmrRows[i]['Current MMR']);
 			players[ r_id ]['tier'] = mmrRows[i]['Tier'];
 
 			if ( ! players[r_id]['cur_mmr'] && mmrRows[i]['Contract Status'] !== 'Perm FA in Waiting.' ) {
@@ -1355,7 +1355,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			// perm FAs don't show up in Count/Keeper sheet. We need to 
 			// calc their tier from MMR.
 			if ( ! ('tier' in players[ r_id ]) ) {
-				players[r_id]['mmr'] = contractRows[i]['Current MMR'];
+				players[r_id]['mmr'] = parseInt(contractRows[i]['Current MMR']);
 				players[r_id]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']), 3);
 				if ( ! players[r_id]['cur_mmr'] && contractRows[i]['Contract Status'] !== 'Dropped' ) {
 					mmr_list[r_id] = players[r_id]['mmr'];
@@ -1392,7 +1392,12 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			WHERE rsc_id = ? AND mmr IS null
 		`;
 		for ( const r_id in mmr_list ) {
-			if ( mmr_list[r_id] == 600 || players[r_id]['active_3s'] === false ) {
+			const p = (r_id in players) ? players[r_id] : null;
+			if ( ! p ) {
+				console.log('skipping (missing player)', mmr_list[r_id], r_id);
+				continue;
+			}
+			if ( mmr_list[r_id] === 600 || p['active_3s'] === false || p['status'] === 'Dropped' || p['status'] === 'Perm FA in Waiting.' ) {
 				console.log('skipping', mmr_list[r_id], r_id, players[r_id]['name'], players[r_id]['active_3s']);
 				continue;
 			}
