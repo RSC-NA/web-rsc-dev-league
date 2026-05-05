@@ -21,9 +21,6 @@ router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'
 	const season = parseInt(req.params.season);
 	const match_day = parseInt(req.params.match_day);
 
-			//const replay_path = `static/devleague_replays/S${season}/MD${day}`;
-	console.log('WE ARE HERE');
-
 	if ( ! season && ! match_day && ! match_id ) {
 		if ( match_day !== 0 ) {
 			return res.json({'success': false});
