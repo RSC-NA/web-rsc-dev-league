@@ -1354,10 +1354,10 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			// perm FAs don't show up in Count/Keeper sheet. We need to 
 			// calc their tier from MMR.
-			if ( ! ('tier' in players[ r_id ]) && contractRows[i]['Contract Status'] !== 'Dropped' ) {
+			if ( ! ('tier' in players[ r_id ]) ) {
 				players[r_id]['mmr'] = contractRows[i]['Current MMR'];
 				players[r_id]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']), 3);
-				if ( ! players[r_id]['cur_mmr'] ) {
+				if ( ! players[r_id]['cur_mmr'] && contractRows[i]['Contract Status'] !== 'Dropped' ) {
 					mmr_list[r_id] = players[r_id]['mmr'];
 				}
 			}
@@ -1392,8 +1392,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			WHERE rsc_id = ? AND mmr IS null
 		`;
 		for ( const r_id in mmr_list ) {
-			if ( mmr_list[r_id] == 600 ) {
-				console.log('skipping', mmr_list[r_id], r_id);
+			if ( mmr_list[r_id] == 600 || players[r_id]['active_3s'] === false ) {
+				console.log('skipping', mmr_list[r_id], r_id, players[r_id]['name'], players[r_id]['active_3s']);
 				continue;
 			}
 			// console.log(`setting RSC_ID:${r_id} to ${mmr_list[r_id]}`);
