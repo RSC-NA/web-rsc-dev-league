@@ -1330,7 +1330,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			players[ r_id ]['mmr'] = parseInt(mmrRows[i]['Current MMR']);
 			players[ r_id ]['tier'] = mmrRows[i]['Tier'];
 
-			if ( ! players[r_id]['cur_mmr'] && mmrRows[i]['Contract Status'] !== 'Perm FA in Waiting.' ) {
+			if ( ! players[r_id]['cur_mmr'] && mmrRows[i]['Contract Status'] !== 'Perm FA in Waiting.' && mmrRows[i]['Contract Status'] !== 'Dropped' ) {
 				mmr_list[r_id] = players[r_id]['mmr'];
 			}
 		} else {
@@ -1348,6 +1348,16 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			const r_id = contractRows[i]['RSC ID'];
 
 			if ( contractRows[i]['Active'] === 'FALSE' ) {
+				delete(players[r_id]);
+				continue;
+			}
+
+			if ( contractRows[i]['Contract Status'] === 'Dropped' ) {
+				delete(players[r_id]);
+				continue;
+			}
+
+			if ( contractRows[i]['Contract Status'] === 'Perm FA in Waiting.' ) {
 				delete(players[r_id]);
 				continue;
 			}
