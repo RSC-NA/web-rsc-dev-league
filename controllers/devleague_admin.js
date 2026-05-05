@@ -1458,17 +1458,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		const add_count = Object.keys(mmr_list).length;
 		const update_count = Object.keys(players).length - add_count;
 
-		const mmr_check = {};
-		if ( mmr_list ) {
-			for ( const r_id in mmr_list ) {
-				mmr_check[r_id] = {
-					mmr: mmr_list[r_id],
-					player: (r_id in players) ? players[r_id] : 'not a player',
-				};
-			}
-		}
-		console.log(mmr_check);
-
 		req.db.query(
 			insertQuery,
 			[ playersArray ],
