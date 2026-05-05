@@ -1349,7 +1349,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			if ( contractRows[i]['Active'] === 'FALSE' ) {
 				delete(players[r_id]);
-				delete(mmr_list[r_id]);
 				continue;
 			}
 
