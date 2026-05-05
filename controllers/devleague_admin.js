@@ -1347,6 +1347,12 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		if ( contractRows[i]['RSC ID'] in players ) {
 			const r_id = contractRows[i]['RSC ID'];
 
+			if ( contractRows[i]['Active'] === 'FALSE' ) {
+				delete(players[r_id]);
+				delete(mmr_list[r_id]);
+				continue;
+			}
+
 			// perm FAs don't show up in Count/Keeper sheet. We need to 
 			// calc their tier from MMR.
 			if ( ! ('tier' in players[ r_id ]) ) {
