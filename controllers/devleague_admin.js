@@ -1330,7 +1330,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			players[ r_id ]['mmr'] = mmrRows[i]['Current MMR'];
 			players[ r_id ]['tier'] = mmrRows[i]['Tier'];
 
-			if ( ! players[r_id]['cur_mmr'] ) {
+			if ( ! players[r_id]['cur_mmr'] && players[i]['Contract Status'] !== 'Perm FA in Waiting' ) {
 				mmr_list[r_id] = players[r_id]['mmr'];
 			}
 		} else {
