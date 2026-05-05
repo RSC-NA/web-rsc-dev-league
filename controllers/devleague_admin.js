@@ -1311,13 +1311,13 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	console.log(`    Players populated...${Object.keys(players).length}`);
 
-	const mmrSheet = doc.sheetsByTitle["Count/Keeper"];
+	const mmrSheet = doc.sheetsByTitle["Contracts"];
 	const mmrRows = await mmrSheet.getRows();
 
 	const mmr_list = {};
 
 	for ( let i = 0; i < mmrRows.length; i++ ) {
-		if ( ! mmrRows[i]['active_3s'] ) {
+		if ( ! mmrRows[i]['RSC ID'] ) {
 			//console.log(mmrRows[i]);
 			// console.log('active_3s null', i, mmrRows[i]['RSC ID'] );
 			delete(mmrRows[i]);
@@ -1327,7 +1327,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		if ( mmrRows[i]['RSC ID'] in players ) {
 			const r_id = mmrRows[i]['RSC ID'];
 			//console.log('found', mmrRows[i]['RSC ID'], mmrRows[i]['Effective MMR'], mmrRows[i]['Tier']);
-			players[ r_id ]['mmr'] = mmrRows[i]['Effective MMR'];
+			players[ r_id ]['mmr'] = mmrRows[i]['Current MMR'];
 			players[ r_id ]['tier'] = mmrRows[i]['Tier'];
 
 			if ( ! players[r_id]['cur_mmr'] ) {
@@ -1338,7 +1338,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		}
 	}
 
-	console.log(`     MMRs/tiers loaded`);
+	console.log(`     MMRs/tiers loaded`, Object.keys(players).length, 'players', Object.keys(mmr_list).length, 'mmr imports');
 
 	const contractSheet = doc.sheetsByTitle['Master Contracts'];
 	const contractRows = await contractSheet.getRows();
@@ -1362,7 +1362,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		}
 	}
 	
-	console.log('import processing finished');
+	console.log('import processing finished', Object.keys(players).length, 'total players', Object.keys(mmr_list).length, 'mmr imports');
 	// always add "tehblister" to the list in case he isn't playing
 	// Added for development in S17 so that I could test things 
 	// while non-playing.
@@ -1388,7 +1388,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		`;
 		for ( const r_id in mmr_list ) {
 			if ( mmr_list[r_id] == 600 ) {
-				console.log('skipping', mmr_list[r_id]);
+				console.log('skipping', mmr_list[r_id], r_id);
 				continue;
 			}
 			// console.log(`setting RSC_ID:${r_id} to ${mmr_list[r_id]}`);
@@ -1408,7 +1408,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 		const playersArray = [];
 		for ( const rsc_id in players ) {
 			const player = players[rsc_id];
-			console.log(rsc_id, player['name']);
+			// console.log(rsc_id, player['name']);
 
 			if ( player['status'] === 'Perm FA in Waiting.' ) {
 				continue; 
