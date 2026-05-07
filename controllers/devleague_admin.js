@@ -1031,20 +1031,19 @@ router.get('/process_gameday', (req, res) => {
 
 	// TODO(erh): think about resorting this by signup date, or perhaps just in the front-end?
 	const signups_query = `
-	SELECT 
-		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
-		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status,p.mmr AS season_mmr
-	FROM 
-		signups AS s
-	LEFT JOIN players AS p 
-		ON s.player_id = p.id
-	LEFT JOIN contracts AS c
-		ON p.discord_id = c.discord_id
-	WHERE ( 
-		DATE(signup_dtg) = CURDATE() OR 
-		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
-	)
-	ORDER BY p.mmr DESC 
+		SELECT 
+			s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
+			p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status,p.mmr AS season_mmr
+		FROM signups AS s
+		LEFT JOIN players AS p 
+			ON s.player_id = p.id
+		LEFT JOIN contracts AS c
+			ON p.discord_id = c.discord_id
+		WHERE ( 
+			DATE(signup_dtg) = CURDATE() OR 
+			DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
+		)
+		ORDER BY p.mmr DESC 
 	`; 
 
 	req.db.query(signups_query, (err, results) => {
