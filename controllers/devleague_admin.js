@@ -266,7 +266,19 @@ router.all('/generate_team/:tier', async (req, res) => {
 	if ( results && results.length ) {
 		if ( results.length % 6 !== 0 ) {
 			results.blister = 'blister';
-			return res.json(results);
+			const find_the_badguy_query = '
+				SELECT player_id, count(player_id) FROM signups 
+				WHERE rostered = 0 AND active = 1 
+				HAVING count(player_id) > 1 
+			';
+			const [bad_results] = await db.execute(find_the_badguy_query);
+			if ( bad_results && bad_results.length ) {
+				let player_data = bad_results.map(e => e.player_id).join(',');
+				await db.end();
+				return res.redirect('/devleague?error=InvalidNumberOfPlayers&players=' + player_data);
+			}
+
+			await db.end();
 			return res.redirect('/devleague?error=InvalidNumberOfPlayers');
 		}
 
@@ -1003,7 +1015,7 @@ router.get('/devleague', async (req, res) => {
 		WHERE
 			m.season = ? AND 
 			m.match_day = ? AND
-			(m.home_wins = 0 AND m.away_wins = 0)
+			(m.home_wins = 0 AND m.away_wins = 0) AND cancelled != 1
 		ORDER BY id DESC
 	`;
 	const [active_results] = await db.query(active_query, [
