@@ -266,11 +266,11 @@ router.all('/generate_team/:tier', async (req, res) => {
 	if ( results && results.length ) {
 		if ( results.length % 6 !== 0 ) {
 			results.blister = 'blister';
-			const find_the_badguy_query = '
+			const find_the_badguy_query = `
 				SELECT player_id, count(player_id) FROM signups 
 				WHERE rostered = 0 AND active = 1 
 				HAVING count(player_id) > 1 
-			';
+			`;
 			const [bad_results] = await db.execute(find_the_badguy_query);
 			if ( bad_results && bad_results.length ) {
 				let player_data = bad_results.map(e => e.player_id).join(',');
