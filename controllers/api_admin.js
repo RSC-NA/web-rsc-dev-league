@@ -101,7 +101,7 @@ async function pull_stats(req, res) {
 			'Franchise'  : franchiseByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
 			'TeamName'   : TeamStatsRows[i]['Team'] ?? '',
 			'Tier'       : tierByTeam[ TeamStatsRows[i]['Team'] ] ?? '',
-			'Wins'       : TeamStatsRows[i]['W'] ?? 0,
+			'Wins'       : TeamStatsRows[i]['W'] !== '#REF!' ? TeamStatRows[i]['W'] : 0,
 			'Loss'       : TeamStatsRows[i]['L'] ?? 0,
 			'WinPct'     : TeamStatsRows[i]['W%'] ? TeamStatsRows[i]['W%'].replace(/\%/,'') : 0, 
 			'Rank'       : ranksByTeam[ TeamStatsRows[i]['Team'] ] ? ranksByTeam[ TeamStatsRows[i]['Team'] ] : 0, 
