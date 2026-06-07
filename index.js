@@ -1,9 +1,5 @@
 require('ansi-colors');
 
-const banned_players = {
-	'754475185960255548': 'rage quitting',
-};
-
 // if we're running in node, pull in our .env
 // we also have to fix out "password" to strip out 
 // any escaping that we need for Bun .env reading
@@ -724,7 +720,7 @@ app.use((req, res, next) => {
 			WHERE 
 				player_id = ? AND 
 				( 
-					DATE(signup_dtg) = CURDATE() 
+					signup_dtg >= date_sub(now(), interval 16 hour)
 				)
 		`;
 		/*
@@ -735,6 +731,7 @@ app.use((req, res, next) => {
 			query,
 			[ req.session.user_id ],
 			(_err, results) => {
+				console.log(results, _err);
 				if ( results && results.length > 0 ) {
 					req.session.checked_in = true;
 					req.session.rostered = results[0].rostered;
@@ -890,13 +887,16 @@ app.get('/', (req, res) => {
 			getTierFromMMR: getTierFromMMR,
 			roles: roles,
 			user_roles: req.session.user_roles,
+			dashboard_error: req.query?.error ?? false,
 
 		});
 	} else {
+		console.log(req.query.error);
 		res.render('dashboard', { 
 			match_days: matchDays, //res.locals.match_days,
 			roles: roles,
 			user_roles: req.session?.user_roles ?? null,
+			dashboard_error: req.query?.error ?? false,
 		});
 	}
 });

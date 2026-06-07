@@ -162,7 +162,7 @@ router.get('/setup/devleague', async (req, res) => {
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
 			ON p.discord_id = c.discord_id 
-		WHERE c.active_3s = 1 AND p.id IN (SELECT player_id FROM team_players) AND p.id NOT in (select player_id FROM signups WHERE active = 0 and rostered = 0)
+		WHERE c.active_3s = 1 AND p.id NOT in (select player_id FROM signups WHERE active = 0 and rostered = 0)
 		ORDER BY rand() 
 		LIMIT 100
 	`;
@@ -1394,7 +1394,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// while non-playing.
 	let tehblister_id = 'RSC000302';
 	let tehblister_discord_id = '207266416355835904';
-	if ( ! (tehblister_id in players) ) {
+	if ( players[tehblister_id].status === 'Non-playing' ) {
 		players[tehblister_id] = {
 			'rsc_id': tehblister_id,
 			'name': 'tehblister',
@@ -1403,6 +1403,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			'mmr': 1450,
 			'tier': 'Elite',
 			'status': 'Free Agent',
+			'active_3s': true,
+			'active_2s': true,
 		};
 	}
 				

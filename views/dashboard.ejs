@@ -30,6 +30,24 @@
 					<h1>Welcome to the RSC Development League</h1>
 			<% } %>
 
+					<% 
+						if ( dashboard_error ) { 
+							if ( dashboard_error === 'Match-Created' ) {
+					%>
+					<div class="border border-danger rounded bg-danger bg-opacity-10 p-3 m-4">
+					<h3 class="text-danger">UNABLE TO CHECK OUT!</h3>
+					<p class="lead">
+						You were not checked out from the queue. Your match has already been created.
+					</p>
+					</div>
+					<%
+							}
+					%>
+
+					<% 
+						}
+					%>
+
 					<p class="lead">
 						The RSC Development League is a Rocket League competitive league that runs concurrently to the 
 						active RSC season. It is open to <strong>ALL RSC players</strong> and is intended to let

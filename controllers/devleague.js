@@ -378,13 +378,26 @@ router.get('/check_out/:match_day', (req, res) => {
 	if ( req.session.discord_id && req.session.checked_in ) {
 		// TODO(get season and match day from somewhere)
 		const match_day = req.params.match_day;
-		req.db.query(
-			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
+		const check_out_query = `
+			DELETE FROM signups 
+			WHERE 
+				player_id = ? AND 
+				match_day = ? AND 
+				rostered = 0
+		`;
+		req.db.query( 
+			check_out_query,
 			[ req.session.user_id, match_day ],
 			function(err, _results) {
 				if ( err ) throw err;
 
-				req.session.checked_in = false;
+				const checked_out = _results.affectedRows === 0 ? false : true;
+
+				if ( checked_out ) {
+					req.session.checked_in = false;
+				} else {
+					res.redirect('/?error=Match-Created');
+				}
 
 				res.redirect('/');
 			}
