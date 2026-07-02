@@ -682,7 +682,7 @@ router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id', (req, re
 	req.db.query(query, [sub_player_id, team_id, player_id], (err, results) => {
 		if ( err ) { throw err; }
 
-		const match_id_query = `SELECT id FROM matches WHERE home_team_id = ? OR away_team_id = ?`;
+		const match_id_query = `SELECT id,reported_rsc_id FROM matches WHERE home_team_id = ? OR away_team_id = ?`;
 		req.db.query(match_id_query, [team_id, team_id], (err, results) => {
 			if ( err ) { throw err; }
 
@@ -700,7 +700,6 @@ router.get('/match/:team_id/sub/:player_id', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
-
 	
 	const query = `
 		SELECT 
