@@ -162,7 +162,15 @@ router.get('/setup/devleague', async (req, res) => {
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
 			ON p.discord_id = c.discord_id 
-		WHERE c.active_3s = 1 AND p.id NOT in (select player_id FROM signups WHERE active = 0 and rostered = 0)
+		WHERE 
+			c.active_3s = 1 AND p.id NOT in (select player_id FROM team_players) AND 
+			p.id NOT IN (
+				SELECT player_id 
+				FROM signups
+				WHERE 
+					signup_dtg >= date_sub(now(), INTERVAL 16 HOUR) AND 
+					rostered = 0 AND active = 0
+			)
 		ORDER BY rand() 
 		LIMIT 100
 	`;
@@ -268,11 +276,20 @@ router.all('/generate_team/:tier', async (req, res) => {
 			results.blister = 'blister';
 			const find_the_badguy_query = `
 				SELECT player_id, count(player_id) FROM signups 
-				WHERE rostered = 0 AND active = 1 
+				WHERE 
+					signup_dtg >= date_sub(now(), INTERVAL 16 HOUR) AND
+					rostered = 0 AND active = 1 
 				HAVING count(player_id) > 1 
 			`;
 			const [bad_results] = await db.execute(find_the_badguy_query);
 			if ( bad_results && bad_results.length ) {
+				console.log('BAD GUYS IN QUEUE MULTIPLE TIMES!!!');
+				console.log('BAD GUYS IN QUEUE MULTIPLE TIMES!!!');
+				console.log('BAD GUYS IN QUEUE MULTIPLE TIMES!!!');
+				console.log(bad_results);
+				console.log('BAD GUYS IN QUEUE MULTIPLE TIMES!!!');
+				console.log('BAD GUYS IN QUEUE MULTIPLE TIMES!!!');
+				console.log('BAD GUYS IN QUEUE MULTIPLE TIMES!!!');
 				let player_data = bad_results.map(e => e.player_id).join(',');
 				await db.end();
 				return res.redirect('/devleague?error=InvalidNumberOfPlayers&players=' + player_data);
@@ -1012,7 +1029,7 @@ router.get('/devleague', async (req, res) => {
 		WHERE
 			m.season = ? AND 
 			m.match_day = ? AND
-			(m.home_wins = 0 AND m.away_wins = 0) AND cancelled != 1
+			(m.home_wins = 0 AND m.away_wins = 0) AND m.cancelled != 1
 		ORDER BY id DESC
 	`;
 	const [active_results] = await db.query(active_query, [
@@ -1389,7 +1406,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 	// while non-playing.
 	let tehblister_id = 'RSC000302';
 	let tehblister_discord_id = '207266416355835904';
-	if ( players[tehblister_id].status === 'Non-playing' ) {
+	if ( ! (tehblister_id in players) ) {
 		players[tehblister_id] = {
 			'rsc_id': tehblister_id,
 			'name': 'tehblister',

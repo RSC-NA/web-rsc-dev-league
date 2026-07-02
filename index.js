@@ -890,7 +890,6 @@ app.get('/', (req, res) => {
 
 		});
 	} else {
-		console.log(req.query.error);
 		res.render('dashboard', { 
 			match_days: matchDays, //res.locals.match_days,
 			roles: roles,
