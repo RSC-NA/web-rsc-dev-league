@@ -731,7 +731,6 @@ app.use((req, res, next) => {
 			query,
 			[ req.session.user_id ],
 			(_err, results) => {
-				console.log(results, _err);
 				if ( results && results.length > 0 ) {
 					req.session.checked_in = true;
 					req.session.rostered = results[0].rostered;

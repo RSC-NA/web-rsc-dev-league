@@ -215,7 +215,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 		LEFT JOIN contracts AS c 
 		ON p.discord_id = c.discord_id 
 		WHERE 
-			s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 			s.active = 1 AND 
 			s.rostered = 0 AND
 			c.tier = ? 
@@ -233,7 +233,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 			LEFT JOIN contracts AS c 
 			ON p.discord_id = c.discord_id 
 			WHERE 
-				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 				s.active = 1 AND 
 				s.rostered = 0 AND
 				(c.tier = ? OR c.tier = ?)
@@ -254,7 +254,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 			LEFT JOIN contracts AS c 
 				ON p.discord_id = c.discord_id 
 			WHERE 
-				s.signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+				s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 				s.active = 1 AND 
 				s.rostered = 0
 			ORDER BY p.mmr DESC
@@ -847,7 +847,7 @@ router.all('/devleague/deactivate-last/:amount', (req, res) => {
 		UPDATE signups SET 
 			active = 0
 		WHERE 
-			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 			active = 1 AND
 			rostered = 0 AND 
 			status in ('Signed', 'Renewed', 'Mid-Contract', 'Rostered')
@@ -877,7 +877,7 @@ router.all('/devleague/deactivate/:player_id', (req, res) => {
 			active = 0
 		WHERE 
 			${single_where}
-			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 			active = 1 AND
 			rostered = 0
 	`;
@@ -908,7 +908,7 @@ router.get('/devleague/activate/:player_id', async (req, res) => {
 			active = 1
 		WHERE 
 			${single_where}
-			signup_dtg > DATE_SUB(now(), INTERVAL 1 DAY) AND 
+			signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 			active = 0 AND
 			rostered = 0
 	`;
@@ -964,11 +964,8 @@ router.get('/devleague', async (req, res) => {
 	LEFT JOIN contracts AS c
 		ON p.discord_id = c.discord_id
 	WHERE 
-	( 
-		DATE(signup_dtg) = CURDATE() OR 
-		DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
-	) AND
-	rostered = 0
+		s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
+		s.rostered = 0
 	ORDER BY p.mmr DESC
 	`; 
 
@@ -1051,10 +1048,8 @@ router.get('/process_gameday', (req, res) => {
 			ON s.player_id = p.id
 		LEFT JOIN contracts AS c
 			ON p.discord_id = c.discord_id
-		WHERE ( 
-			DATE(signup_dtg) = CURDATE() OR 
-			DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
-		)
+		WHERE 
+			s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) 
 		ORDER BY p.mmr DESC 
 	`; 
 

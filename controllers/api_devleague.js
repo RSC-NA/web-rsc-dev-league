@@ -155,8 +155,12 @@ router.get('/check_out', (req, res) => {
 
 	if ( res.locals.checked_in ) {
 		//console.log('8. deleting the record');
-		req.db.query(
-			'DELETE FROM signups WHERE player_id = ? AND match_day = ? AND ( DATE(signup_dtg) = CURDATE() OR DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() )',
+		req.db.query(`
+			DELETE FROM signups 
+			WHERE 
+				player_id = ? AND match_day = ? AND 
+				signup_dtg >= date_sub(now(), INTERVAL 16 HOUR)
+			`,
 			[ player_id, match_day ],
 			function(err, _results) {
 				if ( err ) throw err;
