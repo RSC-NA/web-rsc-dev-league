@@ -81,16 +81,34 @@
 					<h4>Season <%= settings.season %> Dates</h4>
 					<ul class="dates">
 						<%
+							let first_playoff = true;
 							for ( let match_date in match_days ) {
+								const dp = match_date.split('-');
+								const dt = new Date(Date.UTC( 
+									parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]), 
+									24, 00, 00
+								));
+								const dstr = dt.toLocaleString('en-US', { 
+									weekday: 'short', 
+									month: 'short', 
+									day: 'numeric', 
+									timeZone: 'America/New_York', 
+								}); 
 								const css_classes = [];
+								let day_class = 'text-info';
 								if ( match_date === today ) {
 									css_classes.push('today');
+									day_class = 'text-warning';
 								} 
 								if ( match_days[match_date] === 'holiday' ) {
 									css_classes.push('holiday');
 								} 
 								if ( match_days[match_date] === 99 ) {
 									css_classes.push('championship');
+									if ( first_playoff ) {
+										first_playoff = false;
+										css_classes.push('mt-3');
+									}
 								}
 						%>
 
@@ -98,15 +116,22 @@
 							<%
 								if ( match_days[match_date] !== 99 ) {
 							%>
-							<%- match_date %> - 
-							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : 'Match Day: <strong>' + match_days[match_date] + '</strong>' %>
+								<span class="me-1 d-inline-block text-end" style="width:100px;">
+							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday - No Games</strong>' : `Match Day: <strong class="${day_class}">${match_days[match_date]}</strong>`; %>:
+								</span>
+								<strong class="ms-1"><%- dstr; %></strong>
+							</span>
 							<%
 								} else {
 							%>
-							<span style="font-size: 1.4rem;">
-							<strong>Dev League Championship</strong>
-							<br>
-							<%- match_date %>
+							<span class="d-inline-block">
+								<strong class="text-info h5">
+									<i class="fas fa-crown text-warning me-1"></i>
+									Dev League Championship
+								</strong>
+								<span class="d-block ms-5">
+									<%- dstr; %>
+								</span>
 							</span>
 							<%
 								}

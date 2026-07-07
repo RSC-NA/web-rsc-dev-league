@@ -700,6 +700,9 @@ app.use((req, res, next) => {
 
 	if ( date in matchDays ) {
 		res.locals.match_day = matchDays[date]; //res.locals.match_days[date]; //matchDays[date];
+		if ( matchDays[date] === 'playoffs' ) {
+			res.locals.match_day = 99;
+		}
 	}
 	if ( date in combineDays['3s'] || res.locals.combine_live ) {
 		res.locals.combine_day = combineDays['3s'][date]; //res.locals.match_days[date]; //combineDays['3s'][date];
