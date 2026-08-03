@@ -143,7 +143,7 @@
 				<div class="col-12">
 					<div class="text-center">
 						<nav aria-label="" class="dark">
-							<ul class="pagination justify-content-end">
+							<ul class="pagination justify-content-end fs-7">
 								<% 
 									const pages = Math.floor(total / limit) + 1;
 									if ( page <= 1 ) {
@@ -275,8 +275,8 @@
 					}
 				});
 			</script>
-			<div class="mb-3">
-				<table class="table table-hover table-dark">
+			<div class="mb-3 table-responsive">
+				<table class="table table-hover table-dark table-sm">
 					<thead>
 						<tr>
 							<th></th>
@@ -295,7 +295,12 @@
 								role="button"
 								data-order="name"
 								data-dir="">
-								Player Name
+								<span class="d-none d-md-inline">
+									Player Name
+								</span>
+								<span class="d-inline d-md-none">
+									Player
+								</span>
 								<%- arrows['name']; %>
 							</th>
 							<th
@@ -304,7 +309,12 @@
 								role="button"
 								data-order="tier"
 								data-dir="">
+								<span class="d-none d-md-inline">
 								Initial Tier
+								</span>
+								<span class="d-inline d-md-none">
+									Init.Tier
+								</span>
 								<%- arrows['tier']; %>
 							</th>
 							<th
@@ -313,7 +323,12 @@
 								role="button"
 								data-order="base_mmr"
 								data-dir="">
-								Base MMR
+								<span class="d-none d-md-inline">
+									Base MMR
+								</span>
+								<span class="d-inline d-md-none">
+									B.MMR
+								</span>
 								<%- arrows['base_mmr']; %>
 							</th>
 							<th
@@ -322,7 +337,12 @@
 								role="button"
 								data-order="effective_mmr"
 								data-dir="">
-								Effective MMR
+								<span class="d-none d-md-inline">
+									Effective MMR
+								</span>
+								<span class="d-inline d-md-none">
+									Eff.MMR
+								</span>
 								<%- arrows['effective_mmr']; %>
 							</th>
 							<th
@@ -340,7 +360,12 @@
 								role="button"
 								data-order="current_mmr"
 								data-dir="">
-								Combines MMR
+								<span class="d-none d-md-inline">
+									Combines MMR
+								</span>
+								<span class="d-inline d-md-none">
+									Com.MMR
+								</span>
 								<%- arrows['current_mmr']; %>
 							</th>
 							<% if (is_admin || is_combines_admin) { %>
@@ -399,7 +424,10 @@
 								}
 
 					%>
-						<tr id="<%- p.rsc_id; %>">
+						<tr
+							id="<%- p.rsc_id; %>"
+							class="fs-7"
+						>
 							<td class="text-muted">
 								<%- p.num; %>
 							</td>
@@ -409,8 +437,15 @@
 								</a>
 							</td>
 							<td class="fw-bolder">
-								<img src="/icons/<%- p.tier.toLowerCase(); %>.png" height="24">
-								<a href="/combine/matches/<%= rsc_id; %>"><%= p.name; %></a>
+								<img
+									src="/icons/<%- p.tier.toLowerCase(); %>.png"
+									class="d-none d-md-inline"
+									height="24"
+								>
+								<a
+									href="/combine/matches/<%= rsc_id; %>"
+									class="text-truncate d-inline-block" style="width:125px;"
+								><%= p.name; %></a>
 							</td>
 							<td class="text-start bg-<%- p.tier; %>">
 								<span class="view-player-<%- p.rsc_id; %>">
@@ -548,7 +583,7 @@
 			
 				<div class="text-center">
 					<nav aria-label="" class="dark">
-						<ul class="pagination justify-content-center">
+						<ul class="pagination justify-content-center fs-7">
 							<% 
 								if ( page <= 1 ) {
 							%>
