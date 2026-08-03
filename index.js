@@ -2202,6 +2202,16 @@ app.post('/save_mmr', (req, res) => {
 							rsc_id = results[0].rsc_id;
 						}
 
+						if ( st.ones_season_peak < 0 ) {
+							st.ones_season_peak = 0;
+						} 
+						if ( st.twos_season_peak < 0 ) {
+							st.twos_season_peak = 0;
+						}
+						if ( st.threes_season_peak < 0 ) {
+							st.threes_season_peak = 0;
+						}
+
 						const query = `
 						INSERT INTO tracker_data 
 							(psyonix_season,tracker_link,rsc_id,threes_games_played,threes_rating,threes_season_peak,
@@ -2216,7 +2226,10 @@ app.post('/save_mmr', (req, res) => {
 								st.ones_games_played, st.ones_rating, st.ones_season_peak, 
 								d.pulled_by 
 							], (err, results) => {
-								if ( err ) { console.error('Insert error:', err, st); throw err; }
+								if ( err ) { 
+									console.error('Insert error:', err, st); 
+									throw err; 
+								}
 
 								// send it to the server immediately
 								tracker_data.rsc_id = rsc_id;
