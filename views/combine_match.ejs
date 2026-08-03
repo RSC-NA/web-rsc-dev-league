@@ -107,7 +107,7 @@
 			in <a href="https://discord.com/channels/395806681994493964/1447725630379528302">#combines-general</a>. 
 		</p>
 		<h4 class="Prospect">IF YOU NEED HELP:</h4>
-		<ol class="Challenger bg-black bg-opacity-25 pt-3 pb-3 h4 border border-info rounded" style="padding-left: 3.5rem;">
+		<ol class="Challenger bg-black bg-opacity-25 pt-3 pb-3 h4 border border-info rounded overflow-auto" style="padding-left: 3.5rem;">
 			<li>Copy the URL to this Combines Lobby [<a class="Prospect" href="/combine/<%- match.id; %>">https://devleague.rscna.com/combine/<%- match.id; %></a>]</li>
 			<li>Paste that URL into a message asking what you need to have changed (wrong score, cancel the match, etc)</li>
 			<li>Ping <strong>@tehblister</strong> in that help message.</li>
@@ -120,8 +120,8 @@
 				<div class="bg-dark text-light p-2 rounded border-rounded">
 					<p class="lead">This is a <strong>3-game</strong> series.</p>
 					<div class="row">
-						<div class="col-md-4 col-12">
-							<table class="table table-dark">
+						<div class="col-md-4 col-12 table-responsive">
+							<table class="table table-dark table-sm">
 								<thead>
 									<tr>
 										<th colspan="2">
@@ -185,7 +185,13 @@
 												data-copy="https://devleague.rscna.com/combine/<%- match.id; %>"
 												data-copy-success="copy-msg-2"
 											>
-												https://devleague.rscna.com/combine/<%- match.id; %> <span id="copy-msg-2" class="ms-2 hidden Elite">Copied!</span>
+												<span class="d-none d-md-inline">
+													https://devleague.rscna.com/combine/<%- match.id; %>
+												</span>
+												<span class="d-inline d-md-none">
+													devleague.rscna.com/combine/<%- match.id; %>
+												</span>
+												<span id="copy-msg-2" class="ms-2 hidden Elite">Copied!</span>
 											</code></strong>
 										</td>	
 									</tr>
@@ -216,7 +222,7 @@
 									magnitude = 'even';
 								}
 						%>
-						<div class="col-md-4 col-12">
+						<div class="col-md-4 col-12 table-responsive">
 							<table class="table table-dark">
 								<thead>
 									<tr>
@@ -365,7 +371,7 @@
 		%>
 		<div class="row mb-2">
 			<h4 class="mb-2">Admin Controls</h4>
-			<div class="col-6">
+			<div class="col-12 col-md-6 mb-3 mb-md-0">
 				<%
 					if ( ! match.cancelled ) {
 				%>
@@ -389,7 +395,7 @@
 				%>
 
 			</div>
-			<div class="col-6">
+			<div class="col-12 col-md-6">
 				<h5>Override Scores</h5>
 				<%
 					if ( ! match.cancelled ) {
@@ -431,7 +437,7 @@
 							<input
 								tabindex="3"
 								type="submit"
-								class=" btn btn-large btn-outline-danger rounded"
+								class=" btn btn-large btn-outline-danger rounded "
 								value="Override Scores"
 							>
 						</div>
@@ -455,7 +461,7 @@
 		%>
 
 
-		<div class="row mb-4">
+		<div class="row mb-2">
 			<% if ( user.rsc_id ) { %>
 			<div class="col-md-6">
 				<h4>Upload Replays</h4>
@@ -517,6 +523,29 @@
 			</div>
 		</div>
 		
+		<div class="row mb-2">
+			<div class="col-2">
+			</div>
+			<div class="col-8">
+				<div
+					class="my-2 px-4 py-2 border rounded-3 border-danger bg-danger bg-opacity-10"
+				>
+					<h5 class="">
+						Submit a Numbers Report on a Player 
+						<i class="fas fa-arrow-up-1-9 Veteran"></i>
+						<i class="fas fa-arrow-down-9-1 text-warning"></i>
+					</h5>
+					<p class="mb-0">
+						If you think someone in your lobby has an incorrect MMR value, please 
+						submit a report to Numbers Committee by clicking the <strong>Numbers Report</strong> 
+						button listed next to that player's name.
+					</p>
+				</div>
+			</div>
+			<div class="col-2">
+			</div>
+		</div>
+
 		<div class="row">
 			<div class="col-12">
 				<div class="">
@@ -526,7 +555,7 @@
 						<input type="hidden" name="reporter_team" value="<%- combine_player.team; %>">
 			<% } %>
 					<div class="row">
-						<div class="col-md-6">
+						<div class="col-md-6 table-responsive">
 							<h3 class="bg-Elite text-white rounded p-2">
 								<%= CAN_VIEW_ALL ? '[' + teamOneMmr + '] ' : '' %>Home Team
 							</h3>
@@ -569,20 +598,32 @@
 							<% 
 								} 
 							%>
-							<table class="table table-dark">
+							<table class="table table-dark table-sm">
 								<thead>
-									<tr>
-										<th>Player</th>
-										<th class="text-end">Start MMR</th>
-										<th class="text-end">MMR &Delta;</th>
-										<th class="text-end">End MMR</th>
+									<tr class="fs-6">
 										<%
 											if ( user.rsc_id && season === match.season ) {
 										%>
-										<th class="text-center">Report</th>
+										<th
+											class="text-center help"
+											data-bs-toggle="tooltip"
+											title="If you think this player is not correctly placed, please use the button below to submit a numbers report."
+										>
+											<span class="d-none d-md-inline">
+												Num. Report 
+												<i class="fas fa-circle-question text-info"></i>
+											</span>
+											<span class="d-inline d-md-none">
+												Numbers
+											</span>
+										</th>
 										<%
 											}
 										%>
+										<th>Player</th>
+										<th class="text-end">Start</th>
+										<th class="text-end"><span class="d-none d-md-inline">MMR </span>&Delta;</th>
+										<th class="text-end">End</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -606,8 +647,31 @@
 
 										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${report_mmr}`;
 								%>
-									<tr class="fs-5">
-										<td>
+									<tr class="fs-6">
+										<%
+											if ( user.rsc_id && season === match.season ) {
+										%>
+										<td class="text-center">
+											<a
+												href="<%= report_url + player_params; %>"
+												class="btn btn-xs bg-Elite"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p?.tier ?? match.tier; %>'><%= p.name ?? p.nickname; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
+												target="_blank"
+											>
+												<span class="d-none d-md-inline">
+													Numbers Report
+												</span>
+												<span class="d-md-inline d-md-none">
+													Report
+												</span>
+											</a>
+										</td>
+										<%
+											}
+										%>
+										<td class="">
 											<img
 												src="/icons/<%- p?.effective_tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
 												title="<%- p?.tier ?? match.tier; %>"
@@ -662,24 +726,6 @@
 										<% } else if ( combines.active ){ %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
 										<% } %>
-										<%
-											if ( user.rsc_id && season === match.season ) {
-										%>
-										<td class="text-center">
-											<a
-												href="<%= report_url + player_params; %>"
-												class="btn btn-sm bg-Elite"
-												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p?.tier ?? match.tier; %>'><%= p.name ?? p.nickname; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
-												data-bs-toggle="tooltip"
-												data-bs-html="true"
-												target="_blank"
-											>
-												report
-											</a>
-										</td>
-										<%
-											}
-										%>
 									</tr>
 								<%
 									}
@@ -765,20 +811,33 @@
 								}
 							%>
 
-							<table class="table table-dark">
+							<table class="table table-dark table-sm">
 								<thead>
-									<tr>
-										<th>Player</th>
-										<th class="text-end">Start MMR</th>
-										<th class="text-end">MMR &Delta;</th>
-										<th class="text-end">End MMR</th>
+									<tr class="fs-6">
 										<%
 											if ( user.rsc_id && season === match.season ) {
 										%>
-										<th class="text-center">Report</th>
+										<th
+											class="text-center help"
+											data-bs-toggle="tooltip"
+											title="If you think this player is not correctly placed, please use the button below to submit a numbers report."
+
+										>
+											<span class="d-none d-md-inline">
+												Num. Report 
+												<i class="fas fa-circle-question text-info"></i>
+											</span>
+											<span class="d-inline d-md-none">
+												Numbers
+											</span>
+										</th>
 										<%
 											} 
 										%>
+										<th>Player</th>
+										<th class="text-end">Start</th>
+										<th class="text-end"><span class="d-none d-md-inline">MMR </span>&Delta;</th>
+										<th class="text-end">End</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -796,7 +855,30 @@
 										}
 										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${report_mmr}`;
 								%>
-									<tr class="fs-5">
+									<tr class="fs-6">
+										<%
+											if ( user.rsc_id && season === match.season ) {
+										%>
+										<td class="text-center">
+											<a
+												href="<%= report_url + player_params; %>"
+												class="btn btn-xs bg-Prospect"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p?.tier ?? match.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
+												data-bs-toggle="tooltip"
+												data-bs-html="true"
+												target="_blank"
+											>
+												<span class="d-none d-md-inline">
+													Numbers Report
+												</span>
+												<span class="d-md-inline d-md-none">
+													Report
+												</span>
+											</a>
+										</td>
+										<%
+											}
+										%>
 										<td>
 											<img
 												src="/icons/<%- p?.effective_tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
@@ -856,24 +938,6 @@
 										<% } else if ( combines.active ){ %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
 										<% } %>
-										<%
-											if ( user.rsc_id && season === match.season ) {
-										%>
-										<td class="text-center">
-											<a
-												href="<%= report_url + player_params; %>"
-												class="btn btn-sm bg-Prospect"
-												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p?.tier ?? match.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
-												data-bs-toggle="tooltip"
-												data-bs-html="true"
-												target="_blank"
-											>
-												report
-											</a>
-										</td>
-										<%
-											}
-										%>
 									</tr>
 								<%
 									}
@@ -895,7 +959,7 @@
 		%>
 	</div>
 
-	<% if ( is_admin ) { %>
+	<% if ( is_admin && false ) { %>
 	<hr class="mb-4">
 	<pre><%- JSON.stringify(submitted_scores, undefined, 4); %></pre>
 	<pre><%- JSON.stringify(match, undefined, 4); %></pre>

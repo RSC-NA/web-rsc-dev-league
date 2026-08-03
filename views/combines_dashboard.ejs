@@ -55,7 +55,7 @@
 				<div class="col-md-8">
 			<% if ( user.name ) { %>
 					<h1>Welcome to the RSC Combines, <%= user.name %></h1>
-					<div class="roles text-sm">
+					<div class="roles fs-7">
 					<%
 						if ( user_roles ) {
 							for ( const role_id in roles ) {
@@ -159,7 +159,7 @@
 			</div>
 		</div>
 
-		<div class=" p-3 rounded bg-dark border row">
+		<div class="mx-1 p-2 py-3 mx-md-4 p-md-3 rounded bg-dark border row">
 			<div class="col-12">
 				<p>
 					<strong>WARNING:</strong> Only check in if you are at your computer/console and ready to  
@@ -369,6 +369,8 @@
 				} /* end of 2s combines active */
 			%>
 		</div>
+
+		<div class="footer-spacing mt-3"></div>
 	</main>
 
 <%- include('partials/footer.ejs'); %>

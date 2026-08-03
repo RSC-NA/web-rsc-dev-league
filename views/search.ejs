@@ -29,24 +29,23 @@
 	</script>
 
 	<main class="container">
-		<div class="bg-dark text-light p-3 rounded">
+		<div class="bg-dark text-light p-0 p-md-3 rounded">
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-12 col-md-12">
 
-					<h1 class="mb-4">Search <%= needle ? `"${needle}"` : ''; %></h1>
+					<h1 class="mb-4 mt-2">Search <%= needle ? `"${needle}"` : ''; %></h1>
 				
 					<form method="get" action="/search" class="mb-4">
-						<div class="input-group">
-							<div class="form-outline w-50">
-								<input
-									type="search"
-									id="find"
-									name="find"
-									class="form-control text-white"
-									style="background-color:#021e3a;"
-									value="<%= needle ? needle : ''; %>"
-								/>
-							</div>
+						<div class="input-group input-group-joined">
+							<input
+								type="search"
+								id="find"
+								name="find"
+								class="form-control text-white pe-0 border-primary"
+								style="background-color:#021e3a;"
+								value="<%= needle ? needle : ''; %>"
+								autofocus
+							/>
 							<button type="button" class="btn btn-outline-primary">
 								<i class="fas fa-search"></i>
 							</button>
@@ -59,61 +58,63 @@
 					<hr class="mb-4">
 					<h2 class="mt-4"><%- results.length; %> results for "<%= needle; %>"</h2>
 
-					<table class="table table-striped table-dark">
-						<thead>
-							<tr>
-								<th scope="col">RSC ID</th>
-								<th scope="col">Discord</th>
-								<th scope="col">Name</th>
-								<th scope="col">MMR</th>
-								<th scope="col">Tier</th>
-								<th scope="col">Status</th>
-								<th scope="col">Active 3s</th>
-								<th scope="col">Active 2s</th>
-							</tr>
-						</thead>
-						<tbody>
-						<%
-							if ( ! results.length ) {
-						%>
-							<tr>
-								<td colspan="9"><em>No results found for "<%= needle; %>"</em></td>
-							</tr>
-						<%
-							} else {
-								for ( let i = 0; i < results.length; ++i ) {
-									const result = results[i];
-						%>
-							<tr>
-								<th scope="row">
-									<a href="/player/<%= result.rsc_id; %>">
-										<%= result.rsc_id; %>
-									</a>
-								</th>
-								<td
-									class="discord_id"
-									data-discord-mention="&lt;@<%= result.discord_id; %>&gt;"
-									title="Click to copy to clipboard"
-								>
-									<%= result.discord_id; %>
-								</td>
-								<td>
-									<a href="/player/<%= result.rsc_id; %>">
-										<%= result.name; %>
-									</a>
-								</td>
-								<td><%= result.mmr; %></td>
-								<td><%= result.tier; %></td>
-								<td><%= result.status; %></td>
-								<td><%= result.active_3s ? '✅' : '❌'; %></td>
-								<td><%= result.active_2s ? '✅' : '❌'; %></td>
-							</tr>
-						<%
+					<div class="table-responsive">
+						<table class="table table-striped table-dark">
+							<thead>
+								<tr>
+									<th scope="col">RSC ID</th>
+									<th scope="col">Discord</th>
+									<th scope="col">Name</th>
+									<th scope="col">MMR</th>
+									<th scope="col">Tier</th>
+									<th scope="col">Status</th>
+									<th scope="col">Active 3s</th>
+									<th scope="col">Active 2s</th>
+								</tr>
+							</thead>
+							<tbody>
+							<%
+								if ( ! results.length ) {
+							%>
+								<tr>
+									<td colspan="9"><em>No results found for "<%= needle; %>"</em></td>
+								</tr>
+							<%
+								} else {
+									for ( let i = 0; i < results.length; ++i ) {
+										const result = results[i];
+							%>
+								<tr>
+									<th scope="row">
+										<a href="/player/<%= result.rsc_id; %>">
+											<%= result.rsc_id; %>
+										</a>
+									</th>
+									<td
+										class="discord_id"
+										data-discord-mention="&lt;@<%= result.discord_id; %>&gt;"
+										title="Click to copy to clipboard"
+									>
+										<%= result.discord_id; %>
+									</td>
+									<td>
+										<a href="/player/<%= result.rsc_id; %>">
+											<%= result.name; %>
+										</a>
+									</td>
+									<td><%= result.mmr; %></td>
+									<td><%= result.tier; %></td>
+									<td><%= result.status; %></td>
+									<td><%= result.active_3s ? '✅' : '❌'; %></td>
+									<td><%= result.active_2s ? '✅' : '❌'; %></td>
+								</tr>
+							<%
+									}
 								}
-							}
-						%>
-						</tbody>
-					</table>
+							%>
+							</tbody>
+						</table>
+					</div>
 					<%
 						}
 					%>

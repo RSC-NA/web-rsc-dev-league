@@ -71,7 +71,14 @@
 		>
 			<div class="card-header">
 				<h4 id="active_games_count" hx-swap-oob="true">Active Games: <%- games.length; %>
-				<button class="btn btn-primary btn-sm float-end fw-bolder">Show Active Games</button>
+				<button class="btn btn-primary btn-sm float-end fw-bolder">
+					<span class="d-none d-md-inline">
+						Show Active Games
+					</span>
+					<span class="d-inline d-md-none">
+						Active
+					</span>
+				</button>
 				</h4>
 			</div>
 		</a>
@@ -105,9 +112,9 @@
 	%>
 	<div class="row mb-sm-4 mb-lg-0">
 		<div class="col-1 col-sm-2"></div>
-		<div class="col-10 col-sm-8">
+		<div class="col-12 col-sm-8">
 			<div class="alert <%- lobbies < 9 ? 'alert-danger' : 'alert-success'; %> d-flex align-items-center" role="alert">
-				<div class="bi flex-shrink-0 me-2">
+				<div class="bi flex-shrink-0 me-2 d-none d-md-block">
 					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
 						<use xlink:href="#check-circle-fill"/>
 					</svg>
@@ -161,16 +168,17 @@
 
 	<div class="row mb-sm-4 mb-lg-0">
 		<div class="col-1 col-sm-2"></div>
-		<div class="col-10 col-sm-8">
+		<div class="col-12 col-sm-8">
 			<div class="alert alert-warning d-flex align-items-center" role="alert">
-				<div class="bi flex-shrink-0 me-2">
+				<div class="bi flex-shrink-0 me-2 d-none d-md-block">
 					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Warning:">
 						<use xlink:href="#exclamation-triangle-fill"/>
 					</svg>
 				</div>
 				<div class="flex-fill">
 					<div class="h5 alert-heading">
-						<%- missing; %> more for <%- lobbies; %> lobbies
+						<i class="fas fa-triangle-exclamation text-danger"></i>
+						<%- missing; %> more for <%- lobbies; %> lobb<%- lobbies === 1 ? 'y' : 'ies'; %>
 					</div>
 					<hr>
 					<p class="text-xs">
@@ -201,9 +209,9 @@
 
 		<!-- primary FA signup / team generation -->
 		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 order-first">
-			<h3 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
-				<span class="text-success fw-bolder">Ready Room</span>
-				<div class="h4 text-muted">
+			<h5 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
+				<span class="text-success fw-bolder">Ready<span class="d-none d-md-inline"> Room</span></span>
+				<div class="h5 text-muted">
 				
 				<%
 					let players_ready = 0;
@@ -218,7 +226,7 @@
 				%>
 					<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
 					%><%- (extra > 0 && team_avail > 0) ? ' + ' : ''; 
-					%><%- extra > 0 ? '<span class="text-danger">' + extra + (extra == 1 ? ' player' : ' players') : '' + '</span>'; %>
+					%><%- extra > 0 ? '<span class="text-danger">' + extra + '<span class="d-none d-md-inline">' + (extra == 1 ? ' player</span>' : ' players</span>') : '' + '</span>'; %>
 				<%
 					}
 				%>
@@ -230,22 +238,26 @@
 					<%- players_ready == 0 ? 'aria-disabled="true"' :''; %>
 				>
 					<i class="fas fa-user-minus"></i>
-					Remove All
+					<span class="d-none d-md-inline">Remove All</span>
+					<span class="d-inline d-md-none">All</span>
 					<span class="d-xl-inline d-lg-none d-none">&#11022;</span>
 					<span class="d-xl-none d-lg-inline">&darr;</span>
 				</a>
-			</h3>
+			</h5>
 
 			<div class="mb-3 table-responsive">
-				<table class="table table-hover table-dark">
+				<table class="table table-hover table-dark table-sm">
 					<thead>
 						<tr class="border border-success">
+							<th class="d-table-cell d-md-none text-center">
+								<i class="fas fa-user-minus text-warning"></i>
+							</th>
 							<th class="text-center">MMR</th>
 							<th class="text-center">&Delta;</th>
 							<th>Player</th>
 							<th class="text-center">Record</th>
 							<th class="text-center">W%</th>
-							<th></th>
+							<th class="d-none d-md-table-cell"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -287,9 +299,22 @@
 
 					%>
 						<tr class="<%- table_class; %>">
+							<td class="p-0 text-center d-table-cell d-md-none">
+								<a href="/combines/deactivate/<%- rsc_id; %>" 
+									class="move-arrow-back p-0 px-2 mb-0 fs-6"
+									style=""
+									title="Move player to waiting room.">
+									<span class="d-none d-xl-inline">&#10095;</span>
+									<span class="d-inline d-xl-none">
+										<i class="fas fa-user-minus"></i>
+									</span>
+									<!-- &#9754; -->
+								</a>
+							</td>
 							<td class="text-center">
 								<span class="text-primary fw-bold">
-									<%- n; %>. <%= p.current_mmr; %>
+									<span class="d-none d-md-inline"><%- n; %>. </span>
+									<%= p.current_mmr; %>
 								</span>
 							</td>
 							<td class="text-center">
@@ -305,7 +330,7 @@
 									<%= p.mmr_delta; %>
 								</span>
 							</td>
-							<td class="fw-bolder">
+							<td class="fw-bolder text-truncate" style="max-width:100px;">
 								<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
 							</td>
 							<td class="text-center">
@@ -317,7 +342,7 @@
 									<%= p.win_percentage; %>%
 								</span>
 							</td>
-							<td class="p-0 text-center">
+							<td class="p-0 text-center d-none d-md-table-cell">
 								<a href="/combines/deactivate/<%- rsc_id; %>" 
 									class="move-arrow-back h4 p-0 px-2 mb-0" style=""
 									title="Move player to waiting room.">

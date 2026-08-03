@@ -21,7 +21,16 @@
 	if ( show_include ) {
 %>
 	<h4 id="active_games_count" hx-swap-oob="true">Active Games: <%- game_count; %>
-		<button class="btn btn-primary btn-sm float-end fw-bolder">Show Active Games</button>
+		<button
+			class="btn btn-primary btn-sm float-end fw-bolder"
+		>
+			<span class="d-none d-md-inline">
+				Show Active Games
+			</span>
+			<span class="d-inline d-md-none">
+				Active
+			</span>
+		</button>
 	</h4>
 <%
 	}
@@ -51,7 +60,7 @@
 					setTimeout(initialize_devleague, 10);
 				</script>
 				<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
-					<span class="text-muted">Waiting Room</span>
+					<span class="text-muted d-none d-md-inline">Waiting</span>
 					<div class="h4 text-muted">
 					
 					<%
@@ -73,12 +82,17 @@
 						<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
 						<span class="d-xl-none d-lg-inline">&uarr;</span>
 						<i class="fas fa-user-plus"></i>
-						Add All
+						<span class="d-none d-md-inline">
+							Add All
+						</span>
+						<span class="d-inline d-md-none">
+							All
+						</span>
 					</a>
 				</h4>
 
 				<div class="table-responsive" id="waiting_room_player_table">
-					<table class="table table-hover table-dark">
+					<table class="table table-hover table-dark table-sm">
 						<thead>
 							<tr class="border border-primary">
 								<th></th>
@@ -89,7 +103,7 @@
 								<th class="text-center">W%</th>
 								<th class="text-center">
 									<a
-										class="btn btn-danger btn-sm btn-icon"
+										class="btn btn-danger btn-xs btn-icon"
 										href="/combines/dequeue/ALL/<%- league; %>"
 										hx-get="/combines/dequeue/ALL/<%- league; %>"
 										hx-target="#waiting_room_player_table"
@@ -167,7 +181,7 @@
 										<%= p.mmr_delta; %>
 									</span>
 								</td>
-								<td class="fw-bolder">
+								<td class="fw-bolder text-truncate" style="max-width:100px;">
 									<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
 								</td>
 								<td class="text-center">
@@ -181,7 +195,7 @@
 								</td>
 								<td class="text-center">
 									<a
-										class="btn btn-danger btn-sm btn-icon"
+										class="btn btn-danger btn-xs btn-icon"
 										href="/combines/dequeue/<%= rsc_id; %>/<%- league; %>"
 										hx-get="/combines/dequeue/<%- rsc_id; %>/<%- league; %>"
 										hx-target="#player_ready_<%- rsc_id; %>"

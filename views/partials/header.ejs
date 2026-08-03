@@ -31,38 +31,50 @@
 			style="background-color: #000f1e !important; color: #fff;"
 		>
 			<!-- Navbar Brand-->
-			<a class="navbar-brand ps-3" href="/">
-				<img src="/images/rsc-xx-pride.png" style="float:left;margin-top:0px;height:64px;" alt="RSC Logo">
-				<div>Rocket Soccar</div><div>Confederation</div> 
+			<a class="navbar-brand ps-3 align-middle align-center" href="/" style="">
+				<img src="/images/rsc-xx-pride.png" style="float:left;margin-top:0px;height:48px;" alt="RSC Logo" class="img-fluid">
+				<div class="d-none d-sm-block fs-6">Rocket Soccar</div>
+				<div class="d-none d-sm-block fs-6">Confederation</div> 
+				<div class="d-block d-sm-none fs-1 mt-1">RSC</div>
 			</a>
+			
+			<a
+				class="btn btn-outline-light rounded-circle order-1 me-4 me-lg-0 d-block d-md-none"
+				id="searchButton"
+				href="/search"
+			><i class="fas fa-magnifying-glass-arrow-right text-light"></i></a>
+
 			<!-- Sidebar Toggle-->
 			<button
-				class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
+				class="btn btn-link btn-sm order-2 order-lg-0 me-4 me-lg-0"
 				id="sidebarToggle"
-				href="#!"
 			><i class="fas fa-bars"></i></button>
 			<!-- Navbar Search-->
-			<form
-				method="get"
-				action="/search"
-				autocomplete="off"
-			>
-				<div class="input-group">
-					<div class="form-outline w-75 ms-4">
-						<input
-							type="search"
-							id="find_header"
-							name="find"
-							class="form-control text-white bg-dark"
-							placeholder="Search for anything"
-							value=""
-						/>
+
+
+			<div class="d-none d-md-block">
+				<form
+					method="get"
+					action="/search"
+					autocomplete="off"
+				>
+					<div class="input-group">
+						<div class="form-outline w-75 ms-4">
+							<input
+								type="search"
+								id="find_header"
+								name="find"
+								class="form-control text-white bg-dark"
+								placeholder="Search for anything"
+								value=""
+							/>
+						</div>
+						<button type="button" class="btn btn-outline-primary d-none d-md-block">
+							<i class="fas fa-search"></i>
+						</button>
 					</div>
-					<button type="button" class="btn btn-outline-primary d-none d-md-block">
-						<i class="fas fa-search"></i>
-					</button>
-				</div>
-			</form>	
+				</form>	
+			</div>
 			<!-- Navbar-->
 			<ul class="navbar-nav d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0 sb-sidenav-menu">
 				<li class="nav-item dropdown">
