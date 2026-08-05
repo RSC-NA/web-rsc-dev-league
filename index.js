@@ -935,9 +935,10 @@ app.get('/bans', (req, res) => {
 
 app.get('/combine-replays', (req, res) => {
 	const season = 'season' in req.query ? req.query.season : res.locals.combines.season;
-	console.log('zipping combines replays for season', season);
-	const replays_path = `./static/replays/s${season}`;
-	const file_name = `Combine-s${res.locals.settings.season}-replays.zip`;
+	const match_day = 'match_day' in req.query ? req.query.match_day : null;
+	console.log('zipping combines replays for season', season, match_day);
+	const replays_path = `./static/replays/s${season}/md${match_day}`;
+	const file_name = `Combine-s${season}-md${match_day}-replays.zip`;
 	const output = fs.createWriteStream(file_name);
 	const archive = archiver('zip', {
 		zlib: { level: 9 },
