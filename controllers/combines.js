@@ -4,6 +4,7 @@ const mysqlP = require('mysql2/promise');
 const { _mmrRange, getTierFromMMR } = require('../mmrs');
 const { roles } = require('../roles');
 const upload = require('./upload');
+const combineDays = require('../combineDays');
 
 const fs = require('fs');
 
@@ -353,6 +354,9 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 	const user = res.locals.user;
 	const combine_id = req.params.combine_id;
 
+	const season = req.body.season;
+	const match_day = req.body.match_day;
+
 	console.log(req.file.originalname);
 	const file_name = req.file.originalname;
 
@@ -363,20 +367,39 @@ router.post('/combine/:combine_id/upload', upload.single('replay'), async(req, r
 		return res.json({'success': false, 'error': 'You are no longer logged in...'});
 	}
 
-	try { 
+	const exists_query = `
+		SELECT id FROM combine_replays 
+		WHERE season = ? AND match_day = ? AND replay = ?
+	`;
+	req.db.query(exists_query, [season, match_day, file_name], ( err, results ) => {
+		if ( err ) { throw err; }
 
-		const query = `INSERT INTO combine_replays (match_id,rsc_id,replay) VALUES (?, ?, ?)`;
-		req.db.query(query, [combine_id, user.rsc_id, file_name], (err, results) => {
-			if ( err ) { throw err; }
+		if ( results && results.length ) {
+			return res.json({'success': true, 'exists': true});
+		}
 
-			res.json({'success': true });
-		});
-	} catch(e) { 
-		console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
-		console.log(` Combine ID: ${combine_id}`);
+		try { 
+			const query = `
+				INSERT INTO combine_replays 
+					(match_id,rsc_id,replay,season,match_day) 
+				VALUES (?, ?, ?, ?, ?)
+			`;
+			req.db.query(query, [
+				combine_id, user.rsc_id, file_name, season, match_day,
+			], (err, results) => {
+				if ( err ) { throw err; }
 
-		res.json({'success': false });
-	}
+				res.json({'success': true });
+			});
+		} catch(e) { 
+			console.log('---- ERROR ERROR ERROR - Upload failed ---- ');
+			console.log(` Combine ID: ${combine_id}`);
+
+			res.json({'success': false });
+		}
+
+	});
+
 });
 
 router.get('/combine/check_out/:discord_id/:league', async (req, res) => {
@@ -561,7 +584,7 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 
 	const match_query = `
 		SELECT 
-			id, match_dtg, season, lobby_user, lobby_pass, home_mmr, away_mmr,
+			id, match_dtg, season, match_day, lobby_user, lobby_pass, home_mmr, away_mmr,
 			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, 
 			completed, cancelled
 		FROM 
@@ -753,6 +776,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const SEASON = league === 3 ? res.locals.combines.season : res.locals.combines_2s.season;
+	const DAY    = league === 3 ? res.locals.combines.combine_day : res.locals.combines_2s.combine_day;
 	let team_size = 3;
 	if (league === 2) {
 		team_size = 2;
@@ -760,7 +784,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 
 	const match_query = `
 		SELECT 
-			id, match_dtg, season, league, lobby_user, lobby_pass, home_mmr, away_mmr,
+			id, match_dtg, season, match_day, league, lobby_user, lobby_pass, home_mmr, away_mmr,
 			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, completed, cancelled,
 			home_mmr AS tier
 		FROM 
@@ -777,7 +801,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 			if ( league !== match.league ) {
 				return res.redirect(`/combine/${match.id}/${match.league}`);
 			}
-			
+
 			match.players = {
 				home: [],
 				away: [],
@@ -813,7 +837,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 				}
 
 				const replay_query = `
-					SELECT match_id,rsc_id,replay
+					SELECT match_id,rsc_id,replay,season,match_day
 					FROM combine_replays 
 					WHERE match_id = ?
 				`;
@@ -826,6 +850,7 @@ router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
 						error: req.query.error,
 						success: success,
 						season: SEASON,
+						day: DAY,
 					});
 				});
 			});

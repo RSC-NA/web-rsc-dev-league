@@ -410,7 +410,8 @@
 						},
 						renameFile: (file) => {
 							const fileSplit = file.name.split('.');
-							const new_file_name = `<%- match_id; %>_<%- user.rsc_id %>-${fileSplit[0]}.${fileSplit[1]}`;
+							const ext = fileSplit.pop();
+							const new_file_name = `<%- match_id; %>_<%- user.rsc_id %>-${fileSplit[0]}.${ext}`;
 							file.name = new_file_name;
 							return new_file_name;
 						}

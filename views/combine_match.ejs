@@ -494,7 +494,10 @@
 					style="background-color: #000f1e;border:1px solid #021e3a;"
 					class="dropzone fw-bolder text-white"
 					id="replay-dropzone"
-				> </form>
+				> 
+					<input type="hidden" name="season" value="<%- combines.season; %>">
+					<input type="hidden" name="match_day" value="<%- combine_day; %>">
+				</form>
 
 			</div>
 			<% } %>
@@ -506,10 +509,19 @@
 				<ul>
 				<%
 						for ( let i = 0; i < match.replays.length; ++i ) { 
+							const r = match.replays[i];
+							let replay_folder = 'replays';
+							if ( r.season ) {
+								replay_folder += `/s${r.season}`;
+							} 
+							if ( r.match_day ) {
+								replay_folder += `/md${r.match_day}`;
+							}
+							console.log(replay_folder, match.replays[i]);
 				%>
 					<li>
 						<%- match.replays[i].rsc_id; %>: 
-						<a href="/replays/<%- match.replays[i].replay; %>">
+						<a href="/<%- replay_folder; %>/<%- match.replays[i].replay; %>">
 							<%- match.replays[i].replay; %>
 						</a>
 					</li>

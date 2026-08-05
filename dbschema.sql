@@ -350,6 +350,7 @@ CREATE TABLE combine_matches (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`match_dtg` DATETIME NOT NULL DEFAULT NOW(),
 	`season` INT UNSIGNED NOT NULL,
+	`match_day` INT UNSIGNED,
 	`league` INT UNSIGNED NOT NULL DEFAULT 3,
 	`lobby_user` VARCHAR(50) NOT NULL DEFAULT '',
 	`lobby_pass` VARCHAR(50) NOT NULL DEFAULT '',
@@ -367,6 +368,8 @@ CREATE TABLE combine_matches (
 CREATE TABLE combine_replays (
 	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`match_id` INT UNSIGNED NOT NULL,
+	`season` INT UNSIGNED,
+	`match_day` INT UNSIGNED,
 	`rsc_id` VARCHAR(10) NOT NULL,
 	`replay` VARCHAR(100) NOT NULL,
 	PRIMARY KEY(`id`),

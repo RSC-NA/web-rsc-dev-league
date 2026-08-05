@@ -47,12 +47,13 @@ async function make_lobby(db, lobby) {
 	const TEAM_SIZE = lobby.league === 2 ? 2 : 3;
 	const match_query = `
 		INSERT INTO combine_matches
-			(season, league, lobby_user, lobby_pass, home_mmr, away_mmr)
+			(season, match_day, league, lobby_user, lobby_pass, home_mmr, away_mmr)
 		VALUES 
-			(     ?,      ?,          ?,          ?,        ?,        ?)
+			(     ?,         ?,      ?,          ?,          ?,        ?,        ?)
 	`;
 	const params = [
 		lobby.season,
+		lobby.match_day,
 		lobby.league,
 		lobby.username,
 		lobby.password,
@@ -1029,6 +1030,7 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 	const league = req.params.league ? parseInt(req.params.league) : 3;
 	const TEAM_SIZE = league === 2 ? 4 : 6;
 	const SEASON = league === 2 ? res.locals.combines_2s.season : res.locals.combines.season;
+	const MATCH_DAY = league === 2 ? res.locals.combines_2s.combine_day : res.locals.combines.combine_day;
 	const guild_id = league === 3 ? league_guild[3] : league_guild[2];
 
 	console.log('GENERATING TEAMS FOR ', league, `size: ${TEAM_SIZE}, SEASON: ${SEASON}, GUILD_ID: ${guild_id}`);
@@ -1107,6 +1109,7 @@ router.all(['/generate', '/generate/:league'], async (req, res) => {
 
 			const lobby = {
 				season: SEASON,
+				match_day: res.locals.combine_day,
 				league: league,
 				username: get_rand_word(home_players[0].id),
 				password: get_rand_word(),
@@ -1979,7 +1982,7 @@ router.get('/process_2s', (req, res) => {
 
 			const active_query = `
 				SELECT 
-					id,lobby_user,lobby_pass,home_mmr 
+					id,season,match_day,lobby_user,lobby_pass,home_mmr 
 				FROM combine_matches 
 				WHERE completed = 0 AND cancelled = 0 AND league = 2`;
 			req.db.query(active_query, (err, results) => {
