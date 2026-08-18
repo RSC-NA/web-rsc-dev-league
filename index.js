@@ -452,8 +452,9 @@ app.use(async (req, res, next) => {
 
 	let tiersQuery = `
 		SELECT 
-			season,amateur,contender,prospect,challenger,rival,veteran,elite,
-			master,premier 
+			season,
+			amateur,contender,prospect,challenger,
+			rival,veteran,elite,master,premier 
 		FROM league_settings 
 		ORDER BY id DESC 
 		LIMIT 1

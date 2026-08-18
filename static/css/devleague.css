@@ -148,6 +148,7 @@ li.today.holiday {
 }
 
 :root {
+	--legend: 217, 217, 217;
 	--premier: 214, 0, 214;
 	--master: 155, 89, 182;
 	--elite: 52, 152, 219;
@@ -160,6 +161,7 @@ li.today.holiday {
 }
 
 
+.bg-Legend { background-color: rgba(var(--legend), var(--bs-bg-opacity)) !important; font-weight: bold; }
 .bg-Premier { background-color: rgba(var(--premier), var(--bs-bg-opacity)) !important; font-weight: bold; }
 .bg-Master { background-color: rgba(var(--master), var(--bs-bg-opacity)) !important; font-weight: bold; }
 .bg-Elite { background-color: rgba(var(--elite), var(--bs-bg-opacity)) !important; font-weight: bold; }
@@ -193,6 +195,7 @@ li.today.holiday {
     border-color: rgba(var(--prospect), var(--bs-bg-opacity));
 }
 
+.Legend { color: #d9d9d9; !important }
 .Premier { color: #d600d6 !important; }
 .Master { color: #9b59b6 !important; }
 .Elite { color: #3498db !important; }
