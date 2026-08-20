@@ -1199,6 +1199,39 @@ app.get('/test', (_req, res) => {
 	res.send('record inserted on ' + new Date(new Date().setHours(12)).toISOString());
 });
 
+app.get('/combine-matches', (req, res) => {
+	const query = `
+		SELECT 
+			id, match_dtg, season, match_day, league, home_mmr, away_mmr,
+			home_wins, away_wins, reported_rsc_id, confirmed_rsc_id, 
+			completed, cancelled
+		FROM combine_matches
+		WHERE league = 3
+	`;
+	connection.query(query, (err, results) => {
+		if ( err ) { return res.send(`Error: ${err}`); }
+		
+		if ( 'json' in req.query ) {
+			return res.json(results);
+		} else {
+			res.header('Content-type', 'text/csv');
+			res.attachment(`Combine_Matches_Data.csv`);
+			const columns = [
+				'id', 'match_dtg', 'season', 'match_day', 'league', 'home_mmr', 'away_mmr',
+				'home_wins', 'away_wins', 'reported_rsc_id', 'confirmed_rsc_id', 'completed', 'cancelled',
+			];
+			const stringifier = stringify({ header: true, columns: columns });
+			stringifier.pipe(res);
+			for ( let i = 0; i < results.length; ++i ) {
+				results[i]["date_pulled"] = new Date(results[i]['date_pulled']).toString();
+				stringifier.write(results[i]);
+			}
+			stringifier.end();
+		}
+		// return res.render('mmr', { pulls: results });
+	});
+});
+
 /*
  * RSC_ID -> Numbers output
  */
