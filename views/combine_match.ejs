@@ -502,10 +502,10 @@
 			</div>
 			<% } %>
 
+			<%
+				if ( user.rsc_id && match.replays && match.replays.length ) {
+			%>
 			<div class="col-md-6">
-				<%
-					if ( match.replays && match.replays.length ) {
-				%>
 				<ul>
 				<%
 						for ( let i = 0; i < match.replays.length; ++i ) { 
@@ -517,7 +517,6 @@
 							if ( r.match_day ) {
 								replay_folder += `/md${r.match_day}`;
 							}
-							console.log(replay_folder, match.replays[i]);
 				%>
 					<li>
 						<%- match.replays[i].rsc_id; %>: 
@@ -529,10 +528,10 @@
 						}
 				%>
 				</ul>
-				<%
-					}
-				%>
 			</div>
+			<%
+				}
+			%>
 		</div>
 		
 		<div class="row mb-2">
