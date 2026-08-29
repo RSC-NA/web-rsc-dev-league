@@ -8,6 +8,10 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { roles } = require('../roles');
 
 router.get(['/search','/search/:needle'], (req,res) => {
+	if ( ! res.local.user.rsc_id ) {
+		return res.redirect(`/`);
+	}
+
 	const needle = req.params.needle ? req.params.needle : req.query.find;
 	const needle_f = `%${needle}%`;
 	console.log(`Search for "${needle}"`);
