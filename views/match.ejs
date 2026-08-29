@@ -76,13 +76,14 @@
 <main class="container bg-dark mt-2 p-2">
 	<div class="bg-dark p-2 rounded">
 		<h1>
-		Dev League Match Info
-		<img
-			src="/icons/<%- tier.toLowerCase(); %>.png"
-			title="<%- tier; %>"
-			height="48"
-			alt="<%- tier; %> icon"
-		>
+			Dev League Match Info
+			<!-- <img
+				src="/icons/<%- tier.toLowerCase(); %>.png"
+				title="<%- tier; %>"
+				height="48"
+				alt="<%- tier; %> icon"
+			> -->
+			<span class="badge bg-<%- tier; %>"><%- tier; %> Tier</span>
 		</h1>
 		<p class="lead">
 			Please find the lobby information provided below. If you have any questions or problems, please ask for help
@@ -105,12 +106,15 @@
 									<tr>
 										<th colspan="2">
 											Lobby Info
+											<!-- 
 											<img
 												src="/icons/<%- tier.toLowerCase(); %>.png"
 												title="<%- tier; %>"
 												height="16"
 												alt="<%- tier; %> icon"
 											>
+											-->
+											<span class="badge bg-<%- tier; %>"><%- tier; %> Tier</span>
 										</th>
 									</tr>
 								</thead>
@@ -531,6 +535,8 @@
 										} else if ( delta < 0 ) {
 											delta_change = 'text-danger fw-bolder';
 										}
+
+										const p_tier = getTierFromDevMMR(p.end_mmr ? p.end_mmr : p.start_mmr);
 								%>
 									<tr class="fs-5">
 										<% if ( CAN_ADMIN ) { %>
@@ -541,13 +547,7 @@
 										</td>
 										<% } %>
 										<td>
-											<img
-												src="/icons/<%- p.tier.toLowerCase(); %>.png"
-												title="<%- p.tier; %>"
-												style=""
-												height="16"
-												alt="<%- p.tier; %> icon"
-											>
+											<span class="badge bg-<%- p_tier; %>"><%- p_tier; %></span>
 											<strong>
 												<a href="/player/<%= p.rsc_id; %>">
 													<%= p.name %></a>
@@ -673,6 +673,8 @@
 										} else if ( delta < 0 ) {
 											delta_change = 'text-danger fw-bolder';
 										}
+										
+										const p_tier = getTierFromDevMMR(p.end_mmr ? p.end_mmr : p.start_mmr);
 								%>
 									<tr class="fs-5">
 										<% if ( CAN_ADMIN ) { %>
@@ -683,12 +685,7 @@
 										</td>
 										<% } %>
 										<td>
-											<img
-												src="/icons/<%- p.tier.toLowerCase(); %>.png"
-												title="<%- p.tier; %>"
-												height="16"
-												alt="<%- p.tier; %> icon"
-											>
+											<span class="badge bg-<%- p_tier; %>"><%- p_tier; %></span>
 											<strong>
 												<a href="/player/<%= p.rsc_id; %>" class="text-warning"
 													><%= p.name %></a>

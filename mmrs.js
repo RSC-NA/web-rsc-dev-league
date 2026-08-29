@@ -6,44 +6,83 @@
 // for players that aren't assigned to a tier, but have an MMR listed in
 // the contracts sheet
 const mmrRange_3s = {
-	'Premier': { 
+	'Legend': { 
 		'max': 3000,
-		'min': 1775,
+		'min': 1800,
+	},
+	'Premier': { 
+		'max': 1795,
+		'min': 1655,
 	},
 	'Master': { 
-		'max': 1770,
-		'min': 1660,
+		'max': 1650,
+		'min': 1545,
 	},
 	'Elite': { 
-		'max': 1655,
-		'min': 1515,
+		'max': 1540,
+		'min': 1450,
 	},
 	'Veteran': { 
-		'max': 1510,
-		'min': 1385,
+		'max': 1445,
+		'min': 1360,
 	},
 	'Rival': { 
-		'max': 1380,
-		'min': 1255,
+		'max': 1355,
+		'min': 1250,
 	},
 	'Challenger': { 
-		'max': 1250,
-		'min': 1105,
+		'max': 1245,
+		'min': 1135,
 	},
 	'Prospect': { 
-		'max': 1100,
-		'min': 1020,
+		'max': 1130,
+		'min': 1005,
 	},
 	'Contender': { 
-		'max': 1015,
-		'min': 925,
+		'max': 1000,
+		'min': 875,
 	},
 	'Amateur': { 
-		'max': 920,
+		'max': 870,
 		'min': 0,
 	},
 	/*
 	*/
+};
+
+const mmrRange_dev = {
+	'S': { 
+		'max': 3000,
+		'min': 1755,
+	},
+	'A': { 
+		'max': 1750,
+		'min': 1675,
+	},
+	'B': { 
+		'max': 1670,
+		'min': 1505,
+	},
+	'C': { 
+		'max': 1500,
+		'min': 1360,
+	},
+	'D': { 
+		'max': 1355,
+		'min': 1210,
+	},
+	'E': { 
+		'max': 1205,
+		'min': 1055,
+	},
+	'F': { 
+		'max': 1050,
+		'min': 935,
+	},
+	'G': { 
+		'max': 930,
+		'min': 0,
+	},
 };
 
 const mmrRange_2s = {
@@ -82,8 +121,21 @@ const mmrRange_2s = {
 };
 
 // export our mmrRange const object
-exports.mmrRange_3s = mmrRange_3s;
-exports.mmrRange_2s = mmrRange_2s;
+exports.mmrRange_3s  = mmrRange_3s;
+exports.mmrRange_dev = mmrRange_dev;
+exports.mmrRange_2s  = mmrRange_2s;
+
+// this function is used to return a tier
+exports.getTierFromDevMMR = (mmr) => {
+	let ranges = mmrRange_dev;
+
+	mmr = Math.ceil((mmr - 1) / 5) * 5;
+	for ( let tier in ranges ) {
+		if ( mmr >= ranges[tier]['min'] && mmr <= ranges[tier]['max'] ) {
+			return tier;
+		}
+	}
+};
 
 // this function is used to return a tier
 exports.getTierFromMMR = (mmr, league=3) => {

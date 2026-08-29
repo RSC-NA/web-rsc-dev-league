@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const mysqlP = require('mysql2/promise');
-const { _mmrRange_3s, _mmrRange_2s, getTierFromMMR } = require('../mmrs');
+const { _mmrRange_3s, _mmrRange_2s, getTierFromDevMMR } = require('../mmrs');
 const fs = require('fs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
@@ -49,8 +49,8 @@ async function make_lobby_devleague(db, lobby) {
 	console.log('LOBBY MMRS');
 	console.log('Home: ', lobby.home.mmr / 3);
 	console.log('Away: ', lobby.away.mmr / 3);
-	console.log(getTierFromMMR(lobby.home.mmr / 3), 3);
-	const home_tier = getTierFromMMR(lobby.home.mmr / 3, 3);
+	console.log(getTierFromDevMMR(lobby.home.mmr / 3), 3);
+	const home_tier = getTierFromDevMMR(lobby.home.mmr / 3, 3);
 
 	// create teams 
 	const team_query = 'INSERT INTO teams (team_number, tier) VALUES (?, ?)';
@@ -1388,7 +1388,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 			// calc their tier from MMR.
 			if ( ! ('tier' in players[ r_id ]) ) {
 				players[r_id]['mmr'] = parseInt(contractRows[i]['Current MMR']);
-				players[r_id]['tier'] = getTierFromMMR(parseInt(contractRows[i]['Current MMR']), 3);
+				players[r_id]['tier'] = getTierFromDevMMR(parseInt(contractRows[i]['Current MMR']), 3);
 				if ( ! players[r_id]['cur_mmr'] && contractRows[i]['Contract Status'] !== 'Dropped' ) {
 					mmr_list[r_id] = players[r_id]['mmr'];
 				}
@@ -1524,6 +1524,7 @@ router.get('/manage_league', (req, res) => {
 		// hardcoded tier names so we can get correct sort order.
 		const tiers = {
 			'all': { 'total': 0, 'fa': 0 },
+			'Legend': { 'total': 0, 'fa': 0 },
 			'Premier': { 'total': 0, 'fa': 0 },
 			'Master': { 'total': 0, 'fa': 0 },
 			'Elite': { 'total': 0, 'fa': 0 },

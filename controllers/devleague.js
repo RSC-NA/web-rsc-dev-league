@@ -3,7 +3,7 @@ const router = express.Router();
 const upload = require('./upload_devleague');
 const mysqlP = require('mysql2/promise');
 
-const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
+const { mmrRange_3s, mmrRange_2s, getTierFromDevMMR } = require('../mmrs');
 
 // router.post('/score/:match_id', (req, res) => {
 // 	const home_wins = req.body.home_wins;
@@ -166,13 +166,21 @@ router.get('/championship', (req, res) => {
 		WHERE season = ? AND (date(match_dtg) != '2026-03-25' AND date(match_dtg) != '2026-03-30')
 	`;
 	const leaderboards = {
-		'PreMaster': null,
-		'Elite': null,
-		'Veteran': null,
-		'Rival': null,
-		'Challenger': null,
-		'Prospect': null,
-		'ContAmmy': null,
+		'S': null,
+		'A': null,
+		'B': null,
+		'C': null,
+		'D': null,
+		'E': null,
+		'F': null,
+		'G': null,
+		// 'PreMaster': null,
+		// 'Elite': null,
+		// 'Veteran': null,
+		// 'Rival': null,
+		// 'Challenger': null,
+		// 'Prospect': null,
+		// 'ContAmmy': null,
 	};
 	const team_wins = {};
 	const team_match_map = {};
@@ -207,27 +215,27 @@ router.get('/championship', (req, res) => {
 			for ( let i = 0; i < results.length; ++i ) {
 				const player = results[i];
 			
-				const cur_tier = getTierFromMMR(player.cur_mmr)
+				const cur_tier = getTierFromDevMMR(player.cur_mmr)
 				player.save_cur_tier = cur_tier;
 				player.cur_tier = cur_tier;
 
-				if ( cur_tier === 'Premier' || cur_tier === 'Master' ) {
-					player.cur_tier = 'PreMaster';
-				} else if ( cur_tier === 'Contender' || cur_tier === 'Amateur' ) {
-					player.cur_tier = 'ContAmmy';
-				}
+				// if ( cur_tier === 'Premier' || cur_tier === 'Master' ) {
+				// 	player.cur_tier = 'PreMaster';
+				// } else if ( cur_tier === 'Contender' || cur_tier === 'Amateur' ) {
+				// 	player.cur_tier = 'ContAmmy';
+				// }
 						
 				player.save_tier = player.tier;
-				switch ( player.tier ) {
-					case 'Premier':
-					case 'Master':
-						player.tier = 'PreMaster';
-						break;
-					case 'Contender':
-					case 'Amateur':
-						player.tier = 'ContAmmy';
-						break;
-				}
+				// switch ( player.tier ) {
+				// 	case 'Premier':
+				// 	case 'Master':
+				// 		player.tier = 'PreMaster';
+				// 		break;
+				// 	case 'Contender':
+				// 	case 'Amateur':
+				// 		player.tier = 'ContAmmy';
+				// 		break;
+				// }
 
 				if ( ! (player.player_id in players) ) {
 					players[ player.player_id ] = {
@@ -659,22 +667,34 @@ router.get('/match/:match_id', (req, res) => {
 		if ( ! results || results.length === 0 ) {
 			return res.redirect('/');
 		}
-		
+	
+		let lobby_mmr = 0;
+		let lobby_players = 0;
+
 		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
-		const tier = results[0].tier;	
 		const home_team = results[0].lobby_user;
 		const away_team = results[0].lobby_pass;
 		let score_title = '';
 		if ( scored ) {
 			score_title = ` [Home:${results[0].home_wins}, Away:${results[0].away_wins}]`;
 		}
-		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
 	
 		const season = results[0].season;
 		const player_ids = [];
 		for ( let i = 0; i < results.length; ++i ) {
 			player_ids.push(results[i].player_id);
+			lobby_mmr += results[i].end_mmr ? results[i].end_mmr : results[i].start_mmr;
+			lobby_players += 1;
 		}
+		
+		if ( lobby_players > 0 ) {
+			lobby_mmr = lobby_mmr / lobby_players;
+		}
+		const tier = getTierFromDevMMR(lobby_mmr);	
+		console.log(lobby_mmr, lobby_players, tier);
+		
+		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
+
 		const placeholders = '?, '.repeat(player_ids.length - 1) + '?';
 
 		const stats_q = `
@@ -726,6 +746,7 @@ router.get('/match/:match_id', (req, res) => {
 				players: results,
 				stats: playerRecords,
 				replays: {},
+				getTierFromDevMMR: getTierFromDevMMR,
 				error: null,
 			};
 

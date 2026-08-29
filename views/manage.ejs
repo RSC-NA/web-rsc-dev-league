@@ -133,6 +133,13 @@
 			<ul class="list-group mb-3">
 				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
 					<div <%- settings.premier ? 'class="text-success"' : '' %>>
+						<h6 class="my-0"><img height="24" src="/icons/premier.png"> Legend</h6>
+						<!-- <small class="text-muted">Brief description</small> -->
+					</div>
+					<span class="text-muted"><%= tiers['Legend']['total'] - tiers['Legend']['fa'] %> Signed / <%= tiers['Legend']['fa'] %> FA</span>
+				</li>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
+					<div <%- settings.premier ? 'class="text-success"' : '' %>>
 						<h6 class="my-0"><img height="24" src="/icons/premier.png"> Premier</h6>
 						<!-- <small class="text-muted">Brief description</small> -->
 					</div>
