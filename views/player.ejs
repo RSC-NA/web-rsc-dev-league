@@ -121,12 +121,7 @@
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">Dev League Tier </h6>
-					<span class="ms-2 w-50 fw-bolder <%- player.cur_tier; %> text-lg">
-						<% if ( player.tier !== 'NONE' ) { %>
-						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
-						<% } %>
-						<%= player.cur_tier; %>
-					</span>
+					<span class="ms-2 bg-<%- cur_tier; %> badge text-lg"><%= player.cur_tier; %> Tier</span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
