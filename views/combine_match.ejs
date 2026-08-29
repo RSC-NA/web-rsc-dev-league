@@ -656,6 +656,11 @@
 											report_mmr = 'hidden';
 										}
 
+										let display_name = p.name ?? p.nickname;
+										if ( ! display_name ) {
+											display_name = 'unnamed player';
+										}
+
 										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${report_mmr}`;
 								%>
 									<tr class="fs-6">
@@ -692,7 +697,7 @@
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>">
-													<%= p.name ?? p.nickname %></a>
+													<%= display_name %></a>
 											</strong> 
 											<% 
 												if ( submitted_scores.home === p.rsc_id ) { 
@@ -864,6 +869,10 @@
 										if ( ! CAN_VIEW_ALL ) {
 											report_mmr = 'hidden';
 										}
+										let display_name = p.name ?? p.nickname;
+										if ( ! display_name ) {
+											display_name = 'unnamed player';
+										}
 										const player_params = `entry.276704396=${p.name}&entry.131655182=${p.rsc_id}&entry.11178892=${p.discord_id}&entry.15715283=${report_mmr}`;
 								%>
 									<tr class="fs-6">
@@ -899,7 +908,7 @@
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>"
-													><%= p.name ?? p.nickname %></a>
+													><%= display_name; %></a>
 											</strong> 
 											<% 
 												if ( submitted_scores.home === p.rsc_id ) { 
