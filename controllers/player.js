@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const mysqlP = require('mysql2/promise');
-const { mmrRange_3s, mmrRange_2s, getTierFromMMR } = require('../mmrs');
+const { mmrRange_3s, mmrRange_2s, getTierFromDevMMR, getTierFromMMR } = require('../mmrs');
 
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
