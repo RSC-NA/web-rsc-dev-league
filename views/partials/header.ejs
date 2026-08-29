@@ -37,12 +37,14 @@
 				<div class="d-none d-sm-block fs-6">Confederation</div> 
 				<div class="d-block d-sm-none fs-1 mt-1">RSC</div>
 			</a>
-			
+		
+			<% if ( user.rsc_id ) { %>
 			<a
 				class="btn btn-outline-light rounded-circle order-1 me-4 me-lg-0 d-block d-md-none"
 				id="searchButton"
 				href="/search"
 			><i class="fas fa-magnifying-glass-arrow-right text-light"></i></a>
+			<% } %>
 
 			<!-- Sidebar Toggle-->
 			<button
@@ -52,6 +54,7 @@
 			<!-- Navbar Search-->
 
 
+			<% if ( user.rsc_id ) { %>
 			<div class="d-none d-md-block">
 				<form
 					method="get"
@@ -75,6 +78,8 @@
 					</div>
 				</form>	
 			</div>
+			<% } %>
+
 			<!-- Navbar-->
 			<ul class="navbar-nav d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0 sb-sidenav-menu">
 				<li class="nav-item dropdown">
