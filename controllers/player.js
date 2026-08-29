@@ -8,7 +8,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { roles } = require('../roles');
 
 router.get(['/search','/search/:needle'], (req,res) => {
-	if ( ! res.local.user.rsc_id ) {
+	if ( ! res.locals.user.rsc_id ) {
 		return res.redirect(`/`);
 	}
 
