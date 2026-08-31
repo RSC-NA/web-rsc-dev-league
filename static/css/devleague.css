@@ -160,14 +160,14 @@ li.today.holiday {
 	--amateur: 243, 169, 169;
 }
 
-.bg-S { background-color: rgba(var(--legend), var(--bs-bg-opacity)) !important; color: var(--bs-danger); font-weight: 700; }
-.bg-A { background-color: rgba(var(--premier), var(--bs-bg-opacity)) !important; font-weight: bold; }
-.bg-B { background-color: rgba(var(--master), var(--bs-bg-opacity)) !important; font-weight: bold; }
-.bg-C { background-color: rgba(var(--elite), var(--bs-bg-opacity)) !important; font-weight: bold; }
-.bg-D { background-color: rgba(var(--veteran), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
-.bg-E { background-color: rgba(var(--rival), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
-.bg-F { background-color: rgba(var(--challenger), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
-.bg-G { background-color: rgba(var(--amateur), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
+.bg-SPLUS { background-color: rgba(var(--legend), var(--bs-bg-opacity)) !important; color: rgb(var(--premier)); font-weight: 900; }
+.bg-S { background-color: rgba(var(--premier), var(--bs-bg-opacity)) !important; color: var(--bs-white); font-weight: 700; }
+.bg-A { background-color: rgba(var(--master), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-B { background-color: rgba(var(--elite), var(--bs-bg-opacity)) !important; font-weight: bold; }
+.bg-C { background-color: rgba(var(--veteran), var(--bs-bg-opacity)) !important; color: var(--bs-dark); font-weight: bold; }
+.bg-D { background-color: rgba(var(--rival), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
+.bg-E { background-color: rgba(var(--challenger), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
+.bg-F { background-color: rgba(var(--amateur), var(--bs-bg-opacity)) !important; color: #000; font-weight: bold; }
 
 .bg-Legend { background-color: rgba(var(--legend), var(--bs-bg-opacity)) !important; font-weight: bold; }
 .bg-Premier { background-color: rgba(var(--premier), var(--bs-bg-opacity)) !important; font-weight: bold; }
@@ -203,14 +203,14 @@ li.today.holiday {
     border-color: rgba(var(--prospect), var(--bs-bg-opacity));
 }
 
-.S { color: #d9d9d9; !important }
-.A { color: #d600d6 !important; }
-.B { color: #9b59b6 !important; }
-.C { color: #3498db !important; }
-.D { color: #33ffda !important; }
-.E { color: #2ecc71 !important; }
-.F { color: #ceb337 !important; }
-.G { color: #f3a9a9 !important; }
+.SPLUS { color: #d9d9d9; !important }
+.S { color: #d600d6 !important; }
+.A { color: #9b59b6 !important; }
+.B { color: #3498db !important; }
+.C { color: #33ffda !important; }
+.D { color: #2ecc71 !important; }
+.E { color: #ceb337 !important; }
+.F { color: #f3a9a9 !important; }
 
 .Legend { color: #d9d9d9; !important }
 .Premier { color: #d600d6 !important; }

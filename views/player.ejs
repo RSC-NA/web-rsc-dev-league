@@ -122,7 +122,7 @@
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">Dev League Tier </h6>
 					<span class="ms-2 w-50 text-lg">
-						<span class="bg-<%- player.cur_tier; %> badge text-lg"><%= player.cur_tier; %> Tier</span>
+						<span class="bg-<%- player.cur_tier; %> badge text-lg"><%= player.cur_tier === 'SPLUS' ? 'S+' : player.cur_tier; %> Tier</span>
 					</span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">

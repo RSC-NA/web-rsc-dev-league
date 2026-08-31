@@ -77,7 +77,7 @@
 					for ( let i = 0; i < games.length; ++i ) {
 			%>
 				<li>
-					<span class="bg-<%- games[i].tier; %> px-2 d-inline-block text-end" style="width:100px;"><%- games[i].tier; %></span>
+					<span class="bg-<%- games[i].tier; %> px-2 d-inline-block text-end" style="width:100px;"><%- games[i].tier === 'SPLUS' ? 'S+' : games[i].tier; %></span>
 					<a href="/match/<%- games[i].id; %>">
 						RSC<%- games[i].id; %>-<%- games[i].lobby_pass %>
 					</a>
@@ -258,6 +258,7 @@
 							}
 
 							const p = waiting_room[rsc_id];
+							p.cur_tier = getTierFromDevMMR(p.season_mmr);
 							if ( p.win_percentage > 60 ) {
 								analysis = 'great';
 							} else if ( p.win_percentage > 52 ) {
@@ -295,15 +296,8 @@
 							</span> 
 							(<span class="<%- delta_change; %>"><%= mmr_delta; %></span>)
 						</td>
-						<td class="text-center ">
-							<img
-								src="/icons/<%- p.tier.toLowerCase(); %>.png"
-								title="<%- p.tier; %>"
-								style=""
-								height="16"
-								alt="<%- p.tier; %> icon"
-							>
-							<span class=""><%- p.tier; %></span>
+						<td class="text-center bg-<%- p.cur_tier; %> align-middle fs-4">
+							<span class=""><%= p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></span>
 						</td>
 						<td class="fw-bolder">
 							<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
@@ -400,6 +394,7 @@
 									console.log(p)
 								}
 
+								p.cur_tier = getTierFromDevMMR(p.season_mmr);
 								n++;
 								if ( n > 6 ) {
 									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
@@ -425,8 +420,8 @@
 									<%= p.mmr; %>
 								</span>
 							</td>
-							<td class="text-center bg-<%- p.tier; %>">
-								<span class=""><%- p.tier; %></span>
+							<td class="text-center bg-<%- p.cur_tier; %> align-middle fs-4">
+								<span class=""><%- p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></span>
 							</td>
 							<td class="fw-bolder">
 								<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>

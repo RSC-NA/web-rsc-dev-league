@@ -972,7 +972,7 @@ router.get('/devleague', async (req, res) => {
 	SELECT 
 		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
 		s.signup_dtg,c.mmr,p.mmr AS season_mmr,
-		p.discord_id,c.rsc_id,c.name,c.mmr,c.tier,c.status
+		p.discord_id,c.rsc_id,c.name,c.tier,c.status
 	FROM 
 		signups AS s
 	LEFT JOIN players AS p 
@@ -1044,6 +1044,7 @@ router.get('/devleague', async (req, res) => {
 	res.render('process_devleague', {
 		signups: signups,
 		games: games,
+		getTierFromDevMMR: getTierFromDevMMR,
 	});
 });
 

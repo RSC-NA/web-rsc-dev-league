@@ -114,7 +114,7 @@
 												alt="<%- tier; %> icon"
 											>
 											-->
-											<span class="badge bg-<%- tier; %>"><%- tier; %> Tier</span>
+											<span class="badge bg-<%- tier; %>"><%- tier === 'SPLUS' ? 'S+' : tier; %> Tier</span>
 										</th>
 									</tr>
 								</thead>
@@ -547,7 +547,7 @@
 										</td>
 										<% } %>
 										<td>
-											<span class="badge bg-<%- p_tier; %>"><%- p_tier; %></span>
+											<span class="badge bg-<%- p_tier; %>"><%- p_tier === 'SPLUS' ? 'S+' : p_tier; %></span>
 											<strong>
 												<a href="/player/<%= p.rsc_id; %>">
 													<%= p.name %></a>
@@ -685,7 +685,7 @@
 										</td>
 										<% } %>
 										<td>
-											<span class="badge bg-<%- p_tier; %>"><%- p_tier; %></span>
+											<span class="badge bg-<%- p_tier; %>"><%- p_tier === 'SPLUS' ? 'S+' : p_tier; %></span>
 											<strong>
 												<a href="/player/<%= p.rsc_id; %>" class="text-warning"
 													><%= p.name %></a>
