@@ -47,7 +47,7 @@
 								continue;
 							}
 					%>
-					<h4><span class="bg-<%- tier; %> badge"><%= tier; %> Tier</span></h4>
+					<h4><span class="bg-<%- tier; %> badge"><%= tier === 'SPLUS' ? 'S+' : tier; %> Tier</span></h4>
 					<ol class="dates">
 						<%
 							let count = 0;

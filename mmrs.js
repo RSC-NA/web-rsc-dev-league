@@ -80,7 +80,7 @@ const mmrRange_dev = {
 		'min': 975,
 	},
 	'F': { 
-		'max': 960,
+		'max': 970,
 		'min': 0,
 	},
 };

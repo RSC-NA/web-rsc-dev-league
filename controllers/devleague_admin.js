@@ -1512,36 +1512,52 @@ router.get('/manage_league', (req, res) => {
 	
 	const counts_query = `
 		SELECT 
-			count(*) AS count,tier,status 
+			count(*) AS count,tier,mmr,status 
 		FROM contracts 
 		WHERE 
 			tier != "" AND 
 			tier != "NONE" 
-		GROUP BY tier,status 
-		ORDER BY tier,status`;
+		GROUP BY tier,mmr,status 
+		ORDER BY tier,mmr,status`;
 	req.db.query(counts_query, (err, results) => {
 		if ( err ) { throw err; }
-
 		// hardcoded tier names so we can get correct sort order.
 		const tiers = {
 			'all': { 'total': 0, 'fa': 0 },
-			'Legend': { 'total': 0, 'fa': 0 },
-			'Premier': { 'total': 0, 'fa': 0 },
-			'Master': { 'total': 0, 'fa': 0 },
-			'Elite': { 'total': 0, 'fa': 0 },
-			'Veteran': { 'total': 0, 'fa': 0 },
-			'Rival': { 'total': 0, 'fa': 0 },
-			'Challenger': { 'total': 0, 'fa': 0 },
-			'Prospect': { 'total': 0, 'fa': 0 },
-			'Contender': { 'total': 0, 'fa': 0 },
-			'Amateur': { 'total': 0, 'fa': 0 },
+			// 'Legend': { 'total': 0, 'fa': 0 },
+			// 'Premier': { 'total': 0, 'fa': 0 },
+			// 'Master': { 'total': 0, 'fa': 0 },
+			// 'Elite': { 'total': 0, 'fa': 0 },
+			// 'Veteran': { 'total': 0, 'fa': 0 },
+			// 'Rival': { 'total': 0, 'fa': 0 },
+			// 'Challenger': { 'total': 0, 'fa': 0 },
+			// 'Prospect': { 'total': 0, 'fa': 0 },
+			// 'Contender': { 'total': 0, 'fa': 0 },
+			// 'Amateur': { 'total': 0, 'fa': 0 },
+			'SPLUS': { 'total': 0, 'fa': 0 },
+			'S': { 'total': 0, 'fa': 0 },
+			'A': { 'total': 0, 'fa': 0 },
+			'B': { 'total': 0, 'fa': 0 },
+			'C': { 'total': 0, 'fa': 0 },
+			'D': { 'total': 0, 'fa': 0 },
+			'E': { 'total': 0, 'fa': 0 },
+			'F': { 'total': 0, 'fa': 0 },
 		};
 		for ( let i = 0; i < results.length; i++ ) {
-			tiers[ results[i]['tier'] ]['total'] += results[i]['count'];
+			if ( ! results[i].mmr ) {
+				console.log('BROKEN RECORD:', results[i]);
+				continue;
+			}
+			const dev_tier = getTierFromDevMMR(results[i].mmr);
+			if ( ! (dev_tier in tiers) ) {
+				console.log('BROKEN RECORD INSIDE:', results[i], dev_tier, tiers);
+				continue;
+			}
+			tiers[ dev_tier ]['total'] += results[i]['count'];
 			tiers['all']['total'] += results[i]['count'];
 
 			if ( results[i]['status'] == 'Free Agent' ) {
-				tiers[ results[i]['tier'] ]['fa'] += results[i]['count'];
+				tiers[ dev_tier ]['fa'] += results[i]['count'];
 				tiers['all']['fa'] += results[i]['count'];
 			}
 		}

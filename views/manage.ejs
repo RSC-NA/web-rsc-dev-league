@@ -36,7 +36,7 @@
 		<%
 			if ( importResults.display ) {
 		%>
-		<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+		<svg xmlns="http://www.w3.org/1600/svg" style="display: none;">
 			<symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
 				<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
 			</symbol>
@@ -108,7 +108,7 @@
 		<div class="col-md-4 order-md-2 mb-4">
 			<h4 class="d-flex justify-content-between align-items-center mb-3">
 				<span class="text-muted">Active Leagues</span>
-				<span class="badge badge-secondary badge-pill">3</span>
+				<span class="badge rounded-3 border badge-secondary badge-pill">3</span>
 			</h4>
 
 			<div class="text-end mb-3">
@@ -131,98 +131,53 @@
 			</div>
 
 			<ul class="list-group mb-3">
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.premier ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/premier.png"> Legend</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Legend']['total'] - tiers['Legend']['fa'] %> Signed / <%= tiers['Legend']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-SPLUS">S+ Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['SPLUS']['total'] - tiers['SPLUS']['fa'] %> Signed / <%= tiers['SPLUS']['fa'] %> FA</span>
 				</li>
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.premier ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/premier.png"> Premier</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Premier']['total'] - tiers['Premier']['fa'] %> Signed / <%= tiers['Premier']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-S">S Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['S']['total'] - tiers['S']['fa'] %> Signed / <%= tiers['S']['fa'] %> FA</span>
 				</li>
 
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.master ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/master.png"> Master</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Master']['total'] - tiers['Master']['fa'] %> Signed / <%= tiers['Master']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-A">A Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['A']['total'] - tiers['A']['fa'] %> Signed / <%= tiers['A']['fa'] %> FA</span>
 				</li>
 
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.elite ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/elite.png"> Elite</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Elite']['total'] - tiers['Elite']['fa'] %> Signed / <%= tiers['Elite']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-B">B Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['B']['total'] - tiers['B']['fa'] %> Signed / <%= tiers['B']['fa'] %> FA</span>
 				</li>
 
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.veteran ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/veteran.png"> Veteran</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Veteran']['total'] - tiers['Veteran']['fa'] %> Signed / <%= tiers['Veteran']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0  me-3"><span class="badge rounded-3 border bg-C">C Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['C']['total'] - tiers['C']['fa'] %> Signed / <%= tiers['C']['fa'] %> FA</span>
 				</li>
 
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.rival ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/rival.png"> Rival</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Rival']['total'] - tiers['Rival']['fa'] %> Signed / <%= tiers['Rival']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-D">D Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['D']['total'] - tiers['D']['fa'] %> Signed / <%= tiers['D']['fa'] %> FA</span>
 				</li>
 
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.challenger ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/challenger.png"> Challenger</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Challenger']['total'] - tiers['Challenger']['fa'] %> Signed / <%= tiers['Challenger']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-E">E Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['E']['total'] - tiers['E']['fa'] %> Signed / <%= tiers['E']['fa'] %> FA</span>
 				</li>
 
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.prospect ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/prospect.png"> Prospect</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Prospect']['total'] - tiers['Prospect']['fa'] %> Signed / <%= tiers['Prospect']['fa'] %> FA</span>
-				</li>
-
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.contender ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/contender.png"> Contender</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Contender']['total'] - tiers['Contender']['fa'] %> Signed / <%= tiers['Contender']['fa'] %> FA</span>
-				</li>
-
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between lh-condensed">
-					<div <%- settings.amateur ? 'class="text-success"' : '' %>>
-						<h6 class="my-0"><img height="24" src="/icons/amateur.png"> Amateur</h6>
-						<!-- <small class="text-muted">Brief description</small> -->
-					</div>
-					<span class="text-muted"><%= tiers['Amateur']['total'] - tiers['Amateur']['fa'] %> Signed / <%= tiers['Amateur']['fa'] %> FA</span>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end lh-condensed">
+					<h5 class="my-0 me-3"><span class="badge rounded-3 border bg-F">F Tier</span></h5>
+					<span class="text-muted" style="width:160px;"><%= tiers['F']['total'] - tiers['F']['fa'] %> Signed / <%= tiers['F']['fa'] %> FA</span>
 				</li>
 				
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between">
-					<h6 class="my-0 text-light"><img height="24" src="/icons/drafteligible.png"> FA</h6>
-					<strong class="text-light"><%= tiers['all']['fa'] %></strong>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end">
+					<h6 class="my-0 text-light me-3"><img height="24" src="/icons/drafteligible.png"> FA</h6>
+					<strong class="text-light" style="width:160px;"><%= tiers['all']['fa'] %></strong>
 				</li>
 
-				<!-- <li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between">
-					<span>PermFA</span>
-					<strong>86</strong>
-				</li> -->
-
-				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-between">
-					<span class="text-light">Total Players</span>
-					<strong class="text-light"><%= tiers['all']['total'] %></strong>
+				<li style="background-color:#000f1e;" class="list-group-item list-group-item-dark d-flex justify-content-end">
+					<span class="text-light me-3">Total Players</span>
+					<strong class="text-light" style="width:160px;"><%= tiers['all']['total'] %></strong>
 				</li>
 				
 			</ul>
@@ -233,7 +188,12 @@
 		<div class="col-md-8 order-md-1">
 			<h4 class="mb-3">League Settings</h4>
 			
-			<form class="needs-validation" novalidate action="/manage_league" method="post">
+			<form
+				class="needs-validation"
+				novalidate
+				action="/manage_league"
+				method="post"
+			>
 
 			<div class="mb-3">
 				<label for="season">Season</label>
@@ -273,44 +233,15 @@
 				</div>
 			</div>
 			
-			<hr class="mb-4">
-			
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="premier" id="premier" <%- settings.premier ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="master">Premier</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="master" id="master" <%- settings.master ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="master">Master</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="elite" id="elite" <%- settings.elite ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="elite">Elite</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="veteran" id="veteran" <%- settings.veteran ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="veteran">Veteran</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="rival" id="rival" <%- settings.rival ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="rival">Rival</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="challenger" id="challenger" <%- settings.challenger ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="challenger">Challenger</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="prospect" id="prospect" <%- settings.prospect ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="prospect">Prospect</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="contender" id="contender" <%- settings.contender ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="contender">Contender</label>
-			</div>
-			<div class="custom-control custom-checkbox">
-				<input type="checkbox" class="custom-control-input" name="amateur" id="amateur" <%- settings.amateur ? 'checked="checked"' : '' %>>
-				<label class="custom-control-label" for="amateur">Amateur</label>
-			</div>
+			<input type="hidden" name="premier" value="true">			
+			<input type="hidden" name="master" value="true">			
+			<input type="hidden" name="elite" value="true">			
+			<input type="hidden" name="veteran" value="true">			
+			<input type="hidden" name="rival" value="true">			
+			<input type="hidden" name="challenger" value="true">			
+			<input type="hidden" name="prospect" value="true">			
+			<input type="hidden" name="contender" value="true">			
+			<input type="hidden" name="amateur" value="true">			
 		
 			<hr class="mb-4">
 			
