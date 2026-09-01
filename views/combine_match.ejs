@@ -959,6 +959,8 @@
 										</td>
 										<% } else if ( combines.active ){ %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
+										<% } else if ( ! CAN_VIEW_ALL && ! user.user_id ) { %>
+										<td colspan="3" class="text-end fst-italic">MMRs Hidden for Non-Users</td>
 										<% } %>
 									</tr>
 								<%
