@@ -108,10 +108,10 @@ router.get('/player/:rsc_id', async (req, res) => {
 			c.rsc_id, c.discord_id, c.name, c.tier, c.status, c.mmr, c.active_3s, c.active_2s,
 			p.admin,p.tourney_admin,p.devleague_admin,p.stats_admin,p.combines_admin,
 			p.mmr AS cur_mmr, NULL as cur_tier
-		FROM contracts AS c
-		LEFT JOIN players AS p 
-			ON c.rsc_id = p.rsc_id
-		WHERE c.rsc_id = ?
+		FROM players AS p
+		LEFT JOIN contracts AS c 
+			ON p.rsc_id = c.rsc_id
+		WHERE p.rsc_id = ?
 	`;
 
 	const player = {
