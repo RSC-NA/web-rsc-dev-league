@@ -532,6 +532,10 @@ router.get('/combine/check_in/:rsc_id/:league', async (req, res) => {
  ******************** Admin Views *********************
  ******************************************************/
 router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, res, next) => {
+	if ( ! req.session.user_id ) {
+		return res.redirect('/');
+	}
+
 	const match_id = req.params.match_id;
 
 	const home_wins = parseInt(req.body.home_wins);
