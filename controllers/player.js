@@ -90,6 +90,9 @@ router.get('/player/:rsc_id/demote/:role', (req, res) => {
 });
 
 router.get('/player/:rsc_id', async (req, res) => {
+	if ( ! req.session.user_id ) {
+		return res.redirect('/');
+	}
 	/*
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
