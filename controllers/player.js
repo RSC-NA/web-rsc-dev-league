@@ -118,9 +118,9 @@ router.get('/player/:rsc_id', async (req, res) => {
 		rsc_id     : '',
 		discord_id : '',
 		name       : '',
-		tier       : '',
-		cur_tier   : '',
-		status     : '',
+		tier       : 'NONE',
+		cur_tier   : 'NONE',
+		status     : 'Non-Playing',
 		mmr        :  0,
 		cur_mmr    :  0,
 		trackers   : {},
@@ -157,14 +157,14 @@ router.get('/player/:rsc_id', async (req, res) => {
 		player.rsc_id     = req.params.rsc_id;
 		player.discord_id = results[0].discord_id;
 		player.name       = results[0].name;
-		player.tier       = results[0].tier;
+		player.tier       = results[0].tier ? results[0].tier : 'NONE';
 		player.cur_tier   = results[0].cur_mmr ? getTierFromDevMMR(results[0].cur_mmr) : results[0].tier;
-		player.mmr        = results[0].mmr;
-		player.cur_mmr    = results[0].cur_mmr;
-		player.mmr_delta  = results[0].cur_mmr - results[0].mmr;
-		player.status     = results[0].status;
-		player.active_3s  = results[0].active_3s;
-		player.active_2s  = results[0].active_2s;
+		player.mmr        = results[0].mmr ?? 0;
+		player.cur_mmr    = results[0].cur_mmr ?? 0;
+		player.mmr_delta  = player.cur_mmr - player.mmr;
+		player.status     = results[0].status ? results[0].status : 'Non-Playing';
+		player.active_3s  = results[0].active_3s ?? false;
+		player.active_2s  = results[0].active_2s ?? false;
 
 		player.admin           = results[0].admin;
 		player.tourney_admin   = results[0].tourney_admin;
