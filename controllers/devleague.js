@@ -342,7 +342,7 @@ router.get('/bans', (req, res) => {
 		FROM player_bans AS b 
 		LEFT JOIN players AS pp ON b.banned_by = pp.id 
 		LEFT JOIN players AS p ON b.discord_id = p.discord_id
-		ORDER BY b.expires_dtg ASC, b.created_dtg
+		ORDER BY b.id DESC, b.created_dtg
 	`;
 
 	req.db.query(query, (err, results) => {
