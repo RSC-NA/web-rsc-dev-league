@@ -897,7 +897,7 @@ app.get('/', (req, res) => {
 		res.render('dashboard', { 
 			match_days: matchDays, //res.locals.match_days,
 			roles: roles,
-			getTierFromMMR: getTierFromMMR,
+			getTierFromDevMMR: getTierFromDevMMR,
 			user_roles: req.session?.user_roles ?? null,
 			dashboard_error: req.query?.error ?? false,
 		});
