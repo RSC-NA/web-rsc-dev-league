@@ -87,6 +87,19 @@
 
 								const mmr_delta = p.cur_mmr - p.mmr;
 								const delta_class = mmr_delta > 0 ? 'Veteran text-lg fw-bolder' : 'text-danger text-lg fw-bolder';
+								let arrow_dir = '';
+								if ( mmr_delta > 0 ) {
+									arrow_dir = 'arrow-trend-up';
+								} else if ( mmr_delta < 0 ) {
+									arrow_dir = 'arrow-trend-down';
+								}
+								if ( p.save_tier !== p.cur_tier ) {
+									if ( mmr_delta > 0 ) {
+										arrow_dir = 'arrow-turn-up';
+									} else {
+										arrow_dir = 'arrow-turn-down';
+									}
+								}
 						%>
 
 						<li class="<%- player_class  %> <%- top_class %>">
@@ -99,13 +112,13 @@
 								title="Original Tier: <b><%- p.save_tier; %></b><br>Original RSC MMR: <b><%- p.mmr; %></b>"
 								data-bs-toggle="tooltip" data-bs-html="true"
 							>
-								<span class="<%- p.save_tier; %>"><%- p.save_tier; %></span>, <%- p.mmr; %>
-							</span> :
+								<span class="badge bg-<%- p.save_tier; %>"><%- p.save_tier === 'SPLUS' ? 'S+' : p.save_tier; %> (<%- p.mmr ; %>)</span>
+							</span> <i class="fas fa-<%- arrow_dir; %> text-light"></i> 
 							<span
-								title="Current Tier: <b><%- p.save_cur_tier; %></b><br>Current MMR: <b><%- p.cur_mmr; %></b>"
+								title="Current Tier: <b><%- p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></b><br>Current MMR: <b><%- p.cur_mmr; %></b>"
 								data-bs-toggle="tooltip" data-bs-html="true"
 							>
-								<span class="<%- p.save_cur_tier; %>"><%- p.save_cur_tier; %></span>, <%- p.cur_mmr; %> 
+								<span class="badge bg-<%- p.cur_tier; %>"><%- p.save_cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %> (<%- p.cur_mmr; %>)</span>
 							</span>
 							:: 
 							<span

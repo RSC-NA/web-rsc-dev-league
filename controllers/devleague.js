@@ -215,7 +215,9 @@ router.get('/championship', (req, res) => {
 			for ( let i = 0; i < results.length; ++i ) {
 				const player = results[i];
 			
-				const cur_tier = getTierFromDevMMR(player.cur_mmr)
+				const save_tier = getTierFromDevMMR(player.mmr);
+				const cur_tier = getTierFromDevMMR(player.cur_mmr);
+				player.save_tier = save_tier;
 				player.save_cur_tier = cur_tier;
 				player.cur_tier = cur_tier;
 
@@ -225,7 +227,6 @@ router.get('/championship', (req, res) => {
 				// 	player.cur_tier = 'ContAmmy';
 				// }
 						
-				player.save_tier = player.tier;
 				// switch ( player.tier ) {
 				// 	case 'Premier':
 				// 	case 'Master':
