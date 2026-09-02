@@ -693,7 +693,7 @@ router.get('/match/:match_id', (req, res) => {
 		const tier = getTierFromDevMMR(lobby_mmr);	
 		console.log(lobby_mmr, lobby_players, tier);
 		
-		res.locals.title = `${tier} ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
+		res.locals.title = `${tier} Tier #${match_id} | ${home_team}/${away_team}${score_title} (S${results[0].season}, MD${results[0].match_day}) - ${res.locals.title}`;
 
 		const placeholders = '?, '.repeat(player_ids.length - 1) + '?';
 
