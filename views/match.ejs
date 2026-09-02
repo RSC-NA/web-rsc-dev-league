@@ -464,7 +464,8 @@
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-Elite text-white rounded p-2">
-								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team
+								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team [<%- lobby_user; %>]
+
 							</h3>
 							<%
 								let homeClass = 'bg-info';
@@ -597,7 +598,7 @@
 
 						<div class="col-md-6">
 							<h3 class="bg-Prospect rounded p-2 text-black">
-								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team
+								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team [<%- lobby_pass; %>]
 							</h3>
 							<%
 								if ( has_scored ) {

@@ -11,7 +11,17 @@
 				<div class="col-md-8">
 
 			<% if ( user.name ) { %>
-					<h1>Welcome to the RSC Development League, <%= user.name %></h1>
+					<h1>
+						Welcome to the RSC Development League, <%= user.name %>
+						<% 
+							if ( user.season_mmr ) {
+								const cur_tier = getTierFromDevMMR(user.season_mmr);
+						%>
+						<span class="badge bg-<%- cur_tier; %>"><%- cur_tier; %> Tier</span>
+						<%
+							}
+						%>
+					</h1>
 					<div class="roles text-sm">
 					<%
 						if ( user_roles ) {
