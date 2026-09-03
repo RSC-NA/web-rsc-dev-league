@@ -160,7 +160,7 @@ li.today.holiday {
 	--amateur: 243, 169, 169;
 }
 
-.bg-SPLUS { background-color: rgba(var(--legend), var(--bs-bg-opacity)) !important; color: rgb(var(--premier)); font-weight: 900; }
+.bg-SPLUS { background-color: rgba(var(--legend), var(--bs-bg-opacity)) !important; color: '#9a1fc8'; font-weight: 900; }
 .bg-S { background-color: rgba(var(--premier), var(--bs-bg-opacity)) !important; color: var(--bs-white); font-weight: 700; }
 .bg-A { background-color: rgba(var(--master), var(--bs-bg-opacity)) !important; font-weight: bold; }
 .bg-B { background-color: rgba(var(--elite), var(--bs-bg-opacity)) !important; font-weight: bold; }
