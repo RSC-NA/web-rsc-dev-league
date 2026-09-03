@@ -44,7 +44,7 @@
 					</div>
 					<div class="my-0 flex-grow-1 align-middle">
 					<h5 class="my-0">
-						<span class="badge bg-<%- matches[i].tier; %>"><%- matches[i].tier; %> Tier</span>
+						<span class="badge bg-<%- matches[i].tier; %>"><%- matches[i].tier === 'SPLUS' ? 'S+' : matches[i].tier; %> Tier</span>
 						<%= awayTeam %> @ <%= homeTeam %>
 					</h5>
 					</div>
