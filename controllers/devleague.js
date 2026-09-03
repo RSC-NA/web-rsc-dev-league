@@ -166,6 +166,7 @@ router.get('/championship', (req, res) => {
 		WHERE season = ? AND (date(match_dtg) != '2026-03-25' AND date(match_dtg) != '2026-03-30')
 	`;
 	const leaderboards = {
+		'SPLUS': null,
 		'S': null,
 		'A': null,
 		'B': null,
@@ -173,7 +174,6 @@ router.get('/championship', (req, res) => {
 		'D': null,
 		'E': null,
 		'F': null,
-		'G': null,
 		// 'PreMaster': null,
 		// 'Elite': null,
 		// 'Veteran': null,
