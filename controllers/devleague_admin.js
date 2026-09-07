@@ -1241,6 +1241,17 @@ router.get('/import_players/:contract_sheet_id', async(req,res) => {
 
 	console.log(`    Players populated...${Object.keys(players).length}`);
 
+	// if ( ! ('207266416355835904' in players) ) {
+	// 	players['207266416355835904'] = {
+	// 		'rsc_id': 'RSC000302',
+	// 		'name': 'tehblister',
+	// 		'discord_id': '207266416355835904',
+	// 		'active_2s': false,
+	// 		'active_3s': true,
+	// 		'status': 'playing',
+	// 	};
+	// }
+
 	const new_query = `INSERT INTO players (rsc_id,nickname,discord_id) VALUES (?, ?, ?)`;
 	const update_query = `UPDATE players SET rsc_id = ?, nickname = ? WHERE discord_id = ?`;
 	let new_players = 0;

@@ -700,17 +700,17 @@ app.use((req, res, next) => {
 	res.locals.combine_2s_live = res.locals.combines_2s.live;
 
 	if ( date in matchDays ) {
-		res.locals.match_day = matchDays[date]; //res.locals.match_days[date]; //matchDays[date];
+		res.locals.match_day = matchDays[date]; 
 		if ( matchDays[date] === 'playoffs' ) {
 			res.locals.match_day = 99;
 		}
 	}
 	if ( date in combineDays['3s'] || res.locals.combine_live ) {
-		res.locals.combine_day = combineDays['3s'][date]; //res.locals.match_days[date]; //combineDays['3s'][date];
+		res.locals.combine_day = combineDays['3s'][date]; 
 		if ( ! res.locals.combine_day ) {
 			const backup_date = new Date(new Date().setHours(-10)).toISOString().split('T')[0];
 			if ( backup_date in combineDays['3s'] ) {
-				res.locals.combine_day = combineDays['3s'][backup_date]; //res.locals.match_days[date]; //combineDays['3s'][date];
+				res.locals.combine_day = combineDays['3s'][backup_date]; 
 			}
 		}
 	}
@@ -719,29 +719,38 @@ app.use((req, res, next) => {
 	}
 	if ( res.locals.match_day !== false && req.session.user_id && ! res.locals.combine_live ) {
 		const query = `
-			SELECT id,active,rostered 
-			FROM signups 
+			SELECT 
+				s.id,s.active,s.rostered,m.id AS match_id
+			FROM signups AS s 
+			LEFT JOIN team_players AS tp 
+				ON s.player_id = tp.player_id
+			LEFT JOIN matches AS m 
+				ON tp.team_id = m.home_team_id OR tp.team_id = m.away_team_id
 			WHERE 
-				player_id = ? AND 
+				s.player_id = ? AND 
 				( 
-					signup_dtg >= date_sub(now(), interval 16 hour)
-				)
+					s.signup_dtg >= date_sub(now(), interval 16 hour)
+				) AND ( 
+					m.match_dtg >= date_sub(now(), interval 16 hour)
+				) AND (m.reported_rsc_id IS null OR s.rostered = 0)
+
 		`;
-		/*
-					OR 
-					DATE_ADD(DATE(signup_dtg), INTERVAL 1 DAY) = CURDATE() 
-		*/
 		connection.query(
 			query,
 			[ req.session.user_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
+					console.log(results);
 					req.session.checked_in = true;
 					req.session.rostered = results[0].rostered;
 					res.locals.checked_in = req.session.checked_in;
 					res.locals.rostered = req.session.rostered;
 					next();
 				} else {
+					req.session.checked_in = false;
+					req.session.rostered = false;
+					res.locals.checked_in = false;
+					res.locals.rostered = false;
 					next();
 				}
 			}
