@@ -727,11 +727,10 @@ app.use((req, res, next) => {
 			LEFT JOIN matches AS m 
 				ON tp.team_id = m.home_team_id OR tp.team_id = m.away_team_id
 			WHERE 
-				s.player_id = ? AND 
+				s.player_id = ? AND m.reported_rsc_id IS null AND 
 				( 
 					s.signup_dtg >= date_sub(now(), interval 16 hour)
 				) 
-
 		`;
 		/*
 				AND ( 
