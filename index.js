@@ -730,15 +730,20 @@ app.use((req, res, next) => {
 				s.player_id = ? AND 
 				( 
 					s.signup_dtg >= date_sub(now(), interval 16 hour)
-				) AND (m.reported_rsc_id IS null OR s.rostered = 0)
+				) 
 
 		`;
+		/*
+				AND ( 
+					m.match_dtg >= date_sub(now(), interval 16 hour) AND 
+					(m.reported_rsc_id IS null OR s.rostered = 0)
+				)
+				*/
 		connection.query(
 			query,
 			[ req.session.user_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
-					console.log(results);
 					req.session.checked_in = true;
 					req.session.rostered = results[0].rostered;
 					res.locals.checked_in = req.session.checked_in;
