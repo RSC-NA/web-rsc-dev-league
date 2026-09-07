@@ -731,6 +731,8 @@ app.use((req, res, next) => {
 				( 
 					s.signup_dtg >= date_sub(now(), interval 16 hour)
 				) 
+			ORDER BY s.id DESC  
+			LIMIT 1
 		`;
 		/*
 				AND ( 
