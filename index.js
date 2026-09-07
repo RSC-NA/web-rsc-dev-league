@@ -730,8 +730,6 @@ app.use((req, res, next) => {
 				s.player_id = ? AND 
 				( 
 					s.signup_dtg >= date_sub(now(), interval 16 hour)
-				) AND ( 
-					m.match_dtg >= date_sub(now(), interval 16 hour)
 				) AND (m.reported_rsc_id IS null OR s.rostered = 0)
 
 		`;
