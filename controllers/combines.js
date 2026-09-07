@@ -776,6 +776,9 @@ router.post(['/combine/:match_id', '/combine/:match_id/:league'], async (req, re
 });
 
 router.get(['/combine/:match_id', '/combine/:match_id/:league'], (req, res) => {
+	if ( ! req.session.user_id ) {
+		return res.redirect('/');
+	}
 	const match_id = req.params.match_id;
 
 	const league = req.params.league ? parseInt(req.params.league) : 3;
