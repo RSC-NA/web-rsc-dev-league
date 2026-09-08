@@ -720,13 +720,21 @@ app.use((req, res, next) => {
 	if ( res.locals.match_day !== false && req.session.user_id && ! res.locals.combine_live ) {
 		const query = `
 			SELECT 
-				s.id,s.active,s.rostered
+				s.id,s.active,s.rostered,m.id AS match_id
 			FROM signups AS s 
+			LEFT JOIN team_players AS tp 
+				ON s.player_id = tp.player_id
+			LEFT JOIN matches AS m 
+				ON 
+					m.reported_rsc_id IS null AND
+					(tp.team_id = m.home_team_id OR tp.team_id = m.away_team_id)
 			WHERE 
-				s.player_id = ? AND
+				s.player_id = ? AND m.reported_rsc_id IS null AND 
 				( 
 					s.signup_dtg >= date_sub(now(), interval 16 hour)
 				) 
+			ORDER BY s.id DESC  
+			LIMIT 1
 		`;
 		/*
 				AND ( 
