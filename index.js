@@ -727,7 +727,10 @@ app.use((req, res, next) => {
 					SELECT m1.id FROM matches AS m1
 					LEFT JOIN team_players AS tp1 
 						ON tp1.match_id = m1.id AND tp1.player_id = s.player_id
-					WHERE m1.reported_rsc_id IS null
+					WHERE 
+						m1.reported_rsc_id IS null AND 
+						m1.cancelled = 0 AND 
+						m1.season = ? AND m1.match_day = ?
 				)
 			WHERE 
 				s.player_id = ? AND (
@@ -748,7 +751,7 @@ app.use((req, res, next) => {
 				*/
 		connection.query(
 			query,
-			[ req.session.user_id ],
+			[ res.locals.settings.season, res.locals.match_day, req.session.user_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
 					console.log('RESULTS => ', results);
