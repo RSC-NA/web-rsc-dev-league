@@ -720,11 +720,21 @@ app.use((req, res, next) => {
 	if ( res.locals.match_day !== false && req.session.user_id && ! res.locals.combine_live ) {
 		const query = `
 			SELECT 
-				s.id,s.active,s.rostered
+				s.id,s.active,s.rostered,m.id AS match_id, m.reported_rsc_id
 			FROM signups AS s 
+			LEFT JOIN matches AS m
+				ON m.id = (
+					SELECT m1.id FROM matches AS m1
+					LEFT JOIN team_players AS tp1 
+						ON tp1.match_id = m1.id AND tp1.player_id = s.player_id
+					WHERE m1.reported_rsc_id IS null
+				)
 			WHERE 
-				s.player_id = ? AND 
-				( 
+				s.player_id = ? AND (
+					(m.id IS NOT null AND m.reported_rsc_id IS null) OR 
+					(m.id IS NOT null AND s.rostered = 1) OR 
+					(s.rostered = 0)
+				) AND ( 
 					s.signup_dtg >= date_sub(now(), interval 16 hour)
 				) 
 			ORDER BY s.id DESC  
@@ -741,12 +751,14 @@ app.use((req, res, next) => {
 			[ req.session.user_id ],
 			(_err, results) => {
 				if ( results && results.length > 0 ) {
-					req.session.checked_in = true;
+					console.log('RESULTS => ', results);
+					req.session.checked_in = ! results[0].reported_rsc_id ? true : false;
 					req.session.rostered = results[0].rostered;
 					res.locals.checked_in = req.session.checked_in;
 					res.locals.rostered = req.session.rostered;
 					next();
 				} else {
+					console.log('NO RESULTS => ', results);
 					req.session.checked_in = false;
 					req.session.rostered = false;
 					res.locals.checked_in = false;

@@ -77,7 +77,7 @@ async function make_lobby_devleague(db, lobby) {
 
 	const match_id = match_res.insertId;
 
-	const tp_query = `INSERT INTO team_players (team_id, player_id, start_mmr) VALUES (?, ?, ?)`;
+	const tp_query = `INSERT INTO team_players (match_id,team_id, player_id, start_mmr) VALUES (?, ?, ?, ?)`;
 	const home_players = lobby.home.players;
 	const away_players = lobby.away.players;
 
@@ -86,13 +86,13 @@ async function make_lobby_devleague(db, lobby) {
 	for ( let i = 0; i < home_players.length; ++i ) {
 		const p = home_players[i];
 		const start_mmr = p.season_mmr ? p.season_mmr : p.mmr;
-		await db.execute(tp_query, [home_team_id, home_players[i].id, start_mmr]);
+		await db.execute(tp_query, [match_id,home_team_id, home_players[i].id, start_mmr]);
 		in_lobby.push(home_players[i].id);
 	}
 	for ( let i = 0; i < away_players.length; ++i ) {
 		const p = away_players[i];
 		const start_mmr = p.season_mmr ? p.season_mmr : p.mmr;
-		await db.execute(tp_query, [away_team_id, away_players[i].id, start_mmr]);
+		await db.execute(tp_query, [match_id,away_team_id, away_players[i].id, start_mmr]);
 		in_lobby.push(away_players[i].id);
 	}
 
