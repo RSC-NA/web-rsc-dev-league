@@ -755,6 +755,7 @@ app.use((req, res, next) => {
 			query,
 			[ res.locals.settings.season, res.locals.match_day, req.session.user_id ],
 			(_err, results) => {
+				console.log('USER-QUERY', res.locals.settings.season, res.locals.match_day, req.session.user_id);
 				if ( results && results.length > 0 ) {
 					console.log('RESULTS => ', results);
 					req.session.checked_in = ! results[0].reported_rsc_id ? true : false;
