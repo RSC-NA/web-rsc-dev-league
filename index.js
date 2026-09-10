@@ -745,26 +745,20 @@ app.use((req, res, next) => {
 			ORDER BY s.id DESC  
 			LIMIT 1
 		`;
-		/*
-				AND ( 
-					m.match_dtg >= date_sub(now(), interval 16 hour) AND 
-					(m.reported_rsc_id IS null OR s.rostered = 0)
-				)
-				*/
 		connection.query(
 			query,
 			[ res.locals.settings.season, res.locals.match_day, req.session.user_id ],
 			(_err, results) => {
-				console.log('USER-QUERY', res.locals.settings.season, res.locals.match_day, req.session.user_id);
+				// console.log('USER-QUERY', res.locals.settings.season, res.locals.match_day, req.session.user_id);
 				if ( results && results.length > 0 ) {
-					console.log('RESULTS => ', results);
+					// console.log('CHECKED IN => ', results);
 					req.session.checked_in = ! results[0].reported_rsc_id ? true : false;
 					req.session.rostered = results[0].rostered;
 					res.locals.checked_in = req.session.checked_in;
 					res.locals.rostered = req.session.rostered;
 					next();
 				} else {
-					console.log('NO RESULTS => ', results);
+					// console.log('NOT CHECKED IN => ', results);
 					req.session.checked_in = false;
 					req.session.rostered = false;
 					res.locals.checked_in = false;

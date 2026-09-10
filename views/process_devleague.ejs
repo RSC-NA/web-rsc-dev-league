@@ -64,8 +64,13 @@
 			aria-controls="collapse_games">
 
 			<div class="card-header text-black">
-				<h4>Active Games: <%- games.length; %>
-				<button class="btn btn-primary btn-sm float-end fw-bolder">Show Active Games</button>
+				<h4>
+					Active Games: <%- games.length; %>
+					<button
+						class="btn btn-primary btn-sm float-end fw-bolder"
+					>
+						Show Active Games
+					</button>
 				</h4>
 			</div>
 		</a>
@@ -234,6 +239,7 @@
 						<th>Player</th>
 						<th class="text-center">Record</th>
 						<th class="text-center">W%</th>
+						<th class="text-center"><i class="fas fa-trash"></i></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -311,6 +317,14 @@
 							<span class="<%- stat_colors[analysis]; %> fw-bold">
 								<%= p.win_percentage; %>%
 							</span>
+						</td>
+						<td class="text-center">
+							<a
+								href="/devleague/force-out/<%- p.id; %>"
+								class="btn btn-sm btn-outline-danger rounded-pill"
+							>
+								<i class="fas fa-trash"></i>
+							</a>
 						</td>
 					</tr>
 

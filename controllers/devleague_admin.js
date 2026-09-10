@@ -781,7 +781,6 @@ router.get('/activate_everyone/:match_day', (req, res) => {
 });
 
 async function get_stats(db, season) {
-	console.log('in get_stats');
 	const query = `
 		SELECT
 			m.id AS m_id, m.home_team_id, m.home_wins,
@@ -1102,6 +1101,24 @@ router.get('/process_gameday', (req, res) => {
 		}
 		console.log(signups);
 		res.render('process', { signups: signups, match_day: match_day });
+	});
+});
+
+router.get('/devleague/force-out/:signup_id', (req,res) => {
+	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
+		return res.redirect('/');
+	} 
+
+	const signup_id = req.params.signup_id;
+	
+	const delete_query = `
+		DELETE FROM signups WHERE id = ?
+	`; 
+	console.log('DELETE => ', signup_id);
+	req.db.query(delete_query, [signup_id], (err, _results) => {
+		if ( err ) { throw err; }
+
+		res.redirect('/devleague');
 	});
 });
 
