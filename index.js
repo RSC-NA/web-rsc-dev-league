@@ -731,6 +731,8 @@ app.use((req, res, next) => {
 						m1.reported_rsc_id IS null AND 
 						m1.cancelled = 0 AND 
 						m1.season = ? AND m1.match_day = ?
+					ORDER BY m1.id DESC  
+					LIMIT 1
 				)
 			WHERE 
 				s.player_id = ? AND (
