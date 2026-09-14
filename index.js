@@ -89,6 +89,9 @@ app.use(session({
 	secret: 'rsc-dev-league',
 	resave: false,
 	saveUninitialized: false,
+	cookie: {
+		maxAge: 30*24*60*60*1000,
+	}
 }));
 
 app.use(cors({
