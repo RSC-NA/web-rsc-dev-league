@@ -1474,6 +1474,8 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	await db.end();
 
+	console.log(players);
+
 	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }
 		console.log('truncate table');
