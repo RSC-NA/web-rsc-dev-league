@@ -1474,7 +1474,6 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 	await db.end();
 
-	console.log(players);
 
 	req.db.query('TRUNCATE TABLE contracts', (err) => {
 		if ( err ) {  throw err; }
@@ -1504,6 +1503,7 @@ router.get('/import_contracts/:contract_sheet_id', async (req, res) => {
 
 			playersArray.push([ player['discord_id'], player['rsc_id'], player['name'], player['mmr'], player['tier'], player['status'], player['active_3s'], player['active_2s'] ]);
 		}
+		console.log(playersArray);
 
 		const insertQuery = `
 			INSERT INTO contracts 
