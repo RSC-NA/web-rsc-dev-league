@@ -659,7 +659,7 @@ router.post('/admin-score/:match_id', async (req, res) => {
 	return res.redirect(`/match/${req.params.match_id}`);
 });
 
-router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id', (req, res) => {
+router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id/:player_mmr', (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
@@ -667,6 +667,7 @@ router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id', (req, re
 	const team_id = parseInt(req.params.team_id);
 	const player_id = parseInt(req.params.player_id);
 	const sub_player_id = parseInt(req.params.sub_player_id);
+	const sub_mmr = parseInt(req.params.player_mmr);
 	const output = {
 		team_id: team_id,
 		player_id: player_id,
@@ -676,10 +677,10 @@ router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id', (req, re
 	//return res.json(output);
 
 	const query = `
-		UPDATE team_players SET player_id = ? 
+		UPDATE team_players SET player_id = ?, start_mmr = ? 
 		WHERE team_id = ? AND player_id = ?
 	`;
-	req.db.query(query, [sub_player_id, team_id, player_id], (err, results) => {
+	req.db.query(query, [sub_player_id, sub_mmr, team_id, player_id], (err, results) => {
 		if ( err ) { throw err; }
 
 		const match_id_query = `SELECT id,reported_rsc_id FROM matches WHERE home_team_id = ? OR away_team_id = ?`;
