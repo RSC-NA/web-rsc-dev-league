@@ -279,6 +279,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				WHERE 
 					signup_dtg >= date_sub(now(), INTERVAL 16 HOUR) AND
 					rostered = 0 AND active = 1 
+				GROUP BY player_id 
 				HAVING count(player_id) > 1 
 			`;
 			const [bad_results] = await db.execute(find_the_badguy_query);
