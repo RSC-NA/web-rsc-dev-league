@@ -389,12 +389,12 @@ router.get('/match/:match_id/cancel', async (req, res) => {
 
 	const scoreQuery = `
 		UPDATE matches 
-		SET cancelled = 1, home_wins = ?, away_wins = ?, reported_rsc_id = ? 
+		SET cancelled = 1, reported_rsc_id = ? 
 		WHERE id = ?
 	`;
 
 	await db.execute(scoreQuery, [
-		home_wins, away_wins, res.locals.user.rsc_id, req.params.match_id,
+		res.locals.user.rsc_id, req.params.match_id,
 	]);
 
 	const match_details = {
