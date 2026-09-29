@@ -705,7 +705,7 @@ router.get('/match/:team_id/sub/:player_id', (req, res) => {
 	
 	const query = `
 		SELECT 
-			p.id,p.nickname,p.rsc_id,c.mmr,c.tier
+			p.id,p.nickname,p.rsc_id,c.mmr,c.tier,p.mmr AS start_mmr
 		FROM players AS p 
 		LEFT JOIN contracts AS c 
 			ON p.rsc_id = c.rsc_id 
