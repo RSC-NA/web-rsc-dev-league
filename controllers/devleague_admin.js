@@ -535,6 +535,9 @@ router.get('/match/:match_id/cancel', async (req, res) => {
 		match = match_results[0];
 	}
 
+	match.home = [];
+	match.away = [];
+
 	const players_query = ` 
 		SELECT 
 			p.id,p.rsc_id,p.discord_id,p.nickname,p.mmr AS season_mmr,
@@ -585,17 +588,48 @@ router.get('/match/:match_id/cancel', async (req, res) => {
 				p.wins = home_wins;
 				p.losses = away_wins;
 				match_details.players[p.rsc_id] = p;	
+				match.home.push({
+					discord_id: p.discord_id,
+					rsc_id: p.rsc_id,
+					match_id: match_id,
+					team: 'home',
+					name: p.nickname
+				});
 			} else {
 				match_details.away.start_mmr += p.start_mmr;
 				p.team = 'away';
 				p.wins = away_wins;
 				p.losses = home_wins;
 				match_details.players[p.rsc_id] = p;	
+				match.home.push({
+					discord_id: p.discord_id,
+					rsc_id: p.rsc_id,
+					match_id: match_id,
+					team: 'away',
+					name: p.nickname
+				});
 			}
 		}
 	}
 
 	const deltas = await admin_dev_reset_mmrs(db, match_details);
+	
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = res.locals.settings.season;
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+	
+	await send_dev_bot_message(
+		league,
+		actor,
+		'success',
+		'Finished Game',
+		`This match has been cancelled. You may now queue again.`,
+		match
+	);
 
 	await db.end();
 
