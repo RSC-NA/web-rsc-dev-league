@@ -28,7 +28,7 @@ async function send_dev_bot_message(league, actor, status, message_type, message
 	};
 	//console.log(outbound);
 	try {
-		await fetch('http://localhost:8008/combines_event', {
+		await fetch('http://localhost:8008/devleague_event', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -104,12 +104,15 @@ async function get_active(db, league, season, guild_id) {
 		}
 	}
 
+	console.log('inside',games);
+
 	return games;
 }
 
 async function notify_dev_bot(db, league, season, guild_id) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
 	const games = await get_active(db, league, season, guild_id);
+	console.log(games);
 	if ( games && Object.keys(games).length ) {
 		//console.log(games);
 		try {
