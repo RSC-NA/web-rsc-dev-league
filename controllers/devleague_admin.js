@@ -83,8 +83,8 @@ async function get_active(db, league, season, guild_id) {
 	if ( game_ids && game_ids.length ) {
 		const players_query = `
 			SELECT 
-				p.id,p.discord_id,p.rsc_id,p.nickname,
-				tp.match_id,tp.team_id,tp.start_mmr,tp.end_mmr	
+				p.discord_id,p.rsc_id,tp.match_id,p.nickname AS name,
+				tp.team_id AS team
 			FROM team_players AS tp 
 			LEFT JOIN players AS p
 				ON tp.player_id = p.id 
@@ -96,9 +96,11 @@ async function get_active(db, league, season, guild_id) {
 				const p = p_results[i];
 				const g = games[p.match_id];
 
-				if ( p.team_id === g.home_team_id ) {
+				if ( p.team === g.home_team_id ) {
+					p.team = 'home';
 					games[p.match_id].home.push(p);
 				} else {
+					p.team = 'away';
 					games[p.match_id].away.push(p);
 				}
 			}
