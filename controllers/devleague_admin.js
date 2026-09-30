@@ -115,7 +115,7 @@ async function get_active(db, league, season, guild_id) {
 async function notify_dev_bot(db, league, season, guild_id) {
 	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
 	const games = await get_active(db, league, season, guild_id);
-	console.log(games);
+	// console.log(games);
 	if ( games && Object.keys(games).length ) {
 		//console.log(games);
 		try {
@@ -489,10 +489,9 @@ router.all('/generate_team/:tier', async (req, res) => {
 
 			lobbies.push(lobby);
 		}
-
+	
+		const bot_input = await notify_dev_bot(db, league, SEASON, guild_id);
 	}
-		
-	const bot_input = await notify_dev_bot(db, league, SEASON, guild_id);
 
 	await db.end();
 

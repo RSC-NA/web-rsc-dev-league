@@ -538,8 +538,8 @@ async function dev_update_mmrs(db, match, k_factor=48) {
 
 	const delta = dev_rating_delta_series(match.home.start_mmr, match.away.start_mmr, scores, k_factor);
 
-	console.log(match);
-	console.log(delta);
+	// console.log(match);
+	// console.log(delta);
 
 	const player_query = `
 		UPDATE players SET mmr = ? WHERE rsc_id = ?
@@ -675,7 +675,7 @@ router.post('/score/:match_id/:league', async (req, res) => {
 		}
 	}
 
-	console.log(match_details);
+	// console.log(match_details);
 	const k_factor = 48;
 	const deltas = await dev_update_mmrs(db, match_details, k_factor);
 
