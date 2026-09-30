@@ -255,6 +255,33 @@ router.get('/change_tier/:rsc_id/:new_tier', (req, res) => {
 	});
 });
 
+router.get('/devleague/resend_bot/:league', async (req, res) => {
+	if ( ! req.session.is_admin && ! req.session.is_combines_admin ) {
+		return res.redirect('/');
+	}
+	
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = res.locals.settings.season;
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
+
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+
+	await notify_dev_bot(db, league, SEASON, guild_id);
+
+	await db.end();
+
+	return res.redirect('/devleague?resent=true');
+});
+
 
 router.get('/setup/devleague', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
