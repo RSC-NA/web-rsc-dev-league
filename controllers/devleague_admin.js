@@ -89,7 +89,7 @@ async function get_active(db, league, season, guild_id) {
 				ON tp.player_id = p.id 
 			WHERE tp.match_id in (?)
 		`;
-		const [p_results] = await db.query(players_query, [season, league, game_ids]);
+		const [p_results] = await db.query(players_query, [game_ids]);
 		if ( p_results && p_results.length ) {
 			for ( let i = 0; i < p_results.length; ++i ) {
 				const p = p_results[i];
