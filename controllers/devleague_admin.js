@@ -67,6 +67,11 @@ async function get_active(db, league, season, guild_id) {
 			const game = results[i];
 			game.guild_id = guild_id;
 			game.tier = getTierFromDevMMR(Math.floor(game.home_mmr));
+			if ( game.completed ) {
+				game.completed = true;
+			} else {
+				game.completed = false;
+			}
 			console.log('Generated Tier', game.tier);
 			game.home = [];
 			game.away = [];
