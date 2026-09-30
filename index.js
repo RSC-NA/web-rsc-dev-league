@@ -13,6 +13,46 @@ if ( typeof Bun === 'undefined' ) {
 	console.log(`    ${process.env.NODE_ENV}`);
 }
 
+String.prototype.dedent = function () {
+	const text = this.toString().replace(/\r\n|\r/g, "\n");
+	const lines = text.split("\n");
+
+	let minIndent = null;
+
+	for (const line of lines) {
+		if (line.trim() === "") {
+			continue;
+		}
+
+		const match = line.match(/^[ \t]+/);
+
+		if (match) {
+			const indentLen = match[0].length;
+
+			if (minIndent === null || indentLen < minIndent) {
+				minIndent = indentLen;
+			}
+		} else {
+			minIndent = 0;
+			break;
+		}
+	}
+
+	if (!minIndent) {
+		return text;
+	}
+
+	const pattern = new RegExp(`^[ \\t]{0,${minIndent}}`);
+
+	return lines.map((line) => line.replace(pattern, "")).join("\n");
+};
+
+String.prototype.replaysql = function(args=[]) {
+	let index = 0;
+
+	return this.replace(/\?/g, () => `'${args[index++]}'`).dedent();
+};
+
 
 // Server app code below
 const express = require('express');
@@ -439,6 +479,7 @@ app.use(async (req, res, next) => {
 	// a count of how many trackers need to be
 	// "sent" to the official API.
 	const settings = {
+		league: 3,
 		season: 18,
 		premier: false,
 		master: false,
@@ -467,6 +508,7 @@ app.use(async (req, res, next) => {
 
 		if ( results.length ) {
 			res.locals.settings = {
+				league: 3,
 				season: results[0].season,
 				amateur: results[0].amateur, 
 				contender: results[0].contender,

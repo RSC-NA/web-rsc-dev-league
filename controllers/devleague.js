@@ -15,6 +15,36 @@ const { mmrRange_3s, mmrRange_2s, getTierFromDevMMR } = require('../mmrs');
 // 		return res.redirect(`/match/${req.params.match_id}`);
 // 	});
 // });
+
+const league_guild = {
+	3: '395806681994493964',
+	2: '809939294331994113',
+};
+
+async function send_dev_bot_message(league, actor, status, message_type, message, match={}) {
+	console.log(`[BOT-${league}s-${status}:${match?.id || null}] ${actor.nickname} did "${message}"`);
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
+	const outbound = {
+		guild_id: guild_id,
+		actor: actor,
+		status: status,
+		message_type: message_type,
+		message: message,
+		match_id: match?.id || null,
+	};
+	try {
+		await fetch('http://localhost:8008/devleague_event', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+			},
+			body: JSON.stringify(outbound)
+		});
+	} catch(e) { 
+		console.error('ERROR SENDING TO THE BOT', e);
+	}
+}
 router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'), async(req, res) => {
 	const user = res.locals.user;
 	const match_id = parseInt(req.params.match_id);
@@ -28,7 +58,7 @@ router.post('/match-upload/:match_id/:season/:match_day', upload.single('replay'
 	}
 
 	// console.log(req.file.originalname);
-	const file_name = req.file.originalname;
+	const file_name = req.file.originalname
 
 	if ( ! user ) {
 		return res.json({'success': false, 'error': 'No user.' });
@@ -536,7 +566,7 @@ async function dev_update_mmrs(db, match, k_factor=48) {
 }
 
 
-router.post('/score/:match_id', async (req, res) => {
+router.post('/score/:match_id/:league', async (req, res) => {
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
 		user: process.env.DB_USER,
@@ -548,6 +578,12 @@ router.post('/score/:match_id', async (req, res) => {
 		queueLimit: 0
 	});
 
+	const league = req.params.league ? parseInt(req.params.league) : res.locals.settings.league;
+	const actor = {
+		nickname: res.locals.user.nickname,
+		discord_id: res.locals.user.discord_id,
+	};
+
 	const home_wins = parseInt(req.body.home_wins);
 	const away_wins = parseInt(req.body.away_wins);
 	const rsc_id = res.locals.user.rsc_id;
@@ -556,7 +592,7 @@ router.post('/score/:match_id', async (req, res) => {
 	const match_query = `
 		SELECT 
 			id,match_dtg,season,match_day,home_team_id,away_team_id,
-			lobby_user,lobby_pass,reported_rsc_id,home_wins,away_wins,cancelled 
+			lobby_user,lobby_pass,reported_rsc_id,null AS confirmed_rsc_id,home_wins,away_wins,cancelled 
 		FROM matches 
 		WHERE id = ?
 	`;
@@ -603,6 +639,9 @@ router.post('/score/:match_id', async (req, res) => {
 			end_mmr: 0,
 		},
 	};
+
+	match.home = [];
+	match.away = [];
 	if ( players && players.length ) {
 		for ( let i = 0; i < players.length; ++i ) {
 			const p = players[i];
@@ -612,12 +651,26 @@ router.post('/score/:match_id', async (req, res) => {
 				p.wins = home_wins;
 				p.losses = away_wins;
 				match_details.players[p.rsc_id] = p;	
+				match.home.push({
+					discord_id: p.discord_id,
+					rsc_id: p.rsc_id,
+					match_id: match_id,
+					team: 'home',
+					name: p.nickname
+				});
 			} else {
 				match_details.away.start_mmr += p.start_mmr;
 				p.team = 'away';
 				p.wins = away_wins;
 				p.losses = home_wins;
 				match_details.players[p.rsc_id] = p;	
+				match.away.push({
+					discord_id: p.discord_id,
+					rsc_id: p.rsc_id,
+					match_id: match_id,
+					team: 'away',
+					name: p.nickname
+				});
 			}
 		}
 	}
@@ -625,6 +678,15 @@ router.post('/score/:match_id', async (req, res) => {
 	console.log(match_details);
 	const k_factor = 48;
 	const deltas = await dev_update_mmrs(db, match_details, k_factor);
+
+	await send_dev_bot_message(
+		league,
+		actor,
+		'success',
+		'Finished Game',
+		`This match is over with a score of ${home_wins}-${away_wins}. You may now queue again.`,
+		match
+	);
 
 	await db.end();
 		
@@ -673,6 +735,8 @@ router.get('/match/:match_id', (req, res) => {
 	
 		let lobby_mmr = 0;
 		let lobby_players = 0;
+
+		let league = res.locals.settings.league;
 
 		const scored = (results[0].home_wins || results[0].away_wins) ?  true : false;
 		const home_team = results[0].lobby_user;
@@ -739,6 +803,7 @@ router.get('/match/:match_id', (req, res) => {
 				cancelled: results[0].cancelled,
 				active: ( ! scored && ! results[0].cancelled ),
 				tier: tier,
+				league: league,
 				match_day: results[0].match_day, 
 				lobby_user: results[0].lobby_user, 
 				lobby_pass: results[0].lobby_pass, 

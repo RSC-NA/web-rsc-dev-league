@@ -4,12 +4,128 @@ const mysqlP = require('mysql2/promise');
 const { _mmrRange_3s, _mmrRange_2s, getTierFromDevMMR } = require('../mmrs');
 const fs = require('fs');
 
+const league_guild = {
+	3: '395806681994493964',
+	2: '809939294331994113',
+};
+
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 function writeError(error) {
 	fs.writeFileSync('./errors.log', error + '\n', { flag: 'a+' });
 }
 
+async function send_dev_bot_message(league, actor, status, message_type, message, match={}) {
+	console.log(`[BOT-${league}s-${status}:${match?.id || null}] ${actor.nickname} did "${message}"`);
+	const guild_id = league === 2 ? league_guild[2] : league_guild[3];
+	const outbound = {
+		guild_id: guild_id,
+		actor: actor,
+		status: status,
+		message_type: message_type,
+		message: message,
+		match_id: match?.id || null,
+	};
+	//console.log(outbound);
+	try {
+		await fetch('http://localhost:8008/combines_event', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+			},
+			body: JSON.stringify(outbound)
+		});
+	} catch(e) { 
+		console.error('ERROR SENDING TO THE BOT', e);
+	}
+}
+
+async function get_active(db, league, season, guild_id) {
+	let team_size = 3;
+	if ( league === 2 ) {
+		team_size = 2;
+	}
+
+	const active_query = `
+		SELECT 
+			m.id,m.lobby_user,m.lobby_pass,m.home_wins,m.away_wins,
+			m.reported_rsc_id, NULL AS confirmed_rsc_id,
+			(SELECT avg(tp.start_mmr) FROM team_players AS tp WHERE tp.match_id = m.id) AS home_mmr,
+			null as tier,
+			m.home_team_id, m.away_team_id,
+			m.reported_rsc_id AS completed,m.cancelled 
+		FROM matches AS m  
+		WHERE m.reported_rsc_id IS null AND m.cancelled = 0 AND m.season = ?
+	`;
+	const [results] = await db.query(active_query, [season]);
+	const games = {};
+	const game_ids = [];
+	if ( results && results.length ) {
+		for ( let i = 0; i < results.length; ++i ) {
+			game_ids.push(results[i].id);
+			const game = results[i];
+			game.guild_id = guild_id;
+			game.tier = getTierFromDevMMR(Math.floor(game.home_mmr));
+			console.log('Generated Tier', game.tier);
+			game.home = [];
+			game.away = [];
+			games[results[i].id] = game;
+		}
+	}
+
+	if ( game_ids && game_ids.length ) {
+		const players_query = `
+			SELECT 
+				p.id,p.discord_id,p.rsc_id,p.nickname,
+				tp.match_id,tp.team_id,tp.start_mmr,tp.end_mmr	
+			FROM team_players AS tp 
+			LEFT JOIN players AS p
+				ON tp.player_id = p.id 
+			WHERE tp.match_id in (?)
+		`;
+		const [p_results] = await db.query(players_query, [season, league, game_ids]);
+		if ( p_results && p_results.length ) {
+			for ( let i = 0; i < p_results.length; ++i ) {
+				const p = p_results[i];
+				const g = games[p.match_id];
+
+				if ( p.team_id === g.home_team_id ) {
+					games[p.match_id].home.push(p);
+				} else {
+					games[p.match_id].away.push(p);
+				}
+			}
+		}
+	}
+
+	return games;
+}
+
+async function notify_dev_bot(db, league, season, guild_id) {
+	console.log(`SENDING THE STUFF TO THE BOT FOR ${league}s League`);
+	const games = await get_active(db, league, season, guild_id);
+	if ( games && Object.keys(games).length ) {
+		//console.log(games);
+		try {
+			//console.log(`SENDING TO BOT`, games);
+			await fetch('http://localhost:8008/devleague_match', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+				},
+				body: JSON.stringify(games)
+			});
+		} catch(e) { 
+			console.error('ERROR SENDING TO THE BOT', e);
+		}
+	}
+
+	console.log('SENDING STUFF TO THE BOT CMPLETE');
+
+	return games;
+}
 function get_rand_word_devleague() {
 	const words = [
 		'octane', 'gizmo', 'breakout', 'merc', 'hotshot', 'gizmo', 'backfire',
@@ -213,6 +329,9 @@ router.all('/generate_team/:tier', async (req, res) => {
 	});
 
  	const tier = req.params.tier;
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+	const SEASON = res.locals.settings.season;
+	const guild_id = league === 3 ? league_guild[3] : league_guild[2];
 
 	let playersQuery = `
 		SELECT 
@@ -334,6 +453,8 @@ router.all('/generate_team/:tier', async (req, res) => {
 		}
 
 	}
+		
+	const bot_input = await notify_dev_bot(db, league, SEASON, guild_id);
 
 	await db.end();
 
