@@ -385,7 +385,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 			s.active = 1 AND 
 			s.rostered = 0 AND
 			c.tier = ? 
-		ORDER BY p.mmr DESC
+		ORDER BY p.mmr ASC
 	`;
 	let tier_params = [tier];
 	if ( tier === 'Premier' || tier === 'Contender' ) {
@@ -403,7 +403,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				s.active = 1 AND 
 				s.rostered = 0 AND
 				(c.tier = ? OR c.tier = ?)
-			ORDER BY p.mmr DESC
+			ORDER BY p.mmr ASC
 		`;
 		if ( tier === 'Premier' ) {
 			tier_params = ['Premier', 'Master'];
@@ -423,7 +423,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 				s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
 				s.active = 1 AND 
 				s.rostered = 0
-			ORDER BY p.mmr DESC
+			ORDER BY p.mmr ASC
 		`;
 		tier_params = null;
 	}
