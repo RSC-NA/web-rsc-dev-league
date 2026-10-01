@@ -750,7 +750,7 @@ async function admin_dev_update_mmrs(db, match, k_factor=48) {
 	return match;
 }
 
-router.post('/admin-score/:match_id', async (req, res) => {
+router.post('/admin-score/:match_id/:league', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect(`/match/${req.params.match_id}`);
 	}
