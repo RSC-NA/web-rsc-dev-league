@@ -65,6 +65,7 @@ async function get_active(db, league, season, guild_id) {
 		for ( let i = 0; i < results.length; ++i ) {
 			game_ids.push(results[i].id);
 			const game = results[i];
+			game.lobby_user = 'RSC' + game.id;
 			game.guild_id = guild_id;
 			game.home_mmr = Math.floor(game.home_mmr);
 			game.tier = getTierFromDevMMR(game.home_mmr);
@@ -464,7 +465,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 			const lobby = {
 				season: res.locals.settings.season,
 				match_day: res.locals.match_day,
-				username: get_rand_word_devleague(),
+				username: null,
 				password: get_rand_word_devleague(),
 				home_num: ((i * 2) + 1),
 				away_num: ((i * 2) + 2),
