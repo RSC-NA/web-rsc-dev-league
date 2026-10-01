@@ -333,7 +333,7 @@
 					if ( ! cancelled ) {
 				%>
 				<p class="small">Overriding scores of a finished game will re-calculate player MMR gain/loss.</p>
-				<form action="/admin-score/<%- match_id %>/<?- settings.league; %>" method="post">
+				<form action="/admin-score/<%- match_id %>/<%- settings.league; %>" method="post">
 					<div class="mb-3">
 						<label for="home_wins">Home Team Series Score</label>
 						<div class="input-group">
