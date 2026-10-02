@@ -1,10 +1,10 @@
 
 <%- include('partials/header.ejs'); %>
 
-	<main class="container">
+	<main class="container-fluid">
 		<div class="p-3 rounded">
 			<div class="row">
-				<div class="col-12 col-md-5 mt-4 mt-md-0">
+				<div class="col-12 col-xl-5 mt-4 mt-md-0">
 
 					<h1>RSC Development League Season <%= settings.season; %> Championship</h1>
 
@@ -38,7 +38,7 @@
 					</p>
 
 				</div>
-				<div class="col-12 order-first order-md-last col-md-7 matchDates dark">
+				<div class="col-12 order-first order-md-last col-xl-7 matchDates dark">
 					<h3>S<%= settings.season; %> Leaderboard</h3>
 					<%
 						for ( const tier in leaderboards ) {

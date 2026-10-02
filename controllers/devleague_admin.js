@@ -295,10 +295,12 @@ router.get('/devleague/resend_bot/:league', async (req, res) => {
 });
 
 
-router.get('/setup/devleague', async (req, res) => {
+router.get(['/setup/devleague', '/setup/devleague/:amount'], async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
+
+	const limit = req.params.amount ?? 100;
 
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
@@ -327,10 +329,10 @@ router.get('/setup/devleague', async (req, res) => {
 					rostered = 0 AND active = 0
 			)
 		ORDER BY rand() 
-		LIMIT 100
+		LIMIT ? 
 	`;
 
-	const [ results ] = await db.execute(db_query);
+	const [ results ] = await db.execute(db_query, [limit]);
 	if ( results && results.length ) {
 		const ins_query = `
 			INSERT INTO signups 
@@ -1011,17 +1013,6 @@ async function get_stats(db, season) {
 	for ( let i = 0; i < p_results.length; ++i ) {
 		const player = p_results[i];
 
-		// switch ( player.tier ) {
-		// 	case 'Premier':
-		// 	case 'Master':
-		// 		player.tier = 'PreMaster';
-		// 		break;
-		// 	case 'Contender':
-		// 	case 'Amateur':
-		// 		player.tier = 'ContAmmy';
-		// 		break;
-		// }
-
 		if ( ! (player.rsc_id in players) ) {
 			players[ player.rsc_id ] = {
 				id: player.player_id,
@@ -1138,12 +1129,21 @@ router.get('/devleague/activate/:player_id', async (req, res) => {
 	}
 });
 
-
-router.get('/devleague', async (req, res) => {
-
+router.get(['/devleague', '/devleague/waiting', '/devleague/waiting/:league'], async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
-	} 
+	}
+
+	let delay  = req.query.delay ? parseInt(req.query.delay) : 10;
+	let last   = req.query.last ? parseInt(req.query.last) : 0;
+	const league = req.params.league ? parseInt(req.params.league) : 3;
+
+	const force_out = 'force-out' in req.query;
+	
+	const season = res.locals.settings.season;
+	const match_day = res.locals.match_day;
+
+	const HTMX_REQUEST = 'hx-request' in req.headers;
 
 	res.locals.title = `DevLeague Maker - ${res.locals.title}`;
 
@@ -1158,25 +1158,36 @@ router.get('/devleague', async (req, res) => {
 		queueLimit: 0
 	});
 
-	const season = res.locals.settings.season;
 
 	const players = await get_stats(db, season);
+	
+	const games_query = `
+		SELECT 
+			count(*) AS game_count
+		FROM matches
+		WHERE reported_rsc_id IS null AND cancelled = 0 AND season = ? AND match_day = ? 
+	`;
+	const [active_games] = await db.query(games_query, [season, match_day]);
+	let game_count = 0;
+	if ( active_games ) {
+		game_count = active_games[0].game_count;
+	}
 
 	const signups_query = `
-	SELECT 
-		s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
-		s.signup_dtg,c.mmr,p.mmr AS season_mmr,
-		p.discord_id,c.rsc_id,c.name,c.tier,c.status
-	FROM 
-		signups AS s
-	LEFT JOIN players AS p 
-		ON s.player_id = p.id
-	LEFT JOIN contracts AS c
-		ON p.discord_id = c.discord_id
-	WHERE 
-		s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
-		s.rostered = 0
-	ORDER BY p.mmr DESC
+		SELECT 
+			s.id,s.player_id,s.season,s.match_day,s.active,s.rostered,
+			s.signup_dtg,c.mmr,p.mmr AS season_mmr,
+			p.discord_id,c.rsc_id,c.name,c.tier,c.status
+		FROM 
+			signups AS s
+		LEFT JOIN players AS p 
+			ON s.player_id = p.id
+		LEFT JOIN contracts AS c
+			ON p.discord_id = c.discord_id
+		WHERE 
+			s.signup_dtg >= DATE_SUB(now(), INTERVAL 16 HOUR) AND 
+			s.rostered = 0
+		ORDER BY p.mmr DESC
 	`; 
 
 	const signups = {
@@ -1213,6 +1224,14 @@ router.get('/devleague', async (req, res) => {
 		}
 	}
 
+	const players_waiting = Object.keys(signups.waiting).length;
+	if ( last === players_waiting ) {
+		delay = delay + 5;
+	} else {
+		delay = 10;
+		last = players_waiting;
+	}
+
 	const active_query = `
 		SELECT 
 			m.id,m.lobby_user,m.lobby_pass,t.tier 
@@ -1235,11 +1254,34 @@ router.get('/devleague', async (req, res) => {
 
 	db.end();
 
-	res.render('process_devleague', {
-		signups: signups,
-		games: games,
-		getTierFromDevMMR: getTierFromDevMMR,
-	});
+	if ( HTMX_REQUEST ) {
+		res.render('partials/devleague/waiting', {
+			HTMX_REQUEST: HTMX_REQUEST,
+			force_out: force_out,
+			delay: delay,
+			last: last,
+			league: league,
+			signups: signups,
+			include_games: true,
+			ready_room: signups.active,
+			waiting_room: signups.waiting,
+			games: games,
+			game_count: game_count,
+			getTierFromDevMMR: getTierFromDevMMR,
+		});
+	} else {
+		res.render('process_devleague', {
+			HTMX_REQUEST: false,
+			force_out: force_out,
+			delay: delay,
+			last: last,
+			league: league,
+			signups: signups,
+			games: games,
+			game_count: game_count,
+			getTierFromDevMMR: getTierFromDevMMR,
+		});
+	}
 });
 
 router.get('/process_gameday', (req, res) => {
@@ -1294,7 +1336,6 @@ router.get('/process_gameday', (req, res) => {
 
 
 		}
-		console.log(signups);
 		res.render('process', { signups: signups, match_day: match_day });
 	});
 });
@@ -1305,16 +1346,28 @@ router.get('/devleague/force-out/:signup_id', (req,res) => {
 	} 
 
 	const signup_id = req.params.signup_id;
-	
-	const delete_query = `
-		DELETE FROM signups WHERE id = ?
-	`; 
-	console.log('DELETE => ', signup_id);
-	req.db.query(delete_query, [signup_id], (err, _results) => {
-		if ( err ) { throw err; }
 
-		res.redirect('/devleague');
-	});
+	console.log('QUEUE DELETE => ', signup_id);
+	if ( signup_id === 'all' ) {
+		const delete_all_query = `
+			DELETE FROM signups 
+			WHERE active = 0 AND rostered = 0
+		`; 
+		req.db.query(delete_all_query, (err, _results) => {
+			if ( err ) { throw err; }
+
+			res.redirect('/devleague?force-out');
+		});
+	} else {
+		const delete_one_query = `
+			DELETE FROM signups WHERE id = ?
+		`; 
+		req.db.query(delete_one_query, [signup_id], (err, _results) => {
+			if ( err ) { throw err; }
+
+			res.redirect('/devleague?force-out');
+		});
+	}
 });
 
 router.get('/fix_discord', async(req,res) => {

@@ -109,6 +109,23 @@
 					<div class="sb-sidenav-menu">
 						<div class="nav">
 							<div class="sb-sidenav-menu-heading">Core</div>
+							<%
+								if ( user_id === 1 ) {
+							%>
+							<a class="nav-link text-warning" href="#">
+								<div class="sb-nav-link-icon"><i class="fas fa-ruler text-danger"></i></div>
+
+								size-
+								<code class="d-inline d-sm-none">xs</code>
+								<code class="d-none d-sm-inline d-md-none">sm</code>
+								<code class="d-none d-md-inline d-lg-none">md</code>
+								<code class="d-none d-lg-inline d-xl-none">lg</code>
+								<code class="d-none d-xl-inline">xl</code>
+							</a>
+							<%
+								}
+							%>
+
 							<a class="nav-link <%- menu['dashboard'] %>" href="/">
 								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt text-info"></i></div>
 								Dashboard

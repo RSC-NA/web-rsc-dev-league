@@ -1,0 +1,149 @@
+<%
+	const ready = Object.keys(ready_room).length;
+	let lobbies = 0;
+	let missing = 0;
+	if ( ready % 6 === 0 ) {
+		lobbies = ready / 6;
+	} else {
+		missing = 6 - (ready % 6);
+		lobbies = (ready + missing) / 6;
+	}
+%>
+
+<div id="devleague_room_status" <%- HTMX_REQUEST ? 'hx-swap-oob="outerHTML"' : ''; %>>
+	<div class="card mb-4">
+		<a
+			class="btn btn-primary btn-sm float-end"
+			data-bs-toggle="collapse"
+			href="#collapse_games"
+			role="button"
+			aria-expanded="false"
+			aria-controls="collapse_games">
+
+			<div class="card-header text-black">
+				<h4>
+					Active Games: <%- games.length; %>
+					<button
+						class="btn btn-primary btn-sm float-end fw-bolder"
+					>
+						Show Active Games
+					</button>
+				</h4>
+			</div>
+		</a>
+
+		<div id="collapse_games" class="card-body collapse">
+			<a href="/devleague/resend_bot/3" class="btn btn-outline-primary mb-2">Force Bot Resend</a>
+			<ul>
+			<%
+				if ( games.length ) {	
+					for ( let i = 0; i < games.length; ++i ) {
+			%>
+				<li>
+					<span class="bg-<%- games[i].tier; %> px-2 d-inline-block text-end" style="width:100px;"><%- games[i].tier === 'SPLUS' ? 'S+' : games[i].tier; %></span>
+					<a href="/match/<%- games[i].id; %>">
+						RSC<%- games[i].id; %>-<%- games[i].lobby_pass %>
+					</a>
+				</li>
+			<%
+					} 
+				}
+			%>
+			</ul>
+		</div>
+	</div>
+
+<% 
+	if ( lobbies >= 1 && ! missing ) {
+%>
+	<div class="row mb-sm-4 mb-lg-0">
+		<div class="col-1 col-sm-2"></div>
+		<div class="col-10 col-sm-8">
+			<div class="alert alert-success d-flex align-items-center" role="alert">
+				<div class="bi flex-shrink-0 me-2">
+					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+						<use xlink:href="#check-circle-fill"/>
+					</svg>
+				</div>
+				<div class="flex-fill">
+					<div class="display-5 alert-heading">
+						Aww yeah! Game Time! <%- lobbies; %> - <%- missing %>
+					</div>
+					<hr>
+					<%
+						if ( lobbies < 6 ) {
+					%>
+					<p class="lead fw-bolder">
+						Be careful!
+					</p>
+					<p>
+						<small>
+							Clicking this button with just a few lobbies is <strong>PROBABLY</strong> a really 
+							bad idea. Ideally, we probably want 15-20 lobbies every time we click this button to ensure 
+							a balanced distribution of player skill. If you're about to click this with less than 6 lobbies,
+							you're either <code>tehblister</code> or you're doing something wild.
+						</small>
+					</p>
+					<%
+						}
+					%>
+					<p class="lead">
+						If it is after 8PM ET and you're happy with the number of signups in the 
+						<strong>Ready Room</strong>, it's probably safe to kick things off. 
+					</p>
+
+					<div class="text-center">
+						<a href="/generate_team/all" class="btn btn-success btn-lg">
+							<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
+								<span class="visually-hidden">Ready!</span>
+							</div>
+							Generate <%- lobbies > 1 ? `${lobbies} Lobbies!` : `${lobbies} Lobby`; %>
+							<i class="fa fa-car-burst text-warning"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-1 col-sm-2"></div>
+	</div>
+<%
+	} else if ( lobbies > 1 && missing ) {
+%>
+
+	<div class="row mb-sm-4 mb-lg-0">
+		<div class="col-1 col-sm-2"></div>
+		<div class="col-10 col-sm-8">
+			<div class="alert alert-danger d-flex align-items-center" role="alert">
+				<div class="bi flex-shrink-0 me-2">
+					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
+						<use xlink:href="#exclamation-triangle-fill"/>
+					</svg>
+				</div>
+				<div class="flex-fill">
+					<div class="display-5 alert-heading">
+						Missing <%- missing %> more player<%- missing == 1 ? '' : 's'; %>!
+					</div>
+					<hr>
+					<p class="lead">
+						This queue needs <%- missing; %> additional player<%- missing == 1 ? '' : 's'; %> to have <strong><%- lobbies; %></strong>
+						lobbies. Either deativate the last <%- 6 - missing; %> or wait for a few stragglers.
+					</p>
+
+					<div class="text-center">
+						<a href="/devleague/deactivate-last/<%- 6 - missing; %>" class="btn btn-danger btn-lg">
+							Deactivate the Last <%- 6 - missing; %>
+							<i class="fa fa-car-burst text-warning"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-1 col-sm-2"></div>
+	</div>
+
+
+<%
+	}
+%>
+<!-- end of room status -->
+</div>

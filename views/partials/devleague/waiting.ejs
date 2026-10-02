@@ -1,0 +1,308 @@
+<%
+	let players_waiting = 0;
+	if ( Object.keys(waiting_room).length ) {
+		players_waiting = Object.keys(waiting_room).length;
+	}
+	const team_avail = Math.floor(players_waiting / 6)
+	const remaining = players_waiting % 6;
+
+	let load_delay = delay ? delay : 10;
+
+	if ( load_delay < 10 ) {
+		load_delay = 10;
+	} else if (load_delay > 60) { 
+		load_delay = 60;
+	}
+
+	// TODO: MAKE SURE YOU STRIP THIS OUT
+	load_delay = 10;
+	console.log('in waiting.ejs, overriding delay decay to 10');
+
+	let players_ready = 0;
+	if ( Object.keys(ready_room).length ) {
+		players_ready = Object.keys(ready_room).length;
+	}
+	const team_ready = Math.floor(players_ready / 6)
+	const ready_remaining = players_ready % 6;
+
+	const show_include = include_games ? include_games : false;
+%>
+
+<%
+	if ( false && show_include ) {
+%>
+	<h4 id="active_games_count" hx-swap-oob="true">Active Games: <%- game_count; %>
+		<button
+			class="btn btn-primary btn-sm float-end fw-bolder"
+		>
+			<span class="d-none d-md-inline">
+				Show Active Games
+			</span>
+			<span class="d-inline d-md-none">
+				Active
+			</span>
+		</button>
+	</h4>
+<%
+	}
+%>
+
+<div
+	id="waiting_room_div"
+	hx-get="/devleague/waiting/<%- league; %>?delay=<%- load_delay; %>&last=<%- last; %>"
+	hx-trigger="load delay:<%- load_delay; %>s"
+	hx-swap="outerHTML"
+>
+	<% 
+		if ( ! force_out ) {
+	%>
+	<script type="text/javascript">
+		function process_devleague_waiting_room() {
+			let game_count = <%- game_count ? game_count : 0; %>;
+			let local_game_count = parseInt(localStorage.getItem('Dev.game-count') ?? 0);
+			if ( game_count !== local_game_count ) {
+				if ( DevLeague.game_count > 0 && game_count === 0 ) {
+					DevLeague.game_count = game_count;
+					setTimeout(DevLeague.playBoop, 100);
+				} else if ( game_count !== DevLeague.game_count ) {
+					DevLeague.game_count = game_count;
+				}
+				localStorage.setItem('Dev.game-count', game_count);
+			} else if ( DevLeague.game_count !== game_count ) {
+				DevLeague.game_count = game_count;
+			}
+			
+			let team_ready = <%- team_ready ? team_ready : 0; %>;
+			let ready_room = parseInt(localStorage.getItem('Dev.ready-room') ?? 0);
+
+			if ( team_ready !== ready_room ) {
+				ready_room = team_ready;
+				DevLeague.ready_room = ready_room;
+				localStorage.setItem('Dev.ready-room', DevLeague.ready_room);
+			}
+
+			let team_avail = <%- team_avail ? team_avail : 0; %>;
+			let waiting_room = parseInt(localStorage.getItem('Dev.waiting-room') ?? 0);
+			// console.log(
+			// 	'READY => ', team_ready, ready_room, 
+			// 	'WAITING => ', team_avail, waiting_room, team_avail !== waiting_room
+			// );
+			if ( team_avail !== waiting_room ) {
+				waiting_room = team_avail;
+				DevLeague.waiting_room = waiting_room;
+				localStorage.setItem('Dev.waiting-room', DevLeague.waiting_room);
+			}
+
+			// console.log('LOAD THRESHOLD', DevLeague.threshold, team_avail, DevLeague.threshold < team_avail, 'WAITING_ROOM =>', waiting_room);
+			if ( waiting_room && DevLeague.threshold < waiting_room ) {
+				// DevLeague.threshold = waiting_room + 1;
+				// localStorage.setItem('Dev.threshold', DevLeague.threshold);
+				setTimeout(DevLeague.playReady, 100);
+			} else if ( DevLeague.threshold > 10 && waiting_room < 10 ) {
+				DevLeague.threshold = 10;
+				localStorage.setItem('Dev.threshold', DevLeague.threshold);
+			}
+
+			// console.log({
+			// 	team_ready: team_ready,
+			// 	ready_room: ready_room,
+			// 	team_avail: team_avail,
+			// 	waiting_room: waiting_room,
+			// 	Dev_thresh: DevLeague.threshold,
+			// });
+		}
+		setTimeout(process_devleague_waiting_room, 100);
+		
+		setTimeout(initialize_devleague, 10);
+	</script>
+	<%
+		}
+	%>
+
+	<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
+		<span class="text-muted">Waiting Room</span>
+
+		<div class="h4 text-muted">
+		
+		<%
+			if ( players_waiting ) {
+		%>
+			<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
+			%><%- (remaining > 0 && team_avail > 0) ? ' + ' : ''; 
+			%><%- remaining > 0 ? remaining + (remaining == 1 ? ' player' : ' players') : ''; %>
+		<%
+			}
+		%>
+		</div>
+
+		<a
+			href="/devleague/activate/all"
+			hx-get="/devleague/activate/all"
+			hx-target="#waiting_room_div"
+			hx-swap="outerHTML"
+			role="button"
+			class="btn btn-outline-info fw-bold <%- players_waiting == 0 ? 'disabled' :''; %>"
+			<%- players_waiting == 0 ? 'aria-disabled="true"' :''; %>
+		>
+			<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
+			<span class="d-xl-none d-lg-inline">&uarr;</span>
+			<i class="fas fa-user-plus"></i>
+			Add All
+		</a>
+
+	</h4>
+
+	<table class="table table-dark">
+		<thead>
+			<tr>
+				<th></th>
+				<th class="text-center">MMR</th>
+				<th class="text-center">Tier</th>
+				<th>Player</th>
+				<th class="text-center">Record</th>
+				<th class="text-center">W%</th>
+				<th class="text-center">
+					<a
+						href="/devleague/force-out/all"
+						hx-get="/devleague/force-out/all"
+						hx-target="#waiting_room_div"
+						hx-swap="outerHTML"
+						hx-confirm="Are you sure you want to clear out the queue?"
+						class="btn btn-sm btn-outline-danger rounded-pill"
+					>
+						<i class="fas fa-trash text-danger"></i>
+					</a>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		<% 
+			const stat_colors = {
+				'great': 'text-success',
+				'ok': 'text-info',
+				'neutral': 'text-warning',
+				'bad': 'text-danger',
+				'none': 'text-muted',
+			};
+			let analysis = 'none';
+			let table_class = "table-success";
+			let n = 0;
+			if ( Object.keys(waiting_room).length ) {
+				for ( const rsc_id in waiting_room ) {
+					n++
+					if ( n > 6 ) {
+						table_class = table_class === 'table-info' ? 'table-success' : 'table-info';
+						n = 1;
+					}
+
+					const p = waiting_room[rsc_id];
+					p.cur_tier = getTierFromDevMMR(p.season_mmr);
+					if ( p.win_percentage > 60 ) {
+						analysis = 'great';
+					} else if ( p.win_percentage > 52 ) {
+						analysis = 'ok';
+					} else if ( p.win_percentage > 45 ) {
+						analysis = 'neutral';
+					} else if ( p.win_percentage > 20 ) {
+						analysis = 'bad';
+					} else {
+						analysis = 'none';
+					}
+					
+					const mmr_delta = p.season_mmr - p.mmr;
+					let delta_change = 'text-muted';
+					if ( mmr_delta > 0 ) {
+						delta_change = 'text-success fw-bolder';
+					} else {
+						delta_change = 'text-danger fw-bolder';
+					}
+
+		%>
+			<tr class="<%- table_class; %>">
+				<td class="p-0 text-center"> <!--p-0 text-center"> -->
+					<a
+						href="/devleague/activate/<%- p.player_id; %>"
+						hx-get="/devleague/activate/<%- p.player_id; %>"
+						hx-target="#waiting_room_div"
+						hx-swap="outerHTML"
+						class="move-arrow h4 p-0 px-2 mb-0"
+						title="Move player to ready room."
+					>
+						<span class="d-none d-xl-inline">&#10094;</span>
+						<span class="d-inline d-xl-none">&#9786;</span>
+						<!-- &#9754; -->
+					</a>
+				</td>
+				<td class="text-center">
+					<span class="text-primary fw-bold">
+						<%= p.season_mmr ? p.season_mmr : p.mmr; %>
+					</span> 
+					(<span class="<%- delta_change; %>"><%= mmr_delta; %></span>)
+				</td>
+				<td class="text-center bg-<%- p.cur_tier; %> align-middle fs-4">
+					<span class=""><%= p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></span>
+				</td>
+				<td class="fw-bolder">
+					<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
+					<div class="text-muted" style="font-size:0.7em;"><%= p.status; %></div>
+				</td>
+				<td class="text-center">
+					<span class="text-success fw-bold"><%= p.wins; %></span> /
+					<span class="text-red fw-bold"><%= p.losses; %></span>
+				</td>
+				<td class="text-center">
+					<span class="<%- stat_colors[analysis]; %> fw-bold">
+						<%= p.win_percentage; %>%
+					</span>
+				</td>
+				<td class="text-center">
+					<a
+						href="/devleague/force-out/<%- p.id; %>"
+						hx-get="/devleague/force-out/<%- p.id; %>?delay=<%- load_delay; %>&last=<%- players_waiting; %>"
+						hx-target="#waiting_room_div"
+						hx-swap="outerHTML"
+						class="btn btn-sm btn-outline-danger rounded-pill"
+					>
+						<i class="fas fa-trash"></i>
+					</a>
+				</td>
+			</tr>
+
+		<% 
+				} // end of loop
+			} else {
+		%>
+
+			<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
+
+		<%
+			}
+		%>
+
+		</tbody>
+	</table>
+</div>
+
+<% 
+	if ( HTMX_REQUEST ) {
+%>
+
+	<%- include('status.ejs', { 
+			HTMX_REQUEST: HTMX_REQUEST,
+			league: 3, 
+			ready_room: ready_room,
+	}); %>
+
+	<%- 
+		include('ready.ejs', { 
+			HTMX_REQUEST: HTMX_REQUEST,
+			league: 3, 
+			ready_room: ready_room, 
+			include_games: false, 
+			game_count: games.length, 
+			stat_colors: stat_colors, 
+	}); %> 
+<%
+	}
+%>

@@ -101,12 +101,20 @@ ul.dates {
 	list-style-type: none;
 }
 
-li.today {
+li.today .h6 {
 	font-weight: bold;
-	font-size: 1.1rem;
+}
+
+
+.dark li.offnight {
+	background-color: #0a0638;
+}
+.dark li.next-offnight {
+	background-color: #290d3b;
+}
+li.today {
 	background-color: #b5ff00;
 	border-radius: 6px;
-	text-decoration: underline;
 	list-style-type: '⚽';
 }
 .dark li.today {
@@ -134,12 +142,21 @@ ol>li.today {
 	text-decoration: none;
 }
 
+li.holiday {
+	/* list-style-type: '🏖️'; */
+	background-color: #fa7b7b;
+}
+.dark li.holiday {
+	/*list-style-type: '⚽';*/
+	background-color: #630a0a;
+}
+
 li.today.holiday {
-	list-style-type: '🏖️';
+	/* list-style-type: '🏖️'; */
 	background-color: #fa7b7b;
 }
 .dark li.today.holiday {
-	list-style-type: '🏖️';
+	/* list-style-type: '🏖️'; */
 	background-color: #930a0a;
 }
 
@@ -211,6 +228,29 @@ li.today.holiday {
 .D { color: #2ecc71 !important; }
 .E { color: #ceb337 !important; }
 .F { color: #f3a9a9 !important; }
+
+.match_times { 
+	color: #fcfc16 !important; 
+	font-family: monospace;
+	font-weight: bolder;
+}
+
+.tooltip-inner li { 
+	text-align: start;
+	color: #fcfc16 !important; 
+	font-family: monospace;
+}
+
+.tooltip-inner li b {
+	font-weight: 900;
+	font-size: 1.1rem;
+	color: #ffffff !important; 
+}
+
+.tooltip.tooltip-match .tooltip-inner {
+	width: 250px;
+	min-width: 250px;
+}
 
 .Legend { color: #d9d9d9; !important }
 .Premier { color: #d600d6 !important; }

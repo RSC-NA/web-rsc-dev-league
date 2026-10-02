@@ -1,0 +1,154 @@
+<%
+	const ready = Object.keys(ready_room).length;
+	let lobbies = 0;
+	let missing = 0;
+	if ( ready % 6 === 0 ) {
+		lobbies = ready / 6;
+	} else {
+		missing = 6 - (ready % 6);
+		lobbies = (ready + missing) / 6;
+	}
+%>
+
+<div id="ready_room_div" <%- HTMX_REQUEST ? 'hx-swap-oob="outerHTML"' : ''; %>>
+	<h3 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
+		<span class="text-success fw-bolder">Ready Room</span>
+		<div class="h4 text-muted">
+		
+		<%
+			let players_ready = 0;
+			if ( Object.keys(ready_room).length ) {
+				players_ready = Object.keys(ready_room).length;
+			}
+
+
+			if ( players_ready ) {
+				const team_avail = Math.floor(players_ready / 6)
+				const extra = players_ready % 6;
+		%>
+			<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
+			%><%- (extra > 0 && team_avail > 0) ? ' + ' : ''; 
+			%><%- extra > 0 ? '<span class="text-danger">' + extra + (extra == 1 ? ' player' : ' players') : '' + '</span>'; %>
+		<%
+			}
+		%>
+		</div>
+		<a
+			href="/devleague/deactivate/all"
+			hx-get="/devleague/deactivate/all"
+			hx-target="#waiting_room_div"
+			hx-swap="outerHTML"
+			class="btn btn-outline-warning fw-bold <%- players_ready == 0 ? 'disabled' :''; %>"
+			role="button"
+			<%- players_ready == 0 ? 'aria-disabled="true"' :''; %>
+		>
+			<i class="fas fa-user-minus"></i>
+			Remove All
+			<span class="d-xl-inline d-lg-none d-none">&#11022;</span>
+			<span class="d-xl-none d-lg-inline">&darr;</span>
+		</a>
+	</h3>
+
+
+	<div class="mb-3">
+		<table class="table table-dark">
+			<thead>
+				<tr>
+					<th class="text-center">MMR</th>
+					<th class="text-center">Tier</th>
+					<th>Player</th>
+					<th class="text-center">Record</th>
+					<th class="text-center">W%</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+
+			<% 
+				if ( Object.keys(ready_room).length ) {
+					const extra_players = players_ready % 6;
+
+					let table_class = 'table-primary';
+					let n = 0;
+
+					for ( const rsc_id in ready_room ) {
+						const p = ready_room[rsc_id];
+						if ( n === 0 ) {
+							//console.log(p)
+						}
+
+						p.cur_tier = getTierFromDevMMR(p.season_mmr);
+						n++;
+						if ( n > 6 ) {
+							table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
+							n = 1;
+						}
+
+						if ( p.win_percentage > 60 ) {
+							analysis = 'great';
+						} else if ( p.win_percentage > 52 ) {
+							analysis = 'ok';
+						} else if ( p.win_percentage > 45 ) {
+							analysis = 'neutral';
+						} else if ( p.win_percentage > 20 ) {
+							analysis = 'bad';
+						} else {
+							analysis = 'none';
+						}
+
+			%>
+				<tr class="<%- table_class; %>">
+					<td class="text-center">
+						<span class="text-primary fw-bold">
+							<%= p.mmr; %>
+						</span>
+					</td>
+					<td class="text-center bg-<%- p.cur_tier; %> align-middle fs-4">
+						<span class=""><%- p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></span>
+					</td>
+					<td class="fw-bolder">
+						<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
+						<div class="text-muted" style="font-size:0.7em;"><%= p.status; %></div>
+					</td>
+					<td class="text-center">
+						<span class="text-success fw-bold"><%= p.wins; %></span> /
+						<span class="text-red fw-bold"><%= p.losses; %></span>
+					</td>
+					<td class="text-center">
+						<span class="<%- stat_colors[analysis]; %> fw-bold">
+							<%= p.win_percentage; %>%
+						</span>
+					</td>
+					<td class="p-0 text-center">
+						<a
+							href="/devleague/deactivate/<%- p.player_id; %>"
+							hx-get="/devleague/deactivate/<%- p.player_id; %>"
+							hx-target="#waiting_room_div"
+							hx-swap="outerHTML"
+							class="move-arrow-back h4 p-0 px-2 mb-0"
+							style=""
+							title="Move player to waiting room."
+						>
+							<span class="d-none d-xl-inline">&#10095;</span>
+							<span class="d-inline d-xl-none">&#9850;</span>
+							<!-- &#9754; -->
+						</a>
+					</td>
+				</tr>
+
+			<% 
+					} // end of loop
+				} else {
+			%>
+
+				<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
+
+			<%
+				}
+			%>
+
+			</tbody>
+		</table>
+
+	</div>
+</div>

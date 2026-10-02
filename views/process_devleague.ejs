@@ -5,483 +5,89 @@
 	const ready_room = signups.active;
 	const waiting_room = signups.waiting;
 
-	const ready = Object.keys(ready_room).length;
-	let lobbies = 0;
-	let missing = 0;
-	if ( ready % 6 === 0 ) {
-		lobbies = ready / 6;
-	} else {
-		missing = 6 - (ready % 6);
-		lobbies = (ready + missing) / 6;
-	}
+	const stat_colors = {
+		'great': 'text-success',
+		'ok': 'text-info',
+		'neutral': 'text-warning',
+		'bad': 'text-danger',
+		'none': 'text-muted',
+	};
+	let analysis = 'none';
+	let table_class = "table-success";
 %> 
 
-<style type="text/css">
-	td a.move-arrow-back {
-		text-decoration:none;
-		font-size: xx-large;
-		color: #6c757d;
-	}
-	td a.move-arrow {
-		text-decoration:none;
-		font-size: xx-large;
-		color: #6c757d;
-	}
-	td:hover a.move-arrow {
-		color: var(--bs-cyan) !important;
-	}
-	td:hover a.move-arrow-back {
-		color: var(--bs-red) !important;
-	}
-</style>
-
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-	<symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-		<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-	</symbol>
-	<symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-		<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-	</symbol>
-</svg>
-
-<main class="container">
-	<div class="py-3 py-md-5 pb-md-2">
-		<h2>DevLeague Lobby Manager</h2>
-		<p class="lead">
-			Every player that checks in for Dev League is placed in the "Waiting Room". 
-			At 8:05pm, make a large enough lobby (prioritizing FAs) and press the Generate 
-			Teams button.
-		</p>
-	</div>
-
-	<div class="card mb-4">
-		<a
-			class="btn btn-primary btn-sm float-end"
-			data-bs-toggle="collapse"
-			href="#collapse_games"
-			role="button"
-			aria-expanded="false"
-			aria-controls="collapse_games">
-
-			<div class="card-header text-black">
-				<h4>
-					Active Games: <%- games.length; %>
-					<button
-						class="btn btn-primary btn-sm float-end fw-bolder"
-					>
-						Show Active Games
-					</button>
-				</h4>
-			</div>
-		</a>
-
-		<div id="collapse_games" class="card-body collapse">
-			<a href="/devleague/resend_bot/3" class="btn btn-outline-primary mb-2">Force Bot Resend</a>
-			<ul>
-			<%
-				if ( games.length ) {	
-					for ( let i = 0; i < games.length; ++i ) {
-			%>
-				<li>
-					<span class="bg-<%- games[i].tier; %> px-2 d-inline-block text-end" style="width:100px;"><%- games[i].tier === 'SPLUS' ? 'S+' : games[i].tier; %></span>
-					<a href="/match/<%- games[i].id; %>">
-						RSC<%- games[i].id; %>-<%- games[i].lobby_pass %>
-					</a>
-				</li>
-			<%
-					} 
-				}
-			%>
-			</ul>
-		</div>
-	</div>
-
-	<% 
-		if ( lobbies >= 1 && ! missing ) {
-	%>
-	<div class="row mb-sm-4 mb-lg-0">
-		<div class="col-1 col-sm-2"></div>
-		<div class="col-10 col-sm-8">
-			<div class="alert alert-success d-flex align-items-center" role="alert">
-				<div class="bi flex-shrink-0 me-2">
-					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
-						<use xlink:href="#check-circle-fill"/>
-					</svg>
-				</div>
-				<div class="flex-fill">
-					<div class="display-5 alert-heading">
-						Aww yeah! Game Time! <%- lobbies; %> - <%- missing %>
-					</div>
-					<hr>
-					<%
-						if ( lobbies < 6 ) {
-					%>
-					<p class="lead fw-bolder">
-						Be careful!
-					</p>
-					<p>
-						<small>
-							Clicking this button with just a few lobbies is <strong>PROBABLY</strong> a really 
-							bad idea. Ideally, we probably want 15-20 lobbies every time we click this button to ensure 
-							a balanced distribution of player skill. If you're about to click this with less than 6 lobbies,
-							you're either <code>tehblister</code> or you're doing something wild.
-						</small>
-					</p>
-					<%
-						}
-					%>
-					<p class="lead">
-						If it is after 8PM ET and you're happy with the number of signups in the 
-						<strong>Ready Room</strong>, it's probably safe to kick things off. 
-					</p>
-
-					<div class="text-center">
-						<a href="/generate_team/all" class="btn btn-success btn-lg">
-							<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
-								<span class="visually-hidden">Ready!</span>
-							</div>
-							Generate <%- lobbies > 1 ? `${lobbies} Lobbies!` : `${lobbies} Lobby`; %>
-							<i class="fa fa-car-burst text-warning"></i>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-1 col-sm-2"></div>
-	</div>
-	<%
-		} else if ( lobbies > 1 && missing ) {
-	%>
-
-	<div class="row mb-sm-4 mb-lg-0">
-		<div class="col-1 col-sm-2"></div>
-		<div class="col-10 col-sm-8">
-			<div class="alert alert-danger d-flex align-items-center" role="alert">
-				<div class="bi flex-shrink-0 me-2">
-					<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
-						<use xlink:href="#exclamation-triangle-fill"/>
-					</svg>
-				</div>
-				<div class="flex-fill">
-					<div class="display-5 alert-heading">
-						Missing <%- missing %> more player<%- missing == 1 ? '' : 's'; %>!
-					</div>
-					<hr>
-					<p class="lead">
-						This queue needs <%- missing; %> additional player<%- missing == 1 ? '' : 's'; %> to have <strong><%- lobbies; %></strong>
-						lobbies. Either deativate the last <%- 6 - missing; %> or wait for a few stragglers.
-					</p>
-
-					<div class="text-center">
-						<a href="/devleague/deactivate-last/<%- 6 - missing; %>" class="btn btn-danger btn-lg">
-							Deactivate the Last <%- 6 - missing; %>
-							<i class="fa fa-car-burst text-warning"></i>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-1 col-sm-2"></div>
-	</div>
-
-
-	<%
+	<style type="text/css">
+		td a.move-arrow-back {
+			text-decoration:none;
+			font-size: xx-large;
+			color: #6c757d;
 		}
-	%>
+		td a.move-arrow {
+			text-decoration:none;
+			font-size: xx-large;
+			color: #6c757d;
+		}
+		td:hover a.move-arrow {
+			color: var(--bs-cyan) !important;
+		}
+		td:hover a.move-arrow-back {
+			color: var(--bs-red) !important;
+		}
+	</style>
 
-	<div class="row">
+	<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+		<symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
+			<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+		</symbol>
+		<symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+			<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+		</symbol>
+	</svg>
 
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 mt-5 mt-lg-0">
-
-
-			<h4 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
-				<span class="text-muted">Waiting Room</span>
-
-				<div class="h4 text-muted">
-				
-				<%
-					let players_waiting = 0;
-					if ( Object.keys(waiting_room).length ) {
-						players_waiting = Object.keys(waiting_room).length;
-					}
-					const team_avail = Math.floor(players_waiting / 6)
-					const remaining = players_waiting % 6;
-
-					if ( players_waiting ) {
-				%>
-					<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
-					%><%- (remaining > 0 && team_avail > 0) ? ' + ' : ''; 
-					%><%- remaining > 0 ? remaining + (remaining == 1 ? ' player' : ' players') : ''; %>
-				<%
-					}
-				%>
-				</div>
-
-				<a
-					href="/devleague/activate/all"
-					role="button"
-					class="btn btn-outline-info fw-bold <%- players_waiting == 0 ? 'disabled' :''; %>"
-					<%- players_waiting == 0 ? 'aria-disabled="true"' :''; %>
-				>
-					<span class="d-xl-inline d-lg-none d-none">&#10094;</span>
-					<span class="d-xl-none d-lg-inline">&uarr;</span>
-					<i class="fas fa-user-plus"></i>
-					Add All
-				</a>
-
-			</h4>
-
-			<table class="table table-dark">
-				<thead>
-					<tr>
-						<th></th>
-						<th class="text-center">MMR</th>
-						<th class="text-center">Tier</th>
-						<th>Player</th>
-						<th class="text-center">Record</th>
-						<th class="text-center">W%</th>
-						<th class="text-center"><i class="fas fa-trash"></i></th>
-					</tr>
-				</thead>
-				<tbody>
-
-				<% 
-					const stat_colors = {
-						'great': 'text-success',
-						'ok': 'text-info',
-						'neutral': 'text-warning',
-						'bad': 'text-danger',
-						'none': 'text-muted',
-					};
-					let analysis = 'none';
-					let table_class = "table-success";
-					let n = 0;
-					if ( Object.keys(waiting_room).length ) {
-						for ( const rsc_id in waiting_room ) {
-							n++
-							if ( n > 6 ) {
-								table_class = table_class === 'table-info' ? 'table-success' : 'table-info';
-								n = 1;
-							}
-
-							const p = waiting_room[rsc_id];
-							p.cur_tier = getTierFromDevMMR(p.season_mmr);
-							if ( p.win_percentage > 60 ) {
-								analysis = 'great';
-							} else if ( p.win_percentage > 52 ) {
-								analysis = 'ok';
-							} else if ( p.win_percentage > 45 ) {
-								analysis = 'neutral';
-							} else if ( p.win_percentage > 20 ) {
-								analysis = 'bad';
-							} else {
-								analysis = 'none';
-							}
-							
-							const mmr_delta = p.season_mmr - p.mmr;
-							let delta_change = 'text-muted';
-							if ( mmr_delta > 0 ) {
-								delta_change = 'text-success fw-bolder';
-							} else {
-								delta_change = 'text-danger fw-bolder';
-							}
-
-				%>
-					<tr class="<%- table_class; %>">
-						<td class="p-0 text-center"> <!--p-0 text-center"> -->
-							<a href="/devleague/activate/<%- p.player_id; %>" 
-								class="move-arrow h4 p-0 px-2 mb-0" style=""
-								title="Move player to ready room.">
-								<span class="d-none d-xl-inline">&#10094;</span>
-								<span class="d-inline d-xl-none">&#9786;</span>
-								<!-- &#9754; -->
-							</a>
-						</td>
-						<td class="text-center">
-							<span class="text-primary fw-bold">
-								<%= p.season_mmr ? p.season_mmr : p.mmr; %>
-							</span> 
-							(<span class="<%- delta_change; %>"><%= mmr_delta; %></span>)
-						</td>
-						<td class="text-center bg-<%- p.cur_tier; %> align-middle fs-4">
-							<span class=""><%= p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></span>
-						</td>
-						<td class="fw-bolder">
-							<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
-							<div class="text-muted" style="font-size:0.7em;"><%= p.status; %></div>
-						</td>
-						<td class="text-center">
-							<span class="text-success fw-bold"><%= p.wins; %></span> /
-							<span class="text-red fw-bold"><%= p.losses; %></span>
-						</td>
-						<td class="text-center">
-							<span class="<%- stat_colors[analysis]; %> fw-bold">
-								<%= p.win_percentage; %>%
-							</span>
-						</td>
-						<td class="text-center">
-							<a
-								href="/devleague/force-out/<%- p.id; %>"
-								class="btn btn-sm btn-outline-danger rounded-pill"
-							>
-								<i class="fas fa-trash"></i>
-							</a>
-						</td>
-					</tr>
-
-				<% 
-						} // end of loop
-					} else {
-				%>
-
-					<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
-
-				<%
-					}
-				%>
-
-				</tbody>
-			</table>
+	<main class="container">
+		<div class="py-3 py-md-5 pb-md-2">
+			<h2>DevLeague Lobby Manager</h2>
+			<p class="lead">
+				Every player that checks in for Dev League is placed in the "Waiting Room". 
+				At 8:05pm, make a large enough lobby (prioritizing FAs) and press the Generate 
+				Teams button.
+			</p>
 		</div>
 
-		<!-- primary FA signup / team generation -->
-		<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 order-first">
-			<h3 class="d-flex justify-content-between align-items-center mb-3 mt-4 mt-0 mt-md-0">
-				<span class="text-success fw-bolder">Ready Room</span>
-				<div class="h4 text-muted">
-				
-				<%
-					let players_ready = 0;
-					if ( Object.keys(ready_room).length ) {
-						players_ready = Object.keys(ready_room).length;
-					}
+		<%- include('partials/devleague/status.ejs', { 
+				HTMX_REQUEST: HTMX_REQUEST ?? false,
+				league: 3, 
+				ready_room: ready_room,
+		}); %>
 
+		<div class="row" id="room_lists" style="min-height: 400px;">
 
-					if ( players_ready ) {
-						const team_avail = Math.floor(players_ready / 6)
-						const extra = players_ready % 6;
-				%>
-					<%- team_avail > 0 ? '<span class="text-primary">' + team_avail + (team_avail == 1 ? ' team' : ' teams') + '</span>' : ''; 
-					%><%- (extra > 0 && team_avail > 0) ? ' + ' : ''; 
-					%><%- extra > 0 ? '<span class="text-danger">' + extra + (extra == 1 ? ' player' : ' players') : '' + '</span>'; %>
-				<%
-					}
-				%>
-				</div>
-				<a
-					href="/devleague/deactivate/all"
-					class="btn btn-outline-warning fw-bold <%- players_ready == 0 ? 'disabled' :''; %>"
-					role="button"
-					<%- players_ready == 0 ? 'aria-disabled="true"' :''; %>
-				>
-					<i class="fas fa-user-minus"></i>
-					Remove All
-					<span class="d-xl-inline d-lg-none d-none">&#11022;</span>
-					<span class="d-xl-none d-lg-inline">&darr;</span>
-				</a>
-			</h3>
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 mt-5 mt-lg-0">
+				<%- include('partials/devleague/waiting.ejs', { 
+					HTMX_REQUEST: HTMX_REQUEST ?? false,
+					league: 3, 
+					waiting_room: waiting_room, 
+					ready_room: ready_room, 
+					include_games: false, 
+					game_count: games.length, 
+					stat_colors: stat_colors, 
+				}); %>
+			</div>
 
-
-			<div class="mb-3">
-				<table class="table table-dark">
-					<thead>
-						<tr>
-							<th class="text-center">MMR</th>
-							<th class="text-center">Tier</th>
-							<th>Player</th>
-							<th class="text-center">Record</th>
-							<th class="text-center">W%</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-
-					<% 
-						if ( Object.keys(ready_room).length ) {
-							const extra_players = players_ready % 6;
-
-							let table_class = 'table-primary';
-							let n = 0;
-
-							for ( const rsc_id in ready_room ) {
-								const p = ready_room[rsc_id];
-								if ( n === 0 ) {
-									console.log(p)
-								}
-
-								p.cur_tier = getTierFromDevMMR(p.season_mmr);
-								n++;
-								if ( n > 6 ) {
-									table_class = table_class === 'table-warning' ? 'table-primary' : 'table-warning';
-									n = 1;
-								}
-
-								if ( p.win_percentage > 60 ) {
-									analysis = 'great';
-								} else if ( p.win_percentage > 52 ) {
-									analysis = 'ok';
-								} else if ( p.win_percentage > 45 ) {
-									analysis = 'neutral';
-								} else if ( p.win_percentage > 20 ) {
-									analysis = 'bad';
-								} else {
-									analysis = 'none';
-								}
-
-					%>
-						<tr class="<%- table_class; %>">
-							<td class="text-center">
-								<span class="text-primary fw-bold">
-									<%= p.mmr; %>
-								</span>
-							</td>
-							<td class="text-center bg-<%- p.cur_tier; %> align-middle fs-4">
-								<span class=""><%- p.cur_tier === 'SPLUS' ? 'S+' : p.cur_tier; %></span>
-							</td>
-							<td class="fw-bolder">
-								<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
-								<div class="text-muted" style="font-size:0.7em;"><%= p.status; %></div>
-							</td>
-							<td class="text-center">
-								<span class="text-success fw-bold"><%= p.wins; %></span> /
-								<span class="text-red fw-bold"><%= p.losses; %></span>
-							</td>
-							<td class="text-center">
-								<span class="<%- stat_colors[analysis]; %> fw-bold">
-									<%= p.win_percentage; %>%
-								</span>
-							</td>
-							<td class="p-0 text-center">
-								<a href="/devleague/deactivate/<%- p.player_id; %>" 
-									class="move-arrow-back h4 p-0 px-2 mb-0" style=""
-									title="Move player to waiting room.">
-									<span class="d-none d-xl-inline">&#10095;</span>
-									<span class="d-inline d-xl-none">&#9850;</span>
-									<!-- &#9754; -->
-								</a>
-							</td>
-						</tr>
-
-					<% 
-							} // end of loop
-						} else {
-					%>
-
-						<tr><td colspan="6"><em>Nobody is waiting in the queue.</em></td></tr>
-
-					<%
-						}
-					%>
-
-					</tbody>
-				</table>
-
+			<!-- primary FA signup / team generation -->
+			<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 order-first">
+				<%- include('partials/devleague/ready.ejs', { 
+					HTMX_REQUEST: HTMX_REQUEST ?? false,
+					league: 3, 
+					ready_room: ready_room, 
+					include_games: false, 
+					game_count: games.length, 
+					stat_colors: stat_colors, 
+				}); %> 
 			</div>
 
 		</div>
 
-	</div>
+	</main>
 
-</main>
-
-<%- include('partials/footer.ejs'); %>
+	<%- include('partials/footer.ejs'); %>

@@ -745,9 +745,15 @@ app.use((req, res, next) => {
 	res.locals.combine_2s_live = res.locals.combines_2s.live;
 
 	if ( date in matchDays ) {
-		res.locals.match_day = matchDays[date]; 
-		if ( matchDays[date] === 'playoffs' ) {
-			res.locals.match_day = 99;
+		if (typeof matchDays[date] === 'number' ) {
+			res.locals.match_day = matchDays[date]; 
+		} else if( typeof matchDays[date] === 'object' ) {
+			const doobj = matchDays[date];
+			res.locals.match_day_obg = doobj; 
+			res.locals.match_day = doobj.match_day; 
+			if ('game' in doobj && ! doobj.game ) {
+				res.locals.match_day = false;
+			}
 		}
 	}
 	if ( date in combineDays['3s'] || res.locals.combine_live ) {
@@ -2390,12 +2396,26 @@ app.post('/save_mmr', (req, res) => {
  ****************** /TRACKER/MMR TOOL ********************
  *******************************************************/
 app.use((err, req, res, next) => {
-  const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-  res.status(statusCode);
-  res.json({
-    message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack,
-  });
+	const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+	res.status(statusCode);
+
+	const err_stack = process.env.NODE_ENV === 'production' ? '🥞' : err.stack;
+
+	const accept = req.headers.accept;
+	if ( 'hx-request' in req.headers || accept.startsWith('text/html') ) {
+		res.send(`
+<h1 style="margin-bottom: 3px;">${statusCode} Server Error</h1>
+<h2 style="margin-bottom: 3px;">Error Message</h2>
+<pre style="background-color: #040309; color: #f9f9f9; padding: 10px; margin: 0; border: 2px solid black; font-size: 15px;"><code>${err.message}</code></pre>
+<h3 style="margin-bottom: 3px;">Error Stack</h3>
+<pre style="background-color: #040309; color: #f9f9f9; padding: 10px; margin: 0; border: 2px solid black; font-size: 15px;"><code>${err_stack}</code></pre>
+		`);
+	} else {
+		res.json({
+			message: err.message,
+			stack: err_stack,
+		});
+	}
 });
 
 /********************************************************

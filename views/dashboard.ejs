@@ -5,10 +5,10 @@
 		
 %>
 
-	<main class="container">
+	<main class="container-fluid">
 		<div class="bg-dark p-3 rounded">
 			<div class="row">
-				<div class="col-md-8">
+				<div class="col-12 col-md-6 col-xl-8">
 
 			<% if ( user.name ) { %>
 					<h1>
@@ -87,16 +87,36 @@
 						for the rest of the current season.</strong>
 					</p>
 				</div>
-				<div class="col-md-4 matchDates dark">
-					<h4>Season <%= settings.season %> Dates</h4>
-					<ul class="dates ps-0">
+				<div class="col-12 col-md-6 col-xl-4 matchDates dark">
+					<h4>Season <%= settings.season %> Dates - <%- today; %></h4>
+					<ul class="dates ps-1">
 						<%
 							let first_playoff = true;
+
+							// only display the next off-night times 
+							let next_seen = false; 
+							const tz_offset = new Date().getTimezoneOffset();
+							const today_parts = today.split('-');
+							const today_date = new Date(Date.UTC( 
+								parseInt(today_parts[0]), parseInt(today_parts[1])-1, parseInt(today_parts[2]), 
+								(new Date().getHours() + (tz_offset / 60)), new Date().getMinutes(), 0
+							));
+
+							let is_today = false;
+
+							let match_type = 'normal';
+
+
 							for ( let match_date in match_days ) {
+								let match = match_days[match_date];
+								let match_day = null;
+
+								let display_offnight_times = false;
+
 								const dp = match_date.split('-');
 								const dt = new Date(Date.UTC( 
 									parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]), 
-									24, 00, 00
+									(20 + (tz_offset / 60)), 0, 0
 								));
 								const dstr = dt.toLocaleString('en-US', { 
 									weekday: 'short', 
@@ -109,30 +129,228 @@
 								if ( match_date === today ) {
 									css_classes.push('today');
 									day_class = 'text-warning';
-								} 
-								if ( match_days[match_date] === 'holiday' ) {
+									is_today  = true;
+								} else {
+									is_today = false;
+								}
+
+								css_classes.push(dp.join('-'));
+								let offnight_car_class = 'text-secondary';
+
+								let offnight = false;
+								if ( typeof match === 'number' ) {
+									match_day = match;
+									match_type = 'normal';
+									console.log(match_date, match_type);
+								} else if (typeof match === 'object' ) {
+									if ( ! ('type' in match) ) {
+										continue;
+									} 
+
+									if ( match['type'] === 'offnight' ) {
+										match_type = 'offnight';
+										css_classes.push('offnight');
+										match_day = match['match_day'] ?? 'ERROR';
+										offnight = true;
+										if ( is_today ) {
+											offnight_car_class = 'text-warning';
+											display_offnight_times = true;
+											next_seen = true;
+										} else if ( dt < today_date ) {
+											offnight_car_class = 'text-light text-opacity-75';
+											display_offnight_times = false;
+										} else if ( dt > today_date && next_seen === false ) {
+											offnight_car_class = 'C';
+											display_offnight_times = true;
+											next_seen = true;
+											css_classes.push('next-offnight');
+										} else if ( dt > today_date ) {
+											offnight_car_class = 'C';
+										}
+
+									} else if ( match['type'] === 'holiday' ) {
+										match_type = 'holiday';
+										css_classes.push('holiday');
+										if ( match['game'] ) {
+											match_day = match['match_day'] ?? 'ERROR';
+										}
+									} else if ( match['type'] === 'championship' ) {
+										match_type = 'championship';
+										css_classes.push('championship');
+										match_day = match['match_day'] ?? 'ERROR';
+										if ( first_playoff ) {
+											first_playoff = false;
+											css_classes.push('mt-3');
+										}
+									}
+
+									console.log(match_date, match_type);
+								} else if ( match_days[match_date] === 'holiday' ) {
+									match_type = 'holiday';
 									css_classes.push('holiday');
-								} 
-								if ( match_days[match_date] === 99 ) {
+									console.log(match_date, match_type);
+								} else  if ( match_days[match_date] === 99 ) {
+									match_type = 'championship';
 									css_classes.push('championship');
 									if ( first_playoff ) {
 										first_playoff = false;
 										css_classes.push('mt-3');
 									}
+									console.log(match_date, match_type);
 								}
 						%>
 
 						<li class="<%- css_classes.join(' '); %>">
 							<%
-								if ( match_days[match_date] !== 99 ) {
+								if ( match_type === 'offnight' ) {
 							%>
-								<span class="me-1 d-inline-block text-end" style="width:100px;">
-							<%- match_days[ match_date ] == 'holiday' ? '<strong>Holiday</strong>' : `Match Day: <strong class="${day_class}">${match_days[match_date]}</strong>`; %>:
+								<span class="h6 d-inline-block me-1 text-end" style="width:140px;">
+									<i
+										class="fas fa-car-burst <%- offnight_car_class; %> me-1"
+									></i>
+									Off-Night <strong class="<%- day_class; %>"><%- match_day; %></strong>: 
+								</span>
+								<span>
+									<strong class="ms-1"><%- dstr; %></strong>
+								</span>
+								<%
+									if ( display_offnight_times && match.times ) {
+								%>
+								<div class="d-flex justify-content-evenly" data-date="<%- today_date; %>">
+									<%
+										let next_match = null;
+										let match_num  = 1;
+										let displayed_next = false;
+										let tooltip_head = '<h6><u>Off-Night Bonus Matches!</u></h6><ul>';
+										const tooltips = [];
+										let tooltip_foot = '</ul>';
+										for ( let i = 0; i < match.times.length; ++i ) {
+											const tparts = match.times[i].split(':');
+											const hours = parseInt(tparts[0]) + (tz_offset / 60);
+											const minutes = parseInt(tparts[1]);
+											const mdt = new Date(Date.UTC( 
+												parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]), 
+												hours, minutes, 0
+											));
+											const mt = mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' });
+
+											tooltips.push(`<li>#${i+1}. ${mt}`);
+										}
+										for ( let i = 0; i < match.times.length; ++i ) {
+											console.log(i, match_date, match.times[i]);
+											const tparts = match.times[i].split(':');
+											const hours = parseInt(tparts[0]) + (tz_offset / 60);
+											const minutes = parseInt(tparts[1]);
+											const mdt = new Date(Date.UTC( 
+												parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]), 
+												hours, minutes, 0
+											));
+
+											console.log(match_date, match.times[i], mdt);
+
+											const tips = Array.from(tooltips);
+											
+											const mt = mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' });
+
+											if ( mdt < today_date ) {
+												next_match = mdt;
+												tips[i] = `<li><b>#${i+1}. ${mt} ✅</b></li>`;
+
+												const tooltip_out = tooltip_head + tips.join(' ') + tooltip_foot;
+									%>
+									<div
+										data-date="<%- mdt; %>"
+										class="text-center"
+										title="<%- tooltip_out; %>"
+										data-bs-toggle="tooltip"
+										data-bs-html="true"
+										data-bs-custom-class="tooltip-match"
+									>
+									>
+										<div><i class="fas fa-check"></i></div>
+										<div class="match_times text-decoration-line-through"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
+									</div>
+									<%
+											} else if ( ! next_match && (mdt > today_date) ) {
+												next_match = mdt;
+												match_num += i;
+												display_next = true;
+
+												tips[i] = `<li><b>#${i+1}. ${mt} 🔥</b></li>`;
+
+												const tooltip_out = tooltip_head + tips.join(' ') + tooltip_foot;
+									%>
+									<div
+										data-date="<%- mdt; %>"
+										class="text-center"
+										title="<%- tooltip_out; %>"
+										data-bs-toggle="tooltip"
+										data-bs-html="true"
+										data-bs-custom-class="tooltip-match"
+									>
+										<span class="timeago" datetime="<%- next_match.toISOString(); %>"><%- next_match.toString(); %></span>
+										<div class="match_times next"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
+									</div>
+									<%
+											} else {
+												tips[i] = `<li><b>#${i+1}. ${mt}</b></li>`;
+												const tooltip_out = tooltip_head + tips.join(' ') + tooltip_foot;
+									%>
+									<div
+										data-date="<%- mdt; %>"
+										class="text-center"
+										title="<%- tooltip_out; %>"
+										data-bs-toggle="tooltip"
+										data-bs-html="true"
+										data-bs-custom-class="tooltip-match"
+									>
+										<div><i class="fas fa-clock text-light text-opacity-75"></i></div>
+										<div class="match_times"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
+									</div>
+									<%
+											}
+										}
+									%>
+								</div>
+							<%
+									} else if ( display_offnight_times ) {
+							%>
+								<span>
+									<span class="me-1 d-inline-block text-end" style="width:140px;">
+										Off-night: <strong class="<%- day_class; %>"><%- match_day; %></strong>
+									</span>
+									<strong class="ms-1"><%- dstr; %></strong>
+								</span>
+							<%
+									}
+								} else if ( match_type === 'holiday' ) {
+							%>
+							<span>
+								<% if ( match['game'] ) { %>
+								<span class="text-info h6 d-inline-block me-1 text-end" style="width:140px;">
+									<i
+										class="fas fa-car-burst C me-1"
+									></i>
+									HOLIDAY <strong class="<%- day_class; %>"><%- match_day; %></strong>:
+								</span>
+								<% } else { %> 
+								<span class="me-1 d-inline-block text-end" style="width:140px;">
+									<strong>Holiday</strong> (<em>No games</em>)
+								</span>
+								<% } %>
+								<strong class="ms-1"><%- dstr; %></strong>
+							</span>
+							<%
+								} else if ( match_type === 'normal' ) {
+							%>
+							<span>
+								<span class="me-1 d-inline-block text-end" style="width:140px;">
+									Match Day: <strong class="<%- day_class; %>"><%- match_day; %></strong>:
 								</span>
 								<strong class="ms-1"><%- dstr; %></strong>
 							</span>
 							<%
-								} else {
+								} else if ( match_type === 'championship' ) {
 							%>
 							<span class="d-inline-block">
 								<strong class="text-info h5">
@@ -146,6 +364,7 @@
 							<%
 								}
 							%>
+
 						</li>
 
 						<%

@@ -1180,7 +1180,6 @@ router.all(['/dequeue/:rsc_id', '/dequeue/:rsc_id/:league'], (req, res) => {
 	`;
 	const htmx_request = 'hx-request' in req.headers;
 	
-
 	req.db.query(query, params, (err,results) => {
 		if ( err ) { throw err; }
 
