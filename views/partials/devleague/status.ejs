@@ -13,7 +13,7 @@
 <div id="devleague_room_status" <%- HTMX_REQUEST ? 'hx-swap-oob="outerHTML"' : ''; %>>
 	<div class="card mb-4">
 		<a
-			class="btn btn-primary btn-sm float-end"
+			class="btn <%- games.length > 0 ? 'btn-primary' : 'btn-secondary'; %> btn-sm float-end"
 			data-bs-toggle="collapse"
 			href="#collapse_games"
 			role="button"
@@ -24,7 +24,7 @@
 				<h4>
 					Active Games: <%- games.length; %>
 					<button
-						class="btn btn-primary btn-sm float-end fw-bolder"
+						class="btn btn-warning btn-sm float-end fw-bolder"
 					>
 						Show Active Games
 					</button>
@@ -92,8 +92,20 @@
 						<strong>Ready Room</strong>, it's probably safe to kick things off. 
 					</p>
 
+					<div id="generating_indicator" class="text-center htmx-indicator"> 
+						<img
+							src="/images/bars.svg"
+							title="Generating indicator"
+							alt="Generating indicator"
+						> Generating... 
+					</div> 
+
 					<div class="text-center">
-						<a href="/generate_team/all" class="btn btn-success btn-lg">
+						<a
+							href="/generate_team/all"
+							class="btn btn-success btn-lg"
+							onclick="return can_generate();""
+						>
 							<div class="spinner-grow spinner-grow-sm text-warning" style="" role="status">
 								<span class="visually-hidden">Ready!</span>
 							</div>
@@ -130,7 +142,13 @@
 					</p>
 
 					<div class="text-center">
-						<a href="/devleague/deactivate-last/<%- 6 - missing; %>" class="btn btn-danger btn-lg">
+						<a
+							href="/devleague/deactivate-last/<%- 6 - missing; %>"
+							hx-get="/devleague/deactivate-last/<%- 6 - missing; %>"
+							hx-target="#waiting_room_div"
+							hx-swap="outerHTML"
+							class="btn btn-danger btn-lg"
+						>
 							Deactivate the Last <%- 6 - missing; %>
 							<i class="fa fa-car-burst text-warning"></i>
 						</a>

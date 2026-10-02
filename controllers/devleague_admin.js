@@ -300,7 +300,13 @@ router.get(['/setup/devleague', '/setup/devleague/:amount'], async (req, res) =>
 		return res.redirect('/');
 	}
 
-	const limit = req.params.amount ?? 100;
+	let req_limit = parseInt(req.params.amount ?? 100);
+	if ( req_limit === 0 ) {
+		req_limit = 1;
+	} else if ( req_limit > 100 ) {
+		req_limit = 100;
+	}
+	const LIMIT_WHERE = `LIMIT ${req_limit}`;
 
 	const db = await mysqlP.createPool({
 		host: process.env.DB_HOST,
@@ -312,7 +318,6 @@ router.get(['/setup/devleague', '/setup/devleague/:amount'], async (req, res) =>
 		connectionLimit: 10,
 		queueLimit: 0
 	});
-
 
 	const db_query = `
 		SELECT p.id,c.status,p.mmr 
@@ -329,10 +334,11 @@ router.get(['/setup/devleague', '/setup/devleague/:amount'], async (req, res) =>
 					rostered = 0 AND active = 0
 			)
 		ORDER BY rand() 
-		LIMIT ? 
+		${LIMIT_WHERE}
 	`;
 
-	const [ results ] = await db.execute(db_query, [limit]);
+	console.log('Trying to generate fake players', req_limit);
+	const [ results ] = await db.execute(db_query);
 	if ( results && results.length ) {
 		const ins_query = `
 			INSERT INTO signups 
@@ -348,8 +354,8 @@ router.get(['/setup/devleague', '/setup/devleague/:amount'], async (req, res) =>
 	}
 
 	await db.end();
-	
-	res.json({'success': 'added 30 players'});
+
+	res.redirect(`/devleague?added=${req_limit}`);
 });
 
 router.all('/generate_team/:tier', async (req, res) => {

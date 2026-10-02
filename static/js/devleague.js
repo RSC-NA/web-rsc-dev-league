@@ -1,9 +1,20 @@
+function getEl(el_id) {
+	return document.getElementById(el_id);
+}
+function oneSel(selector) {
+	return document.querySelector(selector);
+}
+function getSel(selector) {
+	return document.querySelectorAll(selector);
+}
+
 const DevLeague = {
 	game_count: 0,
 	waiting_room: 0,
 	ready_room: 0,
 	in_game: false,
 	do_ping: true,
+	generating: false,
 	threshold: parseInt(localStorage.getItem('Dev.threshold') ?? 10),
 	initialize: function() {
 		const gc = parseInt(localStorage.getItem('Dev.game-count') ?? 0);
@@ -52,6 +63,17 @@ const DevLeague = {
 }
 
 document.addEventListener('DOMContentLoaded', initialize_devleague); 
+document.addEventListener('htmx:beforeRequest', trap_htmx_requests);
+
+function trap_htmx_requests(ev) {
+	if ( DevLeague.generating ) {
+		ev.preventDefault();
+		console.log('DevLeague.generating = ', DevLeague.generating, "Blocked all HTMX requests.");
+		console.log(ev);
+	} else {
+		console.log('DevLeague.generating = ', DevLeague.generating, "Request approved.");
+	}
+}
 
 function initialize_devleague(_ev) {
 	DevLeague.initialize();

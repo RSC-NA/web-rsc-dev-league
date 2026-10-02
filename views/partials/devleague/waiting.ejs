@@ -15,8 +15,8 @@
 	}
 
 	// TODO: MAKE SURE YOU STRIP THIS OUT
-	load_delay = 10;
-	console.log('in waiting.ejs, overriding delay decay to 10');
+	//load_delay = 10;
+	//console.log('in waiting.ejs, overriding delay decay to 10');
 
 	let players_ready = 0;
 	if ( Object.keys(ready_room).length ) {
@@ -57,19 +57,52 @@
 		if ( ! force_out ) {
 	%>
 	<script type="text/javascript">
+		function can_generate() {
+			getEl('generating_indicator').style.opacity = 1;
+
+			if ( DevLeague.generating ) { 
+				return false; 
+			} else { 
+				DevLeague.generating = true; 
+				return true;
+			}
+		}
+
 		function process_devleague_waiting_room() {
 			let game_count = <%- game_count ? game_count : 0; %>;
 			let local_game_count = parseInt(localStorage.getItem('Dev.game-count') ?? 0);
 			if ( game_count !== local_game_count ) {
 				if ( DevLeague.game_count > 0 && game_count === 0 ) {
 					DevLeague.game_count = game_count;
+					// console.log('top:', {
+					// 	'DevLeague.game_count': DevLeague.game_count,
+					// 	'game_count': game_count,
+					// 	'local_game_count': local_game_count,
+					// });
 					setTimeout(DevLeague.playBoop, 100);
 				} else if ( game_count !== DevLeague.game_count ) {
 					DevLeague.game_count = game_count;
+					if ( game_count === 0 ) {
+						// console.log('mid:', {
+						// 	'DevLeague.game_count': DevLeague.game_count,
+						// 	'game_count': game_count,
+						// 	'local_game_count': local_game_count,
+						// });
+						setTimeout(DevLeague.playBoop, 100);
+					}
 				}
-				localStorage.setItem('Dev.game-count', game_count);
+				localStorage.setItem('Dev.game-count', DevLeague.game_count);
 			} else if ( DevLeague.game_count !== game_count ) {
 				DevLeague.game_count = game_count;
+				if ( game_count === 0 ) {
+					// console.log('bottom:', {
+					// 	'DevLeague.game_count': DevLeague.game_count,
+					// 	'game_count': game_count,
+					// 	'local_game_count': local_game_count,
+					// });
+					setTimeout(DevLeague.playBoop, 100);
+				}
+				localStorage.setItem('Dev.game-count', DevLeague.game_count);
 			}
 			
 			let team_ready = <%- team_ready ? team_ready : 0; %>;
