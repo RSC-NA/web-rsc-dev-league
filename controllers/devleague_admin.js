@@ -465,7 +465,7 @@ router.all('/generate_team/:tier', async (req, res) => {
 			const lobby = {
 				season: res.locals.settings.season,
 				match_day: res.locals.match_day,
-				username: null,
+				username: get_rand_word_devleague(),
 				password: get_rand_word_devleague(),
 				home_num: ((i * 2) + 1),
 				away_num: ((i * 2) + 2),
