@@ -141,7 +141,6 @@
 								if ( typeof match === 'number' ) {
 									match_day = match;
 									match_type = 'normal';
-									console.log(match_date, match_type);
 								} else if (typeof match === 'object' ) {
 									if ( ! ('type' in match) ) {
 										continue;
@@ -184,11 +183,9 @@
 										}
 									}
 
-									console.log(match_date, match_type);
 								} else if ( match_days[match_date] === 'holiday' ) {
 									match_type = 'holiday';
 									css_classes.push('holiday');
-									console.log(match_date, match_type);
 								} else  if ( match_days[match_date] === 99 ) {
 									match_type = 'championship';
 									css_classes.push('championship');
@@ -196,7 +193,6 @@
 										first_playoff = false;
 										css_classes.push('mt-3');
 									}
-									console.log(match_date, match_type);
 								}
 						%>
 
@@ -237,7 +233,6 @@
 											tooltips.push(`<li>#${i+1}. ${mt}`);
 										}
 										for ( let i = 0; i < match.times.length; ++i ) {
-											console.log(i, match_date, match.times[i]);
 											const tparts = match.times[i].split(':');
 											const hours = parseInt(tparts[0]) + (tz_offset / 60);
 											const minutes = parseInt(tparts[1]);
@@ -245,8 +240,6 @@
 												parseInt(dp[0]), parseInt(dp[1])-1, parseInt(dp[2]), 
 												hours, minutes, 0
 											));
-
-											console.log(match_date, match.times[i], mdt);
 
 											const tips = Array.from(tooltips);
 											

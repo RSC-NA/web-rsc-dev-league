@@ -49,7 +49,7 @@
 
 <div
 	id="waiting_room_div"
-	hx-get="/devleague/waiting/<%- league; %>?delay=<%- load_delay; %>&last=<%- last; %>"
+	hx-get="/lobby-update/<%- league; %>?delay=<%- load_delay; %>&last=<%- last; %>"
 	hx-trigger="load delay:<%- load_delay; %>s"
 	hx-swap="outerHTML"
 >

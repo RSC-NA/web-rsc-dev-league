@@ -1135,7 +1135,10 @@ router.get('/devleague/activate/:player_id', async (req, res) => {
 	}
 });
 
-router.get(['/devleague', '/devleague/waiting', '/devleague/waiting/:league'], async (req, res) => {
+router.get([
+	'/devleague', '/devleague/waiting', '/devleague/waiting/:league',
+	'/lobby-update', '/lobby-update/:league',
+], async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
