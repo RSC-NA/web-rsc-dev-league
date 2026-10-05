@@ -280,8 +280,8 @@
 					<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
 					<span
 						class="timeago text-gray-600"
-						data-date="<%- p.signup_dtg.toISOString(); %>"
-						datetime="<%- p.signup_dtg.toISOString(); %>"
+						data-date="<%- p.signup_dtg.getTime(); %>"
+						datetime="<%- p.signup_dtg.getTime(); %>"
 						style="font-size: 0.8rem;"
 					><%- p.signup_dtg.toISOString(); %></span>
 					<div class="text-muted" style="font-size:0.7em;"><%= p.status; %></div>

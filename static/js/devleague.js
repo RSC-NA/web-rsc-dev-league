@@ -86,9 +86,12 @@ function initialize_devleague(_ev) {
 				// uncomment the line of server is set to UTC
 				const d = new Date(dateStr).getTime(); // - (new Date().getTimezoneOffset() * 60000);
 				timeEls[i].setAttribute('datetime', d);
+				timeEls[i].setAttribute('data-generated-time', d);
 			}
 		}
-		timeago.render(timeEls);
+		if ( timeago ) {
+			timeago.render(timeEls);
+		}
 	}
 
 	const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');

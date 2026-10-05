@@ -423,12 +423,11 @@ router.get('/check_out/:match_day', (req, res) => {
 			DELETE FROM signups 
 			WHERE 
 				player_id = ? AND 
-				match_day = ? AND 
 				rostered = 0
 		`;
 		req.db.query( 
 			check_out_query,
-			[ req.session.user_id, match_day ],
+			[ req.session.user_id ],
 			function(err, _results) {
 				if ( err ) throw err;
 
