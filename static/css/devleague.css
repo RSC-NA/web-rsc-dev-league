@@ -116,8 +116,9 @@ ul.dates {
 
 li.today .h6 {
 	font-weight: bold;
+	font-size: 1.3rem;
+	margin: 1rem 0;
 }
-
 
 .dark li.offnight {
 	background-color: #0a0638;

@@ -6932,6 +6932,10 @@ textarea.form-control-lg {
   border-color: #ffc107 !important;
 }
 
+.border-yellow {
+  border-color: #ff0 !important;
+}
+
 .border-danger {
   border-color: #dc3545 !important;
 }
