@@ -110,10 +110,10 @@
 						<a href="/player/<%= rsc_id; %>"><%= p.name; %></a>
 						<span
 							class="timeago small text-gray-600"
-							data-date="<%- p.signup_dtg.getTime(); %>"
-							datetime="<%- p.signup_dtg.getTime(); %>"
+							data-date="<%- p.signup_dtg; %>"
+							datetime="<%- p.signup_dtg; %>"
 							style="font-size: 0.8rem;"
-						><%- p.signup_dtg.toISOString(); %></span>
+						><%- p.signup_time; %></span>
 						<div class="text-muted" style="font-size:0.7em;"><%= p.status; %></div>
 					</td>
 					<td class="text-center">

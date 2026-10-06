@@ -1209,6 +1209,7 @@ router.get([
 	if ( signup_results.length ) {
 		for ( let i = 0; i < signup_results.length; ++i ) {
 			const s = signup_results[i];
+			s.signup_time = s.signup_dtg.getTime();
 			//const p = players[s.rsc_id];
 			//console.log(s,p);
 			s.mmr_delta = 0;
