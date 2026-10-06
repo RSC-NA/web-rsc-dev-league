@@ -43,7 +43,7 @@
 						Signups End:
 						<strong
 							class="timeago"
-							datetime="<%= tournament['signup_close_dtg']; %>"
+							data-date-time="<%= tournament['signup_close_dtg']; %>"
 							title="<%= tournament['signup_close_dtg']; %>"
 						><%= tournament['signup_close_dtg']; %></strong>
 					</li>
@@ -54,7 +54,7 @@
 						Check in Start:
 						<strong
 							class="timeago"
-							datetime="<%= tournament.times.check_in.start; %>"
+							data-date-time="<%= tournament.times.check_in.start; %>"
 							title="<%= tournament.times.check_in.start; %>"
 						><%= tournament.times.check_in.start; %></strong>
 					</li>
@@ -65,7 +65,7 @@
 						Check In Cutoff:
 						<strong
 							class="timeago"
-							datetime="<%= tournament.times.check_in.dtg; %>"
+							data-date-time="<%= tournament.times.check_in.dtg; %>"
 							title="<%= tournament.times.check_in.dtg; %>"
 						><%= tournament.times.check_in.dtg; %></strong>
 					</li>
@@ -76,7 +76,7 @@
 						Start Time:
 						<strong
 							class="timeago"
-							datetime="<%= tournament['start_dtg']; %>"
+							data-date-time="<%= tournament['start_dtg']; %>"
 							title="<%= tournament['start_dtg']; %>"
 						><%= tournament['start_dtg']; %></strong>
 					</li>

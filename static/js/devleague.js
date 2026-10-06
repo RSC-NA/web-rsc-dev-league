@@ -75,16 +75,17 @@ function trap_htmx_requests(ev) {
 	}
 }
 
-function initialize_devleague(_ev) {
-	DevLeague.initialize();
-
+function initialize_timeago() {
 	const timeEls = document.querySelectorAll('.timeago');
 	if ( timeEls && timeEls.length ) {
 		for ( let i = 0; i < timeEls.length; ++i ) {
-			const dateStr = timeEls[i].getAttribute('datetime');
+			const dateStr = timeEls[i].dataset.dateTime; //getAttribute('datetime');
+			console.log(timeEls[i]);
+			console.log(dateStr);
 			if ( dateStr ) {
 				// uncomment the line of server is set to UTC
 				const d = new Date(dateStr).getTime(); // - (new Date().getTimezoneOffset() * 60000);
+				console.log(dateStr, ' => ', new Date(dateStr), new Date(dateStr).getTime());
 				timeEls[i].setAttribute('datetime', d);
 				timeEls[i].setAttribute('data-generated-time', d);
 			}
@@ -93,6 +94,12 @@ function initialize_devleague(_ev) {
 			timeago.render(timeEls);
 		}
 	}
+}
+
+function initialize_devleague(_ev) {
+	DevLeague.initialize();
+
+	initialize_timeago();
 
 	const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 	const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));

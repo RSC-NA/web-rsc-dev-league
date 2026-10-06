@@ -282,7 +282,10 @@
 										data-bs-html="true"
 										data-bs-custom-class="tooltip-match"
 									>
-										<span class="timeago" datetime="<%- next_match.toISOString(); %>"><%- next_match.toString(); %></span>
+										<span
+											class="timeago"
+											data-date-time="<%- next_match; %>"
+										><%- next_match.toString(); %></span>
 										<div class="match_times next"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
 									</div>
 									<%
