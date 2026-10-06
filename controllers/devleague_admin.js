@@ -358,8 +358,7 @@ router.get(['/setup/devleague', '/setup/devleague/:amount'], async (req, res) =>
 	res.redirect(`/devleague?added=${req_limit}`);
 });
 
-router.all('/generate_team/:tier', async (req, res) => {
-
+router.all('/devleague/generate_team/:tier', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
