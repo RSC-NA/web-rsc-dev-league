@@ -860,10 +860,24 @@ router.post('/admin-score/:match_id/:league', async (req, res) => {
 	return res.redirect(`/match/${req.params.match_id}`);
 });
 
-router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id/:player_mmr', (req, res) => {
+router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id/:player_mmr', async (req, res) => {
 	if ( ! req.session.is_admin && ! req.session.is_devleague_admin ) {
 		return res.redirect('/');
 	}
+	
+	const db = await mysqlP.createPool({
+		host: process.env.DB_HOST,
+		user: process.env.DB_USER,
+		password: process.env.DB_PASS,
+		port: process.env.DB_PORT,
+		database: process.env.DB_SCHEMA,
+		waitForConnections: true,
+		connectionLimit: 10,
+		queueLimit: 0
+	});
+	
+	const season = res.locals.settings.season;
+	const match_day = res.locals.match_day;
 
 	const team_id = parseInt(req.params.team_id);
 	const player_id = parseInt(req.params.player_id);
@@ -877,25 +891,59 @@ router.get('/match-sub/:team_id/confirm-sub/:player_id/:sub_player_id/:player_mm
 	console.log(output);
 	//return res.json(output);
 
+	const signup_query = `
+		SELECT id, active, rostered 
+		FROM signups 
+		WHERE player_id = ? AND season = ? AND match_day = ? AND active = 0 and rostered = 0
+	`;
+	const [signup_results] = await db.query(signup_query, [
+		sub_player_id, season, match_day, 
+	]);
+
+	if ( signup_results && signup_results.length ) {
+		const signup = signup_results[0];
+		const update_signup_query = `
+			UPDATE signups 
+			SET active = 1, rostered = 1
+			WHERE id = ?
+		`;
+		await db.execute(update_signup_query, [signup.id]);
+	} else {
+		const insert_signup_query = `
+			INSERT INTO signups 
+				(player_id,season,match_day,active,rostered,status) 
+			VALUES (?, ?, ?, ?, ?, ?)
+		`;
+		await db.execute(insert_signup_query, [
+			sub_player_id, season, match_day, 1, 1, 'sub'
+		]);
+	}
+
 	const query = `
 		UPDATE team_players SET player_id = ?, start_mmr = ? 
 		WHERE team_id = ? AND player_id = ?
 	`;
-	req.db.query(query, [sub_player_id, sub_mmr, team_id, player_id], (err, results) => {
-		if ( err ) { throw err; }
+	await db.execute(query, [sub_player_id, sub_mmr, team_id, player_id]);
+	
+	const match_id_query = `
+		SELECT 
+			id,reported_rsc_id 
+		FROM matches WHERE home_team_id = ? OR away_team_id = ?
+	`;
+	const [match] = await db.query(match_id_query, [team_id, team_id]);
 
-		const match_id_query = `SELECT id,reported_rsc_id FROM matches WHERE home_team_id = ? OR away_team_id = ?`;
-		req.db.query(match_id_query, [team_id, team_id], (err, results) => {
-			if ( err ) { throw err; }
+	let match_id = null;
+	if ( match && match.length ) {
+		match_id = match[0].id;
+	}
 
-			if ( results && results.length ) {
-				const id = results[0].id;
-				res.redirect(`/match/${id}`);
-			} else {
-				res.redirect('/?error=WhatTheHeck');
-			}
-		});
-	});
+	await db.end();
+
+	if ( match_id ) {
+		res.redirect(`/match/${match_id}`);
+	} else {
+		res.redirect('/?error=WhatTheHeck');
+	}
 });
 
 router.get('/match/:team_id/sub/:player_id', (req, res) => {
