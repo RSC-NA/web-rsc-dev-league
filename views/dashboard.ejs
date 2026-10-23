@@ -1,5 +1,5 @@
 
-<%- include('partials/header.ejs'); %>
+<%= include('partials/header.ejs'); %>
 
 <%
 		
@@ -17,7 +17,7 @@
 							if ( user.season_mmr ) {
 								const cur_tier = getTierFromDevMMR(user.season_mmr);
 						%>
-						<span class="badge bg-<%- cur_tier; %>"><%- cur_tier === 'SPLUS' ? 'S+' : cur_tier; %> Tier</span>
+						<span class="badge bg-<%= cur_tier; %>"><%= cur_tier === 'SPLUS' ? 'S+' : cur_tier; %> Tier</span>
 						<%
 							}
 						%>
@@ -28,7 +28,7 @@
 							for ( const role_id in roles ) {
 								if ( user_roles.includes(role_id) ) {
 					%>
-					<span class="badge badge-sm rounded-pill <%- roles[role_id]['css']; %>"><%- roles[role_id]['text']; %></span>
+					<span class="badge badge-sm rounded-pill <%= roles[role_id]['css']; %>"><%= roles[role_id]['text']; %></span>
 					<%
 								
 								}
@@ -88,7 +88,7 @@
 					</p>
 				</div>
 				<div class="col-12 col-md-6 col-xl-4 matchDates dark">
-					<h4>Season <%= settings.season %> Dates - <%- today; %></h4>
+					<h4>Season <%= settings.season %> Dates - <%= today; %></h4>
 					<ul class="dates ps-1">
 						<%
 							let first_playoff = true;
@@ -197,23 +197,23 @@
 								}
 						%>
 
-						<li class="<%- css_classes.join(' '); %>">
+						<li class="<%= css_classes.join(' '); %>">
 							<%
 								if ( match_type === 'offnight' ) {
 							%>
 								<span class="h6 d-inline-block me-1 text-end" style="width:140px;">
 									<i
-										class="fas fa-car-burst <%- offnight_car_class; %> me-1"
+										class="fas fa-car-burst <%= offnight_car_class; %> me-1"
 									></i>
-									Off-Night <strong class="<%- day_class; %>"><%- match_day; %></strong>: 
+									Off-Night <strong class="<%= day_class; %>"><%= match_day; %></strong>: 
 								</span>
 								<span>
-									<strong class="ms-1"><%- dstr; %></strong>
+									<strong class="ms-1"><%= dstr; %></strong>
 								</span>
 								<%
 									if ( display_offnight_times && match.times ) {
 								%>
-								<div class="d-flex justify-content-evenly" data-date="<%- today_date; %>">
+								<div class="d-flex justify-content-evenly" data-date="<%= today_date; %>">
 									<%
 										let next_match = null;
 										let match_num  = 1;
@@ -253,16 +253,16 @@
 												const tooltip_out = tooltip_head + tips.join(' ') + tooltip_foot;
 									%>
 									<div
-										data-date="<%- mdt; %>"
+										data-date="<%= mdt; %>"
 										class="text-center"
-										title="<%- tooltip_out; %>"
+										title="<%= tooltip_out; %>"
 										data-bs-toggle="tooltip"
 										data-bs-html="true"
 										data-bs-custom-class="tooltip-match"
 									>
 									>
 										<div><i class="fas fa-check"></i></div>
-										<div class="match_times text-decoration-line-through"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
+										<div class="match_times text-decoration-line-through"><%= mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
 									</div>
 									<%
 											} else if ( ! next_match && (mdt > today_date) ) {
@@ -275,18 +275,18 @@
 												const tooltip_out = tooltip_head + tips.join(' ') + tooltip_foot;
 									%>
 									<div
-										data-date="<%- mdt; %>"
+										data-date="<%= mdt; %>"
 										class="text-center"
-										title="<%- tooltip_out; %>"
+										title="<%= tooltip_out; %>"
 										data-bs-toggle="tooltip"
 										data-bs-html="true"
 										data-bs-custom-class="tooltip-match"
 									>
 										<span
 											class="timeago"
-											data-date-time="<%- next_match; %>"
-										><%- next_match.toString(); %></span>
-										<div class="match_times next"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
+											data-date-time="<%= next_match; %>"
+										><%= next_match.toString(); %></span>
+										<div class="match_times next"><%= mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
 									</div>
 									<%
 											} else {
@@ -294,15 +294,15 @@
 												const tooltip_out = tooltip_head + tips.join(' ') + tooltip_foot;
 									%>
 									<div
-										data-date="<%- mdt; %>"
+										data-date="<%= mdt; %>"
 										class="text-center"
-										title="<%- tooltip_out; %>"
+										title="<%= tooltip_out; %>"
 										data-bs-toggle="tooltip"
 										data-bs-html="true"
 										data-bs-custom-class="tooltip-match"
 									>
 										<div><i class="fas fa-clock text-light text-opacity-75"></i></div>
-										<div class="match_times"><%- mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
+										<div class="match_times"><%= mdt.toLocaleTimeString('en-US', { hour12: true, timeStyle: 'short' }); %></div>
 									</div>
 									<%
 											}
@@ -314,9 +314,9 @@
 							%>
 								<span>
 									<span class="me-1 d-inline-block text-end" style="width:140px;">
-										Off-night: <strong class="<%- day_class; %>"><%- match_day; %></strong>
+										Off-night: <strong class="<%= day_class; %>"><%= match_day; %></strong>
 									</span>
-									<strong class="ms-1"><%- dstr; %></strong>
+									<strong class="ms-1"><%= dstr; %></strong>
 								</span>
 							<%
 									}
@@ -328,23 +328,23 @@
 									<i
 										class="fas fa-car-burst C me-1"
 									></i>
-									HOLIDAY <strong class="<%- day_class; %>"><%- match_day; %></strong>:
+									HOLIDAY <strong class="<%= day_class; %>"><%= match_day; %></strong>:
 								</span>
 								<% } else { %> 
 								<span class="me-1 d-inline-block text-end" style="width:140px;">
 									<strong>Holiday</strong> (<em>No games</em>)
 								</span>
 								<% } %>
-								<strong class="ms-1"><%- dstr; %></strong>
+								<strong class="ms-1"><%= dstr; %></strong>
 							</span>
 							<%
 								} else if ( match_type === 'normal' ) {
 							%>
 							<span>
 								<span class="me-1 d-inline-block text-end" style="width:140px;">
-									Match Day: <strong class="<%- day_class; %>"><%- match_day; %></strong>:
+									Match Day: <strong class="<%= day_class; %>"><%= match_day; %></strong>:
 								</span>
-								<strong class="ms-1"><%- dstr; %></strong>
+								<strong class="ms-1"><%= dstr; %></strong>
 							</span>
 							<%
 								} else if ( match_type === 'championship' ) {
@@ -355,7 +355,7 @@
 									Dev League Championship
 								</strong>
 								<span class="d-block ms-5">
-									<%- dstr; %>
+									<%= dstr; %>
 								</span>
 							</span>
 							<%
@@ -411,7 +411,7 @@
 			%>
 			<h2>You Are Banned!</h2>
 			<p class="lead">
-				You were banned on <%- user.ban.banned_on; %>. Please message 
+				You were banned on <%= user.ban.banned_on; %>. Please message 
 				ModMail if you believe this to be in error. 
 			</p>
 
@@ -420,12 +420,12 @@
 					if ( is_admin ) {
 				%>
 				<h4>Banned By</h4>
-				<%- user.ban.banned_by_name; %>
+				<%= user.ban.banned_by_name; %>
 				<% 
 					}
 				%>
 				<h4>Ban Reason</h4>
-				<div class="mb-0"><%- user.ban.note; %></div>
+				<div class="mb-0"><%= user.ban.note; %></div>
 			</div>
 			<a class="btn btn-lg btn-danger disabled" href="javascript:void(0);">You Are Banned!</a>
 			<%
@@ -468,7 +468,7 @@
 				}
 			%>
 			<% } else if ( nickname && user && ! user['active_3s'] ) { %>
-			<h2>You are not an active player - <%- nickname; %></h2>
+			<h2>You are not an active player - <%= nickname; %></h2>
 			<p>
 				This league is only available to valid members of RSC with an active contract. Please sign up for the league
 				at <a href="https://discord.gg/rsc" rel="nofollow">https://discord.gg/rsc</a>
@@ -503,4 +503,4 @@
 		</div>
 	</main>
 
-<%- include('partials/footer.ejs'); %>
+<%= include('partials/footer.ejs'); %>

@@ -1,5 +1,5 @@
 
-<%- include('partials/header.ejs'); %>
+<%= include('partials/header.ejs'); %>
 
 <%
 	let CAN_ADMIN = false;
@@ -96,10 +96,10 @@
 		<h1>
 		Combine Match Info
 		<img
-			src="/icons/<%- match.tier.toLowerCase(); %>.png"
-			title="<%- match.tier; %>"
+			src="/icons/<%= match.tier.toLowerCase(); %>.png"
+			title="<%= match.tier; %>"
 			height="48"
-			alt="<%- match.tier; %> icon"
+			alt="<%= match.tier; %> icon"
 		>
 		</h1>
 		<p class="lead">
@@ -108,7 +108,7 @@
 		</p>
 		<h4 class="Prospect">IF YOU NEED HELP:</h4>
 		<ol class="Challenger bg-black bg-opacity-25 pt-3 pb-3 h4 border border-info rounded overflow-auto" style="padding-left: 3.5rem;">
-			<li>Copy the URL to this Combines Lobby [<a class="Prospect" href="/combine/<%- match.id; %>">https://devleague.rscna.com/combine/<%- match.id; %></a>]</li>
+			<li>Copy the URL to this Combines Lobby [<a class="Prospect" href="/combine/<%= match.id; %>">https://devleague.rscna.com/combine/<%= match.id; %></a>]</li>
 			<li>Paste that URL into a message asking what you need to have changed (wrong score, cancel the match, etc)</li>
 			<li>Ping <strong>@tehblister</strong> in that help message.</li>
 			<li>Required: (1. URL to lobby, 2. What needs to be changed, 3. ping to @tehblister)</li>
@@ -127,10 +127,10 @@
 										<th colspan="2">
 											Lobby Info
 											<img
-												src="/icons/<%- match.tier.toLowerCase(); %>.png"
-												title="<%- match.tier; %>"
+												src="/icons/<%= match.tier.toLowerCase(); %>.png"
+												title="<%= match.tier; %>"
 												height="16"
-												alt="<%- match.tier; %> icon"
+												alt="<%= match.tier; %> icon"
 											>
 										</th>
 									</tr>
@@ -140,7 +140,7 @@
 										<td class="text-end">Match:</td>	
 										<td>
 											<strong>
-												<%- match.cancelled ? 'cancelled' : match.completed ? 'completed' : 'active'; %>
+												<%= match.cancelled ? 'cancelled' : match.completed ? 'completed' : 'active'; %>
 											</strong>
 										</td>	
 									</tr>
@@ -148,7 +148,7 @@
 										<td class="text-end">Username:</td>	
 										<td>
 											<strong><code class="h4">
-												<%- user.rsc_id ? match.lobby_user : '<em>not shown</em>'; %>
+												<%= user.rsc_id ? match.lobby_user : '<em>not shown</em>'; %>
 											</code></strong>
 										</td>	
 									</tr>
@@ -156,7 +156,7 @@
 										<td class="text-end">Password:</td>	
 										<td>
 											<strong><code class="h4">
-												<%- user.rsc_id ? match.lobby_pass : '<em>not shown</em>'; %>
+												<%= user.rsc_id ? match.lobby_pass : '<em>not shown</em>'; %>
 											</code></strong>
 										</td>	
 									</tr>
@@ -167,7 +167,7 @@
 												class="btn btn-outline-light copy-to-clipboard"
 												type="button"
 												id="copy_url_to_clipboard"
-												data-copy="https://devleague.rscna.com/combine/<%- match.id; %>"
+												data-copy="https://devleague.rscna.com/combine/<%= match.id; %>"
 												title="<h6>Copy URL to Clipboard</h6>"
 												data-copy-success="copy-msg"
 												data-bs-toggle="tooltip"
@@ -182,14 +182,14 @@
 										<td colspan="2">
 											<strong><code
 												class="h6 copy-to-clipboard"
-												data-copy="https://devleague.rscna.com/combine/<%- match.id; %>"
+												data-copy="https://devleague.rscna.com/combine/<%= match.id; %>"
 												data-copy-success="copy-msg-2"
 											>
 												<span class="d-none d-md-inline">
-													https://devleague.rscna.com/combine/<%- match.id; %>
+													https://devleague.rscna.com/combine/<%= match.id; %>
 												</span>
 												<span class="d-inline d-md-none">
-													devleague.rscna.com/combine/<%- match.id; %>
+													devleague.rscna.com/combine/<%= match.id; %>
 												</span>
 												<span id="copy-msg-2" class="ms-2 hidden Elite">Copied!</span>
 											</code></strong>
@@ -238,7 +238,7 @@
 										<td colspan="2">
 											<strong>
 												Home 
-												<%- match.home_mmr - match.away_mmr; %>
+												<%= match.home_mmr - match.away_mmr; %>
 											</strong>
 										</td>	
 									</tr>
@@ -248,8 +248,8 @@
 										</td>	
 										<td colspan="2">
 											<strong>
-												<a href="/combine/matches/<%- match.reported_rsc_id; %>">
-													<%- match.reported_rsc_id in lobby ? 
+												<a href="/combine/matches/<%= match.reported_rsc_id; %>">
+													<%= match.reported_rsc_id in lobby ? 
 														lobby[match.reported_rsc_id].name : match.reported_rsc_id; %>
 												</a>
 											</strong>
@@ -259,8 +259,8 @@
 										<td class="text-end">Confirmed:</td>	
 										<td colspan="2">
 											<strong>
-												<a href="/combine/matches/<%- match.confirmed_rsc_id; %>">
-													<%- match.confirmed_rsc_id in lobby ? 
+												<a href="/combine/matches/<%= match.confirmed_rsc_id; %>">
+													<%= match.confirmed_rsc_id in lobby ? 
 														lobby[match.confirmed_rsc_id].name : match.confirmed_rsc_id; %>
 												</a>
 											</strong>
@@ -270,11 +270,11 @@
 										<td class="text-end">
 											Predicted:
 										</td>
-										<td class="<%- win_class; %> fw-bold">
-											<%- win_prediction; %> 
+										<td class="<%= win_class; %> fw-bold">
+											<%= win_prediction; %> 
 										</td>
 										<td class="fw-bold fst-italic">
-											<%- magnitude; %>
+											<%= magnitude; %>
 										</td>
 									</tr>
 								</tbody>
@@ -312,11 +312,11 @@
 					</div>
 					<div class="flex-fill">
 						<div class="h4 alert-heading">
-							<%- error; %>
+							<%= error; %>
 						</div>
 						<hr>
 						<p class="lead">
-							<%- errors[error]; %>
+							<%= errors[error]; %>
 						</p>
 						<p class="text-sm">
 							If you are unable to correct this issue, please ask for help in 
@@ -344,7 +344,7 @@
 		%>
 		<div class="row">
 			<div class="col-8 mx-auto">
-				<div class="alert <%- alert_class; %> d-flex align-items-center" role="alert">
+				<div class="alert <%= alert_class; %> d-flex align-items-center" role="alert">
 					<div class="bi flex-shrink-0 me-2">
 						<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
 							<use xlink:href="#check-circle-fill"/>
@@ -352,11 +352,11 @@
 					</div>
 					<div class="flex-fill">
 						<div class="display-5 alert-heading">
-							<%- alert_title; %>
+							<%= alert_title; %>
 						</div>
 						<hr>
 						<p class="lead">
-							<%- message; %>
+							<%= message; %>
 						</p>
 					</div>
 				</div>
@@ -380,7 +380,7 @@
 					Cancelling a game will allow every player in this lobby to requeue. No MMRs will be changed, but the VCs <strong>will be 
 					deleted.</strong>
 				</p>
-				<a tabindex="1" href="/combines/admin/<%- match.id; %>/<%- match.league; %>/cancel" class="btn btn-outline-danger">Cancel Game</a>
+				<a tabindex="1" href="/combines/admin/<%= match.id; %>/<%= match.league; %>/cancel" class="btn btn-outline-danger">Cancel Game</a>
 				<% 
 					} else {
 				%>
@@ -389,7 +389,7 @@
 					Clicking the "Resume Cancelled Game" button will mark this game as not cancelled and will allow players to resume playing. It will also 
 					<strong>create new VC lobbies.</strong>
 				</p>
-				<a tabindex="1" href="/combines/admin/<%- match.id; %>/<%- match.league; %>/resume" class="btn btn-primary">Resume Cancelled Game</a>
+				<a tabindex="1" href="/combines/admin/<%= match.id; %>/<%= match.league; %>/resume" class="btn btn-primary">Resume Cancelled Game</a>
 				<% 
 					}
 				%>
@@ -401,7 +401,7 @@
 					if ( ! match.cancelled ) {
 				%>
 				<p class="small">Overriding scores of a finished game will re-calculate player MMR gain/loss.</p>
-				<form action="/combines/overload/<%- match.id %>/<%- match.league; %>" method="post">
+				<form action="/combines/overload/<%= match.id %>/<%= match.league; %>" method="post">
 					<div class="mb-3">
 						<label for="home_wins">Home Team Series Score</label>
 						<div class="input-group">
@@ -411,7 +411,7 @@
 								name="home_wins"
 								id="home_wins"
 								placeholder=""
-								value="<%- match.home_wins %>"
+								value="<%= match.home_wins %>"
 								max="5"
 								tabindex="1"
 								style="background-color:#000f1e;"
@@ -428,7 +428,7 @@
 								name="away_wins"
 								id="away_wins"
 								placeholder=""
-								value="<%- match.away_wins %>"
+								value="<%= match.away_wins %>"
 								tabindex="2"
 								max="5" 
 								style="background-color:#000f1e;"
@@ -482,21 +482,21 @@
 						},
 						renameFile: (file) => {
 							const fileSplit = file.name.split('.');
-							const new_file_name = `<%- match.id; %>_<%- user.rsc_id %>-${fileSplit[0]}.${fileSplit[1]}`;
+							const new_file_name = `<%= match.id; %>_<%= user.rsc_id %>-${fileSplit[0]}.${fileSplit[1]}`;
 							file.name = new_file_name;
 							return new_file_name;
 						}
 					};
 				</script>
 				<form
-					action="/combine/<%- match.id; %>/upload"
+					action="/combine/<%= match.id; %>/upload"
 					method="post"
 					style="background-color: #000f1e;border:1px solid #021e3a;"
 					class="dropzone fw-bolder text-white"
 					id="replay-dropzone"
 				> 
-					<input type="hidden" name="season" value="<%- combines.season; %>">
-					<input type="hidden" name="match_day" value="<%- combine_day; %>">
+					<input type="hidden" name="season" value="<%= combines.season; %>">
+					<input type="hidden" name="match_day" value="<%= combine_day; %>">
 				</form>
 
 			</div>
@@ -519,9 +519,9 @@
 							}
 				%>
 					<li>
-						<%- match.replays[i].rsc_id; %>: 
-						<a href="/<%- replay_folder; %>/<%- match.replays[i].replay; %>">
-							<%- match.replays[i].replay; %>
+						<%= match.replays[i].rsc_id; %>: 
+						<a href="/<%= replay_folder; %>/<%= match.replays[i].replay; %>">
+							<%= match.replays[i].replay; %>
 						</a>
 					</li>
 				<%
@@ -562,8 +562,8 @@
 				<div class="">
 					
 			<% if ( user.rsc_id ) { %>
-					<form action="/combine/<%- match.id %>/<%- match.league; %>" method="post">
-						<input type="hidden" name="reporter_team" value="<%- combine_player.team; %>">
+					<form action="/combine/<%= match.id %>/<%= match.league; %>" method="post">
+						<input type="hidden" name="reporter_team" value="<%= combine_player.team; %>">
 			<% } %>
 					<div class="row">
 						<div class="col-md-6 table-responsive">
@@ -581,8 +581,8 @@
 									}
 							%>
 							<h3 class="text-center m-4">
-								<span class="<%- homeClass; %> bg-opacity-50 m-4 p-3 border rounded">
-									<%- match.home_wins; %>
+								<span class="<%= homeClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%= match.home_wins; %>
 								</span>
 							</h3>
 							<% 
@@ -671,7 +671,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-xs bg-Elite"
-												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%- p?.tier ?? match.tier; %>'><%= p.name ?? p.nickname; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
+												title="<h6><u>Submit Numbers Report</u></h6><div>player: <strong class='<%= p?.tier ?? match.tier; %>'><%= p.name ?? p.nickname; %></strong><br>match: <strong>/combine/<%= match.id; %></strong><br>MMR: <strong class='<%= p?.tier ?? match.tier; %>'><%= report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
@@ -689,11 +689,11 @@
 										%>
 										<td class="">
 											<img
-												src="/icons/<%- p?.effective_tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
-												title="<%- p?.tier ?? match.tier; %>"
+												src="/icons/<%= p?.effective_tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
+												title="<%= p?.tier ?? match.tier; %>"
 												style=""
 												height="16"
-												alt="<%- p?.tier ?? match.tier; %> icon"
+												alt="<%= p?.tier ?? match.tier; %> icon"
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>">
@@ -731,13 +731,13 @@
 											if ( CAN_VIEW_ALL || (p.rsc_id === user.rsc_id && CAN_VIEW_SELF) ) {
 										%>
 										<td class="text-end">
-											<%- p.start_mmr; %>
+											<%= p.start_mmr; %>
 										</td>
-										<td class="text-end <%- mmr_class; %>">
-											<%- mmr_delta > 0 ? `+${mmr_delta}` : mmr_delta; %>
+										<td class="text-end <%= mmr_class; %>">
+											<%= mmr_delta > 0 ? `+${mmr_delta}` : mmr_delta; %>
 										</td>
-										<td class="text-end font-<%- mmr_class; %>">
-											<%- p.end_mmr; %>
+										<td class="text-end font-<%= mmr_class; %>">
+											<%= p.end_mmr; %>
 										</td>
 										<% } else if ( combines.active ) { %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
@@ -765,8 +765,8 @@
 									}
 							%>
 							<h3 class="text-center m-4">
-								<span class="<%- awayClass; %> bg-opacity-50 m-4 p-3 border rounded">
-									<%- match.away_wins; %>
+								<span class="<%= awayClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%= match.away_wins; %>
 								</span>
 							</h3>
 							<% 
@@ -885,7 +885,7 @@
 											<a
 												href="<%= report_url + player_params; %>"
 												class="btn btn-xs bg-Prospect"
-												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%-p?.tier ?? match.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%- match.id; %></strong><br>MMR: <strong class='<%- p?.tier ?? match.tier; %>'><%- report_mmr; %></strong></div>"
+												title="<h6>Submit Numbers Report</h6><div>player: <strong class='<%=p?.tier ?? match.tier;%>'><%= p.name; %></strong><br>match: <strong>/combine/<%= match.id; %></strong><br>MMR: <strong class='<%= p?.tier ?? match.tier; %>'><%= report_mmr; %></strong></div>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
 												target="_blank"
@@ -903,10 +903,10 @@
 										%>
 										<td>
 											<img
-												src="/icons/<%- p?.effective_tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
-												title="<%- p?.tier ?? match.tier; %>"
+												src="/icons/<%= p?.effective_tier?.toLowerCase() ?? match.tier.toLowerCase(); %>.png"
+												title="<%= p?.tier ?? match.tier; %>"
 												height="16"
-												alt="<%- p?.tier ?? match.tier; %> icon"
+												alt="<%= p?.tier ?? match.tier; %> icon"
 											>
 											<strong>
 												<a href="/combine/matches/<%= p.rsc_id; %>"
@@ -949,13 +949,13 @@
 											if ( CAN_VIEW_ALL || (p.rsc_id === user.rsc_id && CAN_VIEW_SELF)) {
 										%>
 										<td class="text-end">
-											<%- p.start_mmr; %>
+											<%= p.start_mmr; %>
 										</td>
-										<td class="text-end <%- mmr_class; %>">
-											<%- mmr_delta > 0 ? `+${mmr_delta}` : mmr_delta; %>
+										<td class="text-end <%= mmr_class; %>">
+											<%= mmr_delta > 0 ? `+${mmr_delta}` : mmr_delta; %>
 										</td>
-										<td class="text-end font-<%- mmr_class; %>">
-											<%- p.end_mmr; %>
+										<td class="text-end font-<%= mmr_class; %>">
+											<%= p.end_mmr; %>
 										</td>
 										<% } else if ( combines.active ){ %>
 										<td colspan="3" class="text-end fst-italic">MMRs Hidden During Pre-season</td>
@@ -985,10 +985,10 @@
 
 	<% if ( is_admin && false ) { %>
 	<hr class="mb-4">
-	<pre><%- JSON.stringify(submitted_scores, undefined, 4); %></pre>
-	<pre><%- JSON.stringify(match, undefined, 4); %></pre>
+	<pre><%= JSON.stringify(submitted_scores, undefined, 4); %></pre>
+	<pre><%= JSON.stringify(match, undefined, 4); %></pre>
 	<% } %>
 
 </main>
 
-<%- include('partials/footer.ejs'); %>
+<%= include('partials/footer.ejs'); %>

@@ -1,5 +1,5 @@
 
-<%- include('partials/header.ejs'); %>
+<%= include('partials/header.ejs'); %>
 
 	<style type="text/css">
 		.discord_id {
@@ -56,7 +56,7 @@
 						if ( needle ) {
 					%>
 					<hr class="mb-4">
-					<h2 class="mt-4"><%- results.length; %> results for "<%= needle; %>"</h2>
+					<h2 class="mt-4"><%= results.length; %> results for "<%= needle; %>"</h2>
 
 					<div class="table-responsive">
 						<table class="table table-striped table-dark">
@@ -125,4 +125,4 @@
 	
 	</main>
 
-<%- include('partials/footer.ejs'); %>
+<%= include('partials/footer.ejs'); %>

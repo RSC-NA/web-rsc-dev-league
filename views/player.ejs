@@ -11,13 +11,13 @@
 	if ( is_admin ) { is_mod = true; }
 %>
 
-<%- include('partials/header.ejs'); %>
+<%= include('partials/header.ejs'); %>
 
 <% 
 	if ( is_mod ) {
 %>
 <div class="modal fade" id="ban_user_modal" tabindex="-1" aria-labelledby="ban_user_label" aria-hidden="true">
-	<form action="/ban/<%- user_id; %>/<%- player.rsc_id; %>/<%- player.discord_id; %>" method="post">
+	<form action="/ban/<%= user_id; %>/<%= player.rsc_id; %>/<%= player.discord_id; %>" method="post">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -47,7 +47,7 @@
 
 <main class="container">
 	<div class="py-5">
-		<h2><%- player.rsc_id %>: <%= player.name %></h2>
+		<h2><%= player.rsc_id %>: <%= player.name %></h2>
 		<p class="lead">
 			Please review the MMR information for <%= player.name %> below.
 		</p>
@@ -87,7 +87,7 @@
 					<div>
 						<h6 class="my-0 text-light text-end">RSC ID</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.rsc_id; %></span>
+					<span class="ms-2 text-light w-50"><%= player.rsc_id; %></span>
 				</li>
 				<%
 					if ( player && player.combines.length ) {
@@ -97,7 +97,7 @@
 						<h6 class="my-0 text-light text-end">Combines Matches</h6>
 					</div>
 					<span class="ms-2 text-light w-50">
-						<a href="/combine/matches/<%- player.rsc_id; %>">Season <%= combines.season; %></a>
+						<a href="/combine/matches/<%= player.rsc_id; %>">Season <%= combines.season; %></a>
 					</span>
 				</li>
 
@@ -106,9 +106,9 @@
 				%>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">RSC Tier </h6>
-					<span class="ms-2 w-50 fw-bolder <%- player.tier; %> text-lg">
+					<span class="ms-2 w-50 fw-bolder <%= player.tier; %> text-lg">
 						<% if ( player.tier !== 'NONE' ) { %>
-						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
+						<img src="/icons/<%= player.tier.toLowerCase(); %>.png" height="18">
 						<% } %>
 						<%= player.tier; %>
 					</span>
@@ -117,12 +117,12 @@
 					<div>
 						<h6 class="my-0 text-light text-end">RSC MMR</h6>
 					</div>
-					<span class="ms-2 text-light w-50 text-lg"><%- player.mmr; %></span>
+					<span class="ms-2 text-light w-50 text-lg"><%= player.mmr; %></span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<h6 class="my-0 text-light text-end">Dev League Tier </h6>
 					<span class="ms-2 w-50 text-lg">
-						<span class="bg-<%- player.cur_tier; %> badge text-lg"><%= player.cur_tier === 'SPLUS' ? 'S+' : player.cur_tier; %> Tier</span>
+						<span class="bg-<%= player.cur_tier; %> badge text-lg"><%= player.cur_tier === 'SPLUS' ? 'S+' : player.cur_tier; %> Tier</span>
 					</span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
@@ -130,9 +130,9 @@
 						<h6 class="my-0 text-light text-end">Dev League MMR</h6>
 					</div>
 					<span class="ms-2 text-light w-50 text-lg">
-						<%- player.cur_mmr; %> 
-						<span class="<%- player.mmr_delta > 0 ? 'Veteran' : 'text-danger'; %>">
-							<%- player.mmr_delta > 0 ? '+' : ''; %><%- player.mmr_delta; %>
+						<%= player.cur_mmr; %> 
+						<span class="<%= player.mmr_delta > 0 ? 'Veteran' : 'text-danger'; %>">
+							<%= player.mmr_delta > 0 ? '+' : ''; %><%= player.mmr_delta; %>
 						</span>
 					</span>
 				</li>
@@ -146,7 +146,7 @@
 					<div>
 						<h6 class="my-0 text-light text-end">Total Pulls</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.pulls.length; %></span>
+					<span class="ms-2 text-light w-50"><%= player.pulls.length; %></span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
@@ -162,7 +162,7 @@
 							for ( const role_id in roles ) {
 								if ( user_roles.includes(role_id) ) {
 					%>
-					<span class="badge badge-sm rounded-pill <%- roles[role_id]['css']; %>"><%- roles[role_id]['text']; %></span>
+					<span class="badge badge-sm rounded-pill <%= roles[role_id]['css']; %>"><%= roles[role_id]['text']; %></span>
 					<%
 								
 								}
@@ -270,9 +270,9 @@
 						for ( let tracker_link in player.trackers ) {
 							let tracker = player.trackers[ tracker_link ];
 				%>
-					<li class="<%- tracker.registered ? 'registered' : 'unregistered'; %>">
-						[<strong><%- tracker.pulls %></strong>]
-						<a href="<%- tracker_link %>"><%- tracker_link %></a> 
+					<li class="<%= tracker.registered ? 'registered' : 'unregistered'; %>">
+						[<strong><%= tracker.pulls %></strong>]
+						<a href="<%= tracker_link %>"><%= tracker_link %></a> 
 					</li>
 				<%
 						}
@@ -293,7 +293,7 @@
 		if ( false && combines.live && is_admin ) {
 	%>
 
-	<h3>Season <%- combines.season; %> Combines</h3>
+	<h3>Season <%= combines.season; %> Combines</h3>
 	<div class="row">
 		<div class="col-md-4  mb-4 text-light">
 			<h4 class="d-flex justify-content-end align-items-center mb-3">
@@ -311,14 +311,14 @@
 					<div>
 						<h6 class="my-0 text-light text-end">RSC ID</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.rsc_id; %></span>
+					<span class="ms-2 text-light w-50"><%= player.rsc_id; %></span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
 						<h6 class="my-0 text-light text-end">Combines Tier</h6>
 					</div>
-					<span class="ms-2 w-50 fw-bolder <%- player.tier; %>">
-						<img src="/icons/<%- player.tier.toLowerCase(); %>.png" height="18">
+					<span class="ms-2 w-50 fw-bolder <%= player.tier; %>">
+						<img src="/icons/<%= player.tier.toLowerCase(); %>.png" height="18">
 						<%= player.tier; %>
 					</span>
 				</li>
@@ -332,13 +332,13 @@
 					<div>
 						<h6 class="my-0 text-light text-end">Current RSC MMR</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.mmr; %></span>
+					<span class="ms-2 text-light w-50"><%= player.mmr; %></span>
 				</li>
 				<li style="background-color:#000f1e;" class="list-group-item d-flex justify-content-end lh-condensed">
 					<div>
 						<h6 class="my-0 text-light text-end">Total Pulls</h6>
 					</div>
-					<span class="ms-2 text-light w-50"><%- player.pulls.length; %></span>
+					<span class="ms-2 text-light w-50"><%= player.pulls.length; %></span>
 				</li>
 			</ul>
 		</div>
@@ -405,19 +405,19 @@
 									row_class = '';
 								}
 					%>
-						<tr class="<%- row_class; %>">
+						<tr class="<%= row_class; %>">
 							<td><%= pull.season %></td>
 							<td><%= pull.date_pulled.toLocaleString(); %></td>
-							<td><a href="<%- pull.tracker_link; %>"><%= short_link; %></a></td>
-							<td><%- pull.gp_3s; %></td>
-							<td><%- pull.mmr_3s; %></td>
-							<td><strong><%- pull.peak_3s; %></strong></td>
-							<td><%- pull.gp_2s; %></td>
-							<td><%- pull.mmr_2s; %></td>
-							<td><strong><%- pull.peak_2s; %></strong></td>
-							<td><%- pull.gp_1s; %></td>
-							<td><%- pull.mmr_1s; %></td>
-							<td><strong><%- pull.peak_1s; %></strong></td>
+							<td><a href="<%= pull.tracker_link; %>"><%= short_link; %></a></td>
+							<td><%= pull.gp_3s; %></td>
+							<td><%= pull.mmr_3s; %></td>
+							<td><strong><%= pull.peak_3s; %></strong></td>
+							<td><%= pull.gp_2s; %></td>
+							<td><%= pull.mmr_2s; %></td>
+							<td><strong><%= pull.peak_2s; %></strong></td>
+							<td><%= pull.gp_1s; %></td>
+							<td><%= pull.mmr_1s; %></td>
+							<td><strong><%= pull.peak_1s; %></strong></td>
 						</tr>
 					<%
 							}
@@ -436,4 +436,4 @@
 	</div>
 </main>
 
-<%- include('partials/footer.ejs'); %>
+<%= include('partials/footer.ejs'); %>

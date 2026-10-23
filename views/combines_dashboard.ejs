@@ -1,5 +1,5 @@
 
-<%- include('partials/header.ejs'); %>
+<%= include('partials/header.ejs'); %>
 
 	<!-- check in features -->	
 	<style type="text/css">
@@ -30,7 +30,7 @@
 			get up for any reason and walk away, <strong><u>CHECK OUT BEFORE LEAVING YOUR COMPUTER</u></strong>.
 		</p>
 		<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES AND WILL BE BANNED.</h5>
-		<a class="btn btn-lg btn-primary" href="/combine/check_in/<%- user.rsc_id; %>/3" role="button">Confirm Check In!</a>
+		<a class="btn btn-lg btn-primary" href="/combine/check_in/<%= user.rsc_id; %>/3" role="button">Confirm Check In!</a>
 		<a class="btn btn-lg btn-danger" id="backOut_3s" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 	</dialog>
 	<dialog id="confirmCheckIn_2s" class="confirmCheckIn">
@@ -45,7 +45,7 @@
 			get up for any reason and walk away, <strong><u>CHECK OUT BEFORE LEAVING YOUR COMPUTER</u></strong>.
 		</p>
 		<h5>IF YOU CHECK IN AND ARE NOT PRESENT WHEN THE MATCH STARTS, YOU WILL FACE THE CONSEQUENCES AND WILL BE BANNED.</h5>
-		<a class="btn btn-lg btn-primary" href="/combine/check_in/<%- user.rsc_id; %>/2" role="button">Confirm Check In!</a>
+		<a class="btn btn-lg btn-primary" href="/combine/check_in/<%= user.rsc_id; %>/2" role="button">Confirm Check In!</a>
 		<a class="btn btn-lg btn-danger" id="backOut_2s" href="javascript:void(0);" role="button" style="float:right;">Cancel</a>
 	</dialog>
 
@@ -61,7 +61,7 @@
 							for ( const role_id in roles ) {
 								if ( user_roles.includes(role_id) ) {
 					%>
-					<span class="badge badge-sm rounded-pill <%- roles[role_id]['css']; %>"><%- roles[role_id]['text']; %></span>
+					<span class="badge badge-sm rounded-pill <%= roles[role_id]['css']; %>"><%= roles[role_id]['text']; %></span>
 					<%
 								
 								}
@@ -128,7 +128,7 @@
 								}
 							}
 					%>
-					<h4>RSC <%- league; %> Season <%= combine_season; %> Dates</h4>
+					<h4>RSC <%= league; %> Season <%= combine_season; %> Dates</h4>
 					<ul class="dates">
 						<%
 							for ( let match_date in match_days ) {
@@ -141,11 +141,11 @@
 						%>
 
 						<li class="
-							<%- match_date == today ? 'today' : '' %> 
-							<%- match_date == today && (combine_day == 'holiday' || combine_day === 'draft') ? 'holiday' : '' %>
+							<%= match_date == today ? 'today' : '' %> 
+							<%= match_date == today && (combine_day == 'holiday' || combine_day === 'draft') ? 'holiday' : '' %>
 						">
-							<%- match_date %> - 
-							<%- match_str %>
+							<%= match_date %> - 
+							<%= match_str %>
 						</li>
 
 						<%
@@ -174,13 +174,13 @@
 				if ( combines.active ) {
 			%>
 			<div class="col-12 col-md-8">
-				<h2 class="<%- combines.public_numbers && nickname && user ? getTierFromMMR(user.combines.current_mmr) : ''; %>">RSC 3s Combines</h2>
+				<h2 class="<%= combines.public_numbers && nickname && user ? getTierFromMMR(user.combines.current_mmr) : ''; %>">RSC 3s Combines</h2>
 
 				<%
 					if ( nickname && user && user.combines.match && user.combines.match.id ) { 
 				%>
 
-					<%- include('partials/combines/dashboard.ejs', { 
+					<%= include('partials/combines/dashboard.ejs', { 
 							status: 'ready', 
 							user: user, 
 							league: '3s', 
@@ -194,7 +194,7 @@
 						if ( combine_live ) {
 				%>
 					
-					<%- include('partials/combines/dashboard.ejs', { 
+					<%= include('partials/combines/dashboard.ejs', { 
 							status: 'check-in', 
 							user: user, 
 							league: '3s', 
@@ -226,7 +226,7 @@
 				} else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) {
 			%>
 
-				<%- include('partials/combines/dashboard.ejs', { 
+				<%= include('partials/combines/dashboard.ejs', { 
 						status: 'waiting', 
 						user: user, 
 						league: '3s', 
@@ -239,7 +239,7 @@
 					if ( today in combineDays['3s'] && combineDays['3s'][today] === 1 ) {
 			%>
 
-				<h2>The Rolling Tier List is Not Public Yet..., <%- nickname; %></h2>
+				<h2>The Rolling Tier List is Not Public Yet..., <%= nickname; %></h2>
 				<p>
 					You don't currently have an entry in the Rolling Tier List.  Because this 
 					is the first night of Combines, this is probably because you either <strong>just signed up</strong>
@@ -254,7 +254,7 @@
 			<%
 					} else {
 			%>
-				<h2>You Aren't In the Rolling Tier List, <%- nickname; %></h2>
+				<h2>You Aren't In the Rolling Tier List, <%= nickname; %></h2>
 				<p>
 					You don't currently have an entry in the Rolling Tier List. Processing new applicants
 					is a manual process that takes several days. If you just <strong>recently</strong> signed up for RSC, 
@@ -290,7 +290,7 @@
 					if ( nickname && user && user.combines_2s.match && user.combines_2s.match.id ) { 
 				%>
 
-					<%- include('partials/combines/dashboard.ejs', { 
+					<%= include('partials/combines/dashboard.ejs', { 
 							status: 'ready', 
 							user: user, 
 							league: '2s', 
@@ -304,7 +304,7 @@
 						if ( combine_2s_live ) {
 				%>
 
-					<%- include('partials/combines/dashboard.ejs', { 
+					<%= include('partials/combines/dashboard.ejs', { 
 							status: 'check-in', 
 							user: user, 
 							league: '2s', 
@@ -336,7 +336,7 @@
 				} else if ( nickname && checked_in_2s && "rsc_id" in user && user['rsc_id'] != null ) {
 			%>
 
-				<%- include('partials/combines/dashboard.ejs', { 
+				<%= include('partials/combines/dashboard.ejs', { 
 						status: 'waiting', 
 						user: user,
 						league: '2s',
@@ -375,4 +375,4 @@
 		<div class="footer-spacing mt-3"></div>
 	</main>
 
-<%- include('partials/footer.ejs'); %>
+<%= include('partials/footer.ejs'); %>

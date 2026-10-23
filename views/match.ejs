@@ -1,5 +1,5 @@
 
-<%- include('partials/header.ejs'); %>
+<%= include('partials/header.ejs'); %>
 
 <%
 
@@ -78,12 +78,12 @@
 		<h1>
 			Dev League Match Info
 			<!-- <img
-				src="/icons/<%- tier.toLowerCase(); %>.png"
-				title="<%- tier; %>"
+				src="/icons/<%= tier.toLowerCase(); %>.png"
+				title="<%= tier; %>"
 				height="48"
-				alt="<%- tier; %> icon"
+				alt="<%= tier; %> icon"
 			> -->
-			<span class="badge bg-<%- tier; %>"><%- tier === 'SPLUS' ? 'S+' : tier; %> Tier</span>
+			<span class="badge bg-<%= tier; %>"><%= tier === 'SPLUS' ? 'S+' : tier; %> Tier</span>
 		</h1>
 		<p class="lead">
 			Please find the lobby information provided below. If you have any questions or problems, please ask for help
@@ -108,13 +108,13 @@
 											Lobby Info
 											<!-- 
 											<img
-												src="/icons/<%- tier.toLowerCase(); %>.png"
-												title="<%- tier; %>"
+												src="/icons/<%= tier.toLowerCase(); %>.png"
+												title="<%= tier; %>"
 												height="16"
-												alt="<%- tier; %> icon"
+												alt="<%= tier; %> icon"
 											>
 											-->
-											<span class="badge bg-<%- tier; %>"><%- tier === 'SPLUS' ? 'S+' : tier; %> Tier</span>
+											<span class="badge bg-<%= tier; %>"><%= tier === 'SPLUS' ? 'S+' : tier; %> Tier</span>
 										</th>
 									</tr>
 								</thead>
@@ -123,7 +123,7 @@
 										<td class="text-end">Match:</td>	
 										<td>
 											<strong>
-												<%- has_scored ? 'completed' : 'active'; %>
+												<%= has_scored ? 'completed' : 'active'; %>
 											</strong>
 										</td>	
 									</tr>
@@ -131,7 +131,7 @@
 										<td class="text-end">Username:</td>	
 										<td>
 											<strong><code class="h4">
-												RSC<%- match_id; %>
+												RSC<%= match_id; %>
 											</code></strong>
 										</td>	
 									</tr>
@@ -139,7 +139,7 @@
 										<td class="text-end">Password:</td>	
 										<td>
 											<strong><code class="h4">
-												<%- lobby_pass; %>
+												<%= lobby_pass; %>
 											</code></strong>
 										</td>	
 									</tr>
@@ -186,7 +186,7 @@
 										<td colspan="2">
 											<strong>
 												Home 
-												<%- lobby.mmrs.home - lobby.mmrs.away; %>
+												<%= lobby.mmrs.home - lobby.mmrs.away; %>
 											</strong>
 										</td>	
 									</tr>
@@ -196,8 +196,8 @@
 										</td>	
 										<td colspan="2">
 											<strong>
-												<a href="/players/<%- reported_rsc_id; %>">
-													<%- reported_rsc_id in lobby_players ? 
+												<a href="/players/<%= reported_rsc_id; %>">
+													<%= reported_rsc_id in lobby_players ? 
 														lobby_players[reported_rsc_id].name : reported_rsc_id; %>
 												</a>
 											</strong>
@@ -207,11 +207,11 @@
 										<td class="text-end">
 											Predicted:
 										</td>
-										<td class="<%- win_class; %> fw-bold">
-											<%- win_prediction; %> 
+										<td class="<%= win_class; %> fw-bold">
+											<%= win_prediction; %> 
 										</td>
 										<td class="fw-bold fst-italic">
-											<%- magnitude; %>
+											<%= magnitude; %>
 										</td>
 									</tr>
 								</tbody>
@@ -249,11 +249,11 @@
 					</div>
 					<div class="flex-fill">
 						<div class="h4 alert-heading">
-							<%- error; %>
+							<%= error; %>
 						</div>
 						<hr>
 						<p class="lead">
-							<%- errors[error]; %>
+							<%= errors[error]; %>
 						</p>
 						<p class="text-sm">
 							If you are unable to correct this issue, please ask for help in 
@@ -276,7 +276,7 @@
 		%>
 		<div class="row">
 			<div class="col-8 mx-auto">
-				<div class="alert <%- alert_class; %> d-flex align-items-center" role="alert">
+				<div class="alert <%= alert_class; %> d-flex align-items-center" role="alert">
 					<div class="bi flex-shrink-0 me-2">
 						<svg class="bi flex-shrink-0 me-2" width="48" height="48" role="img" aria-label="Success:">
 							<use xlink:href="#check-circle-fill"/>
@@ -284,11 +284,11 @@
 					</div>
 					<div class="flex-fill">
 						<div class="display-5 alert-heading">
-							<%- alert_title; %>
+							<%= alert_title; %>
 						</div>
 						<hr>
 						<p class="lead">
-							<%- message; %>
+							<%= message; %>
 						</p>
 					</div>
 				</div>
@@ -312,7 +312,7 @@
 					Cancelling a game will allow every player in this lobby to requeue. No MMRs will be changed, but the VCs <strong>will be 
 					deleted.</strong>
 				</p>
-				<a tabindex="1" href="/match/<%- match_id; %>/cancel" class="btn btn-outline-danger">Cancel Game</a>
+				<a tabindex="1" href="/match/<%= match_id; %>/cancel" class="btn btn-outline-danger">Cancel Game</a>
 				<% 
 					} else {
 				%>
@@ -321,7 +321,7 @@
 					Clicking the "Resume Cancelled Game" button will mark this game as not cancelled and will allow players to resume playing. It will also 
 					<strong>create new VC lobbies.</strong>
 				</p>
-				<a tabindex="1" href="/match/<%- match_id; %>/resume" class="btn btn-primary">Resume Cancelled Game</a>
+				<a tabindex="1" href="/match/<%= match_id; %>/resume" class="btn btn-primary">Resume Cancelled Game</a>
 				<% 
 					}
 				%>
@@ -333,7 +333,7 @@
 					if ( ! cancelled ) {
 				%>
 				<p class="small">Overriding scores of a finished game will re-calculate player MMR gain/loss.</p>
-				<form action="/admin-score/<%- match_id %>/<%- settings.league; %>" method="post">
+				<form action="/admin-score/<%= match_id %>/<%= settings.league; %>" method="post">
 					<div class="mb-3">
 						<label for="home_wins">Home Team Series Score</label>
 						<div class="input-group">
@@ -343,7 +343,7 @@
 								name="home_wins"
 								id="home_wins"
 								placeholder=""
-								value="<%- home_wins %>"
+								value="<%= home_wins %>"
 								max="5"
 								tabindex="1"
 								style="background-color:#000f1e;"
@@ -360,7 +360,7 @@
 								name="away_wins"
 								id="away_wins"
 								placeholder=""
-								value="<%- away_wins %>"
+								value="<%= away_wins %>"
 								tabindex="2"
 								max="5" 
 								style="background-color:#000f1e;"
@@ -415,14 +415,14 @@
 						renameFile: (file) => {
 							const fileSplit = file.name.split('.');
 							const ext = fileSplit.pop();
-							const new_file_name = `<%- match_id; %>_<%- user.rsc_id %>-${fileSplit[0]}.${ext}`;
+							const new_file_name = `<%= match_id; %>_<%= user.rsc_id %>-${fileSplit[0]}.${ext}`;
 							file.name = new_file_name;
 							return new_file_name;
 						}
 					};
 				</script>
 				<form
-					action="/match-upload/<%- match_id; %>/<%- season; %>/<%- match_day; %>" method="POST"
+					action="/match-upload/<%= match_id; %>/<%= season; %>/<%= match_day; %>" method="POST"
 					style="background-color: #000f1e;border:1px solid #021e3a;"
 					class="dropzone fw-bolder text-white" id="replay-dropzone"
 				> </form>
@@ -442,9 +442,9 @@
 						for ( let i = 0; i < replays.length; ++i ) { 
 				%>
 					<li>
-						<%- replays[i].rsc_id; %>: 
-						<a href="<%- replays[i].path; %>">
-							<%- replays[i].replay; %>
+						<%= replays[i].rsc_id; %>: 
+						<a href="<%= replays[i].path; %>">
+							<%= replays[i].replay; %>
 						</a>
 					</li>
 				<%
@@ -460,11 +460,11 @@
 		<div class="row">
 			<div class="col-12">
 				<div class="">
-					<form action="/score/<%- match_id %>/<%- settings.league; %>" method="post">
+					<form action="/score/<%= match_id %>/<%= settings.league; %>" method="post">
 					<div class="row">
 						<div class="col-md-6">
 							<h3 class="bg-Elite text-white rounded p-2">
-								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team [<%- lobby_user; %>]
+								<%= CAN_ADMIN ? '[' + teamOneMmr + '] ' : '' %>Home Team [<%= lobby_user; %>]
 
 							</h3>
 							<%
@@ -478,8 +478,8 @@
 									}
 							%>
 							<h3 class="text-center m-4">
-								<span class="<%- homeClass; %> bg-opacity-50 m-4 p-3 border rounded">
-									<%- home_wins; %>
+								<span class="<%= homeClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%= home_wins; %>
 								</span>
 							</h3>
 							<% 
@@ -542,13 +542,13 @@
 									<tr class="fs-5">
 										<% if ( CAN_ADMIN ) { %>
 										<td class="text-center">
-											<a href="/match/<%- p.team_id; %>/sub/<%- p.player_id; %>"
+											<a href="/match/<%= p.team_id; %>/sub/<%= p.player_id; %>"
 												class="text-success"
 											><i class="fas fa-recycle"></i></a>
 										</td>
 										<% } %>
 										<td>
-											<span class="badge bg-<%- p_tier; %>"><%- p_tier === 'SPLUS' ? 'S+' : p_tier; %></span>
+											<span class="badge bg-<%= p_tier; %>"><%= p_tier === 'SPLUS' ? 'S+' : p_tier; %></span>
 											<strong>
 												<a href="/player/<%= p.rsc_id; %>">
 													<%= p.name %></a>
@@ -569,25 +569,25 @@
 										<%
 											if ( p.special ) { 
 										%>
-											<span class="text-danger fw-bold">[<%- p.special; %>]</span>
+											<span class="text-danger fw-bold">[<%= p.special; %>]</span>
 										<% 
 											} 
 										%>
 										</td>
 										<td class="text-center">
-											<%- p.end_mmr ? p.end_mmr : p.start_mmr; %> 
+											<%= p.end_mmr ? p.end_mmr : p.start_mmr; %> 
 											(<span
-												title="Starting Season MMR: <b><%- p.mmr; %></b><br> Match MMR Delta: <b><%- mmr_delta; %></b>"
+												title="Starting Season MMR: <b><%= p.mmr; %></b><br> Match MMR Delta: <b><%= mmr_delta; %></b>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
-												class="<%- delta_change; %>"
+												class="<%= delta_change; %>"
 											>
-													<%- delta > 0 ? '+' : ''; %><%- delta; %>
+													<%= delta > 0 ? '+' : ''; %><%= delta; %>
 											</span>)
 										</td>
-										<td class="text-center"><%- p.stats.wins; %></td>
-										<td class="text-center"><%- p.stats.losses; %></td>
-										<td class="text-center"><%- (p.stats.wins + p.stats.losses) ? Math.round((p.stats.wins / (p.stats.losses + p.stats.wins)) * 100,1) : 0; %>%</td>
+										<td class="text-center"><%= p.stats.wins; %></td>
+										<td class="text-center"><%= p.stats.losses; %></td>
+										<td class="text-center"><%= (p.stats.wins + p.stats.losses) ? Math.round((p.stats.wins / (p.stats.losses + p.stats.wins)) * 100,1) : 0; %>%</td>
 									</tr>
 								<%
 									}
@@ -598,7 +598,7 @@
 
 						<div class="col-md-6">
 							<h3 class="bg-Prospect rounded p-2 text-black">
-								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team [<%- lobby_pass; %>]
+								<%= CAN_ADMIN ? '[' + teamTwoMmr + '] ' : '' %>Away Team [<%= lobby_pass; %>]
 							</h3>
 							<%
 								if ( has_scored ) {
@@ -609,8 +609,8 @@
 									}
 							%>
 							<h3 class="text-center m-4">
-								<span class="<%- awayClass; %> bg-opacity-50 m-4 p-3 border rounded">
-									<%- away_wins; %>
+								<span class="<%= awayClass; %> bg-opacity-50 m-4 p-3 border rounded">
+									<%= away_wins; %>
 								</span>
 							</h3>
 							<% 
@@ -680,13 +680,13 @@
 									<tr class="fs-5">
 										<% if ( CAN_ADMIN ) { %>
 										<td class="text-center">
-											<a href="/match/<%- p.team_id; %>/sub/<%- p.player_id; %>"
+											<a href="/match/<%= p.team_id; %>/sub/<%= p.player_id; %>"
 												class="text-success"
 											><i class="fas fa-recycle"></i></a>
 										</td>
 										<% } %>
 										<td>
-											<span class="badge bg-<%- p_tier; %>"><%- p_tier === 'SPLUS' ? 'S+' : p_tier; %></span>
+											<span class="badge bg-<%= p_tier; %>"><%= p_tier === 'SPLUS' ? 'S+' : p_tier; %></span>
 											<strong>
 												<a href="/player/<%= p.rsc_id; %>" class="text-warning"
 													><%= p.name %></a>
@@ -707,25 +707,25 @@
 										<%
 											if ( p.special ) { 
 										%>
-											<span class="text-danger fw-bold">[<%- p.special; %>]</span>
+											<span class="text-danger fw-bold">[<%= p.special; %>]</span>
 										<% 
 											} 
 										%>
 										</td>
 										<td class="text-center">
-											<%- p.end_mmr ? p.end_mmr : p.start_mmr; %>
+											<%= p.end_mmr ? p.end_mmr : p.start_mmr; %>
 											(<span
-												title="Starting Season MMR: <b><%- p.mmr; %></b><br> Match MMR Delta: <b><%- mmr_delta; %></b>"
+												title="Starting Season MMR: <b><%= p.mmr; %></b><br> Match MMR Delta: <b><%= mmr_delta; %></b>"
 												data-bs-toggle="tooltip"
 												data-bs-html="true"
-												class="<%- delta_change; %>"
+												class="<%= delta_change; %>"
 											>
-													<%- delta > 0 ? '+' : ''; %><%- delta; %>
+													<%= delta > 0 ? '+' : ''; %><%= delta; %>
 											</span>)
 										</td>
-										<td class="text-center"><%- p.stats.wins; %></td>
-										<td class="text-center"><%- p.stats.losses; %></td>
-										<td class="text-center"><%- (p.stats.wins + p.stats.losses) ? Math.round((p.stats.wins / (p.stats.losses + p.stats.wins)) * 100,1) : 0; %>%</td>
+										<td class="text-center"><%= p.stats.wins; %></td>
+										<td class="text-center"><%= p.stats.losses; %></td>
+										<td class="text-center"><%= (p.stats.wins + p.stats.losses) ? Math.round((p.stats.wins / (p.stats.losses + p.stats.wins)) * 100,1) : 0; %>%</td>
 
 									</tr>
 								<%
@@ -749,17 +749,17 @@
 	<% if ( is_admin ) { %>
 	<hr class="mb-4">
 	<pre>
-## <%- tier; %> Home 
-<% for ( const rsc_id in lobby.home ) { %>- &lt;@<%- lobby.home[rsc_id].discord_id; %>&gt; - <%- lobby.home[rsc_id].stats.wins; %>/<%- lobby.home[rsc_id].stats.losses + "\n"; %><% } %>
-## <%- tier; %> Away 
-<% for ( const rsc_id in lobby.away ) { %>- &lt;@<%- lobby.away[rsc_id].discord_id; %>&gt; - <%- lobby.away[rsc_id].stats.wins; %>/<%- lobby.away[rsc_id].stats.losses + "\n"; %><% } %>
+## <%= tier; %> Home 
+<% for ( const rsc_id in lobby.home ) { %>- &lt;@<%= lobby.home[rsc_id].discord_id; %>&gt; - <%= lobby.home[rsc_id].stats.wins; %>/<%= lobby.home[rsc_id].stats.losses + "\n"; %><% } %>
+## <%= tier; %> Away 
+<% for ( const rsc_id in lobby.away ) { %>- &lt;@<%= lobby.away[rsc_id].discord_id; %>&gt; - <%= lobby.away[rsc_id].stats.wins; %>/<%= lobby.away[rsc_id].stats.losses + "\n"; %><% } %>
 
 	</pre>
-	<pre><%- JSON.stringify(stats, undefined, 4); %></pre>
-	<pre><%- JSON.stringify(lobby, undefined, 4); %></pre>
+	<pre><%= JSON.stringify(stats, undefined, 4); %></pre>
+	<pre><%= JSON.stringify(lobby, undefined, 4); %></pre>
 	<% } %>
 
 </main>
 
-<%- include('partials/footer.ejs'); %>
+<%= include('partials/footer.ejs'); %>
 
