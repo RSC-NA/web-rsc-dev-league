@@ -1,5 +1,5 @@
 
-<%= include('partials/header.ejs'); %>
+<%- include('partials/header.ejs'); %>
 
 	<!-- check in features -->	
 	<style type="text/css">
@@ -180,7 +180,7 @@
 					if ( nickname && user && user.combines.match && user.combines.match.id ) { 
 				%>
 
-					<%= include('partials/combines/dashboard.ejs', { 
+					<%- include('partials/combines/dashboard.ejs', { 
 							status: 'ready', 
 							user: user, 
 							league: '3s', 
@@ -194,7 +194,7 @@
 						if ( combine_live ) {
 				%>
 					
-					<%= include('partials/combines/dashboard.ejs', { 
+					<%- include('partials/combines/dashboard.ejs', { 
 							status: 'check-in', 
 							user: user, 
 							league: '3s', 
@@ -226,7 +226,7 @@
 				} else if ( nickname && checked_in && "rsc_id" in user && user['rsc_id'] != null ) {
 			%>
 
-				<%= include('partials/combines/dashboard.ejs', { 
+				<%- include('partials/combines/dashboard.ejs', { 
 						status: 'waiting', 
 						user: user, 
 						league: '3s', 
@@ -290,7 +290,7 @@
 					if ( nickname && user && user.combines_2s.match && user.combines_2s.match.id ) { 
 				%>
 
-					<%= include('partials/combines/dashboard.ejs', { 
+					<%- include('partials/combines/dashboard.ejs', { 
 							status: 'ready', 
 							user: user, 
 							league: '2s', 
@@ -304,7 +304,7 @@
 						if ( combine_2s_live ) {
 				%>
 
-					<%= include('partials/combines/dashboard.ejs', { 
+					<%- include('partials/combines/dashboard.ejs', { 
 							status: 'check-in', 
 							user: user, 
 							league: '2s', 
@@ -336,7 +336,7 @@
 				} else if ( nickname && checked_in_2s && "rsc_id" in user && user['rsc_id'] != null ) {
 			%>
 
-				<%= include('partials/combines/dashboard.ejs', { 
+				<%- include('partials/combines/dashboard.ejs', { 
 						status: 'waiting', 
 						user: user,
 						league: '2s',
@@ -375,4 +375,4 @@
 		<div class="footer-spacing mt-3"></div>
 	</main>
 
-<%= include('partials/footer.ejs'); %>
+<%- include('partials/footer.ejs'); %>
