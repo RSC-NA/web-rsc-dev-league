@@ -18,7 +18,7 @@ async function get_lobby(db,match_id) {
 		SELECT 
 			id,lobby_user,lobby_pass,home_wins,away_wins,
 			reported_rsc_id,confirmed_rsc_id,home_mmr as tier,
-			completed,cancelled,league AS guild_id,
+			completed,cancelled,league AS guild_id
 		FROM combine_matches 
 		WHERE id = ?
 	`;
