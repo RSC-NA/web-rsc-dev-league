@@ -2064,7 +2064,7 @@ app.get('/import_trackers', async (req, res) => {
 	await trackerDoc.loadInfo();
 	console.log('trackerDoc.loadInfo() DONE');
 
-	const trackerSheet = trackerDoc.sheetsByTitle["STATIC Link List"];
+	const trackerSheet = trackerDoc.sheetsByTitle["Link List"];
 	const trackerRows = await trackerSheet.getRows();
 	console.log('Getting ready to start loop', trackerRows.length);
 	const tracker_chunks = [];
