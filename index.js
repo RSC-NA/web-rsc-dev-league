@@ -1575,7 +1575,15 @@ async function grabMoreTrackers() {
 	// https://api.rscna.com/api/v1/tracker-links/next/?format=json&limit=25
 	console.log(`Grabbing more trackers [${Object.keys(tracker_queue).length}]`);
 	const url = `https://${API_HOST}/api/v1/tracker-links/next/?format=json&limit=25`;
-	const response = await fetch(url).catch(e => {console.log(`Error: ${e}`); error = true; });
+	const response = await fetch(url, {
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
+		},
+	}).catch(e => {
+		console.log(`Error: ${e}`); 
+		error = true; 
+	});
 	if ( error ) {
 		console.log("Error fetching more trackers. Aborting...");
 		return false;
@@ -1982,6 +1990,7 @@ app.get('/send_bad_trackers', (req, res) => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 				//'Authorization': `Api-Key ${process.env.RSC_API_KEY}`,
 			},
 			body: JSON.stringify({ links: bad_trackers })
