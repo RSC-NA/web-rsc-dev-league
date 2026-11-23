@@ -11,14 +11,14 @@ exports.roles = {
 	"400097901352714261":  {css:"bg-info text-dark", "text":"General Manager"},
 	"1100217807649636362": {css:"bg-info text-dark", "text":"Events Head"},
 	'607719471196536843':  {css:"bg-gray-800 text-warning border border-warning", text: 'Numbers Committee'},
-	"400097026651455489":  {css:"bg-warning", "text":"Transactions Committee"},
+	"400097026651455489":  {css:"bg-warning text-dark", "text":"Transactions Committee"},
 	"400096994552578055":  {css:"bg-success", "text":"Stats Committee"},
 	"978652848067846214":  {css:"bg-info text-dark", "text":"Development Committee"},
 	"831211057003233321":  {css:"bg-info text-dark", "text":"Rules Committee"},
 	"400097117684760597":  {css:"bg-success", "text":"Events Committee"},
 	"400098106307248129":  {css:"bg-success", "text":"Assistant GM"},
 	"1155946438652604517": {css:"bg-success", "text":"Dev League Team"},
-	"1182124823103680542": {css:"bg-warning", "text":"Dev League Champion"},
+	"1182124823103680542": {css:"bg-warning text-dark", "text":"Dev League Champion"},
 	"1399597860760064154": {css:"bg-danger bg-opacity-25 border border-danger text-danger", "text":"Dev League Cookie Champ"},
 };
 
